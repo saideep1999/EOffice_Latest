@@ -1,0 +1,2129 @@
+﻿
+@{
+    ViewBag.Title = "Quality Meisterbock Cubing form";
+    int FormId = 0, AppRowId = 0, ApprovalType = 0; bool IsEdit = true; bool IsNew = true;
+    bool IsNewMode = true, IsEditMode = false, IsViewMode = false;
+    var SecurityDesgnString = "Security";
+    Skoda_DCMS.Models.QualityMeisterbockCubingData QMCRF = null;
+    dynamic FlagRedirect = null;
+    var currentUser = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    List<Skoda_DCMS.Models.ApprovalDataModel>
+    appList = new List<Skoda_DCMS.Models.ApprovalDataModel>
+        ();
+    int? tableCount = 0;
+    string disabled = "", slctDisabled = "";
+    var CurrentUserDesgn = "";
+    long? CurrentUserLevel = 0;
+    if (ViewBag != null && !ViewBag.IsNewMode)
+    {
+        IsNew = ViewBag.IsNew;
+        IsEdit = ViewBag.IsEdit;
+        IsNewMode = ViewBag.IsNewMode;
+        IsEditMode = ViewBag.IsEditMode;
+        IsViewMode = ViewBag.IsViewMode;
+        disabled = IsViewMode ? "readonly" : "";
+        slctDisabled = IsViewMode ? "disabled" : "";
+        QMCRF = ViewBag.Model.one[0] as Skoda_DCMS.Models.QualityMeisterbockCubingData;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        appList = ViewBag.Model?.three as List<Skoda_DCMS.Models.ApprovalDataModel>
+    ;
+        CurrentUserDesgn = appList?.Where(x => x.ApproverUserName == currentUser.UserName).Select(x => x.Designation).FirstOrDefault();
+        CurrentUserLevel = appList?.Where(x => x.ApproverUserName == currentUser.UserName && x.ApproverStatus == "Pending").Select(x => x.Level).FirstOrDefault();
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+        if (IsViewMode)
+        {
+            var Ap = appList?.Where(x =>
+            x.ApproverUserName.ToLower() == currentUser.UserName.ToLower()
+            && x.ApproverStatus.ToLower() == "pending"
+            ).FirstOrDefault();
+        }
+    }
+}
+<!DOCTYPE html>
+<style>
+
+    .hide {
+        display: none;
+    }
+    /*New design css start here*/
+    .astColor {
+        color: red;
+    }
+
+    .textTrans {
+        width: 100%;
+        max-width: 99%;
+        border-radius: 5px;
+        margin-right: 0px;
+        border: 1px solid !important;
+    }
+
+    .empDetailsBg {
+        background-color: #fffbef;
+    }
+
+    #accordion select {
+        color: #000;
+        width: 100% !important;
+        height: 45px;
+        background-color: #FFFFFF;
+        border: 1px solid #BFBFBF;
+        box-sizing: border-box;
+        border-radius: 5px;
+        background-image: url(data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>);
+        background-repeat: no-repeat;
+        background-position: right .75rem center;
+        background-size: 16px 12px;
+    }
+
+    #accordion input[type='text'] {
+        width: 100% !important;
+        max-width: 100%;
+        height: 45px;
+        background-color: #FFFFFF;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px !important;
+    }
+
+    #accordion input[type='date'] {
+        width: 100% !important;
+        max-width: 100%;
+        height: 45px;
+        background-color: #FFFFFF;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px;
+    }
+
+    #accordion input[type='time'] {
+        height: 45px;
+    }
+
+    #accordion label {
+        font-size: 16px;
+        line-height: 22px;
+        font-weight: 600;
+        color: #201F1F;
+    }
+
+    #accordion table tr td {
+        font-size: 16px;
+        line-height: 19px;
+        color: #201F1F;
+        background-color: white;
+    }
+
+    #accordion label {
+        display: block;
+    }
+
+    #accordion .card-header {
+        background: rgb(4 59 100) !important;
+        border-radius: 5px 5px 0px 0px;
+        position: relative;
+        margin-top: 15px;
+    }
+
+        #accordion .card-header.collapsed h5:after {
+            content: '+';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        #accordion .card-header h5:after {
+            content: '-';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+    #accordion h5 button {
+        font-size: 18px;
+        line-height: 22px;
+        /* identical to box height */
+        padding-left: 0px;
+        display: flex;
+        align-items: center;
+        text-transform: uppercase;
+        /* Text_white */
+
+        color: #FFFFFF;
+    }
+
+        #accordion h5 button:focus {
+            box-shadow: none;
+        }
+
+    .empDetailsFields label {
+        display: block !important;
+        margin-bottom: 0px;
+    }
+
+    .empDetailsFields .row label {
+        display: block;
+        margin-bottom: 0px;
+    }
+
+        .empDetailsFields .row label:nth-child(1) {
+            font-style: normal;
+            font-weight: normal !important;
+            font-size: 12px;
+            line-height: 18px;
+            color: #A9A9A9 !important;
+        }
+
+        .empDetailsFields .row label:nth-child(2) {
+            font-style: normal;
+            font-weight: normal;
+            font-size: 18px;
+            line-height: 22px;
+            color: #201F1F;
+        }
+
+    .firstLastName {
+        font-style: normal;
+        font-weight: normal;
+        font-size: 20px;
+        line-height: 24px;
+        /* identical to box height */
+
+        display: flex;
+        align-items: center;
+        color: #201F1F;
+    }
+
+    .submit-btn {
+        background: #3D3D3D;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #FFFFFF;
+        border-color: transparent !important;
+    }
+
+    .cancl-btn {
+        background: #FAE99B;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        border-color: transparent !important;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #212221;
+        margin-left: 10px;
+    }
+
+
+
+
+    .card-footer {
+        display: flex;
+        background-color: transparent !important;
+    }
+
+    .photo-form {
+        width: 100%;
+    }
+
+    .ui-front {
+        z-index: 9999999 !important;
+    }
+
+    /* NEW UI CSS END*/
+
+
+    .showBorder {
+        border: 1px solid #dee2e6;
+    }
+
+    .multiselect {
+        height: 47px;
+        margin-top: 1px;
+    }
+    /*Animation CSS Starts*/
+
+    div.input-block {
+        position: relative;
+    }
+
+        div.input-block input {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 188px;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block textarea {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 100%;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            background-color: #fff;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block span.placeholder {
+            position: absolute;
+            margin: 17px 0;
+            padding: 0 4px;
+            font-family: Roboto, sans-serif;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            top: -6px;
+            left: 15px;
+            transition: all 0.2s;
+            transform-origin: 0% 0%;
+            background: none;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+    .question_span {
+        width: 116% !important;
+        font-size: 15px !important;
+    }
+
+    div.input-block textarea:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: #fff !important;
+    }
+
+    div.input-block textarea:valid + span.placeholder,
+    div.input-block textarea:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+    }
+
+    div.inputSelect select:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+    }
+
+    div.input-block input:valid + span.placeholder,
+    div.input-block input:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: #fff;
+        /*background-color: rgb(219,238,213);*/
+    }
+
+
+    div.input-block input.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: rgb(219,238,213);
+    }
+
+    div.input-block input:read-only + span.placeholder,
+    div.input-block input:read-only + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: rgb(219,238,213);
+    }
+
+
+    div.inputSelect span.placeholder {
+        position: absolute;
+        margin: 17px 0;
+        padding: 0 4px;
+        font-family: Roboto, sans-serif;
+        color: #000;
+        display: flex;
+        align-items: center;
+        font-size: 1rem;
+        top: -6px;
+        left: 15px;
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+        background: none;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    div.inputSelect select:focus + span.placeholder {
+        transform: scale(0.8) translateY(-30px);
+        background: rgb(219,238,213);
+        z-index: 9;
+    }
+
+    div.inputSelect select:not([value=""]):valid + span.placeholder {
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+    }
+
+
+
+    div.input-block input:focus + span.placeholder {
+        color: #284B63;
+    }
+
+    .breadcrumb {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+        padding: 1rem 1rem 0;
+        margin-bottom: 0;
+        list-style: none;
+        background-color: #FFFFFF;
+        border-radius: .25rem;
+    }
+
+    body.nav-sm .container.body .left_col {
+        width: 63px;
+        padding: 0;
+        position: fixed;
+        height: 100%;
+        z-index: 8;
+    }
+
+    .card {
+        position: relative;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        min-width: 0;
+        word-wrap: break-word;
+        background-color: #fff;
+        background-clip: border-box;
+        border: 0px;
+        border-radius: .25rem;
+    }
+
+    .dropdown-toggle::after {
+        display: none;
+        width: 0;
+        height: 0;
+        margin-left: .255em;
+        vertical-align: .255em;
+        content: "";
+        border-top: .3em solid;
+        border-right: .3em solid transparent;
+        border-bottom: 0;
+        border-left: .3em solid transparent;
+    }
+
+    input.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213);
+    }
+
+    inputSelect.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213) !important;
+    }
+
+    select.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background-color: rgb(219,238,213) !important;
+        z-index: 9;
+    }
+
+    select.spanUpperSideWhite + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background-color: rgb(255,255,255) !important;
+        z-index: 9;
+    }
+
+    textarea.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    .TransView {
+        background-color: white !important;
+    }
+
+    @@media only screen and (min-width: 992px) {
+        div .input-block span.placeholder {
+            font-size: 15px;
+        }
+
+        div.inputSelect span.placeholder {
+            font-size: 1rem;
+        }
+    }
+
+    input[type='date'].spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    .showBorder {
+        border: 1px solid #dee2e6;
+    }
+
+    .wField {
+        width: 233px !important;
+        margin-left: 10px;
+    }
+
+    @@-moz-document url-prefix() {
+        input[type=time]::-ms-clear {
+            display: none;
+        }
+    }
+
+    .datetime-reset-button {
+        display: none !important;
+    }
+
+    .forShoppingCart {
+        margin-left: 14% !important;
+    }
+
+    .btn-group {
+        display: block !important;
+    }
+
+    #accordion label {
+        display: inline-block !important;
+    }
+
+
+    .custom-select:focus {
+        box-shadow: none !important;
+        border-color: none !important;
+    }
+
+    #addSoftwarebtn td {
+        border-top: none !important;
+    }
+
+    #ApplicationCategoryBody select {
+        background-color: #fff !important;
+    }
+
+    #loader {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        z-index: 10000;
+    }
+
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        margin: 0;
+    }
+</style>
+<div class="container">
+    <div class="right_col bg-transparent" role="main">
+        <div class="main_container">
+            <form id="QMCRForm" method="post">
+                <div>
+                    <div class="breadcrumb-container">
+                        <div>
+                            @if (IsEditMode || IsViewMode)
+                            {
+                                <div>
+                                    <input type="hidden" id="FormId" name="FormId" value="@(FormId)" />
+                                    <input type="hidden" id="FormSrId" name="FormSrId" value="@(QMCRF.Id)" />
+                                    <input type="hidden" id="AppRowId" name="AppRowId" value="@(AppRowId)" />
+                                    @*<input type="hidden" name="ApplicationCategoryDataCurr" id="ApplicationCategoryDataCurr" value="@(URCF.ApplicationCategoryData.Count)" />*@
+                                </div>
+                            }
+                            <ol class="breadcrumb">
+                                <li>
+                                    <a href="/Dashboard?formName=NGCF">
+                                        Dashboard
+                                    </a>
+                                </li>
+                                <li>
+                                    Quality Meisterbock/Cubing Form
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="row breadcrumb-container table-bordered  mr-1 ml-1" style="background-color: rgb(219,238,213) !important; ">
+                        <div class="col-md-2 col-lg-2">
+                            <span class="placeholder">Date : @(IsViewMode || IsEditMode ? (Convert.ToDateTime(appList.FirstOrDefault().FormId.CreatedDate).ToShortDateString()) : DateTime.Now.ToShortDateString())</span>
+                        </div>
+                        <div class="col-md-8 col-lg-8 mt-2 mb-1 form-heading" style="text-align:center; margin-top:5px">
+                            <span>Quality Meisterbock/Cubing Form</span>
+                        </div>
+                        <div class="col-md-2 col-lg-2">
+                            @if (IsViewMode || IsEditMode)
+                            {
+                                <span class="placeholder white_space_nowrap"> Form Id : @(IsViewMode || IsEditMode ? ("QMCRF" + FormId ?? "") : "" )</span>
+                            }
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="heading d-none" id="headingErr">
+                    <h1 id="" class="info-header">Following fields are mandatory. Please fill in information for<br></h1>
+                    <div id="add_to_me" class="header-list" style="color:red;"></div>
+                </div>
+                <!-- ACCORDIAN STRUCTURE START HERE-->
+                @* Submitter Section *@
+                @{
+                    Html.RenderPartial("_NewSubmitterDetailsWithModel", (ViewBag as object));
+                }
+
+                @* Applicant Section *@
+                @{
+                    Html.RenderPartial("_NewApplicantDetailsWithModel", (ViewBag as object));
+                }
+
+                <div id="accordion">
+                    <div class="card">
+                        <div class="card-header collapsed" id="headingThree" data-toggle="collapse" data-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                            <h5 class="mb-0">
+                                <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                                    <img src="~/assets/img/transactionIcon.svg" width="24" height="24" class="mr-2" /><span class="d-inline-block mt-1">Transaction Fields</span>
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseThree" class="collapse show" aria-labelledby="headingThree" style="">
+                            <div class="card-body">
+
+                                <div class="row">
+                                    <div class="col-12">
+                                        <table class="table mainTbl form-table-container-2">
+                                            <tbody>
+                                                <tr>
+                                                    <td class="actionTypeWidth"><label id="lblActionType" class="f-600">Form Type<span class="astColor">*</span></label></td>
+                                                    <td class="w18">
+                                                        <label class="checkbox-container f-600">
+                                                            Cubing
+                                                            <input type="radio" class="inpDisable" name="chkQMCR" id="chkQMRF" value="QMR" onclick="getActionType()" checked="checked">
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                    </td>
+                                                    <td class="align w-20">
+                                                        <label class="checkbox-container f-600">
+                                                            Meisterbock
+                                                            <input type="radio" class="inpDisable" name="chkQMCR" id="chkQCRF" value="QCR" onclick="getActionType()">
+
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                    </td>
+                                                    <td>
+                                                        <input type="hidden" name="FormType" id="chkActionType" value="">
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+
+                                <div class="row">
+                                    <div class="col-md-4 col-lg-4 col-12 inputSelect">
+
+                                        <select name="ModelQCM" class="spanUpperSide" id="drpModel" required>
+                                            <option style="display: none"></option>
+                                            <option value="SK216">SK216</option>
+                                            <option value="VW216">VW216</option>
+                                            <option value="SK271">SK271</option>
+                                            <option value="VW271">VW271</option>
+                                            <option value="SK216_6">SK216_6</option>
+
+                                        </select>
+                                        <span class="placeholder TransView">Model<span class="astColor">*</span></span>
+
+                                    </div>
+                                    <div class="col-md-4 col-lg-4 col-12 inputSelect">
+                                        <select name="Series" class="spanUpperSide" id="drpSeries" required>
+                                            <option style="display: none"></option>
+                                            <option value="After SOP – Series">After SOP – Series</option>
+                                            <option value="Before SOP – Pre-Series">Before SOP – Pre-Series</option>
+
+                                        </select>
+                                        <span class="placeholder TransView">Series<span class="astColor">*</span></span>
+                                    </div>
+                                    <div class="col-md-4 col-lg-4 col-12 inputSelect">
+
+                                        <select name="PartName" class="spanUpperSide" id="drpPart" required>
+                                            <option style="display: none"></option>
+                                            <option value="Bonnet ZSB">Bonnet ZSB</option>
+                                            <option value="Bonnet Single Part">Bonnet Single Part</option>
+                                            <option value="Fender LH ZSB">Fender LH ZSB</option>
+                                            <option value="Fender LH Single Part">Fender LH Single Part</option>
+                                            <option value="Fender RH ZSB">Fender RH ZSB</option>
+                                            <option value="Fender RH Single Part">Fender RH Single Part</option>
+                                            <option value="FFC">FFC</option>
+                                            <option value="Side Panel Inner LH ZSB">Side Panel Inner LH ZSB</option>
+                                            <option value="Side Panel Inner LH Single Part">Side Panel Inner LH Single Part</option>
+                                            <option value="Side Panel Outer LH ZSB">Side Panel Outer LH ZSB</option>
+                                            <option value="Side Panel Outer LH Single Part">Side Panel Outer LH Single Part</option>
+                                            <option value="Front Door LH ZSB">Front Door LH ZSB</option>
+                                            <option value="Front Door LH Single Part">Front Door LH Single Part</option>
+                                            <option value="Rear Door LH ZSB">Rear Door LH ZSB</option>
+                                            <option value="Rear Door LH Single Part">Rear Door LH Single Part</option>
+                                            <option value="End Part Outer ZSB">End Part Outer ZSB</option>
+                                            <option value="End Part Outer Single Part">End Part Outer Single Part</option>
+                                            <option value="Tailgate ZSB">Tailgate ZSB</option>
+                                            <option value="Tailgate Single Part">Tailgate Single Part</option>
+                                            <option value="Side Panel Inner RH ZSB">Side Panel Inner RH ZSB</option>
+                                            <option value="Side Panel Inner RH Single Part">Side Panel Inner RH Single Part</option>
+                                            <option value="Side Panel Outer RH ZSB">Side Panel Outer RH ZSB</option>
+                                            <option value="Side Panel Outer RH Single Part">Side Panel Outer RH Single Part</option>
+                                            <option value="Front Door RH ZSB">Front Door RH ZSB</option>
+                                            <option value="Front Door RH Single Part">Front Door RH Single Part</option>
+                                            <option value="Rear Door RH ZSB">Rear Door RH ZSB</option>
+                                            <option value="Rear Door RH Single Part">Rear Door RH Single Part</option>
+                                            <option value="Roof ZSB">Roof ZSB</option>
+                                            <option value="Roof Single Part">Roof Single Part</option>
+                                            <option value="Sun Roof ZSB">Sun Roof ZSB</option>
+                                            <option value="Sun Roof Single Part">Sun Roof Single Part</option>
+                                            <option value="Roof Bow">Roof Bow</option>
+                                            <option value="Front Bumper">Front Bumper</option>
+                                            <option value="Front Bumper Grill">Front Bumper Grill</option>
+                                            <option value="Guide Profile">Guide Profile</option>
+                                            <option value="Front Logo">Front Logo</option>
+                                            <option value="Rear Logo">Rear Logo</option>
+                                            <option value="Rear Bumper">Rear Bumper</option>
+                                            <option value="Guide Profile">Guide Profile</option>
+                                            <option value="Attachment Strip">Attachment Strip</option>
+                                            <option value="Ony Way Flap">Ony Way Flap</option>
+                                            <option value="Air Deflector">Air Deflector</option>
+                                            <option value="Fuel Flap">Fuel Flap</option>
+                                            <option value="Fuel Flap Painted">Fuel Flap Painted</option>
+                                            <option value="Head Lamp LH">Head Lamp LH</option>
+                                            <option value="Head Lamp RH">Head Lamp RH</option>
+                                            <option value="Head Lamp LH Highline">Head Lamp LH Highline</option>
+                                            <option value="Head Lamp RH Highline">Head Lamp RH Highline</option>
+                                            <option value="Tail Lamp Inner LH">Tail Lamp Inner LH</option>
+                                            <option value="Tail Lamp Inner RH">Tail Lamp Inner RH</option>
+                                            <option value="Tail Lamp Outer LH">Tail Lamp Outer LH</option>
+                                            <option value="Tail Lamp Outer RH">Tail Lamp Outer RH</option>
+                                            <option value="Grip Mounting">Grip Mounting</option>
+                                            <option value="Front Wind Shield">Front Wind Shield</option>
+                                            <option value="Rear Wind Shield">Rear Wind Shield</option>
+                                            <option value="Front Door LH Glass">Front Door LH Glass</option>
+                                            <option value="Front Door RH Glass">Front Door RH Glass</option>
+                                            <option value="Rear Door LH Glass">Rear Door LH Glass</option>
+                                            <option value="Rear Door RH Glass">Rear Door RH Glass</option>
+                                            <option value="Quarter Glass LH">Quarter Glass LH</option>
+                                            <option value="Quarter Glass RH">Quarter Glass RH</option>
+                                            <option value="GRM Front Door LH ">GRM Front Door LH </option>
+                                            <option value="GRM Front Door RH ">GRM Front Door RH </option>
+                                            <option value="GRM Rear Door LH ">GRM Rear Door LH </option>
+                                            <option value="GRM Rear Door RH ">GRM Rear Door RH </option>
+                                            <option value="Whether Strip FR DR LH ">Whether Strip FR DR LH </option>
+                                            <option value="Whether Strip FR DR RH ">Whether Strip FR DR RH </option>
+                                            <option value="Whether Strip RR DR LH ">Whether Strip RR DR LH </option>
+                                            <option value="Whether Strip RR DR RH ">Whether Strip RR DR RH </option>
+                                            <option value="Whether Strip Crome FR DR LH ">Whether Strip Crome FR DR LH </option>
+                                            <option value="Whether Strip Crome FR DR RH ">Whether Strip Crome FR DR RH </option>
+                                            <option value="Whether Strip Crome RR DR LH ">Whether Strip Crome RR DR LH </option>
+                                            <option value="Whether Strip Crome RR DR RH ">Whether Strip Crome RR DR RH </option>
+                                            <option value="ORVM LH">ORVM LH</option>
+                                            <option value="ORVM RH">ORVM RH</option>
+                                            <option value="Tringular Trim LH">Tringular Trim LH</option>
+                                            <option value="Tringular Trim RH">Tringular Trim RH</option>
+                                            <option value="Cladding_FR_DR_LH">Cladding_FR_DR_LH</option>
+                                            <option value="Cladding_FR_DR_RH">Cladding_FR_DR_RH</option>
+                                            <option value="Cladding_RR_DR_LH">Cladding_RR_DR_LH</option>
+                                            <option value="Cladding_RR_DR_RH">Cladding_RR_DR_RH</option>
+                                            <option value="Side Seal LH">Side Seal LH</option>
+                                            <option value="Side Seal RH">Side Seal RH</option>
+                                            <option value="Wheel Cover FR LH">Wheel Cover FR LH</option>
+                                            <option value="Wheel Cover FR RH">Wheel Cover FR RH</option>
+                                            <option value="Wheel Cover RR LH">Wheel Cover RR LH</option>
+                                            <option value="Wheel Cover RR RH">Wheel Cover RR RH</option>
+                                            <option value="B Trim FR DR LH ">B Trim FR DR LH </option>
+                                            <option value="B Trim FR DR RH">B Trim FR DR RH</option>
+                                            <option value="B Trim RR DR LH">B Trim RR DR LH</option>
+                                            <option value="B Trim RR DR RH">B Trim RR DR RH</option>
+                                            <option value="B Trim 2K FR DR LH ">B Trim 2K FR DR LH </option>
+                                            <option value="B Trim 2K FR DR RH ">B Trim 2K FR DR RH </option>
+                                            <option value="B Trim 2K RR DR LH ">B Trim 2K RR DR LH </option>
+                                            <option value="B Trim 2K RR DR RH ">B Trim 2K RR DR RH </option>
+                                            <option value="C Pillar LH">C Pillar LH</option>
+                                            <option value="C Pillar RH">C Pillar RH</option>
+                                            <option value="C Pillar Crome LH">C Pillar Crome LH</option>
+                                            <option value="C Pillar Crome RH">C Pillar Crome RH</option>
+                                            <option value="Roof Rail LH">Roof Rail LH</option>
+                                            <option value="Roof Rail RH">Roof Rail RH</option>
+                                            <option value="Tailgate_Spoiler">Tailgate_Spoiler</option>
+                                            <option value="Fender_Bedge LH">Fender_Bedge LH</option>
+                                            <option value="Fender_Bedge RH">Fender_Bedge RH</option>
+                                            <option value="Handle_FR_DR_LH">Handle_FR_DR_LH</option>
+                                            <option value="Handle_FR_DR_RH">Handle_FR_DR_RH</option>
+                                            <option value="Handle_RR_DR_LH">Handle_RR_DR_LH</option>
+                                            <option value="Handle_RR_DR_RH">Handle_RR_DR_RH</option>
+                                            <option value="Handle_Crome_FR_DR_LH">Handle_Crome_FR_DR_LH</option>
+                                            <option value="Handle_Crome_FR_DR_RH">Handle_Crome_FR_DR_RH</option>
+                                            <option value="Handle_Crome_RR_DR_LH">Handle_Crome_RR_DR_LH</option>
+                                            <option value="Handle_Crome_RR_DR_RH">Handle_Crome_RR_DR_RH</option>
+                                            <option value="Cowl LH">Cowl LH</option>
+                                            <option value="Cowl RH">Cowl RH</option>
+                                            <option value="Antenna">Antenna</option>
+                                            <option value="Plannum Seal">Plannum Seal</option>
+                                            <option value="Driver Seat Fabrik">Driver Seat Fabrik</option>
+                                            <option value="Co-Driver Seat Fabrik">Co-Driver Seat Fabrik</option>
+                                            <option value="Rear Seat Fabrik_100%">Rear Seat Fabrik_100%</option>
+                                            <option value="Rear Seat Fabrik 60_40%">Rear Seat Fabrik 60_40%</option>
+                                            <option value="Driver Seat Vinyl">Driver Seat Vinyl</option>
+                                            <option value="Co-Driver Seat Vinyl">Co-Driver Seat Vinyl</option>
+                                            <option value="Rear Seat Vinyl_100%">Rear Seat Vinyl_100%</option>
+                                            <option value="Rear Seat Vinyl 60_40%">Rear Seat Vinyl 60_40%</option>
+                                            <option value="Driver Seat Leather">Driver Seat Leather</option>
+                                            <option value="Co-Driver Seat Leather">Co-Driver Seat Leather</option>
+                                            <option value="Rear Seat Leather_100%">Rear Seat Leather_100%</option>
+                                            <option value="Rear Seat Leather60_40%">Rear Seat Leather60_40%</option>
+                                            <option value="Seat Belt FR LH">Seat Belt FR LH</option>
+                                            <option value="Seat Belt FR RH">Seat Belt FR RH</option>
+                                            <option value="Seat Belt RR LH">Seat Belt RR LH</option>
+                                            <option value="Seat Belt RR RH">Seat Belt RR RH</option>
+                                            <option value="Rear Seat Buckle">Rear Seat Buckle</option>
+                                            <option value="A Pillar_LH Upper">A Pillar_LH Upper</option>
+                                            <option value="A Pillar_RH Upper">A Pillar_RH Upper</option>
+                                            <option value="A Pillar_LH Lower">A Pillar_LH Lower</option>
+                                            <option value="A Pillar_RH Lower">A Pillar_RH Lower</option>
+                                            <option value="B Pillar_LH Upper">B Pillar_LH Upper</option>
+                                            <option value="B Pillar_RH Upper">B Pillar_RH Upper</option>
+                                            <option value="C Pillar _LH Lower">C Pillar _LH Lower</option>
+                                            <option value="C Pillar _RH Lower">C Pillar _RH Lower</option>
+                                            <option value="B Pillar_LH Lower">B Pillar_LH Lower</option>
+                                            <option value="B Pillar_RH Lower">B Pillar_RH Lower</option>
+                                            <option value="C Pillar_LH Upper">C Pillar_LH Upper</option>
+                                            <option value="C Pillar_RH Upper">C Pillar_RH Upper</option>
+                                            <option value="Scuff Plate LH">Scuff Plate LH</option>
+                                            <option value="Scuff Plate RH">Scuff Plate RH</option>
+                                            <option value="Door  Trim FR LH">Door  Trim FR LH</option>
+                                            <option value="Door Trim FR RH">Door Trim FR RH</option>
+                                            <option value="Door Trim RR LH">Door Trim RR LH</option>
+                                            <option value="Door Trim RR RH">Door Trim RR RH</option>
+                                            <option value="Door  Inner ORVM Trim FR LH">Door  Inner ORVM Trim FR LH</option>
+                                            <option value="Door  Inner ORVM Trim FR RH">Door  Inner ORVM Trim FR RH</option>
+                                            <option value="Door Cover FR_LH">Door Cover FR_LH</option>
+                                            <option value="Door Cover FR_RH">Door Cover FR_RH</option>
+                                            <option value="Door Cover RR_LH">Door Cover RR_LH</option>
+                                            <option value="Door Cover RR_RH">Door Cover RR_RH</option>
+                                            <option value="Head Liner">Head Liner</option>
+                                            <option value="Head Liner Sun Roof">Head Liner Sun Roof</option>
+                                            <option value="Sun Roof">Sun Roof</option>
+                                            <option value="Grab Handle FR LH">Grab Handle FR LH</option>
+                                            <option value="Grab Handle FR RH">Grab Handle FR RH</option>
+                                            <option value="Grab Handle RR LH">Grab Handle RR LH</option>
+                                            <option value="Grab Handle RR RH">Grab Handle RR RH</option>
+                                            <option value="Sun Visor LH">Sun Visor LH</option>
+                                            <option value="Sun Visor RH">Sun Visor RH</option>
+                                            <option value="Rear View Mirror ">Rear View Mirror </option>
+                                            <option value="Sun Glass Holder">Sun Glass Holder</option>
+                                            <option value="Sun Glass Holder Dummy">Sun Glass Holder Dummy</option>
+                                            <option value="Drain Hose Front LH">Drain Hose Front LH</option>
+                                            <option value="Drain Hose Front RH">Drain Hose Front RH</option>
+                                            <option value="Drain Hose Rear LH">Drain Hose Rear LH</option>
+                                            <option value="Drain Hose Rear RH">Drain Hose Rear RH</option>
+                                            <option value="Rear View Mirror Manual">Rear View Mirror Manual</option>
+                                            <option value="Front reading Light">Front reading Light</option>
+                                            <option value="Rear reading Lamp">Rear reading Lamp</option>
+                                            <option value="Headlamp Aiming Switch">Headlamp Aiming Switch</option>
+                                            <option value="Headlamp Rotary Switch">Headlamp Rotary Switch</option>
+                                            <option value="Switch FR Door LH">Switch FR Door LH</option>
+                                            <option value="Switch FR Door RH">Switch FR Door RH</option>
+                                            <option value="Switch RR Door LH">Switch RR Door LH</option>
+                                            <option value="Switch RR Door RH">Switch RR Door RH</option>
+                                            <option value="Switch ORVM">Switch ORVM</option>
+                                            <option value="Dash Board_Active">Dash Board_Active</option>
+                                            <option value="Dash Board_Style">Dash Board_Style</option>
+                                            <option value="Dash Board_Ambition">Dash Board_Ambition</option>
+                                            <option value="Glove Box">Glove Box</option>
+                                            <option value="Centre Air vent">Centre Air vent</option>
+                                            <option value="Decorative Trim LH">Decorative Trim LH</option>
+                                            <option value="Decorative Trim RH">Decorative Trim RH</option>
+                                            <option value="Instrument Cluster Cover">Instrument Cluster Cover</option>
+                                            <option value="Fuse Box Cover">Fuse Box Cover</option>
+                                            <option value="Climate Control switch">Climate Control switch</option>
+                                            <option value="Radio">Radio</option>
+                                            <option value="End Cap LH">End Cap LH</option>
+                                            <option value="End Cap RH">End Cap RH</option>
+                                            <option value="DSL">DSL</option>
+                                            <option value="Instrument Cluster ">Instrument Cluster </option>
+                                            <option value="Upper/Lower Shroud ">Upper/Lower Shroud </option>
+                                            <option value="Console Side Cover LH">Console Side Cover LH</option>
+                                            <option value="Console Side Cover RH">Console Side Cover RH</option>
+                                            <option value="Console Guard + Charger">Console Guard + Charger</option>
+                                            <option value="Gear Shift Lever">Gear Shift Lever</option>
+                                            <option value="Hand Break Lever">Hand Break Lever</option>
+                                            <option value="Arm Rest">Arm Rest</option>
+                                            <option value="Arm Rest cover">Arm Rest cover</option>
+                                            <option value="Console">Console</option>
+                                            <option value="Climatronic">Climatronic</option>
+                                            <option value="Climatronic cover">Climatronic cover</option>
+                                            <option value="Miko Switch">Miko Switch</option>
+                                            <option value="Rear Air Vent">Rear Air Vent</option>
+                                            <option value="Hazard Switch">Hazard Switch</option>
+                                            <option value="Tailgate Inner Trim">Tailgate Inner Trim</option>
+                                            <option value="Trunk Trim Side LH">Trunk Trim Side LH</option>
+                                            <option value="Trunk Trim Side RH">Trunk Trim Side RH</option>
+                                            <option value="Cover Lock Carrier">Cover Lock Carrier</option>
+                                            <option value="Parcel Shelf">Parcel Shelf</option>
+                                            <option value="Bulk Head Damper">Bulk Head Damper</option>
+                                            <option value="Front Floor Damper">Front Floor Damper</option>
+                                            <option value="Front Floor Cover">Front Floor Cover</option>
+                                            <option value="Trunk Lining">Trunk Lining</option>
+                                            <option value="Tunnel">Tunnel</option>
+                                            <option value="Foot-Rest">Foot-Rest</option>
+                                            <option value="Trunk Carpet LH">Trunk Carpet LH</option>
+                                            <option value="Trunk Carpet RH">Trunk Carpet RH</option>
+                                            <option value="Seal Front Door LH">Seal Front Door LH</option>
+                                            <option value="Seal Front Door RH">Seal Front Door RH</option>
+                                            <option value="Seal Rear Door LH">Seal Rear Door LH</option>
+                                            <option value="Seal Rear Door RH">Seal Rear Door RH</option>
+                                            <option value="Dust Seal Rear Door LH">Dust Seal Rear Door LH</option>
+                                            <option value="Dust Seal Rear Door RH">Dust Seal Rear Door RH</option>
+                                            <option value="Seal Tailgate">Seal Tailgate</option>
+                                            <option value="Stering Wheel">Stering Wheel</option>
+                                            <option value="Stering Wheel Cover">Stering Wheel Cover</option>
+                                            <option value="Stering Wheel Upper Cover">Stering Wheel Upper Cover</option>
+                                            <option value="Stering Wheel Lower Cover">Stering Wheel Lower Cover</option>
+                                            <option value="Combi Switch">Combi Switch</option>
+                                            <option value="Air Bag">Air Bag</option>
+
+
+                                        </select>
+                                        <span class="placeholder TransView">Part Name<span class="astColor">*</span></span>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="row">
+                                    <div class="form-group col-md-2 col-lg-2 col-12 input-block mt-3">
+
+                                        <input type="number" class="w-100 txtDisable" name="PartQuantity" id="txtParts" required value="@(QMCRF?.PartQuantity)" @(disabled)>
+                                        <span class="placeholder">Parts Quantity<span class="astColor">*</span></span>
+
+                                    </div>
+                                    <div class="form-group col-md-2 col-lg-2 col-12 input-block">
+                                    </div>
+                                    <div class="col-md-4 col-lg-4 col-12 input-block">
+                                        <table class="table mainTbl form-table-container-2">
+                                            <tbody>
+                                                <tr>
+                                                    <td class="actionTypeWidth"><label id="lblPSActionType" class="f-600">Problem Sheet<span class="astColor">*</span></label></td>
+                                                    <td class="w18">
+                                                        <label class="checkbox-container f-600">
+                                                            Yes
+                                                            <input type="radio" class="inpDisable" name="chkproblemsheet" id="chkPSY" value="Yes" onclick="getActionType()">
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                    </td>
+                                                    <td class="align w-20">
+                                                        <label class="checkbox-container f-600">
+                                                            No
+                                                            <input type="radio" class="inpDisable" name="chkproblemsheet" id="chkPSN" value="No" onclick="getActionType()" checked="checked">
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                    </td>
+                                                    <td>
+                                                        <input type="hidden" name="ProblemSheet" id="chkPSActionType" value="">
+                                                        <label style="display:none" id="PSAttach1"></label>
+                                                    </td>
+                                                </tr>
+
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="col-md-4 col-lg-4 col-12 input-block">
+                                        <table class="table mainTbl form-table-container-2">
+                                            <tbody>
+                                                <tr>
+                                                    <td class="actionTypeWidth"><label id="lblActionType" class="f-600">Trial Reported<span class="astColor">*</span></label></td>
+                                                    <td class="w18">
+                                                        <label class="checkbox-container f-600">
+                                                            Yes
+                                                            <input type="radio" class="inpDisable" name="chkProblemReported" id="chkTRY" value="Yes" onclick="getActionType()">
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                    </td>
+                                                    <td class="align w-20">
+                                                        <label class="checkbox-container f-600">
+                                                            No
+                                                            <input type="radio" class="inpDisable" name="chkProblemReported" id="chkTRN" value="No" onclick="getActionType()" checked="checked">
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                    </td>
+                                                    <td>
+                                                        <input type="hidden" name="TrialReported" id="chkTRActionType" value="">
+                                                        <label style="display:none" id="TRAttach2"></label>
+                                                    </td>
+                                                </tr>
+
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+
+                                    <div class="form-group col-md-4 col-12 input-block" id="FileUploadPS" style="display:none">
+                                        <label>Upload Problem Sheet:</label>
+                                        @if ((IsEditMode || IsViewMode) && QMCRF.AttachmentFiles.Attachments.Count != 0 && QMCRF.AttachmentFiles != null)
+                                        {
+                                            foreach (var attachment in QMCRF.AttachmentFiles.Attachments)
+                                            {
+                                                var check = attachment.FileName;
+                                                var result = check.Substring(0, 2);
+
+
+                                                if (result == "PS")
+                                                {
+                                                    <input type="hidden" id="attachedfile" name="attachedfile" value="@System.Configuration.ConfigurationManager.AppSettings["SharepointSiteURL"]@attachment.ServerRelativeUrl" />
+                                                    <input type="hidden" id="attachedfileName" name="attachedfileName" value="@attachment.FileName" />
+                                                    <a id="attachedFileLink" href=@System.Configuration.ConfigurationManager.AppSettings["SharepointSiteURL"]@attachment.ServerRelativeUrl download=@attachment.FileName target="_blank">@attachment.FileName.Substring(3)</a>
+                                                }
+
+                                            }
+                                            if (!IsViewMode)
+                                            {
+                                                @*<input type="file" id="fileToUpload" class="d-none" name="fileToUpload" style="background-color: white !important; width: 100%;" />
+                                                    <label for="fileToUpload" style="border: 1px solid #BFBFBF !important; box-sizing: border-box; border-radius: 5px !important; padding: 10px 20px;">
+                                                        Choose File
+                                                    </label>*@
+                                                <input type="file" id="fileToUpload" name="fileToUpload" style="background-color: white !important; width: 100%;" />
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <input type="file" id="fileToUpload" name="fileToUpload" style="background-color: white !important; width: 100%;" />
+                                            @*<label for="fileToUpload" style="border: 1px solid #BFBFBF !important; box-sizing: border-box; border-radius: 5px !important; padding: 10px 20px;">
+                                                    Choose File
+                                                </label>*@
+                                        }
+                                    </div>
+                                    <div class="form-group col-md-4 col-12 input-block" id="FileUploadTR" style="display:none">
+                                        <label>Upload Trial Reported:</label>
+                                        @if ((IsEditMode || IsViewMode) && QMCRF.AttachmentFiles.Attachments.Count != 0 && QMCRF.AttachmentFiles != null)
+                                        {
+                                            foreach (var attachment in QMCRF.AttachmentFiles.Attachments)
+                                            {
+
+                                                var check = attachment.FileName;
+                                                var result = check.Substring(0, 2);
+                                                if (result == "TR")
+                                                {
+                                                    <input type="hidden" id="attachedfile1" name="attachedfile1" value="@System.Configuration.ConfigurationManager.AppSettings["SharepointSiteURL"]@attachment.ServerRelativeUrl" />
+                                                    <input type="hidden" id="attachedfileName1" name="attachedfileName1" value="@attachment.FileName" />
+                                                    <a id="attachedFileLink1" href=@System.Configuration.ConfigurationManager.AppSettings["SharepointSiteURL"]@attachment.ServerRelativeUrl download=@attachment.FileName target="_blank">@attachment.FileName.Substring(3)</a>
+                                                }
+
+                                            }
+                                            if (!IsViewMode)
+                                            {
+                                                @*<input type="file" id="fileToUpload1" class="d-none" name="fileToUpload1" style="background-color: white !important; width: 100%;" />
+                                                    <label for="fileToUpload1" style="border: 1px solid #BFBFBF !important; box-sizing: border-box; border-radius: 5px !important; padding: 10px 20px;">
+
+                                                        Choose File
+                                                    </label>*@
+                                                <input type="file" id="fileToUpload1" name="fileToUpload1" style="background-color: white !important; width: 100%;" />
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <input type="file" id="fileToUpload1" name="fileToUpload1" style="background-color: white !important; width: 100%;" />
+                                            @*<label for="fileToUpload" style="border: 1px solid #BFBFBF !important; box-sizing: border-box; border-radius: 5px !important; padding: 10px 20px;">
+                                                    Choose File
+                                                </label>*@
+                                        }
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="col-md-3 col-lg-3 col-12 inputSelect">
+
+                                        <label class="placeholder" style="margin-top:-9px">Problem Reported at<span class="astColor">*</span></label>
+                                        <select name="ProblemReported1" multiple id="drpProReq" required onchange="GetOtherValue()">
+
+                                            <option value="Assembly">Assembly</option>
+                                            <option value="Paint">Paint</option>
+                                            <option value="Body">Body</option>
+                                            <option value="VehicleAudit">Vehicle Audit</option>
+                                            <option value="DKAAudit">DKA Audit</option>
+                                            <option value="Others">Others</option>
+                                        </select>
+                                        <span class="multiselect-selected-text"></span>
+                                        <input type="hidden" class="w-100 txtDisable" name="ProblemReported" id="ProblemReported">
+                                    </div>
+                                    <div class="form-group col-md-3 col-lg-3 col-12 input-block OtherD" style="display:none">
+                                        <label class="placeholder">Other Details<span class="astColor">*</span></label>
+                                        <input type="text" class="w-100 txtDisable" name="OtherDetails" id="txtOthDetails" required value="@(QMCRF?.OtherDetails)" @(disabled)>
+
+
+                                    </div>
+                                </div>
+                                <div class="form-row mt-3">
+                                    <div class="col-md-12 col-lg-12 col-12 input-block">
+                                        <textarea cols="90" rows="3" name="Details" id="txtDetails" maxlength="500" required></textarea>
+                                        <span class="placeholder">Details (Reason for past trial)<span class="astColor">*</span></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                @* Approval Section And Action Section *@
+                @if (IsViewMode || IsEditMode)
+                {
+                    //Approval Section
+                    <div id="accordion">
+                        <div class="card">
+                            <div class="card-header collapsed" id="headingFour" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                                <h5 class="mb-0">
+                                    <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                                        <img src="~/assets/img/approvalTracking.svg" width="24" height="24" class="mr-2" />Approval Tracking
+                                    </button>
+                                </h5>
+                            </div>
+                            <div id="collapseFour" class="collapse" aria-labelledby="headingFour">
+                                <div class="card-body">
+                                    <div class="form-row">
+                                        <div class="col-12">
+                                            <table class="table w-100 td-border showBorder">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Name</th>
+                                                        <th>Role</th>
+                                                        <th style="display: @(appList.Any(x => !string.IsNullOrEmpty(x.ExtraDetails)) ? " " : " none")">Content</th>
+                                                        <th>Processed on</th>
+                                                        <th>Status</th>
+                                                        <th class="text-center">Comments</th>
+                                                        <th class="text-center">Approval Level</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @if (IsViewMode || IsEditMode)
+                                                    {
+                                                        Html.RenderPartial("_ApprovalTracking", appList);
+                                                    }
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="accordion">
+                        <div class="card">
+                            <div class="card-header collapsed" id="headingFive" data-toggle="collapse" data-target="#collapseFive" aria-expanded="true" aria-controls="collapseFive">
+                                <h5 class="mb-0">
+                                    <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFive" aria-expanded="true" aria-controls="collapseFive">
+                                        <img src="~/assets/img/approvalTracking.svg" width="24" height="24" class="mr-2" /> Action
+                                    </button>
+                                </h5>
+                            </div>
+
+                            <div id="collapseFive" class="collapse show" aria-labelledby="headingFive">
+                                <div class="card-body actionTab">
+                                    @{
+                                        <div class="form-row">
+                                            <div class="form-group col-md-3 col-lg-3 col-12 input-block StartTime">
+                                                <input type="datetime-local" class="w-80 txtDisable" name="StartTime" id="txtStartTime" onchange="DateValidation()" value="@(QMCRF?.StartTime?.ToString("yyyy-MM-ddThh:mm:ss"))">
+                                                <span class="placeholder" style="background-color: #fff !important;">Start Time<span class="astColor"></span></span>
+                                            </div>
+                                            <div class="form-group col-md-3 col-lg-3 col-12 input-block EndTime">
+                                                <input type="datetime-local" class="w-80 txtDisable" name="EndTime" id="txtEndTime" onchange="DateValidation()" value="@(QMCRF?.EndTime?.ToString("yyyy-MM-ddThh:mm:ss"))">
+                                                <span class="placeholder" style="background-color: #fff !important;">End Time<span class="astColor"></span></span>
+                                            </div>
+                                            <div class="form-group col-md-3 col-lg-3 col-12 input-block ConditionPost">
+                                                <select name="ConditionPostTrial" class="spanUpperSide" id="drpConPosTrial" required>
+                                                    <option style="display: none"></option>
+                                                    <option value="Ok">Ok</option>
+                                                    <option value="Conditional Ok">Conditional Ok</option>
+                                                    <option value="Not Ok">Not Ok</option>
+                                                </select>
+                                                <span class="placeholder TransView">Condition Post Trial<span class="astColor">*</span></span>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                @* Buttons *@
+                @if (IsNewMode)
+                {
+                    <div class="card-footer align-content-center">
+                        <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                            Submit
+                        </button>
+                        <button type="reset" class="btn btn-danger btn-sm cancl-btn" id="btnCancel">
+                            Cancel
+                        </button>
+                    </div>
+                }
+                else if (IsEditMode)
+                {
+                    <div class="card-footer align-content-center">
+                        <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                            Re-Submit
+                        </button>
+                        <button type="reset" class="btn btn-danger btn-sm cancl-btn" id="btnCancel">
+                            Cancel
+                        </button>
+                    </div>
+                }
+
+            </form>
+
+            <div>
+                <p class="text-left f-600">SF_II_024</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="successModel" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header modelHeader">
+                <span class="modal-title modalMsgTitle" id="modalTitle"></span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label id="modalBody" class="lableMsg">  </label>
+                <input type="hidden" id="tab" value="0" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="submitBomBtn publishBtn" id="modalOkButton" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+        var spinner = $('#loader');
+        var currentUserDesgn = @Html.Raw(Json.Encode(CurrentUserDesgn));
+        var IsNew = @Html.Raw(Json.Encode(IsNew));
+        var IsEdit = @Html.Raw(Json.Encode(IsEdit));
+        var IsNewMode = @Html.Raw(Json.Encode(IsNewMode));
+        var IsEditMode = @Html.Raw(Json.Encode(IsEditMode));
+        var IsViewMode = @Html.Raw(Json.Encode(IsViewMode));
+        var QMCRF = @Html.Raw(Json.Encode(QMCRF));
+        var appRowId = @Html.Raw(Json.Encode(AppRowId));
+        var approvalType =@Html.Raw(Json.Encode(ApprovalType));
+        var SecurityDesgnString = @Html.Raw(Json.Encode(SecurityDesgnString));
+        var FlagRedirect = @Html.Raw(Json.Encode(FlagRedirect));
+        pageLoad();
+        var errorCount = 0;
+        var errors = "";
+        pageLoad();
+    var globalVariable;
+    $(document).ready(function () {
+        $('select[multiple]').multiselect();
+        @*if (@CurrentUserLevel != 0) {
+            $(".StartTime").show();
+            $(".EndTime").show();
+        } else {
+            $(".StartTime").hide();
+            $(".EndTime").hide();
+        }*@
+
+       if (@CurrentUserLevel == 3) {
+           //$(".ConditionPost").show();
+       } else {
+
+           $("#drpConPosTrial").prop("disabled", "disabled");
+        }
+
+
+
+        if (IsViewMode) {
+
+            if (QMCRF.FormType == "QMR") {
+                $('input[id="chkQMRF"]').prop('checked', true);
+                $('input[id="chkQMRF"]').prop("disabled", true);
+                $('input[id="chkQCRF"]').prop("disabled", true);
+                $("#chkActionType").val('QMR');
+            } else {
+                $('input[id="chkQCRF"]').prop('checked', true);
+                $('input[id="chkQCRF"]').prop("disabled", true);
+                $('input[id="chkQMRF"]').prop("disabled", true);
+                $("#chkActionType").val('QCR');
+            }
+            if (QMCRF.ProblemSheet == "Yes") {
+                $('input[id="chkPSY"]').prop('checked', true);
+                $('input[id="chkPSN"]').prop('checked', false);
+                $("#chkPSActionType").val('Yes');
+                $("#FileUploadPS").show();
+            } else {
+                $('input[id="chkPSN"]').prop('checked', true);
+                $('input[id="chkPSY"]').prop('checked', false);
+                $("#chkPSActionType").val('No');
+            }
+
+            if (QMCRF.TrialReported == "Yes") {
+
+                $('input[id="chkTRY"]').prop('checked', true);
+                $('input[id="chkTRN"]').prop('checked', false);
+                $("#chkTRActionType").val('Yes');
+                $("#FileUploadTR").show();
+            } else {
+
+                $('input[id="chkTRN"]').prop('checked', true);
+                $('input[id="chkTRY"]').prop('checked', false);
+                $("#chkTRActionType").val('No');
+            }
+
+            $("#drpModel option[value='" + QMCRF.ModelQCM + "']").prop('selected', 'selected');
+            $("#drpModel").prop("disabled", "disabled");
+            $("#drpModel").addClass("spanUpperSide");
+
+            $("#drpSeries option[value='" + QMCRF.Series + "']").prop('selected', 'selected');
+            $("#drpSeries").prop("disabled", "disabled");
+            $("#drpSeries").addClass("spanUpperSide");
+
+            $("#drpPart option[value='" + QMCRF.PartName + "']").prop('selected', 'selected');
+            $("#drpPart").prop("disabled", "disabled");
+            $("#drpPart").addClass("spanUpperSide");
+
+            //$("#drpProReq option[value='" + QMCRF.ProblemReported + "']").prop('selected', 'selected');
+            var values = QMCRF.ProblemReported;
+            //var selectedOptions = values.split(",").forEach();
+            var selectedOptions = values.split(",");
+            for (var i in selectedOptions) {
+                var optionVal = selectedOptions[i];
+                $("select").find("option[value=" +  optionVal + "]").prop("selected", "selected");
+            }
+            $("#drpProReq").multiselect('refresh');
+            $("#drpProReq").addClass("spanUpperSide");
+
+            $("#drpProReq").multiselect("disable");
+            GetOtherValue();
+            $("#txtDetails").val(QMCRF.Details)
+            $("#txtDetails").prop("disabled", "disabled");
+
+            if (@CurrentUserLevel == 1) {
+
+            } else {
+                $("#txtStartTime").prop("disabled", "disabled");
+                $("#txtEndTime").prop("disabled", "disabled");
+            }
+
+            //$("#txtStartTime").val(QMCRF.StartTime);
+            //$("#txtEndTime").val(QMCRF.EndTime);
+
+            $("#drpConPosTrial option[value='" + QMCRF.ConditionPostTrial + "']").prop('selected', 'selected');
+
+            $("#drpConPosTrial").addClass("spanUpperSide");
+            getActionType();
+            if (IsViewMode) {
+                $('input[id="chkQMRF"]').prop("disabled", true);
+                $('input[id="chkQCRF"]').prop("disabled", true);
+                $('input[id="chkPSY"]').prop('disabled', true);
+                $('input[id="chkPSN"]').prop('disabled', true);
+                $('input[id="chkTRY"]').prop('disabled', true);
+                $('input[id="chkTRN"]').prop('disabled', true);
+            }
+
+        }
+        if (!IsViewMode) {
+
+            if (IsEditMode) {
+                if (QMCRF.FormType == "QMR") {
+                $('input[id="chkQMRF"]').prop('checked', true);
+                $('input[id="chkQCRF"]').prop('checked', false);
+                $("#chkActionType").val('QMR');
+            } else {
+                $('input[id="chkQCRF"]').prop('checked', true);
+                $('input[id="chkQMRF"]').prop('checked', false);
+                $("#chkActionType").val('QCR');
+                }
+                if (QMCRF.ProblemSheet == "Yes") {
+                $('input[id="chkPSY"]').prop('checked', true);
+                $('input[id="chkPSN"]').prop('checked', false);
+                $("#chkPSActionType").val('Yes');
+            } else {
+                $('input[id="chkPSN"]').prop('checked', true);
+                $('input[id="chkPSY"]').prop('checked', false);
+                $("#chkPSActionType").val('No');
+            }
+                if (QMCRF.TrialReported == "Yes") {
+                $('input[id="chkTRY"]').prop('checked', true);
+                $('input[id="chkTRN"]').prop('checked', false);
+                $("#chkTRActionType").val('Yes');
+            } else {
+                $('input[id="chkTRN"]').prop('checked', true);
+                $('input[id="chkTRY"]').prop('checked', false);
+                $("#chkTRActionType").val('No');
+            }
+
+                $("#drpModel option[value='" + QMCRF.ModelQCM + "']").prop('selected', 'selected');
+                $("#drpModel").addClass("spanUpperSide");
+
+                $("#drpSeries option[value='" + QMCRF.Series + "']").prop('selected', 'selected');
+                $("#drpSeries").addClass("spanUpperSide");
+
+                $("#drpPart option[value='" + QMCRF.PartName + "']").prop('selected', 'selected');
+                $("#drpPart").addClass("spanUpperSide");
+
+                var values = QMCRF.ProblemReported;
+                //$.each(values.split(","), function (i, e) {
+                //    $("#drpProReq option[value='" + e + "']").prop("selected", true);
+                //});
+
+                //$("select").multiselect({
+                //    selectedText: "# of # selected"
+                //});
+                var selectedOptions = values.split(",");
+                for (var i in selectedOptions) {
+                    var optionVal = selectedOptions[i];
+                    $("select").find("option[value=" + optionVal + "]").prop("selected", "selected");
+                }
+                $("#drpProReq").multiselect('refresh');
+
+                $("#drpProReq option[value='" + QMCRF.ProblemReported + "']").prop('selected', 'selected');
+                $("#drpProReq").addClass("spanUpperSide");
+
+                GetOtherValue();
+                $("#txtDetails").val(QMCRF.Details)
+
+                getActionType();
+                if (@CurrentUserLevel == 1) {
+
+            } else {
+                $("#txtStartTime").prop("disabled", "disabled");
+                $("#txtEndTime").prop("disabled", "disabled");
+            }
+
+            }
+            if (IsNewMode) {
+
+                $("#externalCompany").hide();
+                $(".inpIsNewDisable").attr("readonly", "readonly");
+            }
+        }
+
+        //GetRequiredDataForEditAndView();
+    });
+
+
+        function pageLoad() {
+
+        spinner.hide();
+        $("#headingErr").addClass('d-none');
+        $("#rdOnBehalfOptionOthersLabel").text('Blue Collar Employee');
+        //if (IsViewMode || IsEditMode) {
+        //    $("#txtAddressofConsignee").addClass('spanUpperSide');
+        //    $("#txtAddressofReceiver").addClass('spanUpperSide');
+        //    $("#txtBusinessNeed").addClass('spanUpperSide');
+
+        //    GetWeightDimension();
+        //}
+        //else if (IsViewMode) {
+        //    $("#divRequestSubmissionFor").addClass('d-none');
+        //}
+        }
+
+        function allowNumbersOnly(e) {
+        var code = (e.which) ? e.which : e.keyCode;
+        if (code > 31 && (code < 48 || code > 57)) {
+        e.preventDefault();
+        }
+        }
+
+        function successQMCRModal(txt) {
+        //
+        $('#modalTitle').html('Success');
+        if (txt == "approve") {
+        $('#modalBody').html('Form has been approved!');
+        }
+        else if (txt == "reject") {
+        $('#modalBody').html('Form has been rejected!');
+        }
+        else if (txt == "enquire") {
+        $('#modalBody').html('Form has been enquired!');
+        }
+        else if (txt == "cancelled") {
+        $('#modalBody').html('Form has been cancelled!');
+        }
+        else {
+        if (IsEditMode) {
+            $('#modalBody').html('Your form with ID: QMCR' + txt + ' has been re-submitted! Kindly use this for future reference');
+        }
+        else {
+            $('#modalBody').html('Your form with ID: QMCR' + txt + ' has been submitted! Kindly use this for future reference');
+        }
+
+        }
+        FlagRedirect = txt;
+        //$("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+        }
+
+        function failureModal(txt) {
+        if (txt == null) {
+        $('#modalBody').html('Some error occurred!');
+        }
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html(txt);
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+        }
+
+        function permissionModal() {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html('No permssion granted since the device is not SAVWIPL owned!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+        }
+
+        function requiredModal(text) {
+        $('#modalTitle').html('Required!');
+        $('#modalBody').html(text);
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+        }
+
+        function validityModal(txt) {
+        ////
+        if (txt == 'approve') {
+        DisplayAlert('error', 'Error', 'Please select the Type of Car');
+        }
+        else if (txt == 'reject') {
+        DisplayAlert('error', 'Warning', 'Please type in the reason for rejecting the form');
+        }
+        else if (txt == 'enquire') {
+        DisplayAlert('error', 'Warning', 'Please type in the reason for enquiring the form');
+        }
+
+        }
+
+    $("#btnSubmit").on('click', function (e) {
+        $('#loader').show();
+
+        validateSubmitter();
+        validateApplicant();
+        getActionType();
+
+        var lblActionType = $("#chkActionType").val();
+        if (lblActionType == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Form Type" + "</li>";
+            AddError("lblActionType", '', errorCount);
+            errorCount++;
+        }
+
+        var drpModel = $("#drpModel option:selected").val();
+        if (drpModel == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Model" + "</li>";
+            AddError("drpModel", '', errorCount);
+            errorCount++;
+        }
+
+
+        var drpSeries = $("#drpSeries option:selected").val();
+        if (drpSeries == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Series" + "</li>";
+            AddError("drpSeries", '', errorCount);
+            errorCount++;
+        }
+
+        var drpPart = $("#drpPart option:selected").val();
+        if (drpPart == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Part Name" + "</li>";
+            AddError("drpPart", '', errorCount);
+            errorCount++;
+        }
+
+        var PartQty = $("#txtParts").val();
+        if (PartQty == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Part Quantity" + "</li>";
+            AddError("txtParts", '', errorCount);
+            errorCount++;
+        }
+
+        var lblPSActionType = $("#chkPSActionType").val();
+        
+        if (lblPSActionType == "Yes") {
+            var psuploadcount = $("#fileToUpload").val();
+            if (IsNewMode) {
+                if (psuploadcount == "") {
+                    $('#loader').hide();
+                    alert("Please select File for Problem Sheet");
+                    return false;
+                }
+            }
+            
+        } else {
+            if (lblPSActionType == "Yes") {
+                $("#PSAttach1").val('1')
+            } else {
+                $("#PSAttach1").val('0')
+            }
+        }
+
+        var lblTRActionType = $("#chkTRActionType").val();
+        if (lblTRActionType == "Yes") {
+            var Truploadcount = $("#fileToUpload1").val();
+            if (IsNewMode) {
+                if (Truploadcount == "") {
+                    $('#loader').hide();
+                    alert("Please select File for Trial Reported");
+                    return false;
+                }
+            }
+           
+        } else {
+            if (lblTRActionType == "Yes") {
+                $("#TRAttach2").val('1')
+            } else {
+                $("#TRAttach2").val('0')
+            }
+        }
+
+        //var drpProReq = $("#drpProReq option:selected").val();
+        //var drpProReq = $('select#drpProReq').val();
+        var drpProReq = $("#drpProReq option:selected").map(function () { return this.value }).get().join(',');
+        
+        if (drpProReq == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Problem Reported" + "</li>";
+            AddError("drpProReq", '', errorCount);
+            errorCount++;
+        }
+
+        var txtDetails = document.getElementById("txtDetails").value;
+        if (txtDetails == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Details" + "</li>";
+            AddError("txtDetails", '', errorCount);
+            errorCount++;
+        }
+
+
+        if (errors.length) {
+            $('#loader').hide();
+            errors = "<ol id='errorList'>" + errors + "</ol>";
+            $("#headingErr").removeClass('d-none');
+            document.getElementById("add_to_me").innerHTML = errors;
+            errors = "";
+            errorCount = 0;
+            if (IsEditMode) {
+                $("#myModalEdit").scrollTop(0);
+                $("#myModalRequest").scrollTop(0);
+            }
+            else {
+                $(window).scrollTop(0);
+            }
+            return false;
+        }
+        $("#headingErr").addClass('d-none');
+        document.getElementById("add_to_me").innerHTML = '';
+        $('#ddEmpDesignation').prop("disabled", false);
+        $('#txtOnBehalfdesignation').prop("disabled", false);
+        $("#pageLoader").removeClass('invisible');
+        $("#btnSubmit").text('Saving');
+        $("#btnSubmit").prop("disabled", true);
+        $("#btnCancel").prop("disabled", true);
+        $("#ddOtherNewEmpDesignation").prop("disabled", false);
+        $("input").prop('disabled', false);
+        $("#ProblemReported").val(drpProReq);
+        //var form = {
+
+        //}
+        //var serializedArray = $("#QMCRForm").serializeArray();
+        //serializedArray.forEach((x, index) => {
+        //    if (x.value != "") {
+        //        form[x.name] = x.value;
+        //    }
+        //});
+        //form['ProblemReported'] = drpProReq;
+        //console.log(form);
+        var form = $("#QMCRForm");
+        var formData = new FormData(form[0]);
+        $.ajax({
+            url: '/QualityMeisterbockCubingform/SaveQMCRForm',
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            dataType: 'JSON',
+            data: formData,
+            enctype: 'multipart/form-data',
+            success: (function (data) {
+                $('#loader').hide();
+                if (data.Status == 200) {
+                    $("#pageLoader").addClass('invisible');
+                    if (IsNew && IsEdit) {
+                        $("#btnSubmit").text('Submit');
+                    }
+                    else {
+                        $("#btnSubmit").text('Re-Submit');
+                    }
+                    $("#btnSubmit").prop("disabled", false);
+                    $("#btnCancel").prop("disabled", false);
+
+                    successQMCRModal(data.Message);
+                }
+                else {
+                    failureModal(data.Message);
+                    if (IsNew && IsEdit) {
+                        $("#btnSubmit").text('Submit');
+                    }
+                    else {
+                        $("#btnSubmit").text('Re-Submit');
+                    }
+                    $("#pageLoader").addClass('invisible');
+                    $("#btnSubmit").prop("disabled", false);
+                    $("#btnCancel").prop("disabled", false);
+                    console.log("failure");
+                }
+            }),
+            error: (function (data) {
+                $('#loader').hide();
+                failureModal();
+                console.log("error");
+                if (IsNew && IsEdit) {
+                    $("#btnSubmit").text('Submit');
+                }
+                else {
+                    $("#btnSubmit").text('Re-Submit');
+                }
+                $("#pageLoader").addClass('invisible');
+                $("#btnSubmit").prop("disabled", false);
+                $("#btnCancel").prop("disabled", false);
+            })
+        })
+        $("#tab").val(2);
+
+    });
+
+        $("#btnCancel").on('click', function (e) {
+        window.location = "../Dashboard";
+        });
+
+        function saveResponse(text) {
+
+        var status = '', comment = '';
+        comment = $("#comment-" + text).val();
+        switch (text) {
+        case 'approve': {
+        status = 'Approved';
+        if (@CurrentUserLevel == "1") {
+        addRemainingData(status, appRowId, comment, approvalType, text);
+
+        }
+        else if (@CurrentUserLevel == "3") {
+        UpdateCondition(status, appRowId, comment, approvalType, text);
+
+        }
+        else {
+        FormApproval(status, appRowId, comment, approvalType, text);
+        }
+        break;
+        }
+        case 'reject': {
+        status = 'Rejected';
+        if (comment == '') {
+        validityModal(text);
+        return;
+        }
+        else {
+        FormApproval(status, appRowId, comment, approvalType, text);
+        }
+        break;
+        }
+        case 'enquire': {
+        status = 'Enquired';
+        if (comment == '') {
+        validityModal(text);
+        return;
+        }
+        else {
+        FormApproval(status, appRowId, comment, approvalType, text);
+        }
+        break;
+        }
+        }
+
+        $("#tab").val(1);
+        }
+
+        function FormApproval(status, appRowId, comment, approvalType, text) {
+        //
+        spinner.show();
+        $.ajax({
+        url: '/List/SaveResponse',
+        type: 'POST',
+        data: { response: status, appRowId: appRowId, comment: comment, approvalType: approvalType },
+        dataType: 'JSON',
+        success: (function (data) {
+        if (data.Result == 1) {
+        successQMCRModal(text);
+        spinner.hide();
+        //setTimeout(FilterMyTasks, 5000);
+        spinner.hide();
+        }
+        else {
+        failureModal();
+        spinner.hide();
+        }
+        }),
+        error: (function (data) {
+        failureModal();
+        spinner.hide();
+        })
+        })
+
+        $("#tab").val(1);
+        }
+
+        function WeighingUpdate(status, appRowId, comment, approvalType, text){
+
+        var form = $("#QMCRForm").serialize();
+        $.ajax({
+        url: 'ISCLSC/UpdateData',
+        type: 'POST',
+        data: form,
+        dataType: 'JSON',
+        success: (function (data) {
+        if (data == 1) {
+        FormApproval(status, appRowId, comment, approvalType, text);
+        }
+        else {
+        failureModal();
+        }
+        }),
+        error: (function (data) {
+        failureModal();
+        })
+        })
+
+        }
+
+        $('#myModal').modal({ backdrop: 'static', keyboard: false })
+
+        $('#successModel').on('hidden.bs.modal', function () {
+        ////
+        var tab = $("#tab").val();
+        console.log(tab);
+        if (tab == 1) {
+        GetMyTaskTab();
+        }
+        else if (tab == 2) {
+        window.location = "../Dashboard?tab=" + tab;
+        }
+        })
+
+        function GetWeightDimension() {
+        //
+        //$('input:checkbox[id="chkWeight"]').click(function () {
+        //    if ($(this).prop("checked") == true) {
+        //        $('input[id="chkWeight"]').prop('disabled', true);
+        //        $('input[id="chkDimension"]').prop('checked', false);
+        //        $('input[id="chkDimension"]').prop("disabled", false);
+        //        $("#chkWD").val('Weight');
+
+        //    }
+        //});
+
+        //$('input:checkbox[id="chkDimension"]').click(function () {
+        //    if ($(this).prop("checked") == true) {
+        //        $('input[id="chkDimension"]').prop('disabled', true);
+        //        $('input[id="chkWeight"]').prop("checked", false);
+        //        $('input[id="chkWeight"]').prop("disabled", false);
+        //        $("#chkWD").val('Dimension');
+        //    }
+        //});
+        }
+
+        $('input:checkbox[id="chkWeight"]').click(function () {
+        if ($(this).prop("checked") == true) {
+        $('input[id="chkWeight"]').prop('disabled', true);
+        $('input[id="chkDimension"]').prop('checked', false);
+        $('input[id="chkDimension"]').prop("disabled", false);
+        $("#chkWD").val('Weight');
+
+        }
+        });
+
+        $('input:checkbox[id="chkDimension"]').click(function () {
+        if ($(this).prop("checked") == true) {
+        $('input[id="chkDimension"]').prop('disabled', true);
+        $('input[id="chkWeight"]').prop("checked", false);
+        $('input[id="chkWeight"]').prop("disabled", false);
+        $("#chkWD").val('Dimension');
+        }
+        });
+
+    function getActionType() {
+
+        var z = 0;
+        if (!IsViewMode) {
+
+            if ($("#chkQMRF").prop("checked") == true) {
+                console.log("Internal");
+                $('input[id="chkQMRF"]').prop('disabled', true);
+                $('input[id="chkQCRF"]').prop('checked', false).change();
+                $('input[id="chkQCRF"]').prop("disabled", false);
+                $("#chkActionType").val('QMR');
+
+            }
+
+            if ($("#chkQCRF").prop("checked") == true) {
+                z = 1;
+                $("#chkActionType").val('QCR');
+                $('input[id="chkQCRF"]').prop('disabled', true);
+                $('input[id="chkQMRF"]').prop("checked", false).change();
+                $('input[id="chkQMRF"]').prop("disabled", false);
+
+            }
+
+            if ($("#chkPSY").prop("checked") == true) {
+
+                $('input[id="chkPSY"]').prop('disabled', true);
+                $('input[id="chkPSN"]').prop('checked', false).change();
+                $('input[id="chkPSN"]').prop("disabled", false);
+                $("#chkPSActionType").val('Yes');
+
+                $("#FileUploadPS").show();
+            }
+
+            if ($("#chkPSN").prop("checked") == true) {
+
+                $("#chkPSActionType").val('No');
+                $('input[id="chkPSN"]').prop('disabled', true);
+                $('input[id="chkPSY"]').prop("checked", false).change();
+                $('input[id="chkPSY"]').prop("disabled", false);
+                $("#fileToUpload").val('');
+                $("#FileUploadPS").hide();
+            }
+
+            if ($("#chkTRY").prop("checked") == true) {
+
+                $('input[id="chkTRY"]').prop('disabled', true);
+                $('input[id="chkTRN"]').prop('checked', false).change();
+                $('input[id="chkTRN"]').prop("disabled", false);
+                $("#chkTRActionType").val('Yes');
+
+                $("#FileUploadTR").show();
+            }
+
+            if ($("#chkTRN").prop("checked") == true) {
+
+                $("#chkTRActionType").val('No');
+                $('input[id="chkTRN"]').prop('disabled', true);
+                $('input[id="chkTRY"]').prop("checked", false).change();
+                $('input[id="chkTRY"]').prop("disabled", false);
+                $("#fileToUpload1").val('');
+                $("#FileUploadTR").hide();
+            }
+
+        }
+
+
+    }
+
+        function allowAlphaNumericSpace(thisInput) {
+            var arr = thisInput.value.split('');
+
+            if (arr[0] === ".") {
+                thisInput.value = "";
+            }
+
+           //thisInput.value = thisInput.value.split(/[^e]/).join('');
+    }
+
+    function addRemainingData(status, appRowId, comment, approvalType, text) {
+        var StartTime = $("#txtStartTime").val();
+        if (StartTime == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Start Time" + "</li>";
+            AddError("txtStartTime", '', errorCount);
+            errorCount++;
+        }
+
+
+        var EndTime = $("#txtEndTime").val();
+        if (EndTime == "") {
+            errors += "<li id='error" + errorCount + "'>" + "End Time " + "</li>";
+            AddError("txtEndTime", '', errorCount);
+            errorCount++;
+        }
+
+        if (errors.length) {
+            errors = "<ol id='errorList'>" + errors + "</ol>";
+            $("#headingErr").removeClass('d-none');
+            document.getElementById("add_to_me").innerHTML = errors;
+            errors = "";
+            errorCount = 0;
+            if (IsEditMode) {
+                $("#myModalEdit").scrollTop(0);
+                $("#myModalRequest").scrollTop(0);
+            }
+            else {
+                $(window).scrollTop(0);
+            }
+            return false;
+        }
+        var form = $("#QMCRForm");
+        var formData = new FormData(form[0]);
+        $.ajax({
+            url: '/QualityMeisterbockCubingform/UpdateData',
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            dataType: 'JSON',
+            data: formData,
+            enctype: 'multipart/form-data',
+            success: (function (data) {
+                if (data == 1) {
+                    FormApproval(status, appRowId, comment, approvalType, text);
+                }
+                else {
+                    failureModal(data.Message);
+
+                    console.log("failure");
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+
+
+            })
+        })
+
+    }
+
+    function UpdateCondition(status, appRowId, comment, approvalType, text) {
+        var ConPosTrial = $("#drpConPosTrial").val();
+        if (ConPosTrial == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Condition Post Trial" + "</li>";
+            AddError("drpConPosTrial", '', errorCount);
+            errorCount++;
+        }
+
+        if (errors.length) {
+            errors = "<ol id='errorList'>" + errors + "</ol>";
+            $("#headingErr").removeClass('d-none');
+            document.getElementById("add_to_me").innerHTML = errors;
+            errors = "";
+            errorCount = 0;
+            if (IsEditMode) {
+                $("#myModalEdit").scrollTop(0);
+                $("#myModalRequest").scrollTop(0);
+            }
+            else {
+                $(window).scrollTop(0);
+            }
+            return false;
+        }
+        var form = $("#QMCRForm");
+        var formData = new FormData(form[0]);
+        $.ajax({
+            url: '/QualityMeisterbockCubingform/UpdateCondition',
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            dataType: 'JSON',
+            data: formData,
+            enctype: 'multipart/form-data',
+            success: (function (data) {
+                if (data == 1) {
+                    FormApproval(status, appRowId, comment, approvalType, text);
+                }
+                else {
+                    failureModal(data.Message);
+
+                    console.log("failure");
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+
+
+            })
+        })
+
+    }
+
+    function DateValidation() {
+        var FromDate = document.getElementById("txtStartTime").value;
+        var ToDate = document.getElementById("txtEndTime").value;
+        var date1 = new Date(FromDate);
+        var date2 = new Date(ToDate);
+        var Today = new Date();
+
+        if (date1 != "" && date2 != "") {
+            if (date1 >= date2) {
+                document.getElementById('txtEndTime').style.borderColor = "red";
+                alert('Please enter valid Start Time and End Time');
+                //Swal.fire({
+                //    title: 'Error',
+                //    text: "To Date should not be less than from date ",
+                //    icon: 'error'
+                //})
+                $("#txtEndTime").val('');
+                return false;
+            } else {
+                document.getElementById('txtEndTime').style.borderColor = "Gainsboro";
+            }
+        }
+
+    }
+
+    function GetOtherValue() {
+        var drpProReq = $("#drpProReq option:selected").map(function () { return this.value }).get().join(',');
+        var str2 = "Others";
+        let position = drpProReq.search("Others");
+
+        if (position != -1) {
+
+            $(".OtherD").show();
+        } else {
+            $(".OtherD").hide();
+            $("#txtOthDetails").val('');
+        }
+    }
+
+</script>

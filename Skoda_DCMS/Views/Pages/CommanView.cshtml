@@ -1,0 +1,17 @@
+﻿@model Skoda_DCMS.Models.DashboardModel
+@{
+    ViewBag.Title = "Dashboard";
+    var user = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    var pvToBeRendered = Model.Data.PartialViewName;
+    var UniqueFormName = Model.Data.UniqueFormName;
+    var UniqueFormId = Model.Data.FormParentId;
+    var FormName = Model.Data.FullFormName;
+}
+<div class="container body">
+    <div class="main_container">
+        @{
+
+            Html.RenderPartial(pvToBeRendered, Model);
+        }
+    </div>
+</div>

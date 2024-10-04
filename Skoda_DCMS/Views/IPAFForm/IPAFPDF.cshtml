@@ -1,0 +1,1410 @@
+﻿@model dynamic
+@{
+    ViewBag.Title = "IPAFPDF";
+    int FormId = 0, AppRowId = 0, ApprovalType = 0; bool IsEdit = true; bool IsNew = true;
+    bool IsNewMode = true, IsEditMode = false, IsViewMode = false;
+    var user = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    var SecurityDesgnString = "Security";
+    Skoda_DCMS.Models.IPAFData IPAF = null;
+    List<Skoda_DCMS.Models.IPAFData> IPAFFormDataList = new List<Skoda_DCMS.Models.IPAFData>();
+    dynamic FlagRedirect = null;
+    var currentUser = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    List<Skoda_DCMS.Models.ApprovalDataModel>
+    appList = new List<Skoda_DCMS.Models.ApprovalDataModel>
+        ();
+    int? tableCount = 0;
+    string disabled = "", slctDisabled = "";
+    var CurrentUserDesgn = "";
+    long? CurrentUserLevel = 0;
+    if (ViewBag != null && !ViewBag.IsNewMode)
+    {
+        IsNew = ViewBag.IsNew;
+        IsEdit = ViewBag.IsEdit;
+        IsNewMode = ViewBag.IsNewMode;
+        IsEditMode = ViewBag.IsEditMode;
+        IsViewMode = ViewBag.IsViewMode;
+        disabled = IsViewMode ? "readonly" : "";
+        slctDisabled = IsViewMode ? "disabled" : "";
+        IPAF = ViewBag.Model.one[0] as Skoda_DCMS.Models.IPAFData;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        appList = ViewBag.Model?.three as List<Skoda_DCMS.Models.ApprovalDataModel>
+    ;
+        CurrentUserDesgn = appList?.Where(x => x.ApproverUserName == currentUser.UserName).Select(x => x.Designation).FirstOrDefault();
+        CurrentUserLevel = appList?.Where(x => x.ApproverUserName == currentUser.UserName && x.ApproverStatus == "Pending").Select(x => x.Level).FirstOrDefault();
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+        if (IsViewMode)
+        {
+            var Ap = appList?.Where(x =>
+            x.ApproverUserName.ToLower() == currentUser.UserName.ToLower()
+            && x.ApproverStatus.ToLower() == "pending"
+            ).FirstOrDefault();
+        }
+        IPAFFormDataList = ViewBag.Model?.Four as List<Skoda_DCMS.Models.IPAFData>;
+    }
+}
+
+
+<style>
+    body {
+        font-size: 12px; /* just so that it doesn't default to 16px (which is kinda huge) */
+    }
+
+    .hide {
+        display: none;
+    }
+    /*New design css start here*/
+    .astColor {
+        color: red;
+    }
+
+    .textTrans {
+        width: 100%;
+        max-width: 99%;
+        border-radius: 5px;
+        margin-right: 0px;
+        border: 1px solid !important;
+    }
+
+    .empDetailsBg {
+        background-color: #fffbef;
+    }
+
+    #accordion select {
+        color: #000;
+        width: 100% !important;
+        height: 45px;
+        background-color: #FFFFFF;
+        border: 1px solid #BFBFBF;
+        box-sizing: border-box;
+        border-radius: 5px;
+        background-image: url(data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>);
+        background-repeat: no-repeat;
+        background-position: right .75rem center;
+        background-size: 16px 12px;
+    }
+
+    #accordion input[type='text'] {
+        width: 100% !important;
+        max-width: 100%;
+        height: 45px;
+        background-color: #FFFFFF;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px !important;
+    }
+
+    #accordion input[type='date'] {
+        width: 100% !important;
+        max-width: 100%;
+        height: 45px;
+        background-color: #FFFFFF;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px;
+    }
+
+    #accordion input[type='time'] {
+        height: 45px;
+    }
+
+    #accordion label {
+        font-size: 16px;
+        line-height: 22px;
+        font-weight: 600;
+        color: #201F1F;
+    }
+
+    #accordion table tr td {
+        font-size: 16px;
+        line-height: 19px;
+        color: #201F1F;
+        background-color: white;
+    }
+
+    #accordion label {
+        display: block;
+    }
+
+    #accordion .card-header {
+        background: rgb(4 59 100) !important;
+        border-radius: 5px 5px 0px 0px;
+        position: relative;
+        margin-top: 15px;
+    }
+
+        #accordion .card-header.collapsed h5:after {
+            content: '+';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        #accordion .card-header h5:after {
+            content: '-';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+    #accordion h5 button {
+        font-size: 18px;
+        line-height: 22px;
+        /* identical to box height */
+        padding-left: 0px;
+        display: flex;
+        align-items: center;
+        text-transform: uppercase;
+        /* Text_white */
+
+        color: #FFFFFF;
+    }
+
+        #accordion h5 button:focus {
+            box-shadow: none;
+        }
+
+    .empDetailsFields label {
+        display: block !important;
+        margin-bottom: 0px;
+    }
+
+    .empDetailsFields .row label {
+        display: block;
+        margin-bottom: 0px;
+    }
+
+        .empDetailsFields .row label:nth-child(1) {
+            font-style: normal;
+            font-weight: normal !important;
+            font-size: 12px;
+            line-height: 18px;
+            color: #A9A9A9 !important;
+        }
+
+        .empDetailsFields .row label:nth-child(2) {
+            font-style: normal;
+            font-weight: normal;
+            font-size: 18px;
+            line-height: 22px;
+            color: #201F1F;
+        }
+
+    .firstLastName {
+        font-style: normal;
+        font-weight: normal;
+        font-size: 20px;
+        line-height: 24px;
+        /* identical to box height */
+
+        display: flex;
+        align-items: center;
+        color: #201F1F;
+    }
+
+    .submit-btn {
+        background: #3D3D3D;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #FFFFFF;
+        border-color: transparent !important;
+    }
+
+    .cancl-btn {
+        background: #FAE99B;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        border-color: transparent !important;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #212221;
+        margin-left: 10px;
+    }
+
+
+
+
+    .card-footer {
+        display: flex;
+        background-color: transparent !important;
+    }
+
+    .photo-form {
+        width: 100%;
+    }
+
+    .ui-front {
+        z-index: 9999999 !important;
+    }
+
+    /* NEW UI CSS END*/
+
+
+    .showBorder {
+        border: 1px solid #dee2e6;
+    }
+
+    .multiselect {
+        height: 47px;
+        margin-top: -1px;
+    }
+    /*Animation CSS Starts*/
+
+    div.input-block {
+        position: relative;
+    }
+
+        div.input-block input {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 188px;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block textarea {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 100%;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            background-color: #fff;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block span.placeholder {
+            position: absolute;
+            margin: 17px 0;
+            padding: 0 4px;
+            font-family: Roboto, sans-serif;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            top: -6px;
+            left: 15px;
+            transition: all 0.2s;
+            transform-origin: 0% 0%;
+            background: none;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+    .question_span {
+        width: 116% !important;
+        font-size: 15px !important;
+    }
+
+    div.input-block textarea:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: #fff !important;
+    }
+
+    div.input-block textarea:valid + span.placeholder,
+    div.input-block textarea:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+    }
+
+    div.inputSelect select:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+    }
+
+    div.input-block input:valid + span.placeholder,
+    div.input-block input:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: #fff;
+        /*background-color: rgb(219,238,213);*/
+    }
+
+
+    div.input-block input.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: rgb(219,238,213);
+    }
+
+    div.input-block input:read-only + span.placeholder,
+    div.input-block input:read-only + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: rgb(219,238,213);
+    }
+
+
+    div.inputSelect span.placeholder {
+        position: absolute;
+        margin: 17px 0;
+        padding: 0 4px;
+        font-family: Roboto, sans-serif;
+        color: #000;
+        display: flex;
+        align-items: center;
+        font-size: 1rem;
+        top: -6px;
+        left: 15px;
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+        background: none;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    div.inputSelect select:focus + span.placeholder {
+        transform: scale(0.8) translateY(-30px);
+        background: rgb(219,238,213);
+        z-index: 9;
+    }
+
+    div.inputSelect select:not([value=""]):valid + span.placeholder {
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+    }
+
+
+
+    div.input-block input:focus + span.placeholder {
+        color: #284B63;
+    }
+
+    .breadcrumb {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+        padding: 1rem 1rem 0;
+        margin-bottom: 0;
+        list-style: none;
+        background-color: #FFFFFF;
+        border-radius: .25rem;
+    }
+
+    body.nav-sm .container.body .left_col {
+        width: 63px;
+        padding: 0;
+        position: fixed;
+        height: 100%;
+        z-index: 8;
+    }
+
+    .card {
+        position: relative;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        min-width: 0;
+        word-wrap: break-word;
+        background-color: #fff;
+        background-clip: border-box;
+        border: 0px;
+        border-radius: .25rem;
+    }
+
+    .dropdown-toggle::after {
+        display: none;
+        width: 0;
+        height: 0;
+        margin-left: .255em;
+        vertical-align: .255em;
+        content: "";
+        border-top: .3em solid;
+        border-right: .3em solid transparent;
+        border-bottom: 0;
+        border-left: .3em solid transparent;
+    }
+
+    input.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213);
+    }
+
+    inputSelect.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213) !important;
+    }
+
+    select.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background-color: rgb(219,238,213) !important;
+        z-index: 9;
+    }
+
+    select.spanUpperSideWhite + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background-color: rgb(255,255,255) !important;
+        z-index: 9;
+    }
+
+    textarea.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    .TransView {
+        background-color: white !important;
+    }
+
+    @@media only screen and (min-width: 992px) {
+        div .input-block span.placeholder {
+            font-size: 15px;
+        }
+
+        div.inputSelect span.placeholder {
+            font-size: 1rem;
+        }
+    }
+
+    input[type='date'].spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    .showBorder {
+        border: 1px solid #dee2e6;
+    }
+
+    .wField {
+        width: 233px !important;
+        margin-left: 10px;
+    }
+
+    @@-moz-document url-prefix() {
+        input[type=time]::-ms-clear {
+            display: none;
+        }
+    }
+
+    .datetime-reset-button {
+        display: none !important;
+    }
+
+    .forShoppingCart {
+        margin-left: 14% !important;
+    }
+
+    .btn-group {
+        display: block !important;
+    }
+
+    #accordion label {
+        display: inline-block !important;
+    }
+
+
+    .custom-select:focus {
+        box-shadow: none !important;
+        border-color: none !important;
+    }
+
+    #addSoftwarebtn td {
+        border-top: none !important;
+    }
+
+    #ApplicationCategoryBody select {
+        background-color: #fff !important;
+    }
+
+    #loader {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        z-index: 10000;
+    }
+
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        margin: 0;
+    }
+</style>
+<style>
+    /*New design css start here*/
+    .astColor {
+        color: red;
+    }
+
+    .astColor1 {
+        color: red;
+    }
+
+    .textTrans {
+        width: 100%;
+        max-width: 99%;
+        border-radius: 5px;
+        margin-right: 0px;
+        border: 1px solid !important;
+    }
+
+    .empDetailsBg {
+        background-color: #fffbef;
+    }
+
+    #accordion select {
+        color: #000;
+        width: 100% !important;
+        max-width: 97%;
+        height: 45px;
+        background-color: #FFFFFF;
+        border: 1px solid #BFBFBF;
+        box-sizing: border-box;
+        border-radius: 5px;
+        background-image: url(data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>);
+        background-repeat: no-repeat;
+        background-position: right .75rem center;
+        background-size: 16px 12px;
+    }
+
+    #accordion input[type='text'] {
+        width: 100% !important;
+        max-width: 97%;
+        height: 45px;
+        /*background-color: #F8F8F8;*/
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px;
+    }
+
+    #accordion input[type='number'] {
+        width: 100% !important;
+        max-width: 97%;
+        height: 45px;
+        /*background-color: #F8F8F8;*/
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px;
+    }
+
+    #accordion input[type='date'] {
+        width: 100% !important;
+        max-width: 97%;
+        height: 45px;
+        background-color: #FFFFFF;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px;
+    }
+
+    #accordion label {
+        font-size: 16px;
+        line-height: 22px;
+        font-weight: 600;
+        color: #201F1F;
+    }
+
+    #accordion table tr td {
+        border: none !important;
+        font-size: 16px;
+        line-height: 19px;
+        color: #201F1F;
+        background-color: white;
+        padding: 10px 0;
+    }
+
+    #accordion label {
+        display: block;
+    }
+
+    #accordion .card-header {
+        background: rgb(4 59 100) !important;
+        border-radius: 5px 5px 0px 0px;
+        position: relative;
+        margin-top: 15px;
+    }
+
+        #accordion .card-header.collapsed h5:after {
+            content: '+';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        #accordion .card-header h5:after {
+            content: '-';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+    #accordion h5 button {
+        font-size: 18px;
+        line-height: 22px;
+        /* identical to box height */
+        padding-left: 0px;
+        display: flex;
+        align-items: center;
+        text-transform: uppercase;
+        /* Text_white */
+
+        color: #FFFFFF;
+    }
+
+        #accordion h5 button:focus {
+            box-shadow: none;
+        }
+
+    .empDetailsFields label {
+        display: block !important;
+        margin-bottom: 0px;
+    }
+
+    .empDetailsFields .row label {
+        display: block;
+        margin-bottom: 0px;
+    }
+
+        .empDetailsFields .row label:nth-child(1) {
+            font-style: normal;
+            font-weight: normal !important;
+            font-size: 12px;
+            line-height: 18px;
+            color: #A9A9A9 !important;
+        }
+
+        .empDetailsFields .row label:nth-child(2) {
+            font-style: normal;
+            font-weight: normal;
+            font-size: 18px;
+            line-height: 22px;
+            color: #201F1F;
+        }
+
+    .firstLastName {
+        font-style: normal;
+        font-weight: normal;
+        font-size: 20px;
+        line-height: 24px;
+        /* identical to box height */
+
+        display: flex;
+        align-items: center;
+        color: #201F1F;
+    }
+
+    .submit-btn {
+        background: #3D3D3D;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #FFFFFF;
+        border-color: transparent !important;
+    }
+
+    .cancl-btn {
+        background: #FAE99B;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        border-color: transparent !important;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #212221;
+        margin-left: 10px;
+    }
+
+
+
+
+    .card-footer {
+        display: flex;
+        background-color: transparent !important;
+    }
+
+    .photo-form {
+        width: 100%;
+    }
+
+    .ui-front {
+        z-index: 9999999 !important;
+    }
+    /*Animation CSS Starts*/
+
+    div.input-block {
+        position: relative;
+    }
+
+        div.input-block input {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 188px;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block textarea {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #495055;
+            width: 100%;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            background-color: #fff;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block span.placeholder {
+            position: absolute;
+            margin: 17px 0;
+            padding: 0 4px;
+            font-family: Roboto, sans-serif;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            top: -6px;
+            left: 15px;
+            transition: all 0.2s;
+            transform-origin: 0% 0%;
+            background: none;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        div.input-block textarea:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: #fff !important;
+        }
+
+        div.input-block textarea:valid + span.placeholder,
+        div.input-block textarea:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px) !important;
+            background: #fff !important;
+        }
+
+        div.input-block input:valid + span.placeholder,
+        div.input-block input:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: rgb(219,238,213);
+        }
+
+
+        div.input-block input.spanUpperSide + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: rgb(219,238,213);
+        }
+
+        div.input-block input:read-only + span.placeholder,
+        div.input-block input:read-only + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background: rgb(219,238,213);
+        }
+
+
+    div.inputSelect span.placeholder {
+        position: absolute;
+        margin: 17px 0;
+        padding: 0 4px;
+        font-family: Roboto, sans-serif;
+        color: #000;
+        display: flex;
+        align-items: center;
+        font-size: 1rem;
+        top: -6px;
+        left: 15px;
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+        background: none;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    div.inputSelect select:focus + span.placeholder {
+        transform: scale(0.8) translateY(-30px);
+        background: rgb(219,238,213);
+        z-index: 9;
+    }
+
+    div.inputSelect select:not([value=""]):valid + span.placeholder {
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+    }
+
+
+
+    div.input-block input:focus + span.placeholder {
+        color: #284B63;
+    }
+
+    .breadcrumb {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+        padding: 1rem 1rem 0;
+        margin-bottom: 0;
+        list-style: none;
+        background-color: #FFFFFF;
+        border-radius: .25rem;
+    }
+
+    body.nav-sm .container.body .left_col {
+        width: 63px;
+        padding: 0;
+        position: fixed;
+        height: 100%;
+        z-index: 8;
+    }
+
+    .card {
+        position: relative;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        min-width: 0;
+        word-wrap: break-word;
+        background-color: #fff;
+        background-clip: border-box;
+        border: 0px;
+        border-radius: .25rem;
+    }
+
+    .dropdown-toggle::after {
+        display: none;
+        width: 0;
+        height: 0;
+        margin-left: .255em;
+        vertical-align: .255em;
+        content: "";
+        border-top: .3em solid;
+        border-right: .3em solid transparent;
+        border-bottom: 0;
+        border-left: .3em solid transparent;
+    }
+
+    input.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213);
+    }
+
+    inputSelect.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213) !important;
+    }
+
+    select.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background-color: rgb(219,238,213) !important;
+        z-index: 9;
+    }
+
+    textarea.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    @@media only screen and (min-width: 992px) {
+        div.input-block span.placeholder {
+            font-size: 15px;
+        }
+
+        div.inputSelect span.placeholder {
+            font-size: 14px;
+        }
+    }
+
+    #add_to_me {
+        text-align: left !important;
+    }
+
+    .TransView {
+        background-color: white !important;
+    }
+
+    .mt06rem {
+        margin-top: 0.6rem;
+    }
+
+    .chkPosition {
+        position: relative;
+        left: -11px;
+    }
+
+    .pl06rem {
+        padding-left: 0.6rem;
+    }
+
+    .mlSpaceChk {
+        margin-left: 2.1rem;
+    }
+
+    .leftSpace {
+        left: 29px !important;
+    }
+
+    .showBorder {
+        border: 1px solid #dee2e6;
+    }
+
+    .forLblWidth {
+        width: 20.5%;
+    }
+
+    .forTdLbl {
+        width: 14.5%;
+    }
+
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        margin: 0;
+    }
+</style>
+
+<!DOCTYPE html>
+<html>
+<head>
+
+    <style type="text/css">
+        *:visited, *:focus {
+            box-shadow: none;
+        }
+
+        input, select, input:focus, select:focus, textarea, textarea:focus {
+            border: 1px solid #000;
+        }
+
+        input, textarea {
+            padding: 5px;
+        }
+
+        .asset {
+            border: 1px solid black;
+            height: 20px;
+        }
+
+        .signature-table thead td {
+            border-bottom: 1px solid black;
+            border-left: 1px solid black;
+            border-collapse: collapse;
+        }
+
+        .signature-table tbody, .signature-table td {
+            border: none;
+            border-left: 1px solid black;
+            border-collapse: collapse;
+            padding: 5px;
+        }
+
+            .signature-table td:first-child {
+                border-left: none;
+            }
+
+        .signature-table {
+            border: 1px solid black;
+        }
+
+
+
+        body {
+            font-family: 'SKODANext-Black';
+        }
+
+        .form_lbl {
+            color: #000;
+            font-weight: 600;
+        }
+
+        #formlbl {
+            width: 250px;
+        }
+
+        label {
+            font-family: "Trebuchet MS", Verdana, Halvetica, Arial;
+            font-size: 20px;
+            font-weight: normal;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+            table td, th {
+                padding-left: 10px;
+            }
+    </style>
+
+</head>
+<body>
+
+    <table style="width: 100%; font-size: 14px; color: #000; font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+        <tr>
+            <td>
+                <table style="width: 100%;" cellspadding="0" cellspacing="0">
+                    <tr>
+                        <td colspan="6" width="60%" style="text-align: right;">
+                            @*<img style="width: 50%;" src='@Server.MapPath("~/assets/img/SAVWIPL_Merger_Logo.JPG")'>*@
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="6" align="center">
+                <h2 style="font-weight:bold">
+                    IT Production Application Access Form
+                </h2>
+            </td>
+        </tr>
+
+        <tr>
+            <td style="padding: 15px;">
+                <table cellspacing="0" border="" cellpadding="0" width="100%">
+                    @if (IPAF.RequestSubmissionFor == "Self")
+                    {
+                        <tr>
+                            <td colspan="6" align='left'>
+                                <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Submitter Details</u></b></h6>
+                            </td>
+                        </tr>
+                        <tr style="margin-top:5px;">
+                            <td style="width:20%; font-weight: bold;">
+                                Employee Name
+                            </td>
+                            <td style="width: 30%; font-weight: normal;" colspan="2" align='left'>
+                                <span style="height: 25px; width:85%; border-radius: 0; "> @(IPAF.EmployeeName)  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Employee Code
+                            </td>
+                            <td style="width: 30%; font-weight: normal;" colspan="2" align='left'>
+                                <span style="height: 25px; width:85%; border-radius: 0; "> @(IPAF.EmployeeCode) </span>
+                            </td>
+
+                        </tr>
+                        <tr style="margin-top:5px;">
+                            <td style="width:20%; font-weight: bold;">
+                                Designation
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(IPAF.EmployeeDesignation) </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Location
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(IPAF.EmployeeLocation) </span>
+                            </td>
+
+                        </tr>
+                        <tr style="margin-top:5px;">
+                            <td style="width:20%; font-weight: bold;">
+                                Department
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(IPAF.EmployeeDepartment) </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Contact Number
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(IPAF.EmployeeContactNo) </span>
+                            </td>
+
+                        </tr>
+                        <tr style="margin-top:5px;">
+                            <td style="width:20%; font-weight: bold;">
+                                Cost Center Number
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(IPAF.EmployeeCCCode)  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                UserID
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(IPAF.EmployeeUserId)  </span>
+                            </td>
+
+                        </tr>
+                    }
+                    else
+                    {
+                        if (IPAF.EmployeeType == "SAVWIPLEmployee")
+                        {
+                            <tr>
+                                <td colspan="6" align='left'>
+                                    <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Submitter Details</u></b></h6>
+                                </td>
+                            </tr>
+                            <tr>
+
+                                <td style="width:20%; font-weight: bold;">
+                                    Employee Name
+                                </td>
+                                <td style="width: 30%" colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(IPAF.OtherEmployeeName)  </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Employee Code
+                                </td>
+                                <td style="width: 30%" colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(IPAF.OtherEmployeeCode) </span>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Designation
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(IPAF.OtherEmployeeDesignation) </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Location
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(IPAF.OtherEmployeeLocation) </span>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Department
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(IPAF.OtherEmployeeDepartment) </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Contact Number
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(IPAF.OtherEmployeeContactNo) </span>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Cost Center Number
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(IPAF.OtherEmployeeCCCode)  </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    UserID
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(IPAF.OtherEmployeeUserId)  </span>
+                                </td>
+
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" align='left'>
+                                    <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Submitter Details</u></b></h6>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Employee Name
+                                </td>
+                                <td style="width: 30%" colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(IPAF.OtherEmployeeName)  </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Employee Code
+                                </td>
+                                <td style="width: 30%" colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(IPAF.OtherEmployeeCode) </span>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Designation
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(IPAF.OtherEmployeeDesignation) </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Location
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(IPAF.OtherEmployeeLocation) </span>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Department
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(IPAF.OtherEmployeeDepartment) </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Contact Number
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(IPAF.OtherEmployeeContactNo) </span>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Cost Center Number
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(IPAF.OtherEmployeeCCCode)  </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    UserID
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(IPAF.OtherEmployeeUserId)  </span>
+                                </td>
+
+                            </tr>
+                        }
+
+                    }
+                    <tr>
+                        <td colspan="6" align='left'>
+                            <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Transaction Field</u></b></h6>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Request Type:
+                        </td>
+                        <td colspan="3" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(IPAF.RequestType)  </span>
+
+                        </td>
+                        <td colspan="3" align='left'>
+                            @if (IPAF.RequestType == "Temporary")
+                            {
+
+                                <label style="width: 25%; font-weight: normal;  border-radius: 0; ">From Date</label>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@(IPAF.RequestFromDate)</span>
+                                <label style="width: 25%; font-weight: normal;  border-radius: 0; ">To Date</label>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@(IPAF.RequestToDate)</span>
+
+                            }
+                       </td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Business Justification:
+                        </td>
+                        <td colspan="3" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@(IPAF.BusinessJustification)  </span>
+                        </td>
+                        <td></td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+
+    <table style="width: 100%; font-size: 14px; color: #000; font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+        <tr>
+            <th>Application Name</th>
+            <th>Application URL</th>
+            <th>Type Of Access</th>
+            <th>Access Group</th>
+
+
+        </tr>
+
+        @foreach (var item in IPAFFormDataList)
+        {
+            <tr>
+                <th>@item.Applicationname</th>
+                <th>@item.Applicationurl</th>
+                <th>@item.Applicationaccess</th>
+                <th>@item.Accessgroup</th>
+                
+                
+
+            </tr>
+        }
+
+
+    </table>
+
+        <p>SF_II_024</p>
+</body>
+</html>
+

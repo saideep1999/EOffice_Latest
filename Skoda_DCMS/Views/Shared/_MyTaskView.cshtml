@@ -1,0 +1,250 @@
+@model Skoda_DCMS.Models.DashboardModel
+@{
+    var user = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+}
+@{ var count = 1;}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/7.2.0/sweetalert2.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/7.2.0/sweetalert2.all.min.js"></script>
+
+<style>
+    #loader {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        z-index: 10000;
+    }
+</style>
+<table class="table" id="taskTable">
+    <thead>
+        <tr style="background: #ededed;">
+            <th>Form&nbsp;Id</th>
+            <th>Form Name</th>
+            <th>Request&nbsp;From</th>
+            <th>Details / Business Needs</th>
+            <th>Status</th>
+            <th>Received&nbsp;Date</th>
+            <th class="text-center">Action</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if (Model == null || Model.Data == null || Model.Data.Forms == null || Model.Data.Forms.Count == 0)
+        {
+            <tr>
+                <td class="text-center" colspan="6">
+                    <i> No Tasks </i>
+                </td>
+            </tr>
+        }
+        else
+        {
+            foreach (var item in Model.Data.Forms)
+            {
+                <tr class="my_task_table">
+                    @*<td></td>
+                        <td>@item.FormCount</td>*@
+                    <td>@(item.FormRelation.UniqueFormName + item.FormRelation.Id)</td>
+                    <td>@(item.FormRelation.FormName)</td>
+                    @if (item.ApplicantName == null)
+                    {
+                        <td>@item.Author.Submitter  </td>
+                    }
+                    else
+                    {
+                        <td>@item.Author.Submitter <br />Applicant Name= @item.ApplicantName </td>
+                    }
+
+                    @*<td>
+                            @(item.BusinessNeed)
+                        </td>*@
+                    <td title="@item.BusinessNeed">
+                        <input value="@item.BusinessNeed" class="inputTooltip" style="background-color:transparent !important;" maxlength="10" readonly />
+                    </td>
+                    <td>@item.ApproverStatus</td>
+                    <td data-order="@item.RecievedDate.ToString("MM/dd/yyyy HH:mm")">@item.RecievedDate.ToString("MM/dd/yyyy")</td>
+                    <td class="text-center">
+                        <div class="container" style="text-align: center;">
+                            @*Trigger the modal with a button*@
+                            @if (item.FormRelation.UniqueFormName == "BRF")
+                            {
+                                <button type="button" data-toggle="tooltip" data-placement="bottom" title="View" onclick="window.location.href = 'http://win-6cgsdmg51od:8080/sites/DCMS/Lists/@(item.FormRelation.ListName)/EditForm.aspx?ID=@(item.RowId)&Source=http%3A%2F%2Fwin%2D6cgsdmg51od%3A8080%2Fsites%2FDCMS%2FLists%2F@(item.FormRelation.ListName)%2FAllItems%2Easpx&ContentTypeId=0x01008964B342765A924B8A6F018C4C784B11';">
+                                    <i class="fa fa-eye" aria-hidden="true"></i>
+                                </button>
+                            }
+                            else
+                            {
+                                if (item.ApproverStatus == "Enquired")
+                                {
+                                    <button class="btn btn-xs btn-default photography-action-btn" type="button" data-toggle="tooltip" data-placement="bottom" title="Edit" onclick="GoToEditForm('@item.FormRelation.UniqueFormName', @item.RowId, @item.FormRelation.Id, @item.Id,'@item.FormRelation.ControllerName')">
+                                        <i class="fa fa-edit" aria-hidden="true"></i>
+                                    </button>
+
+                                }
+                                else
+                                {
+                                    <button class="btn btn-xs btn-default photography-action-btn" type="button" data-toggle="tooltip" data-placement="bottom" title="View" onclick="GoToViewForm('@item.FormRelation.UniqueFormName', @item.RowId, @item.FormRelation.Id, @item.Id, @item.ApprovalType, @item.AuthorityToEdit, '@item.Department','@item.FormRelation.ControllerName')">
+                                        <i class="fa fa-eye" aria-hidden="true"></i>
+                                    </button>
+                                    <button class="btn btn-xs btn-default photography-action-btn" type="button" data-toggle="tooltip" data-placement="bottom" title="Approve" onclick="GoToApproveForm('@item.FormRelation.UniqueFormName', @item.RowId, @item.FormRelation.Id, @item.Id, @item.ApprovalType, @item.AuthorityToEdit, '@item.Department','@item.FormRelation.ControllerName')">
+                                        <i class="fa fa-check" aria-hidden="true"></i>
+                                    </button>
+                                }
+                            }
+                        </div>
+                        <input type="hidden" id="ApprovalType" name="ApprovalType" value="@item.ApprovalType">
+                        <input type="hidden" id="PAFApproverType" name="PAFApproverType" value="@(item.FormRelation.FormStatus)">
+                    </td>
+                </tr>
+
+                //count++;
+            }
+        }
+    </tbody>
+
+
+</table>
+
+
+<script>
+    /*var MyTaskValue = document.getElementById("PAFApproverType").value;*/
+    function GoToViewForm(formName, rowId, formId, appRowId, ApprovalType, ApproverType, Department, ControllerName) {
+        $(".full-screen-container").removeClass('invisible');
+        $(".full-screen-container").show();
+        var MyTask = 0;
+        if (ApproverType == 1) {
+            MyTask = 1;
+        }
+        else {
+            MyTask = 0;
+        }
+        $("#pageLoader").removeClass('invisible');
+        $.ajax({
+            url: '/List/ViewFilledFormNew',
+            type: 'GET',
+            data: { formName: formName, rowId: rowId, formId: formId, appRowId: appRowId, MyTask: MyTask, ApprovalType: ApprovalType, Department: Department, ControllerName: ControllerName },
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data.isValid) {
+                    console.log(data);
+                    $("#formView").html(data.view);
+                    //if (formName == "ECF") {
+                    //    $("#btnReject").hide();
+                    //    $("#labelReject").hide();
+                    //}
+                    $("#myModal5").modal('show');
+                    $("#pageLoader").addClass('invisible');
+                }
+                else {
+                    $("#pageLoader").addClass('invisible');
+                    alert("There was an issue while opening the form. Please contact your administrator");
+                }
+                $(".full-screen-container").hide();
+            }),
+            error: (function (data) {
+                $("#loader").addClass('invisible');
+                $(".full-screen-container").hide();
+            })
+        })
+    }
+
+    function GoToEditForm(formName, rowId, formId, appRowId, ControllerName) {
+        $(".full-screen-container").removeClass('invisible');
+        $(".full-screen-container").show();
+        $("#pageLoader").removeClass('invisible');
+        $.ajax({
+            url: '/List/EditForm',
+            type: 'GET',
+            data: { formName: formName, rowId: rowId, formId: formId, appRowId: appRowId, ControllerName: ControllerName },
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data.isValid) {
+                    //console.log(data);
+                    $("#viewForm").html(data.view);
+                    $("#myModalEdit").modal('show');
+                    $("#pageLoader").addClass('invisible');
+                }
+                else {
+                    $("#pageLoader").addClass('invisible');
+                    alert("There was an issue while opening the form. Please contact your administrator");
+                } $(".full-screen-container").hide();
+            }),
+            error: (function (data) {
+                $("#loader").addClass('invisible'); $(".full-screen-container").hide();
+            })
+        })
+    }
+
+    $(document).ready(function () {
+        // let -allows you to display the variables that are limit of block stmt/expression
+        let myTaskCount = '@(Model != null && Model.Data != null  && Model.Data.Forms != null ? Model.Data.Forms.Count : 0)';
+        if (myTaskCount > 0)
+            $("#myTaskCount").text("("+myTaskCount+")");
+    });
+
+    function GoToApproveForm(formName, rowId, formId, appRowId, ApprovalType, ApproverType, Department, ControllerName) {
+        $(".full-screen-container").removeClass('invisible');
+        $(".full-screen-container").show();
+        var MyTask = 0;
+        if (ApproverType == 1) {
+            MyTask = 1;
+        }
+        else {
+            MyTask = 0;
+        }
+        //$("#pageLoader").removeClass('invisible');
+        $.ajax({
+            url: '/List/ViewFilledFormNew',
+            type: 'GET',
+            data: { formName: formName, rowId: rowId, formId: formId, appRowId: appRowId, MyTask: MyTask, ApprovalType: ApprovalType, Department: Department, ControllerName: ControllerName },
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data.isValid) {
+                    console.log(data);
+                    $("#formView").html(data.view);
+                    //if (formName == "ECF") {
+                    //    $("#btnReject").hide();
+                    //    $("#labelReject").hide();
+                    //}
+                    //$('#loader').show();
+                    $("#formView").hide();
+                    /* $("#myModal5").modal();*/
+                    var text = "approve";
+                    saveResponse(text);
+                    var ISERROR = $("#add_to_me").val();
+                    if ($('#add_to_me').children().length != 0) {
+                        alert("Form has a Action field. Kindly fill that!");
+                        //$('#loader').hide();
+                        $("#formView").show();
+                        $('.full-screen-container').hide();
+                    } else {
+                        $('.full-screen-container').hide();
+                        swal({
+                            title: "Success!",
+                            text: "Form has been Approved!",
+                            type: "success"
+                        }).then(function () {
+                            //$("#pageLoader").addClass('invisible');
+                            location.reload(true);
+                            //$('#loader').hide();
+                        });
+                    }
+                }
+                else {
+                    $('.full-screen-container').hide();
+                    alert("There was an issue while opening the form. Please contact your administrator");
+                }
+            }),
+            error: (function (data) {
+                $('.full-screen-container').hide();
+            })
+        })
+    }
+
+
+
+</script>
+

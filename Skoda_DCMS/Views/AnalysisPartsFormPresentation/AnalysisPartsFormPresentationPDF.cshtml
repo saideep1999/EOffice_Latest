@@ -1,0 +1,420 @@
+﻿@model dynamic
+@{
+    ViewBag.Title = "Analysis Parts Form Presentation";
+    int FormId = 0, AppRowId = 0, ApprovalType = 0; bool IsEdit = true; bool IsNew = true;
+    bool IsNewMode = true, IsEditMode = false, IsViewMode = false;
+    Skoda_DCMS.Models.AnalysisPartsFormPresentationData APFP = null;
+    List<Skoda_DCMS.Models.AnalysisPartsFormPresentationData> UserDataList = new List<Skoda_DCMS.Models.AnalysisPartsFormPresentationData>();
+    var currentUser = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    List<Skoda_DCMS.Models.ApprovalDataModel>
+    appList = new List<Skoda_DCMS.Models.ApprovalDataModel>
+        ();
+    string disabled = "";
+    var CurrentUserDesgn = "";
+    long? CurrentUserLevel = 0;
+
+
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IsNew = ViewBag.IsNew;
+        IsEdit = ViewBag.IsEdit;
+        IsNewMode = ViewBag.IsNewMode;
+        IsEditMode = ViewBag.IsEditMode;
+        IsViewMode = ViewBag.IsViewMode;
+        disabled = IsViewMode ? "disabled" : "";
+        APFP = ViewBag.Model.one[0] as Skoda_DCMS.Models.AnalysisPartsFormPresentationData;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        appList = ViewBag.Model?.three as List<Skoda_DCMS.Models.ApprovalDataModel>
+    ;
+        CurrentUserDesgn = appList?.Where(x => x.ApproverUserName == currentUser.UserName).Select(x => x.Designation).FirstOrDefault();
+        CurrentUserLevel = appList?.Where(x => x.ApproverUserName == currentUser.UserName && x.ApproverStatus == "Pending").Select(x => x.Level).FirstOrDefault();
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+        if (IsViewMode)
+        {
+            var Ap = appList?.Where(x =>
+            x.ApproverUserName.ToLower() == currentUser.UserName.ToLower()
+            && x.ApproverStatus.ToLower() == "pending"
+            ).FirstOrDefault();
+        }
+
+        UserDataList = ViewBag.Model?.Four as List<Skoda_DCMS.Models.AnalysisPartsFormPresentationData>;
+    }
+    }
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+
+    <style type="text/css">
+        *:visited, *:focus {
+            box-shadow: none;
+        }
+
+        input, select, input:focus, select:focus, textarea, textarea:focus {
+            border: 1px solid #000;
+        }
+
+        input, textarea {
+            padding: 5px;
+        }
+
+        .asset {
+            border: 1px solid black;
+            height: 20px;
+        }
+
+        .signature-table thead td {
+            border-bottom: 1px solid black;
+            border-left: 1px solid black;
+            border-collapse: collapse;
+        }
+
+        .signature-table tbody, .signature-table td {
+            border: none;
+            border-left: 1px solid black;
+            border-collapse: collapse;
+            padding: 5px;
+        }
+
+            .signature-table td:first-child {
+                border-left: none;
+            }
+
+        .signature-table {
+            border: 1px solid black;
+        }
+
+
+
+        body {
+            font-family: 'SKODANext-Black';
+        }
+
+        .form_lbl {
+            color: #000;
+            font-weight: 600;
+        }
+
+        #formlbl {
+            width: 250px;
+        }
+
+        label {
+            font-family: "Trebuchet MS", Verdana, Halvetica, Arial;
+            font-size: 20px;
+            font-weight: normal;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+            table td, th {
+                padding-left: 10px;
+            }
+    </style>
+
+</head>
+<body>
+
+    <table style="width: 100%; font-size: 14px; color: #000; font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+        <tr>
+            <td>
+                <table style="width: 100%;" cellspadding="0" cellspacing="0">
+                    <tr>
+                        <td colspan="6" width="60%" style="text-align: right;">
+                            @*<img style="width: 50%;" src='@Server.MapPath("~/assets/img/SAVWIPL_Merger_Logo.JPG")'>*@
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="6" align="center">
+                <h2 style="font-weight:bold">
+                    Analysis Parts Form Presentation
+                </h2>
+            </td>
+        </tr>
+
+        <tr>
+            <td style="padding: 15px;">
+                <table cellspacing="0" border="" cellpadding="0" width="100%">
+                    @if (APFP.RequestSubmissionFor == "Self")
+                    {
+                        <tr>
+                            <td colspan="6" align='left'>
+                                <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Submitter Details</u></b></h6>
+                            </td>
+                        </tr>
+                        <tr style="margin-top:5px;">
+                            <td style="width:20%; font-weight: bold;">
+                                Employee Name
+                            </td>
+                            <td style="width: 30%; font-weight: normal;" colspan="2" align='left'>
+                                <span style="height: 25px; width:85%; border-radius: 0; "> @(APFP.EmployeeName)  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Employee Code
+                            </td>
+                            <td style="width: 30%; font-weight: normal;" colspan="2" align='left'>
+                                <span style="height: 25px; width:85%; border-radius: 0; "> @(APFP.EmployeeCode) </span>
+                            </td>
+
+                        </tr>
+                        <tr style="margin-top:5px;">
+                            <td style="width:20%; font-weight: bold;">
+                                Designation
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(APFP.EmployeeDesignation) </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Location
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(APFP.EmployeeLocation) </span>
+                            </td>
+
+                        </tr>
+                        <tr style="margin-top:5px;">
+                            <td style="width:20%; font-weight: bold;">
+                                Department
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(APFP.EmployeeDepartment) </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Contact Number
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(APFP.EmployeeContactNo) </span>
+                            </td>
+
+                        </tr>
+                        <tr style="margin-top:5px;">
+                            <td style="width:20%; font-weight: bold;">
+                                Cost Center Number
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(APFP.EmployeeCCCode)  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                UserID
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(APFP.EmployeeUserId)  </span>
+                            </td>
+
+                        </tr>
+                    }
+                    else
+                    {
+                        if (APFP.EmployeeType == "SAVWIPLEmployee")
+                        {
+                            <tr>
+                                <td colspan="6" align='left'>
+                                    <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Submitter Details</u></b></h6>
+                                </td>
+                            </tr>
+                            <tr>
+
+                                <td style="width:20%; font-weight: bold;">
+                                    Employee Name
+                                </td>
+                                <td style="width: 30%" colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(APFP.OtherEmployeeName)  </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Employee Code
+                                </td>
+                                <td style="width: 30%" colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(APFP.OtherEmployeeCode) </span>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Designation
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(APFP.OtherEmployeeDesignation) </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Location
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(APFP.OtherEmployeeLocation) </span>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Department
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(APFP.OtherEmployeeDepartment) </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Contact Number
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(APFP.OtherEmployeeContactNo) </span>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Cost Center Number
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(APFP.OtherEmployeeCCCode)  </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    UserID
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(APFP.OtherEmployeeUserId)  </span>
+                                </td>
+
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" align='left'>
+                                    <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Submitter Details</u></b></h6>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Employee Name
+                                </td>
+                                <td style="width: 30%" colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(APFP.OtherEmployeeName)  </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Employee Code
+                                </td>
+                                <td style="width: 30%" colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(APFP.OtherEmployeeCode) </span>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Designation
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(APFP.OtherEmployeeDesignation) </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Location
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(APFP.OtherEmployeeLocation) </span>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Department
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(APFP.OtherEmployeeDepartment) </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Contact Number
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(APFP.OtherEmployeeContactNo) </span>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Cost Center Number
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(APFP.OtherEmployeeCCCode)  </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    UserID
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(APFP.OtherEmployeeUserId)  </span>
+                                </td>
+
+                            </tr>
+                        }
+
+                    }
+                    <tr>
+                        <td colspan="6" align='left'>
+                            <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Transaction Field</u></b></h6>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Week No:
+                        </td>
+                        <td colspan="3" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(APFP.WeekNo)  </span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">
+                            Topic:
+                        </td>
+                        <td colspan="3" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(APFP.Topic)  </span>
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Department:
+                        </td>
+                        <td colspan="3" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(APFP.Department)  </span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">
+                            Detail Description:
+                        </td>
+                        <td colspan="3" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(APFP.DetailDescription)  </span>
+                        </td>
+
+                    </tr>
+
+
+                </table>
+            </td>
+        </tr>
+    </table>
+    <table style="width: 100%; font-size: 14px; color: #000; font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+
+        <tr>
+            <th>Sr No</th>
+            <th>Project</th>
+            <th>Parts</th>
+            <th>Quantity</th>
+            <th>Reason</th>
+       
+        </tr>
+        @foreach (var item in UserDataList)
+        {
+            <tr>
+                <th>@item.SrNo</th>
+                <th>@item.Project</th>
+                <th>@item.Parts</th>
+                <th>@item.Quantity</th>
+                <th>@item.Reason</th>
+            </tr>
+        }
+    </table>
+    <p>SF_II_024</p>
+</body>
+</html>

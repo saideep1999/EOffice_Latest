@@ -1,0 +1,1948 @@
+@{
+    var user = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    var userAccess = user.UserAccessId;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>@ViewBag.Title</title>
+
+    @*<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>*@
+
+    <script src="~/assets/js/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="~/assets/css/jquery-ui.css">
+    <link href="~/Content/jquery.jqGrid/ui.jqgrid.css" rel="stylesheet" type="text/css" />
+    <link href="~/Content/Site.css" rel="stylesheet" type="text/css" />
+    <link href="~/fonts/SKODANextfont/stylesheet.css" rel="stylesheet" type="text/css" />
+
+
+    <script src="~/assets/js/popper.min.js" crossorigin="anonymous"></script>
+    <script src="~/Scripts/modernizr-2.8.3.js"></script>
+
+    @*<script type="text/javascript" src="~/Scripts/bootstrap.js"></script>*@
+    <script type="text/javascript" src="~/Scripts/respond.js"></script>
+    <script src="~/assets/js/jquery-ui.js"
+            crossorigin="anonymous"></script>
+    <script src="~/Scripts/jquery-migrate-3.3.2.js"></script>
+
+    <script type="text/javascript" src="~/i18n/grid.locale-en.js"></script>
+    <script type="text/javascript" src="~/Scripts/jquery.jqGrid.js"></script>
+    <script type="text/javascript" src="~/Scripts/home.js"></script>
+
+    <script src="~/assets/js/bootstrap.min.js"></script>
+    <script src="~/assets/js/jquery.dataTables.min.js"></script>
+    <link rel="apple-touch-icon" href="~/assets/img/icon.png">
+    <link rel="stylesheet" href="~/assets/css/normalize.css">
+    <!-- Bootstrap core CSS -->
+    <link href="~/assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="~/assets/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="~/assets/font/css/font-awesome.min.css" rel="stylesheet">
+    <link href="~/assets/font/css/animate.min.css" rel="stylesheet">
+    <link href="~/assets/css/icheck/flat/flat.css" rel="stylesheet">
+    <link href="~/assets/css/owl.carousel.css" rel="stylesheet">
+    <link href="~/assets/css/owl.theme.default.css" rel="stylesheet">
+    <link href="~/assets/css/main.css" rel="stylesheet">
+    <link href="~/assets/css/style.css" rel="stylesheet">
+
+    @*<link rel="stylesheet" href="~/assets/css/bootstrap-theme.min.css" crossorigin="anonymous">*@
+
+
+
+    <link href="~/assets/css/loader.css" rel="stylesheet" />
+    <link href="~/assets/css/bootstrap-multiselect.css" rel="stylesheet" />
+    <script src="~/assets/js/bootstrap-multiselect.js"></script>
+
+    <script type="text/javascript" src="~/assets/js/canvasjs.min.js"></script>
+
+
+    <link href="~/assets/css/jquery.timepicker.css" rel="stylesheet" />
+    <script src="~/assets/js/jquery.timepicker.js"></script>
+    <script src="~/Scripts/Validation.js"></script>
+    @*<link href="~/assets/css/bootstrap-multiselect.css" rel="stylesheet" type="text/css" />
+        <script src="~/assets/js/bootstrap-multiselect.js" type="text/javascript"></script>*@
+    <script src="https://cdn.datatables.net/buttons/1.6.1/js/buttons.colVis.min.js"></script>
+    <script src="~/assets/js/dataTables.buttons.min.js"></script>
+    <link href="~/assets/css/buttons.dataTables.css" rel="stylesheet" />
+    <script src="~/assets/js/jszip.min.js"></script>
+    <script src="~/assets/js/dataTables.buttons.min.js"></script>
+    <script src="~/assets/js/pdfmake.min.js"></script>
+    <script src="~/assets/js/vfs_fonts.js"></script>
+    <script src="~/assets/js/buttons.html5.min.js"></script>
+    <script src="~/assets/js/buttons.print.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/7.2.0/sweetalert2.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/7.2.0/sweetalert2.all.min.js"></script>
+    <style>
+
+
+
+        .project-tab {
+            padding: 10px;
+        }
+
+            .project-tab #tabs h6.section-title {
+                color: #eee;
+            }
+
+            .project-tab .nav-link {
+                border: 1px solid transparent;
+                border-top-left-radius: .25rem;
+                border-top-right-radius: .25rem;
+                font-size: 16px;
+            }
+
+                .project-tab .nav-link:hover {
+                    border: none;
+                }
+
+            .project-tab a {
+                text-decoration: none;
+                color: #333;
+            }
+
+        #chartContainer {
+            height: 400px;
+            width: 50%;
+            margin-left: 30%;
+            margin-top: 10px;
+        }
+
+        .locationWise {
+            margin-top: 5px;
+        }
+
+        .topForm {
+            padding-left: 2px;
+            margin-bottom: 15px;
+        }
+
+        .nav-tabs {
+            border-bottom: 0px solid #ddd;
+        }
+
+        .squareBorder {
+            border-radius: 0px;
+        }
+
+        .project-tab #tabs .nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {
+            color: #fff;
+            /*background-color: #0C6980;*/
+            border-color: transparent transparent #f3f3f3;
+            font-weight: bold;
+        }
+
+        .formList {
+            width: 100%;
+            background: #fff;
+            padding: 10px;
+            border: none;
+            margin: 4px;
+            box-shadow: 0 0 15px #eaeaea;
+            margin-bottom: 20px;
+            box-shadow: 0 0 15px #eaeaea;
+        }
+
+        .excelDownload {
+            cursor: pointer;
+            margin-top: 10px;
+            text-align: right;
+            margin-left: -5px;
+            margin-bottom: 5px;
+        }
+    </style>
+
+    <style>
+
+        @@font-face {
+            font-family: 'Nexa';
+            src: url(...);
+            font-weight: 300;
+            font-style: normal;
+        }
+
+        .news_slide {
+            max-width: 100%;
+            border: 1px solid #bdbdbd;
+            width: 100%;
+            border-radius: 0px;
+        }
+
+        .top_tiles .tile-stats {
+            border-radius: 0px;
+            background-color: #fff;
+            color: #333;
+            height: auto;
+            font-family: none;
+            box-shadow: 0 0 15px #eaeaea;
+        }
+
+        .user-profile.dropdown-toggle .img-circle.profile_img {
+            border-radius: 50px;
+        }
+
+        .top_nav .navbar-right {
+            display: block;
+        }
+
+        .top_nav .dropdown-usermenu {
+            padding: 0;
+            min-width: 9.5rem;
+            top: 12px !important;
+            left: -16px !important;
+        }
+
+        .dropdown-toggle::after {
+            display: none !important;
+        }
+
+        #notificationDropdown {
+            position: relative;
+            padding: 0px;
+            font-weight: 500;
+            margin-left: 0 !important;
+            line-height: 32px;
+        }
+
+        .preview-list .dropdown-header {
+            display: block;
+            padding: 3px 20px;
+            font-size: 12px;
+            line-height: 1.42857143;
+            color: #777;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .legend-scale .dropdown {
+            width: 150px;
+            display: initial;
+        }
+
+            .legend-scale .dropdown ul.show {
+                top: 0px !important;
+            }
+
+        .preview-item-content h6 {
+            font-size: 12px;
+        }
+
+        .tile-stats_gray {
+            border-left: 10px solid #4faf28 !important;
+        }
+
+        .tile-stats_blue {
+            border-left: 10px solid #fbd300 !important;
+        }
+
+        .tile-stats_maroon {
+            border-left: 10px solid #d12a20 !important;
+        }
+
+        .tile-stats_gold {
+            border-left: 10px solid #6f6f6f !important;
+        }
+
+        .main_news {
+            padding-left: 18px;
+        }
+
+        .list-icon {
+            margin: 0px 10px;
+            padding-left: 15px;
+            font-size: 14px;
+        }
+
+            .list-icon::before {
+                background: turquoise;
+                left: 0px;
+                border-radius: 0px;
+                margin-top: -1px;
+            }
+
+        .top_tiles .icon {
+            width: 32px;
+            height: 32px;
+        }
+
+        .top_tiles .icon_downld {
+            /*background-image: url("./img/approved.png");*/
+            background-image: url('../../assets/img/approved.png');
+        }
+
+        .top_tiles .icon_eye {
+            /*background-image: url("./img/pending.png");*/
+            background-image: url('../../assets/img/pending.png');
+        }
+
+        .top_tiles .icon_user {
+            /*background-image: url("./img/rejected.png");*/
+            background-image: url('../../assets/img/rejected.png');
+        }
+
+        .top_tiles .icon_used {
+            /*background-image: url("./img/cancel.png");*/
+            background-image: url('../../assets/img/cancel.png');
+        }
+
+        .top_tiles .icon_success {
+            /*background-image: url("./img/submit.png");*/
+            background-image: url('../../assets/img/submit.png');
+        }
+
+        .tile-stats p {
+            margin: 0 0 0px;
+            font-size: 14px;
+            font-family: 'SKODA Next';
+        }
+
+        .tile-stats .count {
+            font-size: 22px;
+            margin-top: 2px;
+        }
+
+        .task_img {
+            margin: 0px 5px;
+        }
+
+        .dept_img {
+            margin: 0px 5px;
+            width: 25px;
+            height: 25px;
+        }
+
+        .best_practise #myTable tbody tr:first-child {
+            background: #A9D08E;
+        }
+
+        .best_practise #myTable tbody tr:nth-child(2) {
+            background: #f4b084;
+        }
+
+        .best_practise #myTable tbody tr:nth-child(3) {
+            background: #ffff007a;
+        }
+
+        .search_box {
+            position: absolute;
+            width: 94%;
+            margin-top: 5px;
+        }
+
+            .search_box .srh_tbl {
+                width: calc(100% - 8px);
+                float: left;
+            }
+
+        .brd_line {
+            position: absolute;
+            margin: 0 auto;
+            width: 85%;
+        }
+
+        .top_nav .navbar-right {
+            width: 30%;
+        }
+
+        .top_logo {
+            width: 60%;
+        }
+
+        .approve {
+            pointer-events: none;
+        }
+
+        .nav_menu {
+            padding: 2px;
+        }
+
+        .top_logo {
+            padding: 0px 10px;
+        }
+
+        .itbest-color .p_box {
+            background: rgb(219 238 213) !important;
+        }
+
+        .buss-color .p_box {
+            background-color: #dddddd;
+        }
+
+        /*.input-group .form-control {
+            width: 92%;
+        }*/
+
+        .search-icon-box input:focus, .search-icon-box input:focus .input-search-icon {
+            border: 1px solid green !important;
+        }
+
+        .best_practise_card {
+            border-radius: 0px;
+        }
+
+            .best_practise_card .form-control {
+                height: 40px;
+            }
+
+            .best_practise_card .btn-primary {
+                color: #fff;
+                border: none;
+                border-radius: 0px !important;
+                margin: 0px 8px;
+                width: 44px;
+            }
+
+        .filter_img {
+            width: 17px;
+        }
+
+        .best_practise_card .dropdown-menu > li > a {
+            padding: 4px 10px;
+        }
+
+        .best_practise_card li input {
+            margin: 0px 5px;
+            top: 2px;
+            position: relative;
+        }
+
+        .my_task, .bulk_btn {
+            background-color: #4CAF50;
+            color: #ffff;
+            border: 1px solid #4CAF50;
+            padding: 5px 16px;
+            text-decoration: none;
+        }
+
+            .my_task a {
+                color: #fff;
+            }
+
+        .best_practise_card h3 {
+            color: #000;
+            text-align: left;
+            text-align: center;
+            margin: 15px 0px !important;
+            display: block;
+        }
+
+        .animated ul li label {
+            font-weight: normal;
+        }
+
+        .best_practise_card .btn .caret {
+            color: #000;
+        }
+
+        .best_practise_card .dropdown-toggle {
+            background: #EFEFEF !important;
+            border: 1px solid #c5bebe;
+            border-radius: 4px !important;
+        }
+
+        [data-title]:hover:after {
+            opacity: 1;
+            transition: all 0.1s ease 0.5s;
+            visibility: visible;
+        }
+
+        [data-title]:after {
+            font-size: 150%;
+            position: absolute;
+            padding: 1px 5px 2px 5px;
+            bottom: -1.6em;
+            left: 100%;
+            white-space: nowrap;
+            box-shadow: 1px 1px 3px #222222;
+            opacity: 0;
+            border: 1px solid #111111;
+            z-index: 99999;
+            visibility: hidden;
+        }
+
+        [data-title] {
+            position: relative;
+        }
+
+        [data-tooltip] {
+            position: relative;
+            z-index: 10;
+        }
+
+            /* Positioning and visibility settings of the tooltip */
+            [data-tooltip]:before {
+                position: absolute;
+                visibility: hidden;
+                opacity: 0;
+                left: 50%;
+                top: calc(100% + 10px); /* 5px is the size of the arrow */
+                pointer-events: none;
+                transition: 0.2s;
+                will-change: transform;
+            }
+
+            /* The actual tooltip with a dynamic width */
+            [data-tooltip]:before {
+                content: attr(data-tooltip);
+                padding: 5px;
+                min-width: 50px;
+                max-width: 300px;
+                width: max-content;
+                width: -moz-max-content;
+                border-radius: 6px;
+                font-size: 12px;
+                background-color: #000;
+                color: #fff;
+                text-align: center;
+                white-space: pre-wrap;
+                transform: translate(-50%, -5px) scale(0.5);
+            }
+
+
+            /* Tooltip becomes visible at hover */
+            [data-tooltip]:hover:before {
+                visibility: visible;
+                opacity: 1;
+            }
+            /* Scales from 0.5 to 1 -> grow effect */
+            [data-tooltip]:hover:before {
+                transition-delay: 0.3s;
+                transform: translate(-50%, -5px) scale(1);
+            }
+
+        [data-tooltip-location="bottom"]:before {
+            top: calc(100% + 5px);
+            bottom: auto;
+        }
+
+        [data-tooltip-location="bottom"]:before {
+            transform: translate(-50%, 5px) scale(0.5);
+        }
+
+        [data-tooltip-location="bottom"]:hover:before {
+            transform: translate(-50%, 5px) scale(1);
+        }
+
+        .newly_added_form .text-capitalize, .stand-color .text-capitalize {
+            text-align: left;
+        }
+
+        .fullHeight {
+            height: 763px;
+        }
+
+        .top_tiles .animated {
+            width: 20%;
+            padding: 8px;
+            margin: 0px 0px 10px 0px;
+        }
+
+        #Dept_table tr td, #Dept_table tr th {
+            text-align: left;
+        }
+
+        #Dept_table .job, #Dept_table .job_value {
+            color: #000;
+        }
+
+        #Dept_table tr td:first-child {
+            text-align: left !important;
+        }
+
+        .pagination_align {
+            margin: 0 auto !important;
+        }
+
+        #Dept_table tbody tr:nth-child(even) {
+            background: #f8f8f8;
+        }
+
+        #Dept_table tbody tr:nth-child(odd) {
+            background: #fff;
+        }
+
+        .my-legend .legend-scale ul {
+            margin: 0;
+            margin-bottom: 5px;
+            padding: 0;
+            float: right;
+            list-style: none;
+        }
+
+            .my-legend .legend-scale ul li {
+                font-size: 80%;
+                list-style: none;
+                margin-left: 0;
+                line-height: 10px;
+                margin-bottom: 2px;
+            }
+
+        .my-legend ul.legend-labels li span {
+            display: block;
+            float: left;
+            height: 10px;
+            width: 15px;
+            margin-right: 5px;
+            margin-left: 0;
+            border: 1px solid #999;
+            margin-top: 2px;
+        }
+
+        .tile-stats_gold.submitted {
+            border-left-color: #73b1dd !important;
+        }
+
+        .gridHeadings {
+            font-size: 14px !important;
+            font-weight: 400;
+            display: inline;
+        }
+
+        .p_box {
+            border-radius: 0px;
+            font-size: 14px;
+        }
+
+        .preview-item-content {
+            text-align: center;
+        }
+
+        .p_box .job {
+            font-size: 14px;
+        }
+
+        .sfo_icons_info {
+            font-size: 13px;
+        }
+
+        .filterBtn {
+            height: 40px;
+        }
+
+        .fa-chevron-right {
+            color: #4CAF50;
+        }
+
+        .toast {
+            right: 3%;
+            position: fixed;
+            bottom: 18%;
+            max-width: 250px;
+        }
+
+        .toast-header {
+            font-size: 15px;
+        }
+
+        #toastTitle {
+            color: white;
+        }
+
+        .toast-header-warning {
+            background-color: yellow;
+        }
+
+        .toast-header-error {
+            background-color: darkred;
+        }
+
+        .toast-header-info {
+            background-color: dodgerblue;
+        }
+
+        .toast-header-success {
+            background-color: green;
+        }
+
+        .toast-header-failure {
+            background-color: red;
+        }
+
+        .toast-body {
+        }
+
+        .fa-address-book-o:before {
+            content: "\f2ba";
+        }
+
+        .animated {
+            animation-duration: 0.25s;
+        }
+
+        .reportIssue {
+            text-align: right;
+            text-decoration: underline;
+            font-size: 1rem;
+            margin-bottom: 2px;
+            margin-top: 65px;
+            padding-right: 24px;
+            position: fixed;
+            right: 0;
+        }
+
+            .reportIssue a {
+                color: #000 !important;
+            }
+
+        body {
+        }
+    </style>
+
+    @*New web code*@
+
+    <style>
+
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        header {
+            height: 45px;
+            width: 100vw;
+            padding: 0 30px;
+            /*background-color: lightgray;*/
+            position: fixed;
+            z-index: 100;
+            box-shadow: 1px 1px 10px #0C6980;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .icn {
+            height: 30px;
+        }
+
+        .menuicn {
+            cursor: pointer;
+        }
+
+        .searchbar,
+        .message,
+        .logosec {
+            display: flex;
+            align-items: center;
+            /*justify-content: center;*/
+        }
+
+        .searchbar2 {
+            display: none;
+        }
+
+        .logosec {
+            gap: 30px;
+        }
+
+        .searchbar input {
+            width: 340px;
+            height: 42px;
+            border-radius: 5px;
+            /*background-color: var(--background-color3);*/
+            padding: 0 20px;
+            font-size: 15px;
+            outline: none;
+            /*    border: none;*/
+            border: 1px solid #c7c7c7;
+        }
+
+        .searchbar select {
+            width: 340px;
+            height: 42px;
+            border-radius: 5px;
+            /*background-color: var(--background-color3);*/
+            padding: 0 20px;
+            font-size: 15px;
+            outline: none;
+            /*    border: none;*/
+            border: 1px solid #c7c7c7;
+        }
+
+        .filterbtn {
+            width: 100px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            background-color: #0C6980;
+            cursor: pointer;
+            color: white;
+            border: none;
+        }
+
+        .message {
+            gap: 10px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .circle {
+            height: 7px;
+            width: 7px;
+            position: absolute;
+            background-color: #fa7bb4;
+            border-radius: 50%;
+            left: 19px;
+            top: 8px;
+        }
+
+        .dp {
+            height: 40px;
+            width: 40px;
+            background-color: #626262;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .main_container {
+            display: flex;
+            /*width: 100vw;*/
+            position: relative;
+            top: 45px;
+            /*z-index: 1;*/
+        }
+
+        .dpicn {
+            height: 42px;
+        }
+
+        .main {
+            height: calc(100vh - 70px);
+            width: 100%;
+            overflow-y: scroll;
+            overflow-x: hidden;
+            padding: 20px 30px 30px 30px;
+        }
+
+            .main::-webkit-scrollbar-thumb {
+                background-image: linear-gradient(to bottom, rgb(0, 0, 85), rgb(0, 0, 50));
+            }
+
+            .main::-webkit-scrollbar {
+                width: 5px;
+            }
+
+            .main::-webkit-scrollbar-track {
+                background-color: #9e9e9eb2;
+            }
+
+        .box-container {
+            display: flex;
+            /*justify-content: space-evenly;*/
+            align-items: center;
+            /*flex-wrap: wrap;*/
+            gap: 20px;
+        }
+
+        .navSet {
+            min-height: 91vh;
+            width: 265px;
+            background-color: #404e67;
+            position: absolute;
+            top: 0px;
+            left: 00;
+            box-shadow: 1px 1px 10px rgba(198, 189, 248, 0.825);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+            padding: 30px 0 20px 10px;
+        }
+
+        .navcontainer {
+            height: calc(100vh - 65px);
+            width: 250px;
+            position: relative;
+            overflow-y: scroll;
+            overflow-x: hidden;
+            transition: all 0.5s ease-in-out;
+        }
+
+            .navcontainer::-webkit-scrollbar {
+                display: none;
+            }
+
+        .navclose {
+            width: 80px;
+        }
+
+        .nav-option {
+            width: 265px;
+            display: flex;
+            align-items: center;
+            padding: 0 30px 0 20px;
+            gap: 30px;
+            transition: all 0.1s ease-in-out;
+            color: white;
+            cursor: pointer;
+        }
+        /*.nav-option:hover {
+        border: 2px solid #fff;
+        cursor: pointer;
+        }*/
+        .navSet-img {
+            height: 30px;
+        }
+
+        .navSet-upper-options {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+
+        .box {
+            height: 80px;
+            /*width: 165px;*/
+            border-radius: 5px;
+            box-shadow: 3px 3px 3px rgba(0, 30, 87, 0.751);
+            padding: 5px;
+            /*display: flex;*/
+            align-items: center;
+            justify-content: space-around;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out;
+        }
+
+            .box:hover {
+                transform: scale(1.08);
+            }
+
+            .box:nth-child(1) {
+                background-color: var(--one-use-color);
+            }
+
+            .box:nth-child(2) {
+                background-color: var(--two-use-color);
+            }
+
+            .box:nth-child(3) {
+                background-color: var(--three-use-color);
+            }
+
+            .box:nth-child(4) {
+                background-color: var(--four-use-color);
+            }
+
+            .box:nth-child(5) {
+                background-color: var(--five-use-color);
+            }
+
+            .box:nth-child(6) {
+                background-color: var(--six-use-color);
+            }
+
+
+            .box img {
+                height: 50px;
+            }
+
+            .box .text {
+                color: white;
+            }
+
+        .topic {
+            font-size: 12px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            margin-top: 5px;
+        }
+
+        /*.topic-heading {
+        font-size: 30px;
+        letter-spacing: 3px;
+        }*/
+
+        .report-container {
+            min-height: 300px;
+            max-width: 100%;
+            margin: 20px 0px 0px 0px;
+            background-color: #ffffff;
+            border-radius: 5px;
+            box-shadow: 3px 3px 10px rgb(188, 188, 188);
+            padding: 0px 20px 20px 20px;
+        }
+
+        .report-header {
+            height: 80px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            /*padding: 20px 20px 10px 20px;*/
+            border-bottom: 2px solid #0C6980;
+        }
+
+        .recent-Articles {
+            font-size: 20px;
+            font-weight: 600;
+            color: #0C6980;
+        }
+
+        .view {
+            height: 35px;
+            width: 90px;
+            border-radius: 5px;
+            background-color: #0C6980;
+            color: white;
+            font-size: 15px;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Responsive CSS Here */
+        @@media screen and (max-width: 950px) {
+            .nav-img {
+                height: 25px;
+            }
+
+            .nav-option {
+                gap: 30px;
+            }
+
+                .nav-option h3 {
+                    font-size: 15px;
+                }
+        }
+        /*
+        @@media screen and (max-width: 850px) {
+            .nav-img {
+                height: 30px;
+            }
+
+            .nav-option {
+                gap: 30px;
+            }
+
+                .nav-option h3 {
+                    font-size: 20px;
+                }
+
+            .navcontainer {
+                width: 100vw;
+                position: absolute;
+                transition: all 0.6s ease-in-out;
+                top: 0;
+                left: -100vw;
+            }
+
+            .nav {
+                width: 100%;
+                position: absolute;
+            }
+
+            .navclose {
+                left: 00px;
+            }
+
+            .main {
+                padding: 40px 30px 30px 30px;
+            }
+
+            .searchbar2 {
+                width: 100%;
+                display: flex;
+                margin: 0 0 40px 0;
+                justify-content: center;
+            }
+
+                .searchbar2 input {
+                    width: 250px;
+                    height: 42px;
+                    border-radius: 50px 0 0 50px;
+                    background-color: var(--background-color3);
+                    padding: 0 20px;
+                    font-size: 15px;
+                    border: 2px solid var(--secondary-color);
+                }
+        }*/
+
+        @@media screen and (max-width: 490px) {
+            /*.message {
+                display: none;
+            }*/
+            /*.logosec {
+                width: 100%;
+                justify-content: space-between;
+            }*/
+
+            .logo {
+                font-size: 20px;
+            }
+
+            .menuicn {
+                height: 25px;
+            }
+
+            .nav-img {
+                height: 25px;
+            }
+
+            .nav-option {
+                gap: 25px;
+            }
+
+                .nav-option h3 {
+                    font-size: 12px;
+                }
+
+            .nav-upper-options {
+                gap: 15px;
+            }
+
+            .recent-Articles {
+                font-size: 20px;
+            }
+        }
+
+        @@media screen and (max-width: 400px) {
+            .recent-Articles {
+                font-size: 17px;
+            }
+
+            .view {
+                width: 60px;
+                font-size: 10px;
+                height: 27px;
+            }
+
+            .report-header {
+                height: 60px;
+                padding: 10px 10px 5px 10px;
+            }
+
+            .searchbtn img {
+                height: 20px;
+            }
+        }
+
+        @@media screen and (max-width: 320px) {
+            .recent-Articles {
+                font-size: 12px;
+            }
+
+            .view {
+                width: 50px;
+                font-size: 8px;
+                height: 27px;
+            }
+
+            .report-header {
+                height: 60px;
+                padding: 10px 5px 5px 5px;
+            }
+
+            .searchbar2 input {
+                width: 180px;
+            }
+        }
+
+        .logout {
+            width: 265px;
+            display: flex;
+            align-items: center;
+            padding: 0 30px 0 20px;
+            gap: 30px;
+            transition: all 0.1s ease-in-out;
+            /*background: #0C6980;
+            margin-top: 250px;*/
+            color: #fff;
+        }
+
+        /*.logout:hover {
+        border: 2px solid #fff;
+        cursor: pointer;
+        }*/
+
+        /*table, th, td {
+          border: 1px solid #0C6980;
+          border-collapse: collapse;
+        }
+
+        table {
+          border-spacing: 0;
+          width: 100%;
+        }
+
+        th, td {
+          padding: 8px;
+        }*/
+
+        .iconStyle {
+            font-size: 25px;
+        }
+
+        .h5, h5 {
+            font-size: 14px;
+            margin-top: 5px;
+            color: #ebebeb;
+        }
+
+        .form-group {
+            margin-bottom: 0;
+        }
+
+        /*
+        .fa-stack[data-count]:after{
+          position:absolute;
+          right:-30%;
+          top:1%;
+          content: attr(data-count);
+          font-size:50%;
+          padding:.6em;
+          border-radius:999px;
+          line-height:.75em;
+          color: white;
+          background:rgba(255,0,0,.85);
+          text-align:center;
+          min-width:2em;
+          font-weight:bold;
+        }*/
+
+        .test {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+    </style>
+
+
+    <style>
+
+        .card-boxes {
+            width: 18%;
+            box-shadow: 0 4px 10px 1px lightgray;
+        }
+
+            .card-boxes:hover {
+                -ms-transform: scale(1.1); /* IE 9 */
+                -webkit-transform: scale(1.1); /* Safari 3-8 */
+                transform: scale(1.1);
+                box-shadow: 0 4px 10px 1px #808586;
+                cursor: pointer;
+            }
+
+        .card-header {
+            display: flex;
+            padding: 8px 5px !important;
+            margin-bottom: 0;
+            /*background-color: #eee !important;
+            border-bottom: 1px solid rgba(0,0,0,.125);*/
+        }
+
+        .card-footer1 {
+            background: linear-gradient(to right,#456990,#99acc2);
+            height: 35px;
+            color: #fff;
+            padding: 5px 15px;
+        }
+
+        .card-footer2 {
+            background: linear-gradient(to right,#2A9D8F,#8ac9c1);
+            height: 35px;
+            color: #fff;
+            padding: 5px 15px;
+        }
+
+        .card-footer3 {
+            background: linear-gradient(to right,#2F86EC,#8dbcf5);
+            height: 35px;
+            color: #fff;
+            padding: 5px 15px;
+        }
+
+        .card-footer4 {
+            background: linear-gradient(to right,#00B2CA,#73d5e2);
+            height: 35px;
+            color: #fff;
+            padding: 5px 15px;
+        }
+
+        .card-footer5 {
+            background: linear-gradient(to right,#EF767A,#f6b4b6);
+            height: 35px;
+            color: #fff;
+            padding: 5px 15px;
+        }
+
+        .card-footer6 {
+            background: linear-gradient(to right,#EEB868,#f6d8ac);
+            height: 35px;
+            color: #fff;
+            padding: 5px 15px;
+        }
+
+        .iconStyle {
+            height: 25px;
+            margin-top: 5px;
+            margin-left: -5px;
+        }
+
+        .tt {
+            color: #456990;
+        }
+
+        .at {
+            color: #2A9D8F;
+        }
+
+        .rt {
+            color: #2F86EC;
+        }
+
+        .pt {
+            color: #00B2CA;
+        }
+
+        .rjt {
+            color: #EF767A;
+        }
+
+        .ct {
+            color: #EEB868;
+        }
+
+        .h2, h2 {
+            font-size: 30px;
+        }
+
+        .icondes {
+            font-size: 30px;
+        }
+
+        .form-control:focus {
+            outline: 0 !important;
+            border-color: initial;
+            box-shadow: none;
+        }
+
+        .searchAdvButton {
+            background: #0C6980;
+            border-radius: 5px;
+            border: 1px solid #0C6980;
+            font-size: 1rem;
+            line-height: 173.7%;
+            position: relative;
+            padding: 0 1rem;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            text-align: center;
+            justify-content: center;
+            text-transform: uppercase;
+            color: #fff;
+        }
+
+        .w-100 {
+            width: 100% !important;
+        }
+
+        /*   .modal {
+            margin-top: 50px;
+        }*/
+
+        .TabActive {
+            background-color: #0C6980;
+            cursor: pointer;
+        }
+
+        .dropdownSection {
+            width: 200px;
+            top: 5px !important;
+            left: -2px !important;
+            box-shadow: 0 4px 10px 1px lightgray;
+        }
+
+        .uName {
+            text-align: center;
+            width: 200px;
+        }
+        /*.class-name:after {
+            content: " ";
+            display: block;
+            border-bottom: 0.5px solid #9E9E9E;
+        }*/
+        .ftr {
+            margin-top: 15px;
+        }
+
+        .pageLoader {
+            border: 10px solid #eee;
+            border-radius: 50%;
+            border-top: 10px solid #0087FF;
+            width: 80px;
+            height: 80px;
+            -webkit-animation: spin 2s linear infinite;
+            animation: spin 2s linear infinite;
+        }
+
+
+
+        @@keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body class="nav-sm">
+
+    <div>
+
+        <header class="wxyz">
+
+            <div class="logosec">
+                <div class="logo">
+                    @*<img src="assets/img/mobinext-logo.png" alt="" style="height: 40px;width: 150px;">*@
+                    <h2 class="headerOfc">E|OFFICE</h2>
+                </div>
+                <img src="https://media.geeksforgeeks.org/wp-content/uploads/20221210182541/Untitled-design-(30).png" class="icn menuicn" id="menuicn" alt="menu-icon" style="width:15px; height: 15px;">
+            </div>
+
+            @*<div>
+                    <h2 class="headerOfc">E|OFFICE</h2>
+                </div>*@
+
+            <div class="message">
+                <label style="margin-top:10px;"> Hello, @(user == null ? "" : $"{user.FirstName}") </label>
+                <a href="" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                    <img src="~/assets/img/userIcon.png" alt="" style="height: 30px;width: 30px;">
+                </a>
+                <ul class="dropdown-menu dropdownSection">
+                    <li id="delegationListItem" style="margin-top:" 5px;">
+                        <a href="" onclick="javascript: $('#MydelList').modal('show');" type="" data-placement="right" title="Delegation" data-toggle="modal" data-target="#MydelList"><i class="fa fa-align-justify mt-1 mr-2"></i>Delegation</a>
+                    </li>
+                    <li>
+                        <a href="@Url.Action("LogoutUser", "Login" )"><i class="fa fa-sign-out mt-1 mr-1"></i> Log Out</a>
+                    </li>
+                    <li id="delegationListItem">
+                        <a href="" onclick="javascript: $('#ChangePassword').modal('show');" type="" data-placement="right" title="Reset Password" data-toggle="modal" data-target="#ChangePassword"><i class="fa fa-lock mt-1 mr-2"></i>Reset Password</a>
+                    </li>
+                </ul>
+            </div>
+
+        </header>
+
+        <div style="page-break-after:always;"></div>
+
+        <div class="container body">
+
+            <div class="container body">
+                <div class="main_container">
+
+                    <div class="navcontainer">
+                        <nav class="navSet">
+                            <div class="nav-upper-options">
+                                <div class="nav-option option1">
+                                    <i class="fa fa-home" style="font-size:18px;"></i><a id="nav-mytask-tab" data-toggle="tab">
+                                        <h5>Home</h5>
+                                    </a>
+                                </div>
+
+
+                                <div class="nav-option option2">
+                                    <i class="fa fa-external-link" style="font-size:15px;"></i>
+                                    <a id="nav-myrequest-tab">
+                                        <h5>My Request</h5>
+                                    </a>
+
+                                </div>
+
+                                <div class="nav-option option3">
+                                    <i class="fa fa-signal" style="font-size:15px;"></i>
+                                    <a id="nav-myReport-tab"><h5> Report</h5></a>
+                                </div>
+                            </div>
+                        </nav>
+
+                    </div>
+
+                    <div class="main">
+                        <div class="clearfix">@RenderBody()</div>
+                    </div>
+
+                </div>
+            </div>
+            <div id="pageLoader" class="loader-wrapper"></div>
+            <div class="full-screen-container">
+                <div class="loading">
+                    <div class="loading-bar"></div>
+                    <div class="loading-bar"></div>
+                    <div class="loading-bar"></div>
+                    <div class="loading-bar"></div>
+                </div>
+            </div>
+            @*<div id="pageLoader" class="loader-wrapper">
+            <div class="wrapper">
+                <ul>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                </ul>
+            </div>
+        </div>*@
+
+        </div>
+
+    </div>
+
+    <div class="abcdef">
+
+        <div class="left_col">
+            <div class="scroll-view">
+                <div class="clearfix"></div>
+                <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+                    <div class="menu_section">
+                        <div class="close_nav"></div>
+                        <ul class="nav side-menu">
+
+                            <li class="menu-list" id="dashboardListItem">
+                                <a href="../dashboard" type="" data-toggle="tooltip" data-placement="right" title="Dashboard"><i class="fa fa-home" style="padding-bottom:8px;"></i></a>
+
+                            </li>
+                            <li class="menu-list">
+                                <a href="@Url.Action("GetMyReport","Dashboard", new { status="Report" })" type="" data-toggle="tooltip" data-placement="right" title="Report Dashboard"><i class="fa fa-signal"></i> </a>
+                            </li>
+
+                            <li class="menu-list d-none" id="liMaster">
+                                <a href="@Url.Action("BusTransportEmployee","BusTransportation", new { status="Master" })" type="" data-toggle="tooltip" data-placement="right" title="Bus Transportation Master"><i class="fa fa-user-plus"></i> </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="top_nav">
+            <div class="nav_menu">
+                <nav class="d-flex navigation justify-content-center align-items-center" role="navigation">
+
+
+                    <div class="d-flex logo_skoda align-content-center" style="padding: 10px 15px;">
+                        <img src="~/assets/img/mobinext-logo-white.png" class="img-responsive img_eform" alt="" />
+                    </div>
+                    <div class="top_logo">
+
+                        <a href="../dashboard">
+                            <span class="brd_line d-flex justify-content-center">
+                            </span>
+                        </a>
+                    </div>
+
+                    @*<ul class="nav navbar-nav navbar-right">
+                            <li class="profile_drop_down d-flex align-items-center userSelect">
+                                <a href="" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                    <span class="username">Hi, @(user == null ? "" : $"{user.FirstName} {user.LastName}")</span><span class="fa fa-angle-down" id="logArrow"></span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-usermenu animated fadeIn pull-right">
+
+                                    <li>
+                                    </li>
+                                    <li id="delegationListItem">
+                                        <a href="" onclick="javascript: $('#MydelList').modal('show');" type="" data-placement="right" title="Delegation" data-toggle="modal" data-target="#MydelList"><i class="fa fa-align-justify mt-1 mr-2"></i>Delegation</a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("LogoutUser", "Login" )"><i class="fa fa-sign-out mt-1 mr-1"></i> Log Out</a>
+                                    </li>
+                                    <li id="delegationListItem">
+                                        <a href="" onclick="javascript: $('#ChangePassword').modal('show');" type="" data-placement="right" title="Reset Password" data-toggle="modal" data-target="#ChangePassword"><i class="fa fa-lock mt-1 mr-2"></i>Reset Password</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>*@
+
+                    <div class="nav toggle1" style="color:white;">
+                        <a id="menu_toggle1" onclick="openNav()"><i class="fa fa-bars" style="font-size:20px;margin-top:7px;"></i></a>
+                    </div>
+
+                    <div id="myNav" class="overlay">
+                        <div style="margin-top:5px;"><span class="username">Hello, @(user == null ? "" : $"{user.FirstName}")</span></div>
+                        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+                        <div class="overlay-content">
+                            <a href="../dashboard" type="" data-toggle="tooltip" data-placement="right"><i class="fa fa-home"></i>&nbsp;&nbsp; Home</a>
+                            <a href="javascript:void(0)" onclick="GetMyRequestTab()" type="" data-toggle="tooltip" data-placement="right" style="margin-top:10px;"><i class="fa fa-external-link"></i>&nbsp;&nbsp; My Request</a>
+                        </div>
+
+                        <div class="sub_div">
+                            <div class='inline'><a href="" onclick="javascript: $('#MydelList').modal('show');" type="" data-placement="right" title="Delegation" data-toggle="modal" data-target="#MydelList"><i class="fa fa-navicon"></i> Delegation</a></div>
+                            <div class='inline'><a href="@Url.Action("LogoutUser", "Login" )"><i class="fa fa-sign-out"></i> Logout</a></div>
+                            <div class='inline'><a href="" onclick="javascript: $('#ChangePassword').modal('show');" type="" data-placement="right" title="Reset Password" data-toggle="modal" data-target="#ChangePassword"><i class="fa fa-lock"></i> Reset Password</a></div>
+                        </div>
+
+                    </div>
+                </nav>
+
+            </div>
+        </div>
+
+
+    </div>
+
+
+    <footer>
+
+        <div class="row webFooter">
+            <div class="col-12 ftr">
+                <label>Copyright &copy 2023 MobiNext Technologies Pvt Ltd. All rights reserved.</label>
+                <img src="assets/img/mobinext-logo.png" alt="" style="height: 30px;float:right;">
+            </div>
+        </div>
+
+        <div class="row footerIcon">
+            <div class="col-md-3 col-3" style="padding: 0 !important;">
+                <div class="footIcon">
+                    <button type="button" class="btn btn-outline-default" title="Logout" onclick="getdashboardback();"><i class="fa fa-arrow-left"></i></button>
+                </div>
+                <div>
+                    <label class="foooterLabel">Back</label>
+                </div>
+            </div>
+            <div class="col-md-3 col-3" style="padding: 0 !important;">
+                <div class="footIcon">
+                    <button type="button" class="btn btn-outline-default" title="Created By Me" onclick="GetMyRequestMobileTab();"><i class="fa fa-pencil-square"></i></button>
+                </div>
+                <div>
+                    <label class="foooterLabel">Created By Me</label>
+                </div>
+            </div>
+            <div class="col-md-3 col-3" style="padding: 0 !important;">
+                <div class="footIcon">
+                    <button type="button" class="btn btn-outline-default" title="Approved" onclick="GetMyApprovedMobileTab();"><i class="fa fa-check-square"></i></button>
+                </div>
+                <div>
+                    <label class="foooterLabel">Approved</label>
+                </div>
+            </div>
+            <div class="col-md-3 col-3" style="padding: 0 !important;">
+                <div class="footIcon">
+                    <button type="button" class="btn btn-outline-default" title="Create Form"><i class="fa fa-file" style="font-size:20px !important;"></i></button>
+                </div>
+                <div>
+                    <label class="foooterLabel">Created</label>
+                </div>
+            </div>
+        </div>
+
+
+
+    </footer>
+
+    @*<div id="loader" class="loader-wrapper">
+            <div class="wrapper">
+                <ul>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                </ul>
+            </div>
+        </div>*@
+
+    @RenderSection("scripts", required: false)
+
+    <script src="~/Scripts/owl.carousel.js"></script>
+
+    <script type="text/javascript" src="~/Scripts/maps/gdp-data.js"></script>
+    <script type="text/javascript" src="~/Scripts/maps/jquery-jvectormap-2.0.3.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/maps/jquery-jvectormap-us-aea-en.js"></script>
+    <script type="text/javascript" src="~/Scripts/maps/jquery-jvectormap-world-mill-en.js"></script>
+
+    <script src="~/Scripts/icheck/icheck.min.js"></script>
+    <script src="~/Scripts/custom.js"></script>
+    <script src="~/Scripts/main.js"></script>
+
+</body>
+</html>
+
+<script>
+    $("#nav-mytask-tab").on('click', function () {
+        window.location = "../Dashboard";
+    });
+    $('#nav-mytask-tab').on('click', function () {
+        GetMyTaskTab();
+        DisplayMyTaskTab();
+    });
+    $('#nav-myrequest-tab').on('click', function () {
+        //DisplayMyRequestTab();
+        ViewMyRequest();
+        GetMyRequestTab();
+    });
+    $('#nav-myReport-tab').on('click', function () {
+        $(".nav-upper-options .TabActive").removeClass("TabActive");
+        $(".nav-upper-options .option3").addClass("TabActive");
+        GetMyReportTab();
+    });
+    function GetMyReportTab() {
+        ViewMyReport();
+
+        $("#loaderMyReq").removeClass('d-none');
+        $.ajax({
+            url: '/Dashboard/GetMyReport',
+            type: 'GET',
+            dataType: 'html',
+            data: { status: "Report" },
+            success: (function (data) {
+                /*    $('#requestTable').dataTable().fnDestroy();*/
+                //console.log(data);
+                $("#nav-myReport").html(data);
+                $("#loaderMyReq").addClass('d-none');
+            }),
+            error: (function (data) {
+                console.log("There was an issue while refreshing tasks. Please reload the page");
+            })
+        })
+    }
+    function GetMyRequestTab() {
+
+        $("#loaderMyReq").removeClass('d-none');
+        $.ajax({
+            url: '/Dashboard/GetMyReqtab',
+            type: 'GET',
+            dataType: 'html',
+            success: (function (data) {
+                /*    $('#requestTable').dataTable().fnDestroy();*/
+                //console.log(data);
+                $("#nav-myrequest").html(data);
+                $("#loaderMyReq").addClass('d-none');
+            }),
+            error: (function (data) {
+                console.log("There was an issue while refreshing tasks. Please reload the page");
+            })
+        })
+    }
+
+    function GetMyTaskTab() {
+        ViewDashboard();
+        /*alert('my task load');*/
+        $("#loaderMytsk").removeClass('d-none');
+        $.ajax({
+            url: '/Dashboard/GetMyTasks',
+            type: 'GET',
+            dataType: 'html',
+            success: (function (data) {
+                console.log(data);
+                $("#loaderMytsk").addClass('d-none');
+                $("#myTaskView").html(data);
+                $('#taskTable').dataTable().fnDestroy();
+                MyTaskTable();
+            }),
+            error: (function (data) {
+                console.log("There was an issue while refreshing tasks. Please reload the page");
+                $("#loaderMytsk").addClass('d-none');
+            })
+        })
+    }
+    function ViewDashboard() {
+        $(".dvdashboard").removeClass("d-none");
+        $("#dvMyRequest").addClass("d-none");
+        $("#dvMyReport").addClass("d-none");
+        $(".nav-upper-options .TabActive").removeClass("TabActive");
+        $(".nav-upper-options .option1").addClass("TabActive");
+    };
+    function ViewMyRequest() {
+        $(".dvdashboard").addClass("d-none");
+        $("#dvMyRequest").removeClass("d-none");
+        $("#dvMyReport").addClass("d-none");
+        $(".nav-upper-options .TabActive").removeClass("TabActive");
+        $(".nav-upper-options .option2").addClass("TabActive");
+    };
+    function ViewMyReport() {
+        $(".dvdashboard").addClass("d-none");
+        $("#dvMyRequest").addClass("d-none");
+        $("#dvMyReport").removeClass("d-none");
+        $(".nav-upper-options .TabActive").removeClass("TabActive");
+        $(".nav-upper-options .option3").addClass("TabActive");
+    };
+    //$(document).ajaxComplete(function (event, res, settings) {
+    //    if (res.getResponseHeader('REQUIRES_AUTH') === '1') {
+    //        window.location.href = "/Login/Index";
+    //    }
+    //});
+
+    $(document).ready(function () {
+        function disableBack() {
+    }
+        window.onload = disableBack();
+        window.onpageshow = function (evt) { if (evt.persisted) disableBack() }
+
+        $('#report-mail').tooltip();
+
+
+        if ("@userAccess.ToLower()" == "@user.UserName.ToLower()") {
+            $("#liMaster").removeClass('d-none');
+        }
+        else {
+            $("#liMaster").addClass('d-none');
+        }
+    });
+
+    function DisplayAlert(alertType = 'info', title = 'Info', message = '', timeInMs = 8000) {
+        var defaultClass = 'toast-header toast-header-';
+
+        if (alertType == 'warning') {
+            $("#toastHeaderDiv").attr('class', defaultClass + 'warning');
+        }
+        else if (alertType == 'error') {
+            $("#toastHeaderDiv").attr('class', defaultClass + 'error')
+        }
+        else if (alertType == 'info') {
+            $("#toastHeaderDiv").attr('class', defaultClass + 'info')
+        }
+        else if (alertType == 'success') {
+            $("#toastHeaderDiv").attr('class', defaultClass + 'success')
+        }
+        else if (alertType == 'failure') {
+            $("#toastHeaderDiv").attr('class', defaultClass + 'failure')
+        }
+
+        $("#toastTitle").text(title);
+        $("#toastMsg").text(message);
+        $('#toast').toast({
+            delay: timeInMs
+        });
+
+        $('#toast').toast('hide').css("z-index", "auto");
+        $('#toast').toast('show').css("z-index", "99999");
+    }
+
+    function FilterMyTasks() {
+        var Filter = 0;
+        var Checked = 0;
+        $("#myTaskView").html("");
+        $('#taskTable').dataTable().fnDestroy();
+        $.ajax({
+            url: '/Dashboard/GetMyTasks',
+            type: 'GET',
+            dataType: 'html',
+            data: { Checked: Checked, Filter: Filter },
+            success: (function (data) {
+                $('#taskTable').dataTable().fnDestroy();
+                $("#myTaskView").html(data);
+                MyTaskTable();
+            }),
+            error: (function (data) {
+                console.log("There was an issue while refreshing tasks. Please reload the page");
+            })
+        })
+    }
+
+    function validateEmail(emailId, domainIdList) {
+        ////
+        var validRegex = null;
+        var EmailValidate = '@System.Configuration.ConfigurationManager.AppSettings["EmailValidate"]';
+        console.log("EmailValidate=" + EmailValidate);
+            var arrEmails = [];
+
+        if (EmailValidate == "mailnesia") {
+            arrEmails = domainIdList;
+        }
+        else if (EmailValidate == "skoda") {
+            arrEmails = domainIdList;
+        }
+        if (EmailValidate == "mailnesia") {
+            validRegex = [];
+            arrEmails.forEach((x) => validRegex.push(new RegExp("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@@" + x + "$", "i")));
+        }
+        else if (EmailValidate == "skoda") {
+            validRegex = [];
+            arrEmails.forEach((x) => validRegex.push(new RegExp("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@@" + x + "$", "i")));
+        }
+
+        var receivedEmail = emailId;
+        console.log(receivedEmail);
+        var valid = validRegex.filter(x => {
+            if (!(receivedEmail.match(x))) {
+                return false;
+            }
+            else
+                return true;
+        });
+        return valid.length > 0;
+    }
+</script>
+
+
+
+<script>
+    function openNav() {
+        document.getElementById("myNav").style.left = "0";
+    }
+
+    function closeNav() {
+        document.getElementById("myNav").style.left = "-699px";
+    }
+
+    function getdashboardback() {
+        window.location = "../Dashboard?tab=" + 1;
+    }
+</script>
+
+
+<script>
+    let menuicn = document.querySelector(".menuicn");
+    let nav = document.querySelector(".navcontainer");
+
+    menuicn.addEventListener("click", () => {
+        nav.classList.toggle("navclose");
+    })
+</script>

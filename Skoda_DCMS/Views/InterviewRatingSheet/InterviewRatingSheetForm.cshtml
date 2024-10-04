@@ -1,0 +1,1269 @@
+﻿@model dynamic
+@{
+    ViewBag.Title = "Interview Rating Sheet Form";
+    var user = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    bool IsNew = true;
+    bool IsEdit = true;
+    dynamic FlagRedirect = null;
+    dynamic IRSF = null;
+    Layout = ViewBag.Layout;
+    int RowId = 0, FormId = 0, AppRowId = 0, ApprovalType = 0;
+    int FormSrId = 0;
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IsNew = ViewBag.IsNew;
+        IsEdit = ViewBag.IsEdit;
+        IRSF = ViewBag.Model;
+        RowId = ViewBag.RowId;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+        FormSrId = IRSF.one[0].Id;
+    }
+}
+
+<style>
+    /*New design css start here*/
+
+    .textTrans {
+        width: 100%;
+        max-width: 99%;
+        border-radius: 5px;
+        margin-right: 0px;
+        border: 1px solid !important;
+    }
+
+    .empDetailsBg {
+        background-color: #fffbef;
+    }
+
+    #accordion select {
+        width: 100% !important;
+        max-width: 97%;
+        height: 45px;
+        background-color: #F8F8F8;
+        border: 1px solid #BFBFBF;
+        box-sizing: border-box;
+        border-radius: 5px;
+        background-image: url(data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>);
+        background-repeat: no-repeat;
+        background-position: right .75rem center;
+        background-size: 16px 12px;
+    }
+
+    #accordion input[type='text'] {
+        width: 100% !important;
+        max-width: 97%;
+        height: 45px;
+        background: #F8F8F8;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px;
+    }
+
+    #accordion input[type='date'] {
+        width: 100% !important;
+        max-width: 97%;
+        height: 45px;
+        background: #F8F8F8;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px;
+    }
+
+    #accordion label {
+        font-size: 16px;
+        line-height: 22px;
+        font-weight: 600;
+        color: #201F1F;
+    }
+
+    #accordion table tr td {
+        border: none !important;
+        font-size: 16px;
+        line-height: 19px;
+        color: #201F1F;
+        background-color: white;
+    }
+
+    #accordion label {
+        display: block;
+    }
+
+    #accordion .card-header {
+        background: rgb(4 59 100) !important;
+        border-radius: 5px 5px 0px 0px;
+        position: relative;
+        margin-bottom: 15px;
+    }
+
+        #accordion .card-header.collapsed h5:after {
+            content: '+';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        #accordion .card-header h5:after {
+            content: '-';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+    #accordion h5 button {
+        font-size: 18px;
+        line-height: 22px;
+        /* identical to box height */
+        padding-left: 0px;
+        display: flex;
+        align-items: center;
+        text-transform: uppercase;
+        /* Text_white */
+
+        color: #FFFFFF;
+    }
+
+        #accordion h5 button:focus {
+            box-shadow: none;
+        }
+
+    .empDetailsFields label {
+        display: block !important;
+        margin-bottom: 0px;
+    }
+
+    .empDetailsFields .row label {
+        display: block;
+        margin-bottom: 0px;
+    }
+
+        .empDetailsFields .row label:nth-child(1) {
+            font-style: normal;
+            font-weight: normal !important;
+            font-size: 12px;
+            line-height: 18px;
+            color: #A9A9A9 !important;
+        }
+
+        .empDetailsFields .row label:nth-child(2) {
+            font-style: normal;
+            font-weight: normal;
+            font-size: 18px;
+            line-height: 22px;
+            color: #201F1F;
+        }
+
+    .firstLastName {
+        font-style: normal;
+        font-weight: normal;
+        font-size: 20px;
+        line-height: 24px;
+        /* identical to box height */
+
+        display: flex;
+        align-items: center;
+        color: #201F1F;
+    }
+
+    .submit-btn {
+        background: #3D3D3D;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #FFFFFF;
+        border-color: transparent !important;
+    }
+
+    .cancl-btn {
+        background: #FAE99B;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        border-color: transparent !important;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #212221;
+        margin-left: 10px;
+    }
+
+     
+ 
+
+    .card-footer {
+        display: flex;
+        background-color: transparent !important;
+    }
+
+    .photo-form {
+        width: 100%;
+    }
+
+    .ui-front {
+        z-index: 9999999 !important;
+    }
+</style>
+@*Loader*@
+<style type="text/css">
+    #loader {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        
+        z-index: 10000;
+    }
+</style>
+
+@*Loader*@
+<body>
+    <div class="right_col bg-transparent" role="main">
+        <div class="container">
+            <form id="IRSForm" method="post">
+                @if (IsNew)
+                {
+                    if (!IsEdit)
+                    {
+                        foreach (var item in IRSF.one)
+                        {
+                            <input type="hidden" id="hiddentxtEmail" name="hiddentxtEmail" value="" />
+                            <input type="hidden" id="FormSrId" name="FormSrId" value="@(IRSF.one[0].Id)" />
+                            <input type="hidden" id="FormId" name="FormId" value="@(FormId)" />
+                            <input type="hidden" id="AppRowId" name="AppRowId" value="@(AppRowId)" />
+                            <table class="table mainTbl table-bordered form-table-container bg-color">
+                                <tr>
+                                    <td colspan="6" class="heading form-heading-1">
+                                        <span>Interview Rating Sheet</span>
+                                    </td>
+                                </tr>
+                            </table>
+                            <div class="container form-container">
+                                <div class="heading" id="headingErr">
+                                    <h1 id="" class="info-header">Following fields are mandatory. Please fill in information for<br /></h1>
+                                    <div id="add_to_me" class="header-list" style="color:red;"></div>
+                                </div>
+                                <div id="accordion">
+                                    <div class="card">
+                                        <div class="card-header collapsed" id="headingOne" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                            <h5 class="mb-0">
+                                                <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                                    <img src="~/assets/img/transactionIcon.svg" width="24" height="24" class="mr-2" />Transaction Fields
+                                                </button>
+                                            </h5>
+                                        </div>
+                                        <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+                                            <div class="card-body">
+                                                <table class="w-95 m-auto">
+                                                    <tr>
+                                                        <td>
+                                                            <table class="w-100 form-border">
+                                                                <tr>
+                                                                    <td class="br-0 bt-0"></td>
+                                                                    <td class="bl-0 br-0 bt-0 text-center font-h3 pt-2 pb-2">Interview Rating Sheet</td>
+                                                                    <td class="bl-0 bt-0"></td>
+                                                                </tr>
+                                                            </table>
+                                                            <table class="w-100 form-outer-border">
+                                                                <tr class="">
+                                                                    <td class="br-0">Name</td>
+                                                                    <td class="bl-0 br-0">:<input class="txtDisable" type="text" id="txtName" name="txtName" value="@(!IsNew ||!IsEdit ? (item.Name ?? "") : "")"></td>
+                                                                    <td class="br-0 bl-0">Job Title</td>
+                                                                    <td class="bl-0">:<input class="txtDisable" type="text" id="txtJobTitle" name="txtJobTitle" value="@(!IsNew ||!IsEdit ? (item.JobTitle ?? "") : "")"></td>
+                                                                </tr>
+                                                                <tr class="">
+                                                                    <td class="br-0">Interview Date</td>
+                                                                    <td class="bl-0 br-0">:<input class="txtDisable" type="date" id="txtInterviewDate" name="txtInterviewDate" value="@(!IsNew ||!IsEdit ? (item.InterviewDate.ToString("yyyy-MM-dd")  ?? "") : "")"></td>
+                                                                    <td class="br-0 bl-0">Department</td>
+                                                                    <td class="bl-0 br-0">:<input class="txtDisable" type="text" id="txtDepartment" name="txtDepartment" value="@(!IsNew ||!IsEdit ? (item.Department ?? "") : "")"></td>
+                                                                </tr>
+                                                                <tr class="">
+                                                                    <td class="br-0">Section</td>
+                                                                    <td class="bl-0 br-0">:<input class="txtDisable" type="text" id="txtSection" name="txtSection" value="@(!IsNew ||!IsEdit ? (item.Section ?? "") : "")"></td>
+                                                                    <td class="br-0 bl-0">Interview place</td>
+                                                                    <td class="bl-0 br-0">:<input class="txtDisable" type="text" id="txtInterviewPlace" name="txtInterviewPlace" value="@(!IsNew ||!IsEdit ? (item.InterviewPlace ?? "") : "")"></td>
+                                                                </tr>
+                                                            </table>
+                                                            <table class="w-100 form-border">
+                                                                <tr class="">
+                                                                    <td class="bt-0 br-0"><b>Rating Scale :</b></td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td class="w-20 dorgerBg br-0 bb-0 underline"><b>A: Excellent</b></td>
+                                                                    <td class="w-20 dorgerBg bl-0 br-0 bb-0 underline"><b>B: Very Good</b></td>
+                                                                    <td class="w-20 dorgerBg bl-0 br-0 bb-0 underline"><b>C: Good</b></td>
+                                                                    <td class=" w-20 dorgerBg bl-0 bb-0 underline"><b>D: Satisfactory</b></td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td class="w-20 dorgerBg br-0 bt-0 underline"><b>E :Poor</b></td>
+                                                                    <td class="bl-0 br-0 bt-0"></td>
+                                                                    <td class="bl-0 br-0 bt-0"></td>
+                                                                    <td class="bl-0 bt-0"></td>
+
+                                                                </tr>
+                                                            </table>
+                                                            <br>
+                                                            <table class="w-100 form-border">
+                                                                <tr>
+                                                                    <td><b>Competence: General</b>Talent/Aptitude/Expertise/Adeptness</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td class="intAlpha"><b>|A|B|C|D|E</b></td>
+                                                                    <td class="intAlpha"><input class="txtDisable" type="text" id="txtCompetenceGeneral" name="txtCompetenceGeneral" value="@(!IsNew ||!IsEdit ? (item.CompetenceGeneral ?? "") : "")"></td>
+                                                                </tr>
+
+                                                            </table>
+                                                            <br>
+                                                            <table class="w-100 form-border">
+                                                                <tr>
+                                                                    <td><b>Competence: Technical</b></td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td class="intAlpha"><b>|A|B|C|D|E</b></td>
+                                                                    <td class="intAlpha"><input class="txtDisable" type="text" id="txtCompetenceTechnical" name="txtCompetenceTechnical" value="@(!IsNew ||!IsEdit ? (item.CompetenceTechnical ?? "") : "")"></td>
+                                                                </tr>
+
+                                                            </table>
+                                                            <br>
+                                                            <table class="w-100 form-border">
+                                                                <tr>
+                                                                    <td><b>Inner drive : Living Integrity and Responsibility (Knock out criteria –  Required Score C)</b></td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td class="intAlpha"><b>|A|B|C|D|E</b></td>
+                                                                    <td class="intAlpha"><input class="txtDisable" type="text" id="txtLivingIntegrityandResponsibility" name="txtLivingIntegrityandResponsibility" value="@(!IsNew ||!IsEdit ? (item.LivingIntegrityandResponsibility ?? "") : "")"></td>
+                                                                </tr>
+
+                                                            </table>
+                                                            <br>
+                                                            <table class="w-100 form-border">
+                                                                <tr>
+                                                                    <td class="bb-0"><b>Other Comments:</b></td>
+                                                                    <td class="bl-0">:<textarea class="txtDisable" type="text" maxlength="500" name="txtOtherComments" id="txtOtherComments">@(!IsNew || !IsEdit ? (item.OtherComments ?? "") : "")</textarea></td>
+                                                                </tr>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                                <table class="detail-sec-p">
+                                                    <tr>
+                                                        <td>SF_S_016</td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card">
+                                        <div class="card-header collapsed" id="headingThree" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                            <h5 class="mb-0">
+                                                <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                                    <img src="~/assets/img/termsIcon.svg" width="24" height="24" class="mr-2" />  General Info / Terms & Conditions
+
+                                                </button>
+                                            </h5>
+                                        </div>
+                                        <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
+                                            <div class="card-body">
+                                                <table class="w-100 form-border">
+                                                    <tr>
+                                                        <td class="bb-0"><b>Training needs identified (Next six months)</b></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="bt-0 bb-0">1.</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="bt-0">2.</td>
+                                                    </tr>
+                                                </table>
+                                                <br>
+                                                <table class="w-100 form-border">
+                                                    <tbody>
+                                                        <tr>
+                                                            <th class="text-center" colspan="3">RESULT</th>
+                                                            <th>PROPOSED POSITION</th>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>SELECTED</th>
+                                                            <th>HOLD</th>
+                                                            <th>REJECTED</th>
+                                                            <th>T.M</th>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                                <br>
+                                                <table class="w-100 form-border">
+                                                    <tbody>
+                                                        <tr>
+                                                            <th></th>
+                                                            <th>NAME OF INTERVIEW PANEL</th>
+                                                            <th>SIGNATURE</th>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>1.</th>
+                                                            <th></th>
+                                                            <th></th>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>2.</th>
+                                                            <th></th>
+                                                            <th></th>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                                <br>
+                                                <table class="w-100 form-border">
+                                                    <tbody>
+                                                        <tr>
+                                                            <th></th>
+                                                            <th class="authority">NAME OF APPROVAL AUTHORITY</th>
+                                                            <th>SIGNATURE</th>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>1.</th>
+                                                            <th></th>
+                                                            <th></th>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="breadcrumb-container">
+                            <div>
+                                <ol class="breadcrumb pl-0">
+                                    <li>
+                                        <a href="/Dashboard?formName=IJPF">
+                                            Dashboard
+                                        </a>
+                                    </li>
+                                    <li class="active">
+                                        <a href="/Dashboard/GetDepartmentWiseForms?department=HR">
+                                            HR Department
+                                        </a>
+                                    </li>
+                                    <li class="active">Interview Rating Sheet</li>
+                                </ol>
+                            </div>
+                        </div>
+                        <div class="container radius-5 border-info mb-5">
+                            <div class="row topContent">
+                                <div class="col-lg-6 col-md-6 ">
+                                    <h4 class="font-h4 f-500 pl-2">Form Name : Interview Rating Sheet</h4>
+                                </div>
+                                <div class="col-lg-6 col-md-6 text-right">
+                                    <h4 class="font-h4 f-500">
+                                        Form Department | Owner
+                                    </h4>
+                                </div>
+
+                            </div>
+                        </div>
+                        <table class="table mainTbl table-bordered form-table-container bg-color">
+                            <tr>
+                                <td colspan="6" class="heading form-heading-1">
+                                    <span>Interview Rating Sheet</span>
+                                </td>
+                            </tr>
+                        </table>
+                        <div class="container form-container">
+                            <div class="heading" id="headingErr">
+                                <h1 id="" class="info-header">Following fields are mandatory. Please fill in information for<br /></h1>
+                                <div id="add_to_me" class="header-list" style="color:red;"></div>
+                            </div>
+                            <div id="accordion">
+                                @*<div class="card">
+                                        <div class="card-header collapsed" id="headingSelf" data-toggle="collapse" data-target="#collapseSelf" aria-expanded="true" aria-controls="collapseSelf">
+                                            <h5 class="mb-0">
+                                                <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseSelf" aria-expanded="true" aria-controls="collapseSelf">
+                                                    <img src="~/assets/img/empIcon.svg" width="24" height="24" class="mr-2" /> Employee Details
+                                                </button>
+                                            </h5>
+                                        </div>
+                                        <div id="collapseSelf" class="collapse" aria-labelledby="headingSelf" data-parent="#accordion">
+                                            <div class="card-body empDetailsBg">
+                                                <div class="row">
+                                                    <div class="col-md-2 col-lg-2 text-center col-12">
+                                                        <img src="~/assets/img/empProfile.png" />
+                                                    </div>
+
+                                                    <div class="col-md-10 col-lg-10 col-12">
+                                                        <div class="empDetailsFields">
+                                                            <div class="row">
+                                                                <div class="form-group col-md-2 col-lg-2 col-12">
+                                                                    <label class="firstLastName">First Name:</label>
+                                                                    <input type="text" name="txtFirstName" class="inpDisable inpText" id="txtFirstName" value="@(!IsNew || !IsEdit ? (IRSF.one[0].SelfFirstName ?? "") : "")">
+
+                                                                </div>
+                                                                <div class="form-group col-md-2 col-lg-2 col-12">
+                                                                    <label class="Surname">Surname:</label>
+                                                                    <input type="text" name="txtSurname" class="inpDisable inpText" id="txtSurname" value="@(!IsNew || !IsEdit ? (IRSF.one[0].SelfSurname ?? "") : "")">
+
+                                                                </div>
+                                                                <div class="form-group col-md-2 col-lg-2 col-12">
+                                                                    <label class="f-600">Employee ID No.:</label>
+                                                                    <input type="text" name="txtEmpId" class="inpDisable inpText" id="txtEmpId" value="@(!IsNew || !IsEdit ? (IRSF.one[0].SelfEmployeeIDNo ?? "") : "")" onkeypress="allowNumbersOnly(event)">
+
+                                                                </div>
+
+                                                                <div class="form-group col-md-2 col-lg-2 col-12">
+                                                                    <label class="f-600">Department:</label>
+                                                                    <input type="text" name="txtDepartment" class="inpDisable inpText" id="txtDepartment" value="@(!IsNew || !IsEdit ? (IRSF.one[0].SelfDepartment ?? "") : "")">
+
+                                                                </div>
+
+                                                                <div class="form-group col-md-2 col-lg-2 col-12">
+                                                                    <label class="f-600">Mobile:</label>
+                                                                    <input type="text" name="txtMobile" id="txtMobile" class="inpText" value="@((!IsNew && IRSF.one[0].SelfMobile != 0) || (!IsEdit && IRSF.one[0].SelfMobile != 0) ? (IRSF.one[0].SelfMobile ?? "") : "")" onkeypress="allowNumbersOnly(event)">
+                                                                </div>
+                                                                <div class="form-group col-md-2 col-lg-2 col-12">
+                                                                    <label class="f-600">Telephone (office):</label>
+                                                                    <input type="text" name="txtTelephone" id="txtTelephone" class="inpText" value="@((!IsNew && IRSF.one[0].SelfTelephone != 0) || (!IsEdit && IRSF.one[0].SelfTelephone != 0) ? (IRSF.one[0].SelfTelephone ?? "") : "")" onkeypress="allowNumbersOnly(event)">
+
+                                                                </div>
+
+                                                                <div class="form-group col-md-2 col-lg-2 col-12">
+                                                                    <label class="f-600">Date:</label>
+                                                                    <input type="text" name="txtDate" placeholder="/ /" class="inpDisable" value="@(!IsNew || !IsEdit ? (Convert.ToDateTime(IRSF.two[0].FormId.Created).ToShortDateString() + " " + Convert.ToDateTime(IRSF.two[0].FormId.Created).ToShortTimeString()) : DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString())" readonly>
+
+                                                                </div>
+
+                                                                <div class="form-group col-md-2 col-lg-2 col-12">
+                                                                    <label class="f-600">Email ID:</label>
+                                                                    <input type="text" name="txtEmail" id="txtEmail" class="inpDisable" onkeypress="allowNumbersOnly(event)" value="@(!IsNew || !IsEdit ? (IRSF.one[0].SelfEmailID ?? "") : "")">
+
+                                                                </div>
+
+                                                                <div class="form-group col-md-2 col-lg-2 col-12">
+                                                                    <label class="f-600">Form ID:</label>
+                                                                    <input type="text" name="txtFormId" class="inpDisable" value="@(!IsNew || !IsEdit ? ("IRSF" + IRSF.three[0].FormId.Id ?? "") : "" )" readonly>
+
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>*@
+
+                                <div class="card">
+                                    <div class="card-header collapsed" id="headingOne" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                        <h5 class="mb-0">
+                                            <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                                <img src="~/assets/img/transactionIcon.svg" width="24" height="24" class="mr-2" />Transaction Fields
+                                            </button>
+                                        </h5>
+                                    </div>
+                                    <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+                                        <div class="card-body">
+                                            <table class="w-95 m-auto">
+                                                <tr>
+                                                    <td>
+                                                        <table class="w-100 form-outer-border">
+                                                            <tr class="">
+                                                                <td class="br-0">Name</td>
+                                                                <td class="bl-0 br-0">:<input class="inputCourier" type="text" id="txtName" name="txtName" autocomplete="off"></td>
+                                                                <td class="br-0 bl-0">Job Title</td>
+                                                                <td class="bl-0">:<input class="inputCourier" type="text" id="txtJobTitle" name="txtJobTitle" autocomplete="off"></td>
+                                                            </tr>
+                                                            <tr class="">
+                                                                <td class="br-0">Interview Date</td>
+                                                                <td class="bl-0 br-0">:<input class="inputCourier" type="date" id="txtInterviewDate" name="txtInterviewDate"></td>
+                                                                <td class="br-0 bl-0">Department</td>
+                                                                <td class="bl-0 br-0">:<input class="inputCourier" type="text" id="txtDepartment" name="txtDepartment" autocomplete="off"></td>
+                                                            </tr>
+                                                            <tr class="">
+                                                                <td class="br-0">Section</td>
+                                                                <td class="bl-0 br-0">:<input class="inputCourier" type="text" id="txtSection" name="txtSection" autocomplete="off"></td>
+                                                                <td class="br-0 bl-0">Interview place</td>
+                                                                <td class="bl-0 br-0">:<input class="inputCourier" type="text" id="txtInterviewPlace" name="txtInterviewPlace" autocomplete="off"></td>
+                                                            </tr>
+                                                        </table>
+                                                        <table class="w-100 form-border">
+                                                            <tr class="">
+                                                                <td class="bt-0 br-0"><b>Rating Scale :</b></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="w-20 dorgerBg br-0 bb-0 underline"><b>A: Excellent</b></td>
+                                                                <td class="w-20 dorgerBg bl-0 br-0 bb-0 underline"><b>B: Very Good</b></td>
+                                                                <td class="w-20 dorgerBg bl-0 br-0 bb-0 underline"><b>C: Good</b></td>
+                                                                <td class=" w-20 dorgerBg bl-0 bb-0 underline"><b>D: Satisfactory</b></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="w-20 dorgerBg br-0 bt-0 underline"><b>E :Poor</b></td>
+                                                                <td class="bl-0 br-0 bt-0"></td>
+                                                                <td class="bl-0 br-0 bt-0"></td>
+                                                                <td class="bl-0 bt-0"></td>
+
+                                                            </tr>
+                                                        </table>
+                                                        <br>
+                                                        <table class="w-100 form-border">
+                                                            <tr>
+                                                                <td><b>Competence: General</b>Talent/Aptitude/Expertise/Adeptness</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="intAlpha"><b>|A|B|C|D|E</b></td>
+                                                                <td class="intAlpha"><input class="inputCourier" type="text" id="txtCompetenceGeneral" name="txtCompetenceGeneral" autocomplete="off"></td>
+                                                            </tr>
+
+                                                        </table>
+                                                        <br>
+                                                        <table class="w-100 form-border">
+                                                            <tr>
+                                                                <td><b>Competence: Technical</b></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="intAlpha"><b>|A|B|C|D|E</b></td>
+                                                                <td class="intAlpha"><input class="inputCourier" type="text" id="txtCompetenceTechnical" name="txtCompetenceTechnical" autocomplete="off"></td>
+                                                            </tr>
+
+                                                        </table>
+                                                        <br>
+                                                        <table class="w-100 form-border">
+                                                            <tr>
+                                                                <td><b>Inner drive : Living Integrity and Responsibility (Knock out criteria –  Required Score C)</b></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="intAlpha"><b>|A|B|C|D|E</b></td>
+                                                                <td class="intAlpha"><input class="inputCourier" autocomplete="off" type="text" id="txtLivingIntegrityandResponsibility" name="txtLivingIntegrityandResponsibility"></td>
+                                                            </tr>
+
+                                                        </table>
+                                                        <br>
+                                                        <table class="w-100 form-border">
+                                                            <tr>
+                                                                <td class="bb-0"><b>Other Comments:</b></td>
+                                                                <td class="bl-0">:<textarea class="inputCourier" type="text" maxlength="500" autocomplete="off" name="txtOtherComments" id="txtOtherComments"></textarea></td>
+                                                            </tr>
+                                                        </table>
+
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            <table class="detail-sec-p">
+                                                <tr>
+                                                    <td>SF_S_016</td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-header collapsed" id="headingThree" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                        <h5 class="mb-0">
+                                            <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                                <img src="~/assets/img/termsIcon.svg" width="24" height="24" class="mr-2" />  General Info / Terms & Conditions
+
+                                            </button>
+                                        </h5>
+                                    </div>
+                                    <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
+                                        <div class="card-body">
+                                            <table class="w-100 form-border">
+                                                <tr>
+                                                    <td class="bb-0"><b>Training needs identified (Next six months)</b></td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="bt-0 bb-0">1.</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="bt-0">2.</td>
+                                                </tr>
+                                            </table>
+                                            <br>
+                                            <table class="w-100 form-border">
+                                                <tbody>
+                                                    <tr>
+                                                        <th class="text-center" colspan="3">RESULT</th>
+                                                        <th>PROPOSED POSITION</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>SELECTED</th>
+                                                        <th>HOLD</th>
+                                                        <th>REJECTED</th>
+                                                        <th>T.M</th>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <br>
+                                            <table class="w-100 form-border">
+                                                <tbody>
+                                                    <tr>
+                                                        <th></th>
+                                                        <th>NAME OF INTERVIEW PANEL</th>
+                                                        <th>SIGNATURE</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>1.</th>
+                                                        <th></th>
+                                                        <th></th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>2.</th>
+                                                        <th></th>
+                                                        <th></th>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <br>
+                                            <table class="w-100 form-border">
+                                                <tbody>
+                                                    <tr>
+                                                        <th></th>
+                                                        <th class="authority">NAME OF APPROVAL AUTHORITY</th>
+                                                        <th>SIGNATURE</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>1.</th>
+                                                        <th></th>
+                                                        <th></th>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    foreach (var item in IRSF.one)
+                    {
+                        <table class="table mainTbl table-bordered form-table-container bg-color">
+                            <tr>
+                                <td colspan="6" class="heading form-heading-1">
+                                    <span>Interview Rating Sheet</span>
+                                </td>
+                            </tr>
+                        </table>
+                        <div class="container form-container">
+                            <div id="accordion">
+                                <div class="card">
+                                    <div class="card-header collapsed" id="headingOne" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                        <h5 class="mb-0">
+                                            <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                                <img src="~/assets/img/transactionIcon.svg" width="24" height="24" class="mr-2" />Transaction Fields
+                                            </button>
+                                        </h5>
+                                    </div>
+                                    <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+                                        <div class="card-body">
+                                            <table class="w-95 m-auto">
+                                                <tr>
+                                                    <td>
+                                                        <table class="w-100 form-border">
+                                                            <tr>
+                                                                <td class="br-0 bt-0"></td>
+                                                                <td class="bl-0 br-0 bt-0 text-center font-h3 pt-2 pb-2">Interview Rating Sheet</td>
+                                                                <td class="bl-0 bt-0"></td>
+                                                            </tr>
+                                                        </table>
+                                                        <table class="w-100 form-outer-border">
+                                                            <tr class="">
+                                                                <td class="br-0">Name</td>
+                                                                <td class="bl-0 br-0">:<input class="txtDisable" type="text" id="txtName" name="txtName" value="@(!IsNew ? (item.Name ?? "") : "")"></td>
+                                                                <td class="br-0 bl-0">Job Title</td>
+                                                                <td class="bl-0">:<input class="txtDisable" type="text" id="txtJobTitle" name="txtJobTitle" value="@(!IsNew ? (item.JobTitle ?? "") : "")"></td>
+                                                            </tr>
+                                                            <tr class="">
+                                                                <td class="br-0">Interview Date</td>
+                                                                <td class="bl-0 br-0">:<input class="txtDisable" type="text" id="txtInterviewDate" name="txtInterviewDate" value="@(!IsNew ? (item.InterviewDate.ToShortDateString() ?? "") : "")"></td>
+                                                                <td class="br-0 bl-0">Department</td>
+                                                                <td class="bl-0 br-0">:<input class="txtDisable" type="text" id="txtDepartment" name="txtDepartment" value="@(!IsNew ? (item.Department ?? "") : "")"></td>
+                                                            </tr>
+                                                            <tr class="">
+                                                                <td class="br-0">Section</td>
+                                                                <td class="bl-0 br-0">:<input class="txtDisable" type="text" id="txtSection" name="txtSection" value="@(!IsNew ? (item.Section ?? "") : "")"></td>
+                                                                <td class="br-0 bl-0">Interview place</td>
+                                                                <td class="bl-0 br-0">:<input class="txtDisable" type="text" id="txtInterviewPlace" name="txtInterviewPlace" value="@(!IsNew ? (item.InterviewPlace ?? "") : "")"></td>
+                                                            </tr>
+                                                        </table>
+                                                        <table class="w-100 form-border">
+                                                            <tr class="">
+                                                                <td class="bt-0 br-0"><b>Rating Scale :</b></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="w-20 dorgerBg br-0 bb-0 underline"><b>A: Excellent</b></td>
+                                                                <td class="w-20 dorgerBg bl-0 br-0 bb-0 underline"><b>B: Very Good</b></td>
+                                                                <td class="w-20 dorgerBg bl-0 br-0 bb-0 underline"><b>C: Good</b></td>
+                                                                <td class=" w-20 dorgerBg bl-0 bb-0 underline"><b>D: Satisfactory</b></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="w-20 dorgerBg br-0 bt-0 underline"><b>E :Poor</b></td>
+                                                                <td class="bl-0 br-0 bt-0"></td>
+                                                                <td class="bl-0 br-0 bt-0"></td>
+                                                                <td class="bl-0 bt-0"></td>
+
+                                                            </tr>
+                                                        </table>
+                                                        <br>
+                                                        <table class="w-100 form-border">
+                                                            <tr>
+                                                                <td><b>Competence: General</b>Talent/Aptitude/Expertise/Adeptness</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="intAlpha"><b>|A|B|C|D|E</b></td>
+                                                                <td class="intAlpha"><input class="txtDisable" type="text" id="txtCompetenceGeneral" name="txtCompetenceGeneral" value="@(!IsNew ? (item.CompetenceGeneral ?? "") : "")"></td>
+                                                            </tr>
+
+                                                        </table>
+                                                        <br>
+                                                        <table class="w-100 form-border">
+                                                            <tr>
+                                                                <td><b>Competence: Technical</b></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="intAlpha"><b>|A|B|C|D|E</b></td>
+                                                                <td class="intAlpha"><input class="txtDisable" type="text" id="txtCompetenceTechnical" name="txtCompetenceTechnical" value="@(!IsNew ? (item.CompetenceTechnical ?? "") : "")"></td>
+                                                            </tr>
+
+                                                        </table>
+                                                        <br>
+                                                        <table class="w-100 form-border">
+                                                            <tr>
+                                                                <td><b>Inner drive : Living Integrity and Responsibility (Knock out criteria –  Required Score C)</b></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="intAlpha"><b>|A|B|C|D|E</b></td>
+                                                                <td class="intAlpha"><input class="txtDisable" type="text" id="txtLivingIntegrityandResponsibility" name="txtLivingIntegrityandResponsibility" value="@(!IsNew ? (item.LivingIntegrityandResponsibility ?? "") : "")"></td>
+                                                            </tr>
+
+                                                        </table>
+                                                        <br>
+                                                        <table class="w-100 form-border">
+                                                            <tr>
+                                                                <td class="bb-0"><b>Other Comments:</b></td>
+                                                                <td class="bl-0">:<textarea class="txtDisable" type="text" maxlength="500" name="txtOtherComments" id="txtOtherComments">@(!IsNew ? (item.OtherComments ?? "") : "")</textarea></td>
+                                                            </tr>
+                                                        </table>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            <table class="detail-sec-p">
+                                                <tr>
+                                                    <td>SF_S_016</td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-header collapsed" id="headingThree" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                        <h5 class="mb-0">
+                                            <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                                <img src="~/assets/img/termsIcon.svg" width="24" height="24" class="mr-2" />  General Info / Terms & Conditions
+
+                                            </button>
+                                        </h5>
+                                    </div>
+                                    <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
+                                        <div class="card-body">
+                                            <table class="w-100 form-border">
+                                                <tr>
+                                                    <td class="bb-0"><b>Training needs identified (Next six months)</b></td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="bt-0 bb-0">1.</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="bt-0">2.</td>
+                                                </tr>
+                                            </table>
+                                            <br>
+                                            <table class="w-100 form-border">
+                                                <tbody>
+                                                    <tr>
+                                                        <th class="text-center" colspan="3">RESULT</th>
+                                                        <th>PROPOSED POSITION</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>SELECTED</th>
+                                                        <th>HOLD</th>
+                                                        <th>REJECTED</th>
+                                                        <th>T.M</th>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <br>
+                                            <table class="w-100 form-border">
+                                                <tbody>
+                                                    <tr>
+                                                        <th></th>
+                                                        <th>NAME OF INTERVIEW PANEL</th>
+                                                        <th>SIGNATURE</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>1.</th>
+                                                        <th></th>
+                                                        <th></th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>2.</th>
+                                                        <th></th>
+                                                        <th></th>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <br>
+                                            <table class="w-100 form-border">
+                                                <tbody>
+                                                    <tr>
+                                                        <th></th>
+                                                        <th class="authority">NAME OF APPROVAL AUTHORITY</th>
+                                                        <th>SIGNATURE</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>1.</th>
+                                                        <th></th>
+                                                        <th></th>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    }
+                }
+                @if (IsNew)
+                {
+                    if (!IsEdit)
+                    {
+                        <div class="card-footer align-content-center">
+                            <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                                Re-Submit
+                            </button>
+                            <button type="reset" class="btn btn-danger btn-sm cancl-btn" id="btnCancel">
+                                Cancel
+                            </button>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="card-footer align-content-center">
+                            <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                                Submit
+                            </button>
+                            <button type="reset" class="btn btn-danger btn-sm cancl-btn" id="btnCancel">
+                                Cancel
+                            </button>
+                        </div>
+                    }
+                }
+            </form>
+
+        </div>
+    </div>
+</body>
+<div class="modal fade" id="successModel" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header modelHeader">
+                <span class="modal-title modalMsgTitle" id="modalTitle"></span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label id="modalBody" class="lableMsg">  </label>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="submitBomBtn publishBtn" id="modalOkButton">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    //var spinner = $('#loader');
+    var formID = @Html.Raw(Json.Encode(FormId));
+    var RowId = @Html.Raw(Json.Encode(RowId));
+    var isNew = @Html.Raw(Json.Encode(IsNew));
+    var irsf = @Html.Raw(Json.Encode(IRSF));
+    var appRowId = @Html.Raw(Json.Encode(AppRowId));
+    var approvalType =@Html.Raw(Json.Encode(ApprovalType));
+    var isEdit = @Html.Raw(Json.Encode(IsEdit));
+    var FlagRedirect = @Html.Raw(Json.Encode(FlagRedirect));
+
+    pageLoad();
+
+    function pageLoad() {
+        $("#headingErr").hide();
+        if (!isNew) {
+            $(".inpDisable").attr("disabled", "disabled");
+            $(".txtDisable").prop("readonly", true);
+        }
+        if (!isEdit) {
+
+            $(".inpDisable").attr("disabled", false);
+            $(".txtDisable").prop("readonly", false);
+        }
+    }
+
+    function successModal(txt) {
+        ////
+        $('#modalTitle').html('Success');
+        if (txt == "approve") {
+            $('#modalBody').html('Form has been approved!');
+            FlagRedirect = txt;// For Email Update
+        }
+        else if (txt == "reject") {
+            $('#modalBody').html('Form has been rejected!');
+        }
+        else if (txt == "enquire") {
+            $('#modalBody').html('Form has been enquired!');
+        }
+        else if (txt == "cancelled") {
+            $('#modalBody').html('Form has been cancelled!');
+        } else {
+            $('#modalBody').html('Your form with ID: IRSF' + txt + ' has been submitted! Kindly use this for future reference');
+            FlagRedirect = txt;// For Email Update
+        }
+        // $("#modalOkButton").attr('data-dismiss', 'modal');//Commented For Email Update
+        $("#successModel").modal('show');
+    }
+
+    function failureModal() {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html('Some error occurred!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function validityModal(txt) {
+        ////
+        if (txt == 'approve') {
+            //DisplayAlert('error', 'Error', 'Please select the Type of Car');
+        }
+        else if (txt == 'reject') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for rejecting the form');
+        }
+        else if (txt == 'enquire') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for enquiring the form');
+        }
+
+    }
+
+    function requiredModal(text) {
+        $('#modalTitle').html('Required');
+        $('#modalBody').html(text + '!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function allowNumbersOnly(e) {
+        var code = (e.which) ? e.which : e.keyCode;
+        if (code > 31 && (code < 48 || code > 57)) {
+            e.preventDefault();
+        }
+    }
+
+    function alphaOnly(e) {
+        var key = e.keyCode;
+        if (key > 32 && (key < 65 || key > 122 || key == 91 || key == 92 || key == 93 || key == 94 || key == 95 || key == 96)) {
+            e.preventDefault();
+        }
+    }
+
+    $("#btnSubmit").on('click', function (e) {
+        //
+        //var txtName = document.getElementById("txtName").value;
+        //if (txtName == "") {
+        //    requiredModal("Please enter the Name");
+        //    return false;
+        //}
+        //var txtJobTitle = document.getElementById("txtJobTitle").value;
+        //if (txtJobTitle == "") {
+        //    requiredModal("Please enter the Job Title");
+        //    return false;
+        //}
+        //var txtInterviewDate = document.getElementById("txtInterviewDate").value;
+        //if (txtInterviewDate == "") {
+        //    requiredModal("Please select the Interview Date");
+        //    return false;
+        //}
+        //var txtDepartment = document.getElementById("txtDepartment").value;
+        //if (txtDepartment == "") {
+        //    requiredModal("Please enter the Department");
+        //    return false;
+        //}
+        //var txtSection = document.getElementById("txtSection").value;
+        //if (txtSection == "") {
+        //    requiredModal("Please enter the Section");
+        //    return false;
+        //}
+        //var txtInterviewPlace = document.getElementById("txtInterviewPlace").value;
+        //if (txtInterviewPlace == "") {
+        //    requiredModal("Please enter the Interview Place");
+        //    return false;
+        //}
+
+        //New Validation Summary Code
+        var errors = "";
+        var txtName = document.getElementById("txtName").value;
+        if (txtName == "") {
+            errors += "* Name.<br>";
+        }
+        var txtJobTitle = document.getElementById("txtJobTitle").value;
+        if (txtJobTitle == "") {
+            errors += "* Job Title.<br>";
+        }
+        var txtInterviewDate = document.getElementById("txtInterviewDate").value;
+        if (txtInterviewDate == "") {
+            errors += "* Interview Date.<br>";
+        }
+        var txtDepartment = document.getElementById("txtDepartment").value;
+        if (txtDepartment == "") {
+            errors += "* Department.<br>";
+        }
+        var txtSection = document.getElementById("txtSection").value;
+        if (txtSection == "") {
+            errors += "* Section.<br>"
+        }
+        var txtInterviewPlace = document.getElementById("txtInterviewPlace").value;
+        if (txtInterviewPlace == "") {
+            errors += "* Interview Place.<br>";
+        }
+        if (errors.length) {
+            $("#headingErr").show();
+            document.getElementById("add_to_me").innerHTML = errors;
+            $(window).scrollTop(0);
+            return false;
+        }
+        $("#headingErr").hide();
+        document.getElementById("add_to_me").innerHTML = '';
+
+        $("#pageLoader").removeClass('invisible');
+        var form = $("#IRSForm");
+        var formData = new FormData(form[0]);
+
+
+        $.ajax({
+            url: '/InterviewRatingSheet/SaveInterviewRatingSheet',
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            data: formData,
+            enctype: 'multipart/form-data',
+            success: (function (data) {
+                if (data[0].Value == 1) {
+                    console.log(data);
+                    $("#pageLoader").addClass('invisible');
+                    successModal(data[1].Value);
+                }
+                else {
+                    failureModal();
+                    $("#pageLoader").addClass('invisible');
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+                $("#pageLoader").addClass('invisible');
+            })
+        })
+    });
+
+    $("#btnCancel").on('click', function (e) {
+        //
+        $("#headingErr").hide();
+        document.getElementById("add_to_me").innerHTML = '';
+    });
+
+    function saveResponse(text) {
+        ////
+
+        var status = '', comment = '';
+        comment = $("#comment-" + text).val();
+        switch (text) {
+            case 'approve': {
+                status = 'Approved';
+                if (comment != '') {
+                    //validityModal(text);
+                    //return;
+                }
+                break;
+            }
+            case 'reject': {
+                status = 'Rejected';
+                if (comment == '') {
+                    validityModal(text);
+                    return;
+                }
+                break;
+            }
+            case 'enquire': {
+                status = 'Enquired';
+                if (comment == '') {
+                    validityModal(text);
+                    return;
+                }
+                break;
+            }
+        }
+        spinner.show();
+        $.ajax({
+            url: '/List/SaveResponse',
+            type: 'POST',
+            data: { response: status, appRowId: appRowId, comment: comment, approvalType: approvalType },
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data == 1) {
+                    successModal(text);
+                    setTimeout(FilterMyTasks, 5000);
+                    spinner.hide();
+                }
+                else {
+                    failureModal();
+                    spinner.hide();
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+                spinner.hide();
+            })
+        })
+    }
+
+    $("#modalOkButton").on('click', function () {
+        //
+        if (FlagRedirect != null) {
+            window.location = "../Dashboard";
+        }
+    });
+
+    $('#myModal').modal({ backdrop: 'static', keyboard: false })
+</script>

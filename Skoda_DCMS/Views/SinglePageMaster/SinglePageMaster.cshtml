@@ -1,0 +1,976 @@
+﻿
+@model dynamic
+@{
+    ViewBag.Title = "Single Page Master Form";
+    var user = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    bool IsNew = true;
+    bool IsEdit = true;
+    dynamic FlagRedirect = null; // For Email Update
+    dynamic COIF = null;
+    Skoda_DCMS.Models.SPMFData SPMF = null;
+    Layout = ViewBag.Layout;
+    int RowId = 0, FormId = 0, AppRowId = 0, ApprovalType = 0;
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IsNew = ViewBag.IsNew;
+        IsEdit = ViewBag.IsEdit;
+        SPMF = ViewBag.Model;
+        RowId = ViewBag.RowId;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+    }
+    SPMF = ViewBag.Model;
+}
+@*For Email Update*@
+<style type="text/css">
+    .astColor {
+        color: red;
+    }
+
+    .per-checkbox {
+        padding-left: 61px !important;
+    }
+
+    #OtherEmpName #txtOtherEmpname {
+        border-radius: 0;
+        height: 20%;
+        font-size: 12px;
+    }
+
+    .textTrans {
+        width: 100%;
+        max-width: 100%;
+        margin-right: 0px;
+        border: 1px solid !important;
+    }
+
+    .form-row {
+        display: -ms-flexbox;
+        display: block;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+        margin-right: -5px;
+        margin-left: -5px;
+    }
+
+    .empDetailsBg {
+        background-color: #fffbef;
+    }
+
+    #accordion select {
+        width: 100% !important;
+        max-width: 97%;
+        height: 45px;
+        background-color: #F8F8F8;
+        border: 1px solid #BFBFBF;
+        box-sizing: border-box;
+        border-radius: 5px;
+        background-image: url(data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>);
+        background-repeat: no-repeat;
+        background-position: right .75rem center;
+        background-size: 16px 12px;
+    }
+
+    #accordion input[type='text'] {
+        width: 100% !important;
+        max-width: 97%;
+        height: 45px;
+        background-color: #F8F8F8;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px;
+        padding-left: 10px;
+    }
+
+    #accordion input[type='date'] {
+        width: 100% !important;
+        max-width: 97%;
+        height: 45px;
+        background-color: #F8F8F8;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px;
+        padding-left: 10px;
+    }
+
+    #accordion label {
+        font-size: 16px;
+        line-height: 22px;
+        font-weight: normal;
+        color: #201F1F;
+    }
+
+    #accordion table tr td {
+        border: none !important;
+        font-size: 16px;
+        line-height: 19px;
+        color: #201F1F;
+    }
+
+    #accordion label {
+        display: block;
+    }
+
+    #accordion .card-header {
+        background: rgb(4 59 100) !important;
+        border-radius: 5px 5px 0px 0px;
+        position: relative;
+        margin-bottom: 15px;
+    }
+
+        #accordion .card-header.collapsed h5:after {
+            content: '+';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        #accordion .card-header h5:after {
+            content: '-';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+    #accordion h5 button {
+        font-size: 18px;
+        line-height: 22px;
+        /* identical to box height */
+        padding-left: 0px;
+        display: flex;
+        align-items: center;
+        text-transform: uppercase;
+        /* Text_white */
+
+        color: #FFFFFF;
+    }
+
+        #accordion h5 button:focus {
+            box-shadow: none;
+        }
+
+    .empDetailsFields label {
+        display: block !important;
+        margin-bottom: 0px;
+    }
+
+    .empDetailsFields .row label {
+        display: block;
+        margin-bottom: 0px;
+    }
+
+        .empDetailsFields .row label:nth-child(1) {
+            font-style: normal;
+            font-weight: normal !important;
+            font-size: 12px;
+            line-height: 18px;
+            color: #A9A9A9 !important;
+        }
+
+        .empDetailsFields .row label:nth-child(2) {
+            font-style: normal;
+            font-weight: normal;
+            font-size: 18px;
+            line-height: 22px;
+            color: #201F1F;
+        }
+
+    .firstLastName {
+        font-style: normal;
+        font-weight: normal;
+        font-size: 20px;
+        line-height: 24px;
+        /* identical to box height */
+
+        display: flex;
+        align-items: center;
+        color: #201F1F;
+    }
+
+    .submit-btn {
+        background: #3D3D3D;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #FFFFFF;
+        border-color: transparent !important;
+    }
+
+    .cancl-btn {
+        background: #FAE99B;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        border-color: transparent !important;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #212221;
+        margin-left: 10px;
+    }
+
+
+
+
+    .card-footer {
+        display: flex;
+        background-color: transparent !important;
+    }
+
+    .photo-form {
+        width: 100%;
+    }
+
+    .approvalTracking table th {
+        font-family: SKODA Next;
+        font-style: normal;
+        font-weight: 600;
+        font-size: 16px;
+        line-height: 19px;
+        color: #201F1F;
+        padding: .75rem 10px !important;
+    }
+
+    .approvalTracking table tr td {
+        font-family: SKODA Next;
+        font-style: normal;
+        font-weight: 600;
+        font-size: 14px !important;
+        line-height: 19px;
+        color: #201F1F;
+        padding: .75rem 10px !important;
+    }
+
+    .actionTab textarea {
+        width: 100% !important;
+        max-width: 98.7%;
+        height: 45px;
+        background: #F8F8F8;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px;
+        padding-left: 10px;
+    }
+
+    .table-middle tr td, .table-middle tr th {
+        text-align: center !important;
+    }
+
+    .per-checkbox {
+        padding-left: 61px !important;
+    }
+
+    #loader {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        z-index: 10000;
+    }
+
+    #divRdExisting {
+        padding-top: 20px !important;
+    }
+
+    #divRdNew {
+        padding-top: 24px !important;
+    }
+
+    div.input-block {
+        position: relative;
+    }
+
+        div.input-block input {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 188px;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block textarea {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 100%;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            background-color: #fff;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block span.placeholder {
+            font-weight: normal;
+            position: absolute;
+            margin: 17px 0;
+            padding: 0 4px;
+            font-family: Roboto, sans-serif;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            top: -6px;
+            left: 15px;
+            transition: all 0.2s;
+            transform-origin: 0% 0%;
+            background: none;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+
+        div.input-block textarea:valid + span.placeholder,
+        div.input-block textarea:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px) !important;
+            background: #fff !important;
+        }
+
+        div.input-block span.placeholder {
+            font-size: 15px;
+            /*transform: scale(0.8) translateY(-23px);*/
+        }
+
+    textarea:disabled + span.placeholder {
+        transform: translate(-10px, -20px);
+        background: #fff;
+    }
+
+    div.input-block input:valid + span.placeholder,
+    div.input-block input:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: rgb(219,238,213);
+    }
+
+    #collapseThree div.input-block input:read-only + span.placeholder,
+    #collapseThree div.input-block input:valid + span.placeholder,
+    #collapseThree div.input-block input:focus + span.placeholder {
+        background-color: #fff;
+        transform: scale(0.8) translateY(-25px);
+    }
+
+    #collapseThree div.input-block input[type="date"]:invalid + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+    }
+
+    .checkmark {
+        background-color: #fff;
+    }
+
+
+    div.input-block input.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: rgb(219,238,213);
+    }
+
+    div.input-block input:read-only + span.placeholder,
+    div.input-block input:read-only + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background: rgb(219,238,213);
+    }
+
+
+    div.inputSelect span.placeholder {
+        position: absolute;
+        margin: 17px 0;
+        padding: 0 4px;
+        font-family: Roboto, sans-serif;
+        color: #000;
+        display: flex;
+        align-items: center;
+        font-size: 1rem;
+        top: -6px;
+        left: 15px;
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+        background: none;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+
+    div.inputSelect select:focus + span.placeholder,
+    div.inputSelect select:not([value=""]):valid + span.placeholder {
+        transition: all 0.2s;
+        transform: scale(0.8) translateY(-25px);
+        background-color: rgb(219,238,213);
+    }
+
+    #changeDetails div.inputSelect select:focus + span.placeholder,
+    #changeDetails div.inputSelect select:not([value=""]):valid + span.placeholder {
+        transition: all 0.2s;
+        transform: scale(0.8) translateY(-25px);
+        background-color: #fff;
+    }
+
+    /*  div.inputSelect select:focus + span.placeholder {
+        transform: scale(0.8) translateY(-30px);
+        background: #fff;
+        z-index: 9;
+    }*/
+    /* div.inputSelect select:not([value=""]):valid + span.placeholder {
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+        transform: translate(-59px, -23px) !important;
+        background: rgb(219,238,213);
+        font-size: 12px;
+    }*/
+
+
+    div.input-block input:focus + span.placeholder {
+        color: #284B63;
+    }
+
+    .breadcrumb {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+        padding: 1rem 1rem 0;
+        margin-bottom: 0;
+        list-style: none;
+        background-color: #FFFFFF;
+        border-radius: .25rem;
+    }
+
+    body.nav-sm .container.body .left_col {
+        width: 63px;
+        padding: 0;
+        position: fixed;
+        height: 100%;
+        z-index: 8;
+    }
+
+    .card {
+        position: relative;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        min-width: 0;
+        word-wrap: break-word;
+        background-color: #fff;
+        background-clip: border-box;
+        border: 0px;
+        border-radius: .25rem;
+    }
+
+    .dropdown-toggle::after {
+        display: none;
+        width: 0;
+        height: 0;
+        margin-left: .255em;
+        vertical-align: .255em;
+        content: "";
+        border-top: .3em solid;
+        border-right: .3em solid transparent;
+        border-bottom: 0;
+        border-left: .3em solid transparent;
+    }
+
+    input.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213);
+    }
+
+    inputSelect.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213) !important;
+    }
+
+    select.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background-color: rgb(219,238,213) !important;
+        z-index: 9;
+    }
+
+    textarea.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    @@media only screen and (min-width: 992px) {
+        div.input-block span.placeholder {
+            font-size: 15px;
+        }
+
+        div.inputSelect span.placeholder {
+            font-size: 15px;
+        }
+    }
+    /*Animation css end here*/
+
+    .exisiting {
+        top: 0px !important;
+    }
+
+    .new {
+        top: 0 !important;
+    }
+
+    .form-head-1 tr th {
+        text-align: left;
+        padding-left: 20px;
+    }
+
+    #addRemoveUsersTable .checkmark {
+        left: 1.5rem;
+        top: 0.6rem;
+    }
+
+    #addRemoveBody .checkmark {
+        left: 1.5rem;
+        top: 0.6rem;
+    }
+
+    #addRemoveUsersTable.form-table-container-2 tr td input[type='image'],
+    #creationTable.form-table-container-2 tr td input[type='image'] {
+        margin-top: 0.8rem;
+        position: relative;
+        right: 0.3rem;
+    }
+
+    #addRemoveBody.form-table-container-2 tr td input[type='image'] {
+        margin-top: 0.9rem;
+        position: relative;
+        right: 0.5rem;
+    }
+
+    .tb-space {
+        margin-bottom: 0px !important;
+    }
+
+    .pd-left {
+        padding-left: 21px !important;
+    }
+
+    #tblQustionB_1_data, #tblQustionC_1_data {
+        padding: 0px;
+    }
+
+    .form-table-container-2 tr td:first-child {
+        text-align: left;
+    }
+</style>
+
+<script type="text/javascript">
+
+    function checkSelect(id) {
+
+        if ($('#' + id).val() != '') {
+            $('#' + id).addClass('spanUpperSide');
+        }
+    }
+
+
+</script>
+
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedheader/3.1.7/css/fixedHeader.dataTables.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/searchpanes/1.2.0/css/searchPanes.dataTables.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.5/css/responsive.bootstrap4.min.css">
+<script src="https://cdn.datatables.net/fixedheader/3.1.7/js/dataTables.fixedHeader.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.5/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.5/js/responsive.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/rowreorder/1.2.6/js/dataTables.rowReorder.min.js"></script>
+<script src="https://cdn.datatables.net/rowgroup/1.1.1/js/dataTables.rowGroup.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.6.1/js/buttons.colVis.min.js"></script>
+<script src="https://cdn.datatables.net/colreorder/1.5.2/js/dataTables.colReorder.min.js"></script>
+<script src="https://cdn.datatables.net/searchpanes/1.2.0/js/dataTables.searchPanes.min.js"></script>
+<script src="https://cdn.datatables.net/select/1.3.1/js/dataTables.select.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script src="https://code.jquery.com/jquery-migrate-3.4.1.js"></script>
+
+<script src="~/assets/js/jquery-3.3.1.min.js" type="text/javascript"></script>
+<script src="~/assets/js/jquery.dataTables.min.js" type="text/javascript"></script>
+@*For Email Update*@
+<div class="right_col bg-transparent" role="main">
+    <form action="/List/CreateConflictOfInterestRequest" id="COIForm" method="post">
+        <div class="container">
+            @if (IsNew)
+            {
+                if (!IsEdit)
+                {
+                    <div>
+                        <input type="hidden" id="FormSrId" name="FormSrId" value="@(COIF.one[0].Id)" />
+                        <input type="hidden" id="FormId" name="FormId" value="@(FormId)" />
+                        <input type="hidden" id="AppRowId" name="AppRowId" value="@(AppRowId)" />
+                    </div>
+                }
+                else
+                {
+                    <div class="breadcrumb-container">
+                        <div>
+                            <ol class="breadcrumb pl-0">
+                                <li>
+                                    <a href="/Dashboard?formName=COI">
+                                        Dashboard
+                                    </a>
+                                </li>
+                                @*<li class="active">
+                                        <a href="/Dashboard/GetDepartmentWiseForms?department=IT">
+                                            IT Department
+                                        </a>
+                                    </li>*@
+                                <li class="active">Single Page Master Form</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                }
+            }
+            <div class=" row breadcrumb-container table-bordered mr-1 ml-1 " style="background-color: rgb(219,238,213) !important;">
+                <div class="col-md-2 col-lg-2 col-12">
+                    <span class="placeholder">Date : @(!IsNew || !IsEdit ? (Convert.ToDateTime(COIF.one[0].FormID.CreatedDate).ToShortDateString()) : DateTime.Now.ToShortDateString())</span>
+                </div>
+                <div class="col-md-8 col-lg-8 col-12 mt-2 mb-1  form-heading" style="text-align:center; margin-top:5px">
+                    <span>Single Page Master Form</span>
+                </div>
+
+                <div class="col-md-2 col-lg-2 col-12">
+                    @if (!IsNew || !IsEdit)
+                    {
+                        <span class="placeholder"> Form Id : @(!IsNew || !IsEdit ? ("COIF" + COIF.one[0].FormID.Id ?? "") : "" )</span>
+                    }
+                </div>
+            </div>
+            <div class="container form-container">
+                <div class="pb-3 pt-3">
+                    <table class="w-100 m-auto">
+                        <tr>
+                            <td>
+
+                                <div class="heading d-none" id="headingErr">
+                                    <h1 id="" class="info-header">Following fields are mandatory. Please fill in information for<br /></h1>
+                                    <div id="add_to_me" class="header-list" style="color:red;"></div>
+                                </div>
+                                <!-- ACCORDIAN STRUCTURE START HERE-->
+                                <div id="accordion">
+                                    <div class="card">
+                                        <div class="card-header collapsed" id="headingOne" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                            <h5 class="mb-0">
+                                                <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                                    <img src="~/assets/img/empIcon.svg" width="24" height="24" class="mr-2" /><span class="d-inline-block mt-2">Master Table List</span>
+                                                </button>
+                                            </h5>
+                                        </div>
+
+                                        <div id="collapseOne" class="collapse show" aria-labelledby="headingOne">
+                                            <div class="card-body empDetailsBg">
+                                                <div class="row">
+
+                                                    <div class="form-group col-md-4 col-lg-4 col-12 inputSelect">
+                                                        <select name="mastertablelist" class="w-100 spanUpperSide" id="mastertablelist" onchange="GetMasterinfo();"></select>
+                                                        <span class="placeholder">Master Tables <span class="astColor">*</span></span>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-12 col-sm-12">
+                                        <div class="table-responsive">
+                                            <table id="pendingforapprovalsummary" class="table table-bordered text-center table-hover w-100 card-table m-0 text-nowrap" style="width:100%">
+                                                <thead class="bg-primary" style="color:white">
+                                                    <tr>
+                                                        @*<th>APPROVE</th>
+                                                            <th>Edit</th>
+                                                            <th>Download</th>
+                                                            <th>Voucher No</th>
+                                                            <th>Voucher Date </th>
+                                                            <th>Transaction No </th>
+                                                            <th>Bill No </th>
+                                                            <th>Bill DATE </th>
+                                                            <th>VENDOR NAME</th>
+                                                            <th>Discount</th>
+                                                            <th>Net Total</th>
+                                                            <th>CGST</th>
+                                                            <th>SGST</th>
+                                                            <th>IGST</th>
+
+                                                            <th>GRAND TOTAL</th>
+
+                                                            <th>TDS AMOUNT</th>
+                                                            <th>REMARKS</th>
+                                                            <th>Generated By</th>*@
+
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+
+<script>
+     // For Email Update
+    var spinner = $('#loader');
+    var FlagRedirect = @Html.Raw(Json.Encode(FlagRedirect));
+    var formID = @Html.Raw(Json.Encode(FormId));
+    var RowId = @Html.Raw(Json.Encode(RowId));
+    // For Email Update
+     var isNew = @Html.Raw(Json.Encode(IsNew));
+    var coif = @Html.Raw(Json.Encode(COIF ));
+    var appRowId = @Html.Raw(Json.Encode(AppRowId));
+    var approvalType =@Html.Raw(Json.Encode(ApprovalType));
+    var isEdit = @Html.Raw(Json.Encode(IsEdit));
+
+    $(document).ready(function () {
+        pageLoad();
+    })
+
+    function pageLoad()
+    {
+        GetMasterdata();
+
+        
+    }
+    function GetMasterdata() {
+        
+        $.ajax({
+            url: '/SinglePageMaster/GetMasterData',
+            data: {},
+            type: "GET",
+            dataType: 'JSON',
+            async: false,
+            success: function (data) {
+                var s = '<option value="" selected disabled>Select</option>';
+
+                for (var i = 0; i < data.Result.length; i++) {
+                   /* s += '<option value="' + data.Result[i].TableNicName + '">' + data.Result[i].TableNicName + '</option>';*/
+                    s += '<option value="' + data.Result[i].TableName + '">' + data.Result[i].TableName + '</option>';
+                }
+
+                /*  $("#selappURL_" + i + "").html(s);*/
+                $("#mastertablelist").html(s);
+
+
+
+
+
+            },
+            error: function () {
+
+            }
+        });
+
+    }
+
+    //function GetMasterinfo(table) {
+
+    //    var table = document.getElementById("mastertablelist").value;
+
+    //    
+    //    $.ajax({
+    //        url: '/SinglePageMaster/GetMasterinfo',
+    //        data: { tablename: table },
+    //        type: "GET",
+    //        dataType: 'JSON',
+    //        async: false,
+    //        success: (function (data) {
+
+    //            var Response = data.Result;
+
+
+
+
+    //        }),
+    //        error: function () {
+
+    //        }
+    //    });
+
+    //}
+
+
+    function GetMasterinfo(table) {
+
+        var table = document.getElementById("mastertablelist").value;
+
+
+        
+        data1 = { 'tablename': table};
+        data = JSON.stringify(data1);
+
+
+        $.ajax({
+            type: 'POST',
+            url: '/SinglePageMaster/GetDynamicTables',
+            data: data,
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            async: false,
+            success: function (jsonResult) {
+
+                if (jsonResult == "[]") {
+                    alert('No Data Found')
+                } else {
+
+                    RepTableDataJson($("#pendingforapprovalsummary"), jsonResult, "Pending For Approval", "Pending_ForApproval_List", [3, 4]);
+
+                }
+            },
+            error: function (error) {
+                let str = error.responseText;
+                var a = str.indexOf("<title>") + 7;
+                var b = str.indexOf("</title>");
+                str = str.substring(a, b);
+                alert("Something went wrong: " + str);
+            }
+        });
+
+        //  GetUserRightsAgainstControllerAndAction();
+    }
+
+    function RepTableDataJson(tableName, data, title, fileName, ColumnsForExport) {
+
+
+
+        try {
+            if (tableName == null) {
+                alert("table not exist.");
+            }
+            
+            //Check Data Table has if already initialize then need to destroy first!
+            //if ($.fn.DataTable.isDataTable(tableName)) {
+            //    tableName.DataTable().destroy();
+            //    tableName.empty();
+            //}
+
+            //if (tableName) {
+            ////    tableName.destroy();
+            //    tableName.DataTable().destroy();
+            //    tableName.empty();
+            //}
+
+          // var parseJSONResult = jQuery.parseJSON(data);
+           var parseJSONResult = JSON.parse(data);
+            console.log(parseJSONResult);
+            //if (parseJSONResult != null && parseJSONResult.length > 0) {
+            if (parseJSONResult != null) {
+                //Get dynmmic column.
+                var dynamicColumns = [];
+                var i = 0;
+
+                $.each(parseJSONResult.Table[0], function (key, value) {
+                    var obj = { sTitle: key };
+                    dynamicColumns[i] = obj;
+                    i++;
+                });
+                //fetch all records from JSON result and make row data set.
+                var rowDataSet = [];
+                var i = 0;
+
+                console.log(parseJSONResult.Table)
+  
+                $.each(parseJSONResult.Table, function (key, value) {
+                    var rowData = [];
+                    var j = 0;
+                    $.each(parseJSONResult.Table[i], function (key, value) {
+                        rowData[j] = value;
+                        j++;
+                    });
+                    rowDataSet[i] = rowData;
+
+                    i++;
+                });
+ 
+                console.log(rowDataSet);
+
+                tableName.dataTable({
+                    "destroy": true,
+                    "bLengthChange": false,
+                    //"aaData": rowDataSet,
+                    "aaData": rowDataSet,
+                    "bInfo": false,
+                    "bPaginate": true,
+                    "bFilter": true,
+                    "paging": true,
+                    //"order": ColumnsForExport ,
+                    "columns": dynamicColumns,
+                    "deferRender": true,
+                    "bSort": true,
+                    "dom": 'Bfrtip',
+
+                    "columnDefs": [{
+                        "targets": 0,
+                        "orderable": false,
+                    }],
+                    "buttons": [
+
+                        {
+                            extend: 'excel',
+                            title: title,
+                            exportOptions: {
+                                columns: ColumnsForExport
+                            }
+                        }
+                    ]
+                    //"pagingType": "full_numbers"
+                });
+                //$(".buttons-excel").addClass("btn btn-primary");
+                //$(".buttons-excel>span").replaceWith('<i class="fa fa-file-excel-o" data-toggle="tooltip" data-placement="bottom" title="Export To Excel" data-original-title="Export To Excel"></i>');
+                //$('[data-toggle="tooltip"]').tooltip();
+            }
+
+
+        }
+        catch (ex) {
+            alert(ex.message);
+        }
+
+    }
+
+
+
+</script>
+

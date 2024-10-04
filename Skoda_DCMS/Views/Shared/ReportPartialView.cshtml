@@ -1,0 +1,199 @@
+﻿@model Skoda_DCMS.Models.DashboardModel
+<div class="row">
+    <div class="col-lg-12 col-md-12 text-right">
+        <div class="col-lg-12 col-md-12 col-12 text-right excelDownload">
+            <span id="SpHLClientControlPanel" style="display: none; color: Red;">
+                @(Session["Common"] = Model)
+                @(Session["ActiveFlag"] = "RPT")
+            </span>
+
+            <a href="@Url.Action("ExportToExcel", "Dashboard")">
+                <i class="fa fa-file-excel-o excelIcon" aria-hidden="true" id="ExportToExcel" title="Report Download"></i>
+            </a>
+        </div>
+    </div>
+</div>
+<table id="dtReportTable" class="table table-striped table-bordered table-sm display nowrap" cellspacing="0" width="100%">
+    <thead>
+        <tr class="status-table-row">
+            <th class="th-sm sortingFormIdForReport">
+                Form ID
+                <span class="caret-icon">
+                    <a href="" class="caret-up">
+                        <i class="fa fa-caret-up"></i>
+                    </a>
+                    <a href="" class="caret-down">
+                        <i class="fa fa-caret-down"></i>
+                    </a>
+                </span>
+            </th>
+            <th class="th-sm sortingFormNameForReport">
+                Form Name
+                <span class="caret-icon">
+                    <a href="" class="caret-up">
+                        <i class="fa fa-caret-up"></i>
+                    </a>
+                    <a href="" class="caret-down">
+                        <i class="fa fa-caret-down"></i>
+                    </a>
+                </span>
+            </th>
+            <th class="th-sm sortingRequestFormForReport">
+                Request From (User Name)
+                <span class="caret-icon">
+                    <a href="" class="caret-up">
+                        <i class="fa fa-caret-up"></i>
+                    </a>
+                    <a href="" class="caret-down">
+                        <i class="fa fa-caret-down"></i>
+                    </a>
+                </span>
+            </th>
+            <th class="th-sm sortingBusinessNeedForReport">
+                Details / Business Needs
+                <span class="caret-icon">
+                    <a href="" class="caret-up">
+                        <i class="fa fa-caret-up"></i>
+                    </a>
+                    <a href="" class="caret-down">
+                        <i class="fa fa-caret-down"></i>
+                    </a>
+                </span>
+            </th>
+            <th class="th-sm sortingStatusForReport">
+                Status
+                <span class="caret-icon">
+                    <a href="" class="caret-up">
+                        <i class="fa fa-caret-up"></i>
+                    </a>
+                    <a href="" class="caret-down">
+                        <i class="fa fa-caret-down"></i>
+                    </a>
+                </span>
+            </th>
+            <th class="th-sm sortingRecievedDateForReport">
+                Received  Date
+                <span class="caret-icon">
+                    <a href="" class="caret-up">
+                        <i class="fa fa-caret-up"></i>
+                    </a>
+                    <a href="" class="caret-down">
+                        <i class="fa fa-caret-down"></i>
+                    </a>
+                </span>
+            </th>
+            <th class="th-sm text-center">
+                Action
+                <span class="caret-icon">
+                    <a href="" class="caret-up">
+                        <i class="fa fa-caret-up"></i>
+                    </a>
+                    <a href="" class="caret-down">
+                        <i class="fa fa-caret-down"></i>
+                    </a>
+                </span>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Data.Forms)
+        {
+            <tr>
+                <td class="align-middle">@($"{item.UniqueFormName}{item.UniqueFormId}")</td>
+                <td class="align-middle">@item.FormName</td>
+                @if (item.Author != null)
+                {
+                    <td class="align-middle">@item.Author.Submitter</td>
+                }
+                else
+                {
+                    <td class="align-middle">@item.Author</td>
+                }
+
+                @*<td>
+                        @(item.BusinessNeed)
+                    </td>*@
+                <td class="align-middle" title="@item.BusinessNeed">
+                    <input value="@item.BusinessNeed" class="inputTooltipFontNormal" maxlength="10" readonly />
+                </td>
+                @*<td>
+                        <div class="container" style="text-align: center;">
+                            <button type="button" class="btn btn-xs btn-default" data-toggle="modal" data-target="#myModal2">@(item.Status ?? "Unknown")</button>
+                        </div>
+                    </td>*@
+                <td>@item.Status</td>
+                <td data-order="@item.FormCreatedDate.ToString("MM/dd/yyyy HH:mm")">@item.FormCreatedDate.ToString("MM/dd/yyyy")</td>
+
+                <td>
+                    <div class="container col-lg-12 d-flex justify-content-sm-between" style="text-align: center;">
+                        <!-- Trigger the modal with a button -->
+                        <button type="button" class="btn btn-xs btn-default photography-action-btn" id="tooltipex"
+                                onclick="GoToViewForm('@item.UniqueFormName',@item.DataRowId,@item.UniqueFormId,@item.Id,'@item.ControllerName')" data-bs-toggle="tooltip" data-bs-placement="right" title="View">
+                            <i class="fa fa-eye" aria-hidden="true"></i>
+                        </button>
+                        <button type="button" class="btn btn-xs btn-default photography-action-btn" data-toggle="tooltip" data-placement="bottom" title="Download">
+                            <a href=@Url.Action("PrintIndex","List",new { formName=item.UniqueFormName, formId=item.UniqueFormId, rowId=item.DataRowId, appRowId=item.Id, ControllerName=item.ControllerName}) class="txt-primary download-icon">
+                                <i class="fa fa-download"></i>
+                            </a>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        }
+
+    </tbody>
+</table>
+
+<script>
+    $(document).ready(function () {
+        if (!$.fn.DataTable.isDataTable('#dtReportTable')) {
+            $('#dtReportTable').dataTable({
+                "bPaginate": true,
+                "bLengthChange": true,
+                "bFilter": true,
+                "bInfo": false,
+                "responsive": true,
+                "oLanguage": { "sSearch": "" },
+                "bAutoWidth": false,
+                language: {
+                    searchPlaceholder: "Search",
+                    paginate: {
+                        next: '&#8811;', // or '→'
+                        previous: '&#8810;' // or '←'
+                    }
+                },
+                columnDefs: [{ type: 'date', 'targets': [5] }],
+                order: [[5, 'desc']],
+            });
+        }
+    });
+    function GoToViewForm(formName, rowId, formId, appRowId, ControllerName) {
+        $(".full-screen-container").removeClass('invisible');
+        $(".full-screen-container").show();
+        $.ajax({
+            url: '/List/ViewFilledFormNew',
+            type: 'GET',
+            data: { formName: formName, rowId: rowId, formId: formId, appRowId: appRowId, ControllerName: ControllerName },
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data.isValid) {
+                    //console.log(data);
+                    $("#viewForm").html(data.view);
+                    $("#myModal").modal();
+                    $(".loader").removeClass('invisible');
+                }
+                else {
+                    $(".loader").addClass('invisible');
+                    alert("There was an issue while opening the form. Please contact your administrator");
+                }
+                $(".full-screen-container").hide();
+            }),
+            error: (function (data) {
+                $("#loader").addClass('invisible');
+                $(".full-screen-container").hide();
+            })
+        })
+    }
+</script>
+
+

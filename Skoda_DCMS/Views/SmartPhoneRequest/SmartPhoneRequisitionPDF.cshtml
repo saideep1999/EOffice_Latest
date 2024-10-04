@@ -1,0 +1,565 @@
+﻿
+@{
+    Layout = null;
+    dynamic SPRF = null;
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        SPRF = ViewBag.Model;
+    }
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <style type="text/css">
+        *:visited, *:focus {
+            box-shadow: none;
+        }
+
+        table tr td {
+            vertical-align: top;
+            color: rgb(110,110,110);
+        }
+
+        input, select, input:focus, select:focus, textarea, textarea:focus {
+            border: 1px solid #000;
+        }
+
+        input, textarea {
+            padding: 5px;
+        }
+
+        .signature-table thead td {
+            border-bottom: 1px solid black;
+            border-left: 1px solid black;
+            border-collapse: collapse;
+        }
+
+        .signature-table tbody, .signature-table td {
+            border: none;
+            border-left: 1px solid black;
+            border-collapse: collapse;
+            padding: 5px;
+        }
+
+        .signature-table td:first-child {
+            border-left: none;
+        }
+
+        .signature-table {
+            border: 1px solid black;
+        }
+
+        @@font-face {
+            font-family: 'SKODANext-Black';
+            src: url('../../fonts/SKODANextfont/SKODANext-Black.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Bold.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Light.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Regular.ttf') format('truetype');
+        }
+
+        body {
+            font-family: 'SKODANext-Black';
+        }
+        .vertically-align {
+            height: 50px;
+            line-height: 50px;
+            text-align: center;
+            border-right: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <center>
+        <table style="width: 100%; font-size: 14px; color: rgb(110,110,110); font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+            <tr>
+                <td>
+                    <table style="width: 100%;" cellspadding="0" cellspacing="0">
+                        <tr>
+                            <td width="20%" style="text-align: center; border-right: 1px solid #000; border-bottom: 1px solid #000;">
+                                Classification
+                            </td>
+                            <td width="20%" style="text-align: center; border-right: 1px solid #000; border-bottom: 1px solid #000;">
+                                Internal
+                            </td>
+                            <td rowspan="2" width="60%" style="text-align: right;">
+                                <img style="width: 50%;" src='@Server.MapPath("~/assets/img/SAVWIPL_Merger_Logo.JPG")'>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="vertically-align" style="text-align: center; border-right: 1px solid #000;">
+                                Version
+                            </td>
+                            <td class="vertically-align" style="text-align: center; border-right: 1px solid #000;">
+                                01
+                            </td>
+
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td style="height: 45px; line-height: 44px; text-align: center; border-left: 1px solid #000; border-right: 1px solid #000; border-bottom: 1px solid #000;">
+                Smartphone Requisition Form
+            </td>
+        </tr>
+        @*<tr>
+            <td style="height: 45px; padding-left: 15px; color: #000;">
+                This is digital form, that can be filled and digitally signed by your PKI card. Please do not take print out.
+            </td>
+        </tr>*@
+
+            <tr>
+                <td style="padding: 15px;">
+                    <table cellspacing="0" cellpadding="0" width="100%">
+                        @if (SPRF.one[0].RequestSubmissionFor != "OnBehalf")
+                        {
+                            <tr>
+                                <td>
+                                    Type of Employee
+                                </td>
+                                <td>
+                                    @if (SPRF.one[0].EmployeeType == "Internal")
+                                    {
+                                        <input type="checkbox" id="internal" name="chkTyprEmp" value="Internal" checked>
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" id="internal" name="chkTyprEmp" value="Internal">
+                                    }
+                                    <label for="vehicle1"> Internal</label>
+                                </td>
+                                <td>
+                                    @if (SPRF.one[0].EmployeeType == "External")
+                                    {
+                                        <input type="checkbox" id="external" name="chkTyprEmp" value="Internal" checked>
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" id="external" name="chkTyprEmp" value="Internal">
+                                    }
+                                    <label for="vehicle1"> External</label>
+                                </td>
+                                <td colspan="3">
+                                    @if (SPRF.one[0].EmployeeType == "External")
+                                    {
+                                        <input type="text" placeholder="External Company Name" style="height: 25px; border-radius: 0; " value="@(SPRF.one[0].ExternalOtherOrganizationName ?? "")" />
+                                    }
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="height: 15px;">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Employee Code
+                                </td>
+                                <td>
+                                    <input type="text" style="height: 25px; border-radius: 0; " value="@(SPRF.one[0].EmployeeCode ?? "")" />
+                                </td>
+                                <td>
+                                    Cose Center No.
+                                </td>
+                                <td>
+                                    <input type="text" style="height: 25px; border-radius: 0; " value="@(SPRF.one[0].EmployeeCCCode ?? "")" />
+                                </td>
+                                <td>
+                                    UserId
+                                </td>
+                                <td>
+                                    <input type="text" style="height: 25px; border-radius: 0; width: 100%; " value="@(SPRF.one[0].EmployeeUserId ?? "")" />
+                                </td>
+                            </tr>
+
+                        <tr>
+                            <td style="height: 15px;">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Employee Name
+                            </td>
+                            <td>
+                                <input type="text" style="height: 25px; border-radius: 0; " value="@(SPRF.one[0].EmployeeName ?? "")" />
+                            </td>
+                            <td>
+                                Department
+                            </td>
+                            <td>
+                                <input type="text" style="height: 25px; border-radius: 0; " value="@(SPRF.one[0].EmployeeDepartment ?? "")" />
+                            </td>
+                            <td>
+                                Contact Number
+                            </td>
+                            <td>
+                                <input type="text" style="height: 25px; border-radius: 0; width: 100%; " value="@(SPRF.one[0].EmployeeContactNo ?? "")" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="height: 15px;">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Designation
+                            </td>
+                            <td>
+                                @*<select style="width: 97%; height: 30px;">
+                                    <option>
+                                        HR
+                                    </option>
+                                    <option>
+                                        Manager
+                                    </option>
+                                </select>*@
+                                <input type="text" style="height: 25px; border-radius: 0; width: 100%; " value="@(SPRF.one[0].EmployeeDesignation ?? "")" />
+                            </td>
+
+                                <td>
+                                    Location
+                                </td>
+
+                            <td>
+                                @*<select style="width: 100%; height: 30px;">
+                                    <option>
+                                        Mumbai
+                                    </option>
+                                    <option>
+                                        Pune
+                                    </option>
+                                </select>*@
+                                <input type="text" style="height: 25px; border-radius: 0; width: 100%; " value="@(SPRF.one[0].EmployeeLocation ?? "")" />
+                            </td>
+                            <td colspan="2">
+                                &nbsp;
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td>
+                                Type of Employee
+                            </td>
+                            <td>
+                                @if (SPRF.one[0].OtherEmployeeType == "Internal")
+                                {
+                                    <input type="checkbox" id="internal" name="chkTyprEmp" value="Internal" checked>
+                                }
+                                else
+                                {
+                                    <input type="checkbox" id="internal" name="chkTyprEmp" value="Internal">
+                                }
+                                <label for="vehicle1"> Internal</label>
+                            </td>
+                            <td>
+                                @if (SPRF.one[0].OtherEmployeeType == "External")
+                                {
+                                    <input type="checkbox" id="external" name="chkTyprEmp" value="Internal" checked>
+                                }
+                                else
+                                {
+                                    <input type="checkbox" id="external" name="chkTyprEmp" value="Internal">
+                                }
+                                <label for="vehicle1"> External</label>
+                            </td>
+                            <td colspan="3">
+                                @if (SPRF.one[0].OtherEmployeeType == "External")
+                                {
+                                    <input type="text" placeholder="External Company Name" style="height: 25px; border-radius: 0; " value="@(SPRF.one[0].OtherExternalOtherOrganizationName ?? "")" />
+                                }
+                            </td>
+
+                            </tr>
+                            <tr>
+                                <td style="height: 15px;">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Employee Code
+                                </td>
+                                <td>
+                                    <input type="text" style="height: 25px; border-radius: 0; " value="@(SPRF.one[0].OtherEmployeeCode ?? "")" />
+                                </td>
+                                <td>
+                                    Cose Center No.
+                                </td>
+                                <td>
+                                    <input type="text" style="height: 25px; border-radius: 0; " value="@(SPRF.one[0].OtherEmployeeCCCode ?? "")" />
+                                </td>
+                                <td>
+                                    UserId
+                                </td>
+                                <td>
+                                    <input type="text" style="height: 25px; border-radius: 0; width: 100%; " value="@(SPRF.one[0].OtherEmployeeUserId ?? "")" />
+                                </td>
+                            </tr>
+
+                        <tr>
+                            <td style="height: 15px;">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Employee Name
+                            </td>
+                            <td>
+                                <input type="text" style="height: 25px; border-radius: 0; " value="@(SPRF.one[0].OtherEmployeeName ?? "")" />
+                            </td>
+                            <td>
+                                Department
+                            </td>
+                            <td>
+                                <input type="text" style="height: 25px; border-radius: 0; " value="@(SPRF.one[0].OtherEmployeeDepartment ?? "")" />
+                            </td>
+                            <td>
+                                Contact Number
+                            </td>
+                            <td>
+                                <input type="text" style="height: 25px; border-radius: 0; width: 100%; " value="@(SPRF.one[0].OtherEmployeeContactNo ?? "")" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="height: 15px;">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Designation
+                            </td>
+                            <td>
+                                @*<select style="width: 97%; height: 30px;">
+                                    <option>
+                                        HR
+                                    </option>
+                                    <option>
+                                        Manager
+                                    </option>
+                                </select>*@
+                                <input type="text" style="height: 25px; border-radius: 0; width: 100%; " value="@(SPRF.one[0].OtherEmployeeDesignation ?? "")" />
+                            </td>
+
+                                <td>
+                                    Location
+                                </td>
+
+                            <td>
+                                @*<select style="width: 100%; height: 30px;">
+                                    <option>
+                                        Mumbai
+                                    </option>
+                                    <option>
+                                        Pune
+                                    </option>
+                                </select>*@
+                                <input type="text" style="height: 25px; border-radius: 0; width: 100%; " value="@(SPRF.one[0].OtherEmployeeLocation ?? "")" />
+                            </td>
+                            <td colspan="2">
+
+                            </td>
+                        </tr>
+                    }
+
+                        <tr>
+                            <td style="height: 25px;">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="6">
+                                <lable>Details</lable>
+                                <ul style="list-style: number; margin: 0; line-height: 28px; padding-left: 11px;">
+                                    <li>
+                                        The monthly fee for the use of the Mobile Device Management Service is 49,50€/User
+                                    </li>
+                                    <li>
+                                        International Roaming services will be activated as per the Mobile Phone Policy
+                                    </li>
+                                </ul>
+
+
+
+                            </td>
+
+
+                        </tr>
+
+                        <tr>
+                            <td style="height: 25px;">
+                            </td>
+                        </tr>
+
+
+
+
+
+
+                        <tr>
+                            <td style="height: 25px;">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="6">
+                                <lable>Reason for Requisition (Business Need)</lable>
+                                <div style="margin-bottom: 10px; margin-top: 10px;">
+
+                                    <textarea type="text" rows="5" value="" style="width: 100%;">@(SPRF.one[0].BusinessNeed ?? "")</textarea>
+                                </div>
+
+                            </td>
+
+
+
+                        </tr>
+                        <tr>
+                            <td style="height: 25px;">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="6">
+                                <p>Compliance with the privacy terms:</p>
+                                <p>
+                                    While using company issued smartphone and using the respective services, attention is to be paid to the privacy and security
+                                    terms of the Volkswagen AG.
+                                </p>
+                            </td>
+
+                        </tr>
+
+                        <tr>
+                            <td colspan="6">
+
+
+                                <table style="border: 1px solid #000;" cellpadding="0" cellspacing="0" border="1" class="signature-table">
+                                    <thead>
+                                        <tr>
+                                            <td rowspan="2" width="25%" style="padding: 10px; text-align: center;">
+                                                Requester Signature
+                                            </td>
+                                            <td width="25%" rowspan="2" style="padding: 10px; text-align: center;">
+                                                Executive Director / Vice
+                                                President of requester Signature
+                                            </td>
+                                            <td colspan="2" width="25%" style="padding: 10px; text-align: center;">
+                                                In case of Deviation in Mobile Phone Policy
+                                            </td>
+
+                                        </tr>
+                                        <tr>
+
+                                            <td width="25%" style="padding: 10px; text-align: center; border-left: 1px solid #000;">
+                                                Managing Director Signature
+                                            </td>
+                                            <td width="25%" style="padding: 10px; text-align: center;">
+                                                CIO
+                                            </td>
+
+                                        </tr>
+                                    </thead>
+                                    @*<tr>
+                                            <td style="padding: 10px; height: 80px; text-align: center;">
+                                            </td>
+                                            <td style="padding: 10px; height: 80px; text-align: center;">
+                                            </td>
+                                            <td colspan="2" style="padding: 10px; height: 80px; text-align: center;">
+                                            </td>
+
+                                        </tr>*@
+                                    @if ((SPRF.two.Count > 0) || (SPRF.three.Count > 0))
+                                    {
+                                        <tr>
+                                            <td>@(SPRF.two[0].Author.Title ?? " ")</td>
+                                            @foreach (var item in SPRF.three)
+                                            {
+                                                <td>@(item.UserName ?? "")</td>
+                                            }
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                @("Submitted on " + Convert.ToDateTime(SPRF.two[0].FormId.Created).ToShortDateString() + " "
+                                                                + Convert.ToDateTime(SPRF.two[0].FormId.Created).ToShortTimeString() ?? "")
+                                            </td>
+                                            @foreach (var item in SPRF.three)
+                                            {
+                                                <td>
+                                                    @(item.ApproverStatus != "Pending"
+                                                    ? (item.ApproverStatus + " on " + " " + Convert.ToDateTime(item.Modified).ToShortDateString()
+                                                    + " " + Convert.ToDateTime(item.Modified).AddHours(5.5).ToShortTimeString())
+                                                    : "" )
+                                                </td>
+                                            }
+                                        </tr>
+                                        @*if (SPRF.three[0].ApproverStatus != "Pending")
+                                        {
+                                            <tr class="f-600">
+                                                <td></td>
+                                                <td>
+                                                    <span>
+                                                        <label name="txtHod">
+                                                            @(SPRF.three[0].Comment ?? "")
+                                                        </label>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span>
+                                                        @if (SPRF.three[1].ApproverStatus != "Pending")
+                                                        {
+
+                                                            <label name="txtKeyuser">
+                                                                @(SPRF.three[1].Comment ?? "")
+                                                            </label>
+                                                        }
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span>
+                                                        @if (SPRF.three[2].ApproverStatus != "Pending")
+                                                        {
+
+                                                            <label name="txtKeyuser">
+                                                                @(SPRF.three[2].Comment ?? "")
+                                                            </label>
+                                                        }
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        }*@
+                                    }
+                                </table>
+
+                            </td>
+
+
+
+                        </tr>
+                        <tr>
+                            <td style="height: 25px;">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                <lable>For IT use only</lable>
+                                @*<div style="margin-bottom: 10px; margin-top: 10px;">
+
+                                    <span>Ticket No. </span>  <span> <input type="text" value="" style="width: 20%;"></input></span>
+                                </div>*@
+
+                            </td>
+                            <td colspan="3">
+                                <span>Ticket No. </span>  <span> <input type="text" value="" style="width: 20%;"></span>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 15px;">
+                    <p style="font-weight: 600; color: black;">SF_FI_031</p>
+                </td>
+            </tr>
+        </table>
+    </center>
+</body>
+</html>

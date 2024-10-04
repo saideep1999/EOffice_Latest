@@ -1,0 +1,579 @@
+﻿@model dynamic
+@{
+    ViewBag.Title = "Quality Meisterbock Cubing PDF";
+    var user = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    bool IsNew = true;
+    bool IsEdit = true;
+    dynamic QMCRF = null;
+    Layout = ViewBag.Layout;
+    int RowId = 0, FormId = 0, AppRowId = 0, ApprovalType = 0;
+    List<Skoda_DCMS.Models.ApprovalDataModel> appList = new List<Skoda_DCMS.Models.ApprovalDataModel>();
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IsNew = ViewBag.IsNew;
+        IsEdit = ViewBag.IsEdit;
+        QMCRF = ViewBag.Model;
+        RowId = ViewBag.RowId;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+        appList = ViewBag.Model?.three as List<Skoda_DCMS.Models.ApprovalDataModel>;
+    }
+}
+
+
+<!DOCTYPE html>
+<html>
+<head>
+
+    <style type="text/css">
+        *:visited, *:focus {
+            box-shadow: none;
+        }
+
+        input, select, input:focus, select:focus, textarea, textarea:focus {
+            border: 1px solid #000;
+        }
+
+        input, textarea {
+            padding: 5px;
+        }
+
+        .asset {
+            border: 1px solid black;
+            height: 20px;
+        }
+
+        .signature-table thead td {
+            border-bottom: 1px solid black;
+            border-left: 1px solid black;
+            border-collapse: collapse;
+        }
+
+        .signature-table tbody, .signature-table td {
+            border: none;
+            border-left: 1px solid black;
+            border-collapse: collapse;
+            padding: 5px;
+        }
+
+            .signature-table td:first-child {
+                border-left: none;
+            }
+
+        .signature-table {
+            border: 1px solid black;
+        }
+
+        @@font-face {
+            font-family: 'SKODANext-Black';
+            src: url('../../fonts/SKODANextfont/SKODANext-Black.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Bold.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Light.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Regular.ttf') format('truetype');
+        }
+
+        body {
+            font-family: 'SKODANext-Black';
+        }
+
+        .form_lbl {
+            color: #000;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <table style="width: 100%; font-size: 14px; color: rgb(110,110,110); font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+        <tr>
+            <td>
+                <table style="width: 100%;" cellspadding="0" cellspacing="0">
+                    <tr>
+                        <td width="20%" style="text-align: center; border-right: 1px solid #000; border-bottom: 1px solid #000;">
+                            Classification
+                        </td>
+                        <td width="20%" style="text-align: center; border-right: 1px solid #000; border-bottom: 1px solid #000;">
+                            Internal
+                        </td>
+                        <td rowspan="2" width="60%" style="text-align: right;">
+                            <img style="width: 50%;" src='@Server.MapPath("~/assets/img/SAVWIPL_Merger_Logo.JPG")'>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: center; border-right: 1px solid #000;">
+                            Version
+                        </td>
+                        <td style="text-align: center; border-right: 1px solid #000;">
+                            01
+                        </td>
+
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td style="height: 45px; text-align: center; border-left: 1px solid #000; border-right: 1px solid #000; border-bottom: 1px solid #000;">
+                <b style="color:black">Quality Meisterbock Cubing Form</b> 
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 15px;">
+                <table cellspacing="0" cellpadding="0" width="100%">
+                    <tr>
+                        <td style="height: 15px;" colspan="6">
+                            <b style="color:black"><u>Submitter Details</u></b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="form_lbl">
+                            Type of Employee
+                        </td>
+                        <td>
+                            @(QMCRF.one[0].EmployeeType)
+                        </td>
+                        <td>
+                        </td>
+                        <td colspan="3">
+                            @*<input type="text" placeholder="External Company Name" style="height: 25px; border-radius: 0; " value="" />*@
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="height: 15px;" colspan="6">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="form_lbl">
+                            Employee Code
+                        </td>
+                        <td>
+                            @(QMCRF.one[0].EmployeeCode)
+                        </td>
+                        <td class="form_lbl">
+                            Cost Center No.
+                        </td>
+                        <td>
+                            @(QMCRF.one[0].EmployeeCCCode)
+                        </td>
+                        <td class="form_lbl">
+                            UserId
+                        </td>
+                        <td>
+                            @(QMCRF.one[0].EmployeeUserId)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="height: 15px;" colspan="6">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="form_lbl">
+                            Employee Name
+                        </td>
+                        <td>
+                            @(QMCRF.one[0].EmployeeName)
+                        </td>
+                        <td class="form_lbl">
+                            Department
+                        </td>
+                        <td>
+                            @(QMCRF.one[0].EmployeeDepartment)
+                        </td>
+                        <td class="form_lbl">
+                            Contact Number
+                        </td>
+                        <td>
+                            @(QMCRF.one[0].EmployeeContactNo)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="height: 15px;" colspan="6">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="form_lbl">
+                            Designation
+                        </td>
+                        <td>
+                            @(QMCRF.one[0].EmployeeDesignation)
+                        </td>
+
+                        <td class="form_lbl">
+                            Location
+                        </td>
+
+                        <td>
+                            @(QMCRF.one[0].EmployeeLocation)
+                        </td>
+                        <td colspan="2">
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="height: 25px;">
+                        </td>
+                    </tr>
+
+                    @if (QMCRF.one[0].EmployeeType == "SAVWIPLEmployee")
+                    {
+                        <tr>
+                            <td style="height: 15px;" colspan="6">
+                                <b style="color:black"><u>Applicants Details</u></b>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="form_lbl">
+                                Employee Code
+                            </td>
+                            <td>
+                                @(QMCRF.one[0].OtherEmployeeCode)
+                            </td>
+                            <td class="form_lbl">
+                                Cost Center No.
+                            </td>
+                            <td>
+                                @(QMCRF.one[0].OtherEmployeeCCCode)
+                            </td>
+                            <td class="form_lbl">
+                                UserId
+                            </td>
+                            <td>
+                                @(QMCRF.one[0].OtherEmployeeUserId)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="height: 15px;" colspan="6">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="form_lbl">
+                                Employee Name
+                            </td>
+                            <td>
+                                @(QMCRF.one[0].OtherEmployeeName)
+                            </td>
+                            <td class="form_lbl">
+                                Department
+                            </td>
+                            <td>
+                                @(QMCRF.one[0].OtherEmployeeDepartment)
+                            </td>
+                            <td class="form_lbl">
+                                Contact Number
+                            </td>
+                            <td>
+                                @(QMCRF.one[0].OtherEmployeeContactNo)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="height: 15px;" colspan="6">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="form_lbl">
+                                Designation
+                            </td>
+                            <td>
+                                @(QMCRF.one[0].OtherEmployeeDesignation)
+                            </td>
+
+                            <td class="form_lbl">
+                                Location
+                            </td>
+
+                            <td>
+                                @(QMCRF.one[0].OtherEmployeeLocation)
+                            </td>
+                            <td colspan="2">
+                            </td>
+                        </tr>
+
+                    }
+                    <tr>
+                        <td style="height: 15px;" colspan="6">
+                        </td>
+                    </tr>
+
+                </table>
+            </table>
+
+    <table style="width: 100%; font-size: 14px; color: rgb(110,110,110); font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+        <tr>
+            <td style="padding: 15px">
+                <table style="width:100%;" cellspadding="0" cellspacing="0">
+                    <tr>
+                        <td style="height: 15px;" colspan="6">
+                            <b style="color:black"><u>Transaction Details</u></b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="form_lbl">
+                            Form Type:
+                        </td>
+                        <td>
+                            @if ((QMCRF.one[0].FormType) == "QCR")
+                            {
+
+
+                                <input type="checkbox" id="permanent" name="chkTyprEmp" value="Permanent" checked>
+                            }
+                            else
+                            {
+                                <input type="checkbox" id="permanent" name="chkTyprEmp" value="Permanent">
+                            }
+
+                            <label for=""> Cubing</label>
+                        </td>
+                        <td>
+                            @if ((QMCRF.one[0].FormType) == "QMR")
+                            {
+
+
+                                <input type="checkbox" id="permanent" name="chkTyprEmp" value="Permanent" checked>
+                            }
+                            else
+                            {
+                                <input type="checkbox" id="permanent" name="chkTyprEmp" value="Permanent">
+                            }
+                            <label for=""> Meisterbock</label>
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td class="form_lbl">
+                            Model
+                        </td>
+                        <td>
+                            @(QMCRF.one[0].ModelQCM)
+                        </td>
+                        <td class="form_lbl">
+                            Series
+                        </td>
+                        <td>
+                            @(QMCRF.one[0].Series)
+                        </td>
+                        <td class="form_lbl">
+                            Part Name
+                        </td>
+                        <td>
+                            @(QMCRF.one[0].PartName)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="height: 15px;" colspan="6">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="form_lbl">
+                            Problem Reported at
+                        </td>
+                        <td>
+                            @(QMCRF.one[0].ProblemReported)
+                        </td>
+                        <td class="form_lbl">
+                            Parts Quantity
+                        </td>
+                        <td>
+                            @(QMCRF.one[0].PartQuantity)
+                        </td>
+                        <td class="form_lbl">
+                        </td>
+                        <td>
+                            @*<input type="text" style="height: 25px; border-radius: 0; width: 100%; " value="" />*@
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="height: 15px;" colspan="6">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="form_lbl">
+                            Problem Sheet
+                        </td>
+                        <td>
+                            @if ((QMCRF.one[0].ProblemSheet) == "Yes")
+                            {
+                                <input type="checkbox" id="permanent" name="chkTyprEmp" value="Permanent" checked>
+                            }
+                            else
+                            {
+                                <input type="checkbox" id="permanent" name="chkTyprEmp" value="Permanent">
+                            }
+                            <label for="vehicle1"> Yes</label>
+                        </td>
+                        <td>
+                            @if ((QMCRF.one[0].ProblemSheet) == "No")
+                            {
+                                <input type="checkbox" id="permanent" name="chkTyprEmp" value="Permanent" checked>
+                            }
+                            else
+                            {
+                                <input type="checkbox" id="permanent" name="chkTyprEmp" value="Permanent">
+                            }
+                            <label for="vehicle1"> No</label>
+                        </td>
+                        <td class="form_lbl">
+                            Trial Reported
+                        </td>
+                        <td>
+                            @if ((QMCRF.one[0].TrialReported) == "Yes")
+                            {
+                                <input type="checkbox" id="permanent" name="chkTyprEmp" value="Permanent" checked>
+                            }
+                            else
+                            {
+                                <input type="checkbox" id="permanent" name="chkTyprEmp" value="Permanent">
+                            }
+                            <label for="vehicle1"> Yes</label>
+                        </td>
+                        <td>
+                            @if ((QMCRF.one[0].TrialReported) == "No")
+                            {
+                                <input type="checkbox" id="permanent" name="chkTyprEmp" value="Permanent" checked>
+                            }
+                            else
+                            {
+                                <input type="checkbox" id="permanent" name="chkTyprEmp" value="Permanent">
+                            }
+                            <label for="vehicle1"> No</label>
+                        </td>
+                    </tr>
+                    @*<tr>
+                        <td class="form_lbl">
+                            File Name
+                        </td>
+                        <td colspan="2">
+                            testfile.txt
+                        </td>
+                        <td class="form_lbl">
+                            File Name
+                        </td>
+                        <td colspan="2">
+                            testfile.txt
+                        </td>
+                    </tr>*@
+                    <tr>
+                        <td style="height: 15px;" colspan="6">
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 15px">
+                <table style="width:100%;" cellspadding="0" cellspacing="0">
+                    <tr>
+                        <td colspan="6">
+                            <lable class="form_lbl">Details (Reason for past trial)</lable>
+                            <div style="margin-bottom: 10px; margin-top: 10px;">
+                                <textarea type="text" rows="5" value="@(QMCRF.one[0].OtherDetails)" style="width: 200%;"></textarea>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td style="height: 15px;" colspan="6">
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 15px">
+                <table style="width:100%;" cellspadding="0" cellspacing="0">
+                    @if (appList.Count > 0)
+                    {
+                        if (appList.Any(x => x.ApproverStatus.Contains("Approved")))
+                        {
+                            <tr>
+                                <td colspan="6" align='left'>
+                                    <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Approval Tracking</u></b></h6>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="1" style="color:black">Name</td>
+                                <td colspan="1" style="color:black">Proccessed On</td>
+                                <td colspan="1" style="color:black">Status</td>
+                                <td colspan="1" style="color:black">Level</td>
+                            </tr>
+                            foreach (var item in appList)
+                            {
+                                <tr>
+                                    <td colspan="1">
+                                        <div style="margin-bottom: 10px; font-weight: normal;">
+                                            <div>@item.UserName</div>
+                                            <div>@item.Designation</div>
+                                        </div>
+                                    </td>
+                                    <td colspan="1" style="font-weight: normal;">
+                                        @if (item.Logic == "OR")
+                                        {
+                                            if (item.ApproverStatus != "Pending")
+                                            {
+                                                <div>
+                                                    @item.TimeStamp
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div>
+                                                @item.TimeStamp
+                                            </div>
+                                        }
+                                    </td>
+                                    <td colspan="1" style="font-weight: normal;">
+                                        @if (item.Logic == "OR")
+                                        {
+                                            if (item.ApproverStatus != "Pending")
+                                            {
+                                                <div>
+                                                    @item.ApproverStatus
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div>
+                                                @item.ApproverStatus
+                                            </div>
+                                        }
+                                    </td>
+                                    <td colspan="1" style="font-weight: normal;">
+                                        <div>
+                                            @item.Level
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+
+                        }
+
+                    }
+                    <tr>
+                        <td colspan="6" align='left'>
+                            <h6 style="margin-top:5px;margin-left:5px;color:black;font-weight:bold"><b>SF_II_024</b></h6>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,237 @@
+﻿@model dynamic
+@{
+    ViewBag.Title = "Conflict Of Interest Form";
+    var user = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    bool IsNew = true;
+    bool IsEdit = true;
+    dynamic COIF = null;
+    Layout = ViewBag.Layout;
+    int RowId = 0, FormId = 0, AppRowId = 0, ApprovalType = 0;
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IsNew = ViewBag.IsNew;
+        IsEdit = ViewBag.IsEdit;
+        COIF = ViewBag.Model;
+        RowId = ViewBag.RowId;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+    }
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SAVWIPL - Conflict Of Interest Form</title>
+    <style type="text/css">
+        *:visited, *:focus {
+            box-shadow: none;
+        }
+
+        input, select, input:focus, select:focus, textarea, textarea:focus {
+            border: 1px solid #000;
+        }
+
+        input, textarea {
+            padding: 5px;
+        }
+
+        table td {
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <table style="width: 100%; font-size: 14px; color: #000; font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+        <tr>
+            <td>
+                <table style="width: 100%;" cellspadding="0" cellspacing="0">
+                    <tr>
+                        <td colspan="6" width="60%" style="text-align: right;">
+                            <img style="width: 50%;" src='@Server.MapPath("~/assets/img/SAVWIPL_Merger_Logo.JPG")'>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="6" align="center">
+                <h2> Conflict Of Interest Form </h2>
+            </td>
+        </tr>
+
+
+        <tr>
+            <td style="padding: 15px;">
+                <table border="1" cellspacing="0" cellpadding="0" width="100%">
+
+
+                    <tr>
+                        <td style="width:20%">
+                            Employee Name
+                        </td>
+                        <td style="width: 30%; font-weight: normal;" colspan="2" align='left'>
+                            @(COIF.one[0].EmployeeName ?? "")
+                        </td>
+                        <td style="width:20%">
+                            Employee Code
+                        </td>
+                        <td style="width: 30%; font-weight: normal;" colspan="2" align='left'>
+
+                            @(COIF.one[0].EmployeeCode ?? "")
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td style="width:20%">
+                            Designatiion
+                        </td>
+                        <td colspan="2" align='left' style="font-weight: normal;">
+                            @(COIF.one[0].EmployeeDesignation ?? "")
+                        </td>
+                        <td style="width:20%">
+                            Location
+                        </td>
+                        <td colspan="2" align='left' style="font-weight: normal;">
+                            @(COIF.one[0].EmployeeLocation ?? "")
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td style="width:20%">
+                            Department
+                        </td>
+                        <td colspan="2" align='left' style="font-weight: normal;">
+                            @(COIF.one[0].EmployeeDepartment ?? "")
+                        </td>
+                        <td style="width:20%">
+                            Contact Number
+                        </td>
+                        <td colspan="2" align='left' style="font-weight: normal;">
+                            @(COIF.one[0].EmployeeContactNo ?? "")
+                        </td>
+
+                    </tr>
+
+                    <tr>
+                        <td colspan="6" style="height: 15px;">
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="6">
+                            Describe the nature of conflict at the point in time and scope in which the conflict of interest has arisen or may arise at MobiNext Technologies India Pvt. Ltd. (SAVWIPL): <br />
+                            * Affiliated persons means and includes relatives, spouse, children or any other person closely related.
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td colspan='6'>
+                            1. Do you / affiliated persons, have an ownership interest in, or employed by an SAVWIPL or non– SAVWIPL (automotive dealer, supplier, competitor, or service provider) or any company doing business with SAVWIPL or VW Group?
+                            @if (COIF.one[0].IsQ1Yes == "Yes")
+                            {
+                                <input type="checkbox" checked />
+                            }
+                            else
+                            {
+                                <input type="checkbox" />
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan='6'>
+                            2. Are you / affiliated person a director or officer in any business organization (Profit / Non-Profit) or are engaged in employment other than SAVWIPL?
+                            @if (COIF.one[0].IsQ2Yes == "Yes")
+                            {
+                                <input type="checkbox" checked />
+                            }
+                            else
+                            {
+                                <input type="checkbox" />
+                            }
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan='6'>
+                            3. Are you / affiliated persons a public official / politically exposed person?
+                            @if (COIF.one[0].IsQ3Yes == "Yes")
+                            {
+                                <input type="checkbox" checked />
+                            }
+                            else
+                            {
+                                <input type="checkbox" />
+                            }
+                        </td>
+                    </tr>
+                    @{
+                        var appList = COIF.three as List<Skoda_DCMS.Models.ApprovalDataModel>;
+                    }
+
+                    @if (appList.Count > 0)
+                    {
+                        <tr>
+                            <td colspan="2">Name</td>
+                            <td colspan="2">Proccessed On</td>
+                            <td colspan="1">Status</td>
+                            <td colspan="1">Level</td>
+                        </tr>
+                        foreach (var item in appList)
+                        {
+                            <tr>
+                                <td colspan="2">
+                                    <div style="margin-bottom:10px;">
+                                        <div>@item.UserName</div>
+                                        <div>@item.Designation</div>
+                                    </div>
+                                </td>
+                                <td colspan="2">
+                                    @if (item.Logic == "OR")
+                                    {
+                                        if (item.ApproverStatus != "Pending")
+                                        {
+                                            <div>
+                                                @item.TimeStamp
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {                                       
+                                        <div>
+                                            @item.TimeStamp
+                                        </div>
+                                    }
+                                </td>
+                                <td colspan="1">
+                                    @if (item.Logic == "OR")
+                                    {
+                                        if (item.ApproverStatus != "Pending")
+                                        {
+                                            <div>
+                                                @item.ApproverStatus
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div>
+                                            @item.ApproverStatus
+                                        </div>
+                                    }
+                                </td>
+                                <td colspan="1">
+                                    <div>
+                                        @item.Level
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

@@ -1,0 +1,2448 @@
+﻿@model Skoda_DCMS.Models.PPFResults
+@{
+    bool IsNew = true;
+    Skoda_DCMS.Models.PPFData PPF = null;
+    dynamic FlagRedirect = null;
+    bool IsEdit = true, IsNewMode = true, IsEditMode = false, IsViewMode = false;
+    int FormId = 0, AppRowId = 0, ApprovalType = 0;
+    var CurrentUserDesgn = "";
+    var SecurityDesgnString = "Security";
+    Layout = ViewBag.Layout;
+    var currentUser = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    List<Skoda_DCMS.Models.ApprovalDataModel> appList = new List<Skoda_DCMS.Models.ApprovalDataModel>();
+    string disabled = "";
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IsNew = ViewBag.IsNew;
+        IsEdit = ViewBag.IsEdit;
+        IsNewMode = ViewBag.IsNewMode;
+        IsEditMode = ViewBag.IsEditMode;
+        IsViewMode = ViewBag.IsViewMode;
+        disabled = IsViewMode ? "disabled" : "";
+        PPF = ViewBag.Model.one[0] as Skoda_DCMS.Models.PPFData;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+        appList = ViewBag.Model?.three as List<Skoda_DCMS.Models.ApprovalDataModel>;
+        CurrentUserDesgn = appList?.Where(x => x.ApproverUserName.ToLower() == currentUser.UserName.ToLower()).Select(x => x.Designation).FirstOrDefault();
+    }
+    ViewBag.Title = "Photography Authorization Form";
+    int count = 0;
+}
+
+<style>
+
+    .deviationDate {
+        /*max-width: fit-content !important;*/
+        /* max-width:20px;*/
+        width: 15px;
+        margin-left: 1px;
+        margin-right: 1px;
+        height: 30px !important;
+        border: none !important;
+        max-width: 95px !important;
+        background-color: #fff !important;
+        outline: none !important;
+    }
+
+    .astColor {
+        color: red;
+    }
+
+    /*New design css start here*/
+
+    .textTrans {
+        width: 100%;
+        max-width: 99%;
+        border-radius: 5px;
+        margin-right: 0px;
+        border: 1px solid #BFBFBF !important;
+    }
+
+    .empDetailsBg {
+        background-color: #fffbef;
+    }
+
+    #accordion select {
+        color: #000;
+        width: 100% !important;
+        max-width: 100%;
+        height: 45px;
+        background-color: #fff;
+        border: 1px solid #BFBFBF;
+        box-sizing: border-box;
+        border-radius: 5px;
+        background-image: url(data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>);
+        background-repeat: no-repeat;
+        background-position: right .75rem center;
+        background-size: 16px 12px;
+    }
+
+    #accordion input[type='text'] {
+        width: 100% !important;
+        max-width: 100%;
+        height: 45px;
+        background-color: #fff;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px !important;
+    }
+
+    #accordion input[type='date'] {
+        width: 100% !important;
+        max-width: 100%;
+        height: 45px;
+        background-color: #fff;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px;
+    }
+
+    #accordion input[type='time'] {
+        height: 45px;
+    }
+
+    #accordion label {
+        font-size: 16px;
+        line-height: 22px;
+        font-weight: 600;
+        color: #201F1F;
+    }
+
+    #accordion table tr td {
+        border: none;
+        font-size: 16px;
+        line-height: 19px;
+        color: #201F1F;
+        background-color: white;
+    }
+
+    #accordion label {
+        display: block;
+    }
+
+    #accordion .card-header {
+        background: rgb(4 59 100) !important;
+        border-radius: 5px 5px 0px 0px;
+        position: relative;
+        margin-top: 15px;
+    }
+
+        #accordion .card-header.collapsed h5:after {
+            content: '+';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        #accordion .card-header h5:after {
+            content: '-';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+    #accordion h5 button {
+        font-size: 18px;
+        line-height: 22px;
+        /* identical to box height */
+        padding-left: 0px;
+        display: flex;
+        align-items: center;
+        text-transform: uppercase;
+        /* Text_white */
+
+        color: #FFFFFF;
+    }
+
+        #accordion h5 button:focus {
+            box-shadow: none;
+        }
+
+    .empDetailsFields label {
+        display: block !important;
+        margin-bottom: 0px;
+    }
+
+    .empDetailsFields .row label {
+        display: block;
+        margin-bottom: 0px;
+    }
+
+        .empDetailsFields .row label:nth-child(1) {
+            font-style: normal;
+            font-weight: normal !important;
+            font-size: 12px;
+            line-height: 18px;
+            color: #A9A9A9 !important;
+        }
+
+        .empDetailsFields .row label:nth-child(2) {
+            font-style: normal;
+            font-weight: normal;
+            font-size: 18px;
+            line-height: 22px;
+            color: #201F1F;
+        }
+
+    .firstLastName {
+        font-style: normal;
+        font-weight: normal;
+        font-size: 20px;
+        line-height: 24px;
+        /* identical to box height */
+
+        display: flex;
+        align-items: center;
+        color: #201F1F;
+    }
+
+    .submit-btn {
+        background: #3D3D3D;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #FFFFFF;
+        border-color: transparent !important;
+    }
+
+    .cancl-btn {
+        background: #FAE99B;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        border-color: transparent !important;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #212221;
+        margin-left: 10px;
+    }
+
+
+
+
+    .card-footer {
+        display: flex;
+        background-color: transparent !important;
+    }
+
+    .photo-form {
+        width: 100%;
+    }
+
+    .ui-front {
+        z-index: 9999999 !important;
+    }
+    /*Animation CSS Starts*/
+
+    div.input-block {
+        position: relative;
+    }
+
+        div.input-block input {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 188px;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block textarea {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 100%;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            background-color: #fff;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block span.placeholder {
+            position: absolute;
+            margin: 17px 0;
+            padding: 0 4px;
+            font-family: Roboto, sans-serif;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            top: -6px;
+            left: 15px;
+            transition: all 0.2s;
+            transform-origin: 0% 0%;
+            background: none;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        div.input-block textarea:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: #fff !important;
+        }
+
+        div.input-block textarea:valid + span.placeholder,
+        div.input-block textarea:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px) !important;
+            background: #fff !important;
+        }
+
+        div.input-block input:valid + span.placeholder,
+        div.input-block input:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: #fff;
+        }
+
+    .empDetailsFields div.input-block input:valid + span.placeholder,
+    .empDetailsFields div.input-block input:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: rgb(219,238,213);
+    }
+
+    div.input-block input.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: rgb(219,238,213);
+    }
+
+    .empDetailsFields div.input-block input:read-only + span.placeholder,
+    .empDetailsFields div.input-block input:read-only + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: rgb(219,238,213);
+    }
+
+    div.input-block input:read-only + span.placeholder,
+    div.input-block input:read-only + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: #fff;
+    }
+
+
+    div.inputSelect span.placeholder {
+        position: absolute;
+        margin: 17px 0;
+        padding: 0 4px;
+        font-family: Roboto, sans-serif;
+        color: #000;
+        display: flex;
+        align-items: center;
+        font-size: 1rem;
+        top: -6px;
+        left: 15px;
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+        background: none;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    div.inputSelect select:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background: #fff;
+        z-index: 9;
+    }
+
+    .empDetailsFields div.inputSelect select:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: rgb(219,238,213);
+        z-index: 9;
+    }
+
+    div.inputSelect select:not([value=""]):valid + span.placeholder {
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+    }
+
+
+
+    div.input-block input:focus + span.placeholder {
+        color: #284B63;
+    }
+
+    .breadcrumb {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+        padding: 1rem 1rem 0;
+        margin-bottom: 0;
+        list-style: none;
+        background-color: #FFFFFF;
+        border-radius: .25rem;
+    }
+
+    body.nav-sm .container.body .left_col {
+        width: 63px;
+        padding: 0;
+        position: fixed;
+        height: 100%;
+        z-index: 8;
+    }
+
+    .card {
+        position: relative;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        min-width: 0;
+        word-wrap: break-word;
+        background-color: #fff;
+        background-clip: border-box;
+        border: 0px;
+        border-radius: .25rem;
+    }
+
+    .dropdown-toggle::after {
+        display: none;
+        width: 0;
+        height: 0;
+        margin-left: .255em;
+        vertical-align: .255em;
+        content: "";
+        border-top: .3em solid;
+        border-right: .3em solid transparent;
+        border-bottom: 0;
+        border-left: .3em solid transparent;
+    }
+
+    input.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213);
+    }
+
+    inputSelect.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213) !important;
+    }
+
+    select.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background-color: #fff !important;
+        z-index: 9;
+    }
+
+    .empDetailsFields select.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background-color: rgb(219,238,213) !important;
+        ;
+        z-index: 9;
+    }
+
+    textarea.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    .TransView {
+        background-color: white !important;
+    }
+
+    @@media only screen and (min-width: 992px) {
+        div .input-block span.placeholder {
+            font-size: 15px;
+        }
+
+        div.inputSelect span.placeholder {
+            font-size: 14px;
+        }
+    }
+
+    input[type='date'].spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    .showBorder {
+        border: 1px solid #dee2e6;
+    }
+
+    .forSameHt {
+        padding-bottom: 40px;
+        height: 78px !important;
+    }
+
+    .forPoints input[type='checkbox'] {
+        margin-right: 2px;
+        position: relative;
+        top: 2px;
+    }
+
+    #lblReason {
+        font-size: 16px !important;
+    }
+
+    #drpCurrency {
+        max-width: 100% !important;
+    }
+
+    #accordion table.tblBorders tr td {
+        border: 1px solid #dee2e6 !important;
+    }
+
+    #txtAboutRoleAppliedFor {
+        padding-top: 25px !important;
+    }
+
+    #fileToUpload {
+        border: none !important;
+        width: 100% !important;
+    }
+
+    #moduleBody td {
+        vertical-align: middle;
+    }
+
+    .wd {
+        margin-top: 6px;
+    }
+
+    label#lblThirdPartyPhotographer {
+        font-size: 15px !important;
+    }
+</style>
+@*Loader*@
+<style type="text/css">
+    #loader {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        
+        z-index: 10000;
+    }
+</style>
+<script type="text/javascript">
+
+    function checkSelect(id) {
+
+        if ($('#' + id).val() != '') {
+            $('#' + id).addClass('spanUpperSide');
+        }
+    }
+    /*$('#timedemo').pickatime({ twelvehour: true });*/
+
+</script>
+
+<div class="right_col bg-color">
+    @*class for hiding left menu*@
+    <form action="/List/SavePPF" id="PPFForm" method="post">
+
+        <div>
+            @if (IsEditMode || IsViewMode)
+            {
+                <div>
+                    <input type="hidden" id="FormSrId" name="FormSrId" value="@(ViewBag.Model.one[0].Id)" />
+                    <input type="hidden" id="FormId" name="FormId" value="@(FormId)" />
+                    <input type="hidden" id="AppRowId" name="AppRowId" value="@(AppRowId)" />
+                </div>
+            }
+
+            <div>
+                <ol class="breadcrumb pl-0">
+                    <li>
+                        <a href="/Dashboard?formName=BTF">
+                            Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        Photography Authorization Form
+                    </li>
+
+                </ol>
+            </div>
+            <div class="breadcrumb-container table-bordered" style="background-color: rgb(219,238,213) !important; ">
+                <div class="col-md-2 col-lg-2">
+                    <span class="placeholder">Date : @(!IsNew || !IsEdit ? (Convert.ToDateTime(ViewBag.Model.one[0].Created_Date).ToShortDateString()) : DateTime.Now.ToShortDateString())</span>
+                </div>
+                <div class="col-md-8 col-lg-8 mt-2 mb-1 form-heading" style="text-align:center; margin-top:5px">
+                    <span>
+                        Photography Authorization Form
+                    </span>
+                </div>
+                <div class="col-md-2 col-lg-2">
+                    @if (!IsNew || !IsEdit)
+                    {
+                        <span class="placeholder"> Form Id : @(!IsNew || !IsEdit ? ("PAF" + FormId ?? "") : "" )</span>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="heading d-none" id="headingErr">
+            <h1 id="" class="info-header">Following fields are mandatory. Please fill in information for<br /></h1>
+            <div id="add_to_me" class="header-list" style="color:red;"></div>
+        </div>
+
+        @{
+            Html.RenderPartial("_SubmitterDetailsWithModel", (ViewBag as object));
+        }
+        @{
+            Html.RenderPartial("_ApplicantDetailsWithModel", (ViewBag as object));
+        }
+
+
+        <div class="table photoform_table mb-0">
+            <table class="photo-form">
+                <tr>
+                    <td class="border-none p-0 skoda-auto">
+
+                        <!-- ACCORDIAN STRUCTURE START HERE-->
+                        <div id="accordion">
+                            <div class="card">
+                                <div class="card-header collapsed" id="headingTwo" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                    <h5 class="mb-0">
+                                        <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                            <img src="~/assets/img/transactionIcon.svg" width="24" height="24" class="mr-2" />  Transaction Fields
+                                        </button>
+                                    </h5>
+                                </div>
+                                <div id="collapseThree" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+                                    <div class="card-body">
+                                        <div class="form-row">
+                                            <div class="form-group col-md-12 col-12">
+                                                @if (IsNewMode)
+                                                {
+                                                    <div class="d-flex mb-4 mt-2">
+                                                        <div class="mr-3">
+                                                            <input type="checkbox" class="ThirdPartyPhotographerchk mr-1" name="ChkThirdPartyPhotographer" id="ChkThirdPartyPhotographer" value="3rd Party Photographer">
+                                                            <label id="lblThirdPartyPhotographer">
+                                                                3rd Party Photographer
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-flex mb-4 mt-2">
+                                                        <div class="mr-3">
+                                                            <label id="lblDevice"> Device</label>
+                                                        </div>
+                                                        <div class="mr-3">
+                                                            <input type="checkbox" class="deviceCheck mr-1" name="chkVideoCamera" id="chkVideoCamera" value="VideoCamera"> Video Camera
+                                                        </div>
+                                                        <div class="mr-3">
+                                                            <input type="checkbox" class="deviceCheck mr-1" name="chkCamera" id="chkCamera" value="Camera"> Business Camera
+                                                        </div>
+                                                        <div class="mr-3">
+                                                            <input type="checkbox" class="deviceCheck mr-1" name="chkMobile" id="chkMobile" value="Mobile"> Company Mobile
+                                                        </div>
+                                                        <div class="mr-3">
+                                                            <input type="checkbox" class="deviceCheck mr-1" name="chkTablet" id="chkTablet" value="Tablet"> Company Tablet
+                                                        </div>
+                                                    </div>
+
+                                                }
+                                                else if (IsViewMode)
+                                                {
+                                                    if (PPF?.ThirdPartyPhotographer == "3rd Party Photographer")
+                                                    {
+                                                        <div class="d-flex mb-4 mt-2">
+                                                            <div class="mr-3">
+                                                                <input disabled checked type="checkbox" class="ThirdPartyPhotographerchk mr-1" name="ChkThirdPartyPhotographer" id="ChkThirdPartyPhotographer" value="3rd Party Photographer">
+                                                                <label id="lblThirdPartyPhotographer">
+                                                                    3rd Party Photographer
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="d-flex mb-4 mt-2">
+                                                            <div class="mr-3">
+                                                                <input disabled type="checkbox" class="ThirdPartyPhotographerchk mr-1" name="ChkThirdPartyPhotographer" id="ChkThirdPartyPhotographer" value="3rd Party Photographer">
+                                                                <label id="lblThirdPartyPhotographer">
+                                                                    3rd Party Photographer
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    }
+
+                                                    <div class="d-flex mb-4 mt-2">
+                                                        <div class="mr-3">
+                                                            <label id="lblDevice"> Device</label>
+                                                        </div>
+                                                        @if (PPF?.VideoCameraDevice == "VideoCamera")
+                                                        {
+                                                            <div class="mr-3">
+                                                                <input type="checkbox" class="deviceCheck mr-1" name="chkVideoCamera" id="chkVideoCamera" value="VideoCamera" disabled checked> Video Camera
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            <div class="mr-3">
+                                                                <input type="checkbox" class="deviceCheck mr-1" name="chkVideoCamera" id="chkVideoCamera" value="VideoCamera" disabled> Video Camera
+                                                            </div>
+                                                        }
+                                                        @if (PPF?.CameraDevice == "Camera")
+                                                        {
+                                                            <div class="mr-3">
+                                                                <input type="checkbox" class="deviceCheck mr-1" name="chkCamera" id="chkCamera" value="Camera" disabled checked> Business Camera
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            <div class="mr-3">
+                                                                <input type="checkbox" class="deviceCheck mr-1" name="chkCamera" id="chkCamera" value="Camera" disabled> Business Camera
+                                                            </div>
+                                                        }
+                                                        @if (PPF?.MobileDevice == "Mobile")
+                                                        {
+                                                            <div class="mr-3">
+                                                                <input type="checkbox" class="deviceCheck mr-1" name="chkMobile" id="chkMobile" value="Mobile" disabled checked> Company Mobile
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            <div class="mr-3">
+                                                                <input type="checkbox" class="deviceCheck mr-1" name="chkMobile" id="chkMobile" value="Mobile" disabled> Company Mobile
+                                                            </div>
+                                                        }
+                                                        @if (PPF?.TabletDevice == "Tablet")
+                                                        {
+                                                            <div>
+                                                                <input type="checkbox" class="deviceCheck mr-1" name="chkTablet" id="chkTablet" value="Tablet" disabled checked>Company Tablet
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            <div>
+                                                                <input type="checkbox" class="deviceCheck mr-1" name="chkTablet" id="chkTablet" value="Tablet" disabled> Company Tablet
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                }
+                                                else if (IsEditMode)
+                                                {
+                                                    if (PPF?.ThirdPartyPhotographer == "3rd Party Photographer")
+                                                    {
+                                                        <div class="d-flex mb-4 mt-2">
+                                                            <div class="mr-3">
+                                                                <input checked type="checkbox" class="ThirdPartyPhotographerchk mr-1" name="ChkThirdPartyPhotographer" id="ChkThirdPartyPhotographer" value="3rd Party Photographer">
+                                                                <label id="lblThirdPartyPhotographer">
+                                                                    3rd Party Photographer
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="d-flex mb-4 mt-2">
+                                                            <div class="mr-3">
+                                                                <input type="checkbox" class="ThirdPartyPhotographerchk mr-1" name="ChkThirdPartyPhotographer" id="ChkThirdPartyPhotographer" value="3rd Party Photographer">
+                                                                <label id="lblThirdPartyPhotographer">
+                                                                    3rd Party Photographer
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                    <div class="d-flex mb-4 mt-2">
+                                                        <div class="mr-3">
+                                                            <label id="lblDevice"> Device</label>
+                                                        </div>
+                                                        @if (PPF?.VideoCameraDevice == "VideoCamera")
+                                                        {
+                                                            <div class="mr-3">
+                                                                <input type="checkbox" class="deviceCheck mr-1" name="chkVideoCamera" id="chkVideoCamera" value="VideoCamera" checked> Video Camera
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            <div class="mr-3">
+                                                                <input type="checkbox" class="deviceCheck mr-1" name="chkVideoCamera" id="chkVideoCamera" value="VideoCamera"> Video Camera
+                                                            </div>
+                                                        }
+                                                        @if (PPF?.CameraDevice == "Camera")
+                                                        {
+                                                            <div class="mr-3">
+                                                                <input type="checkbox" class="deviceCheck mr-1" name="chkCamera" id="chkCamera" value="Camera" checked> Business Camera
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            <div class="mr-3">
+                                                                <input type="checkbox" class="deviceCheck mr-1" name="chkCamera" id="chkCamera" value="Camera"> Business Camera
+                                                            </div>
+                                                        }
+                                                        @if (PPF?.MobileDevice == "Mobile")
+                                                        {
+                                                            <div class="mr-3">
+                                                                <input type="checkbox" class="deviceCheck mr-1" name="chkMobile" id="chkMobile" value="Mobile" checked> Company Mobile
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            <div class="mr-3">
+                                                                <input type="checkbox" class="deviceCheck mr-1" name="chkMobile" id="chkMobile" value="Mobile"> Company Mobile
+                                                            </div>
+                                                        }
+                                                        @if (PPF?.TabletDevice == "Tablet")
+                                                        {
+                                                            <div>
+                                                                <input type="checkbox" class="deviceCheck mr-1" name="chkTablet" id="chkTablet" value="Tablet" checked>Company Tablet
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            <div>
+                                                                <input type="checkbox" class="deviceCheck mr-1" name="chkTablet" id="chkTablet" value="Tablet"> Company Tablet
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                }
+
+                                                <div class="mb-2 d-none" id="divVideoCamera">
+                                                    <div>
+                                                        <label class="f-600 mb-2"><b>Video Camera</b></label>
+                                                    </div>
+
+                                                    <div class="form-row">
+                                                        <div class="form-group col-4 input-block">
+                                                            <input type="text" @(disabled) value="@(PPF?.VideoCameraMake ?? "")" maxlength="15" id="txtVideoCameraMake" name="txtVideoCameraMake" class="inpDisable" required>
+                                                            <span for="drpInstrument" class="placeholder TransView">Make</span>
+                                                        </div>
+                                                        <div class="form-group col-4 input-block">
+                                                            <input type="text" @(disabled) value="@(PPF?.VideoCameraModel ?? "")" maxlength="15" id="txtVideoCameraModel" name="txtVideoCameraModel" class="model-create inpDisable" required>
+                                                            <span class="placeholder TransView">Model</span>
+                                                        </div>
+                                                        <div class="form-group col-4 input-block">
+                                                            <input type="text" @(disabled) value="@(PPF?.VideoCameraSerialIMEINo ?? "")" maxlength="15" id="txtVideoCameraSerialIMEINo" name="txtVideoCameraSerialIMEINo" class="inpDisable" required>
+                                                            <span for="drpInstrument" class="placeholder TransView">Serial/IMEI No</span>
+                                                        </div>
+
+                                                        <div class="form-group col-md-4 col-12 inputSelect">
+                                                            <select @(disabled) name="drpVideoCameraSAVWIPLOwned" id="drpVideoCameraSAVWIPLOwned" class="" onchange="checkSelect('drpVideoCameraSAVWIPLOwned')">
+                                                                <option style="display: none;"></option>
+                                                                <option value="Yes" @(PPF?.VideoCameraSAVWIPLOwned == "Yes" ? "selected" : "")>Yes</option>
+                                                                <option value="No" @(PPF?.VideoCameraSAVWIPLOwned == "No" ? "selected" : "")>No</option>
+                                                            </select>
+                                                            <span class="placeholder TransView">MobiIPL Owned</span>
+                                                        </div>
+
+                                                        <!-- capture video/sound start -->
+                                                        <div class="form-group col-md-4 col-12 inputSelect">
+                                                            <select @(disabled) name="drpVideoCameraCaptureVoiceSound" id="drpVideoCameraCaptureVoiceSound" class="voice_create" onchange="checkSelect('drpVideoCameraCaptureVoiceSound')">
+                                                                <option style="display: none;"></option>
+                                                                <option value="Yes" @(PPF?.VideoCameraCaptureVoiceSound == "Yes" ? "selected" : "")>Yes</option>
+                                                                <option value="No" @(PPF?.VideoCameraCaptureVoiceSound == "No" ? "selected" : "")>No</option>
+                                                            </select>
+                                                            <span class="placeholder TransView">Capture Voice/Sound</span>
+                                                        </div>
+
+                                                        <!-- capture video/sound start -->
+                                                        <div class="form-group col-md-4 col-12 inputSelect">
+                                                            <select @(disabled) name="drpVideoCameraCaptureVideo" id="drpVideoCameraCaptureVideo" class="" onchange="checkSelect('drpVideoCameraCaptureVideo')" required>
+                                                                <option style="display: none;"></option>
+                                                                <option value="Yes" @(PPF?.VideoCameraCaptureVideo == "Yes" ? "selected" : "")>Yes</option>
+                                                                <option value="No" @(PPF?.VideoCameraCaptureVideo == "No" ? "selected" : "")>No</option>
+                                                            </select>
+                                                            <span class="placeholder TransView">Capture Video</span>
+                                                        </div>
+
+                                                        <!-- capture image start-->
+
+                                                        <div class="form-group col-md-4 col-12 inputSelect">
+                                                            <select @(disabled) name="drpVideoCameraCaptureImages" id="drpVideoCameraCaptureImages" onchange="checkSelect('drpVideoCameraCaptureImages')">
+                                                                <option value="null" selected>Choose</option>
+                                                                <option value="Yes" @(PPF?.VideoCameraCaptureImages == "Yes" ? "selected" : "")>Yes</option>
+                                                                <option value="No" @(PPF?.VideoCameraCaptureImages == "No" ? "selected" : "")>No</option>
+                                                            </select>
+                                                            <span class="placeholder TransView">Capture Images</span>
+                                                        </div>
+
+                                                        <!--bluetooth/wireless start here-->
+
+                                                        <div class="form-group col-md-4 col-12 inputSelect">
+                                                            <select @(disabled) name="drpVideoCameraBluetoothWireless" id="drpVideoCameraBluetoothWireless" class="" onchange="checkSelect('drpVideoCameraBluetoothWireless')" required>
+                                                                <option style="display: none;"></option>
+                                                                <option value="Yes" @(PPF?.VideoCameraBluetoothWireless == "Yes" ? "selected" : "")>Yes</option>
+                                                                <option value="No" @(PPF?.VideoCameraBluetoothWireless == "No" ? "selected" : "")>No</option>
+                                                            </select>
+                                                            <span class="placeholder">Bluetooth/Wireless</span>
+                                                        </div>
+
+                                                        <!--end here-->
+
+                                                        <div class="form-group col-md-4 col-12 input-block">
+                                                            <input @(disabled) value="@(PPF?.VideoCameraOther ?? "")" type="text" id="txtVideoCameraOther" name="txtVideoCameraOther" class="inpDisable" required>
+                                                            <span class="placeholder TransView">Other</span>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
+                                                <div class="mb-2 d-none" id="divCamera">
+                                                    <div>
+                                                        <label class="f-600 mb-2"><b>Business Camera</b></label>
+                                                    </div>
+
+                                                    <div class="form-row">
+                                                        <div class="form-group col-4 input-block">
+                                                            <input @(disabled) value="@(PPF?.CameraMake ?? "")" type="text" maxlength="15" id="txtCameraMake" name="txtCameraMake" class="inpDisable" required>
+                                                            <span for="drpInstrument" class="placeholder TransView">Make</span>
+                                                        </div>
+                                                        <div class="form-group col-4 input-block">
+                                                            <input @(disabled) value="@(PPF?.CameraModel ?? "")" type="text" maxlength="15" id="txtCameraModel" name="txtCameraModel" class="model-create inpDisable" required>
+                                                            <span class="placeholder TransView">Model</span>
+                                                        </div>
+                                                        <div class="form-group col-4 input-block">
+                                                            <input @(disabled) value="@(PPF?.CameraSerialIMEINo ?? "")" maxlength="15" type="text" id="txtCameraSerialIMEINo" name="txtCameraSerialIMEINo" class="inpDisable" required>
+                                                            <span for="drpInstrument" class="placeholder TransView">Serial/IMEI No</span>
+                                                        </div>
+
+                                                        <div class="form-group col-md-4 col-12 inputSelect">
+                                                            <select @(disabled) name="drpCameraSAVWIPLOwned" id="drpCameraSAVWIPLOwned" class="" onchange="checkSelect('drpCameraSAVWIPLOwned')">
+                                                                <option style="display: none;"></option>
+                                                                <option value="Yes" @(PPF?.CameraSAVWIPLOwned == "Yes" ? "selected" : "")>Yes</option>
+                                                                <option value="No" @(PPF?.CameraSAVWIPLOwned == "No" ? "selected" : "")>No</option>
+                                                            </select>
+                                                            <span class="placeholder TransView">MobiIPL Owned</span>
+                                                        </div>
+
+                                                        <!-- capture video/sound start -->
+                                                        <div class="form-group col-md-4 col-12 inputSelect">
+                                                            <select @(disabled) name="drpCameraCaptureVoiceSound" id="drpCameraCaptureVoiceSound" class="voice_create" onchange="checkSelect('drpCameraCaptureVoiceSound')">
+                                                                <option style="display: none;"></option>
+                                                                <option value="Yes" @(PPF?.CameraCaptureVoiceSound == "Yes" ? "selected" : "")>Yes</option>
+                                                                <option value="No" @(PPF?.CameraCaptureVoiceSound == "No" ? "selected" : "")>No</option>
+                                                            </select>
+                                                            <span class="placeholder TransView">Capture Voice/Sound</span>
+                                                        </div>
+
+                                                        <!-- Capture video start -->
+                                                        <div class="form-group col-md-4 col-12 inputSelect">
+                                                            <select @(disabled) name="drpCameraCapture" id="drpCameraCapture" class="" onchange="checkSelect('drpCameraCapture')" required>
+                                                                <option style="display: none;"></option>
+                                                                <option value="Yes" @(PPF?.CameraCapture == "Yes" ? "selected" : "")>Yes</option>
+                                                                <option value="No" @(PPF?.CameraCapture == "No" ? "selected" : "")>No</option>
+                                                            </select>
+                                                            <span class="placeholder TransView">Capture Video</span>
+                                                        </div>
+
+                                                        <!-- capture video end -->
+                                                        <!-- capture image start-->
+
+                                                        <div class="form-group col-md-4 col-12 inputSelect">
+                                                            <select @(disabled) name="drpCameraCaptureImages" id="drpCameraCaptureImages" onchange="checkSelect('drpCameraCaptureImages')">
+                                                                <option value="null" selected>Choose</option>
+                                                                <option value="Yes" @(PPF?.CameraCaptureImages == "Yes" ? "selected" : "")>Yes</option>
+                                                                <option value="No" @(PPF?.CameraCaptureImages == "No" ? "selected" : "")>No</option>
+                                                            </select>
+                                                            <span class="placeholder TransView">Capture Images</span>
+                                                        </div>
+
+                                                        <!--bluetooth/wireless start here-->
+
+                                                        <div class="form-group col-md-4 col-12 inputSelect">
+                                                            <select @(disabled) name="drpCameraBluetoothWireless" id="drpCameraBluetoothWireless" class="" onchange="checkSelect('drpCameraBluetoothWireless')" required>
+                                                                <option style="display: none;"></option>
+                                                                <option value="Yes" @(PPF?.CameraBluetoothWireless == "Yes" ? "selected" : "")>Yes</option>
+                                                                <option value="No" @(PPF?.CameraBluetoothWireless == "No" ? "selected" : "")>No</option>
+                                                            </select>
+                                                            <span class="placeholder">Bluetooth/Wireless</span>
+                                                        </div>
+
+                                                        <!--end here-->
+
+                                                        <div class="form-group col-md-4 col-12 input-block">
+                                                            <input @(disabled) value="@(PPF?.CameraOther ?? "")" type="text" id="txtCameraOther" name="txtCameraOther" class="inpDisable" required>
+                                                            <span class="placeholder TransView">Other</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="d-none" id="divMobile">
+                                                    <div>
+                                                        <label class="f-600 mb-2"><b>Company Mobile</b></label>
+                                                    </div>
+
+                                                    <div class="form-row">
+                                                        <div class="form-group col-4 input-block">
+                                                            <input @(disabled) value="@(PPF?.MobileMake ?? "")" type="text" maxlength="15" id="txtMobileMake" name="txtMobileMake" class="inpDisable" required>
+                                                            <span for="drpInstrument" class="placeholder TransView">Make</span>
+                                                        </div>
+                                                        <div class="form-group col-4 input-block">
+                                                            <input @(disabled) value="@(PPF?.MobileModel ?? "")" type="text" maxlength="15" id="txtMobileModel" name="txtMobileModel" class="model-create inpDisable" required>
+                                                            <span class="placeholder TransView">Model</span>
+                                                        </div>
+                                                        <div class="form-group col-4 input-block">
+                                                            <input @(disabled) value="@(PPF?.MobileSerialIMEINo ?? "")" maxlength="15" type="text" id="txtMobileSerialIMEINo" name="txtMobileSerialIMEINo" class="inpDisable" required>
+                                                            <span for="drpInstrument" class="placeholder TransView">Serial/IMEI No</span>
+                                                        </div>
+
+                                                        <div class="form-group col-md-4 col-12 inputSelect">
+                                                            <select @(disabled) name="drpMobileSAVWIPLOwned" id="drpMobileSAVWIPLOwned" class="" onchange="checkSelect('drpMobileSAVWIPLOwned')">
+                                                                <option style="display: none;"></option>
+                                                                <option value="Yes" @(PPF?.MobileSAVWIPLOwned == "Yes" ? "selected" : "")>Yes</option>
+                                                                <option value="No" @(PPF?.MobileSAVWIPLOwned == "No" ? "selected" : "")>No</option>
+                                                            </select>
+                                                            <span class="placeholder TransView">MobiIPL Owned</span>
+                                                        </div>
+
+                                                        <!-- capture video/sound start -->
+                                                        <div class="form-group col-md-4 col-12 inputSelect">
+                                                            <select @(disabled) name="drpMobileCaptureVoiceSound" id="drpMobileCaptureVoiceSound" class="voice_create" onchange="checkSelect('drpMobileCaptureVoiceSound')">
+                                                                <option style="display: none;"></option>
+                                                                <option value="Yes" @(PPF?.MobileCaptureVoiceSound == "Yes" ? "selected" : "")>Yes</option>
+                                                                <option value="No" @(PPF?.MobileCaptureVoiceSound == "No" ? "selected" : "")>No</option>
+                                                            </select>
+                                                            <span class="placeholder TransView">Capture Voice/Sound</span>
+                                                        </div>
+
+                                                        <!-- Capture video start -->
+                                                        <div class="form-group col-md-4 col-12 inputSelect">
+                                                            <select @(disabled) name="drpMobileCapture" id="drpMobileCapture" class="" onchange="checkSelect('drpMobileCapture')" required>
+                                                                <option style="display: none;"></option>
+                                                                <option value="Yes" @(PPF?.MobileCapture == "Yes" ? "selected" : "")>Yes</option>
+                                                                <option value="No" @(PPF?.MobileCapture == "No" ? "selected" : "")>No</option>
+                                                            </select>
+                                                            <span class="placeholder TransView">Capture Video</span>
+                                                        </div>
+
+                                                        <!-- capture video end -->
+                                                        <!-- capture image start-->
+
+                                                        <div class="form-group col-md-4 col-12 inputSelect">
+                                                            <select @(disabled) name="drpMobileCaptureImages" id="drpMobileCaptureImages" onchange="checkSelect('drpMobileCaptureImages')">
+                                                                <option value="null" selected>Choose</option>
+                                                                <option value="Yes" @(PPF?.MobileCaptureImages == "Yes" ? "selected" : "")>Yes</option>
+                                                                <option value="No" @(PPF?.MobileCaptureImages == "No" ? "selected" : "")>No</option>
+                                                            </select>
+                                                            <span class="placeholder TransView">Capture Images</span>
+                                                        </div>
+
+                                                        <!--bluetooth/wireless start here-->
+
+                                                        <div class="form-group col-md-4 col-12 inputSelect">
+                                                            <select @(disabled) name="drpMobileBluetoothWireless" id="drpMobileBluetoothWireless" class="" onchange="checkSelect('drpMobileBluetoothWireless')" required>
+                                                                <option style="display: none;"></option>
+                                                                <option value="Yes" @(PPF?.MobileBluetoothWireless == "Yes" ? "selected" : "")>Yes</option>
+                                                                <option value="No" @(PPF?.MobileBluetoothWireless == "No" ? "selected" : "")>No</option>
+                                                            </select>
+                                                            <span class="placeholder">Bluetooth/Wireless</span>
+                                                        </div>
+
+                                                        <!--end here-->
+
+                                                        <div class="form-group col-md-4 col-12 input-block">
+                                                            <input @(disabled) value="@(PPF?.MobileOther ?? "")" type="text" id="txtMobileOther" name="txtMobileOther" class="inpDisable" required>
+                                                            <span class="placeholder TransView">Other</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="mb-2 d-none" id="divTablet">
+                                                    <div>
+                                                        <label class="f-600 mb-2"><b>Company Tablet</b></label>
+                                                    </div>
+
+                                                    <div class="form-row">
+                                                        <div class="form-group col-4 input-block">
+                                                            <input @(disabled) value="@(PPF?.TabletMake ?? "")" type="text" maxlength="15" id="txtTabletMake" name="txtTabletMake" class="inpDisable" required>
+                                                            <span for="drpInstrument" class="placeholder TransView">Make</span>
+                                                        </div>
+                                                        <div class="form-group col-4 input-block">
+                                                            <input @(disabled) value="@(PPF?.TabletModel ?? "")" type="text" maxlength="15" id="txtTabletModel" name="txtTabletModel" class="model-create inpDisable" required>
+                                                            <span class="placeholder TransView">Model</span>
+                                                        </div>
+                                                        <div class="form-group col-4 input-block">
+                                                            <input @(disabled) value="@(PPF?.TabletSerialIMEINo ?? "")" maxlength="15" type="text" id="txtTabletSerialIMEINo" name="txtTabletSerialIMEINo" class="inpDisable" required>
+                                                            <span for="drpInstrument" class="placeholder TransView">Serial/IMEI No</span>
+                                                        </div>
+
+                                                        <div class="form-group col-md-4 col-12 inputSelect">
+                                                            <select @(disabled) name="drpTabletSAVWIPLOwned" id="drpTabletSAVWIPLOwned" class="" onchange="checkSelect('drpTabletSAVWIPLOwned')">
+                                                                <option style="display: none;"></option>
+                                                                <option value="Yes" @(PPF?.TabletSAVWIPLOwned == "Yes" ? "selected" : "")>Yes</option>
+                                                                <option value="No" @(PPF?.TabletSAVWIPLOwned == "No" ? "selected" : "")>No</option>
+                                                            </select>
+                                                            <span class="placeholder TransView">MobiIPL Owned</span>
+                                                        </div>
+
+                                                        <!-- capture video/sound start -->
+                                                        <div class="form-group col-md-4 col-12 inputSelect">
+                                                            <select @(disabled) name="drpTabletCaptureVoiceSound" id="drpTabletCaptureVoiceSound" class="voice_create" onchange="checkSelect('drpTabletCaptureVoiceSound')">
+                                                                <option style="display: none;"></option>
+                                                                <option value="Yes" @(PPF?.TabletCaptureVoiceSound == "Yes" ? "selected" : "")>Yes</option>
+                                                                <option value="No" @(PPF?.TabletCaptureVoiceSound == "No" ? "selected" : "")>No</option>
+                                                            </select>
+                                                            <span class="placeholder TransView">Capture Voice/Sound</span>
+                                                        </div>
+
+                                                        <!-- Capture video start -->
+                                                        <div class="form-group col-md-4 col-12 inputSelect">
+                                                            <select @(disabled) name="drpTabletCapture" id="drpTabletCapture" class="" onchange="checkSelect('drpTabletCapture')" required>
+                                                                <option style="display: none;"></option>
+                                                                <option value="Yes" @(PPF?.TabletCapture == "Yes" ? "selected" : "")>Yes</option>
+                                                                <option value="No" @(PPF?.TabletCapture == "No" ? "selected" : "")>No</option>
+                                                            </select>
+                                                            <span class="placeholder TransView">Capture Video</span>
+                                                        </div>
+
+                                                        <!-- capture video end -->
+                                                        <!-- capture image start-->
+
+                                                        <div class="form-group col-md-4 col-12 inputSelect">
+                                                            <select @(disabled) name="drpTabletCaptureImages" id="drpTabletCaptureImages" onchange="checkSelect('drpTabletCaptureImages')">
+                                                                <option value="null" selected>Choose</option>
+                                                                <option value="Yes" @(PPF?.TabletCaptureImages == "Yes" ? "selected" : "")>Yes</option>
+                                                                <option value="No" @(PPF?.TabletCaptureImages == "No" ? "selected" : "")>No</option>
+                                                            </select>
+                                                            <span class="placeholder TransView">Capture Images</span>
+                                                        </div>
+
+                                                        <!--bluetooth/wireless start here-->
+
+                                                        <div class="form-group col-md-4 col-12 inputSelect">
+                                                            <select @(disabled) name="drpTabletBluetoothWireless" id="drpTabletBluetoothWireless" class="" onchange="checkSelect('drpTabletBluetoothWireless')" required>
+                                                                <option style="display: none;"></option>
+                                                                <option value="Yes" @(PPF?.TabletBluetoothWireless == "Yes" ? "selected" : "")>Yes</option>
+                                                                <option value="No" @(PPF?.TabletBluetoothWireless == "No" ? "selected" : "")>No</option>
+                                                            </select>
+                                                            <span class="placeholder">Bluetooth/Wireless</span>
+                                                        </div>
+
+                                                        <!--end here-->
+
+                                                        <div class="form-group col-md-4 col-12 input-block">
+                                                            <input @(disabled) value="@(PPF?.TabletOther ?? "")" type="text" id="txtTabletOther" name="txtTabletOther" class="inpDisable" required>
+                                                            <span class="placeholder TransView">Other</span>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+
+                                        <!--<div class="form-row">-->
+                                        <!-- activity validity start -->
+                                        <!--<div class="form-group col-md-6 col-12 input-block">
+
+                                            <input type="date" class="start_create" name="txtActivityStart" id="txtActivityStart" onclick="date_val(); onChangeActivityStart()" onchange="setInternalYear()" />
+                                            <span class="placeholder TransView">Activity Start</span>
+                                        </div>
+                                        <div class="form-group col-md-6 col-12 inputSelect" id="dateInput">
+
+                                            <select name="drpActivityEnd" id="drpActivityEnd" onclick="date_val_end()" onchange="date_val_end(), checkSelect('drpActivityEnd')" required></select>
+                                                <span class="placeholder TransView">Activity End</span>
+
+                                            <select name="drpActivityEnd" id="drpActivityEnd" onchange="date_val_end(), checkSelect('drpActivityEnd')"></select>
+
+                                            <input type="hidden" name="txtInternalActivityEnd" id="txtInternalActivityEnd"  />
+
+                                            <input type="date" name="txtActivityEnd" id="txtActivityEnd" onchange="date_val_end()"  />
+                                                <span class="placeholder TransView">Activity End</span>
+                                        </div>-->
+                                        <!-- activity validity end -->
+                                        <!--</div>-->
+                                        <div class="form-row">
+                                            <!-- LOCATION START -->
+
+                                            <div class="form-group col-md-6 col-12 inputSelect">
+                                                <select @(disabled) class="drpDisable" name="drpPAFLocation" id="drpPAFLocation" onchange="getZoneByArea(), checkSelect('drpPAFLocation')" required></select>
+                                                <span class="placeholder TransView">Location</span>
+                                            </div>
+
+
+                                            <!-- LOCATION END -->
+
+                                            <div class="form-group col-md-6 col-12 input-block">
+
+                                                <input value="@(PPF?.Zone ?? "")" type="text" name="txtZone" id="txtZone" class="" readonly required>
+                                                @*<input type="hidden" id="txtZoneHeadEmailId" name="txtZoneHeadEmailId" />*@
+                                                <input type="hidden" id="txtCostCenterNumberByZone" name="txtCostCenterNumberByZone" value="@(PPF?.CostCenterNumberByZone ?? 0)" />
+                                                <span class="placeholder TransView">Zone</span>
+                                            </div>
+                                            <!-- ZONE START -->
+
+
+                                            <div class="form-group col-md-6 col-12 inputSelect">
+                                                <select @(disabled) name="drpPreSeriesCarOrPart" id="drpPreSeriesCarOrPart" class="drpDisable" onchange="checkSelect('drpPreSeriesCarOrPart')" required>
+                                                    <option style="display: none;"></option>
+                                                    <option value="Yes" @(PPF?.PreSeriesCarOrPart == "Yes" ? "selected" : "")>Yes</option>
+                                                    <option value="No" @(PPF?.PreSeriesCarOrPart == "No" ? "selected" : "")>No</option>
+                                                </select>
+                                                <span class="placeholder TransView">Per-Series or Prototype?</span>
+                                            </div>
+
+
+                                            <div class="form-group col-md-6 col-12 col-12 inputSelect">
+                                                <select @(disabled) name="drpExceptionalPhoto" id="drpExceptionalPhoto" class="drpDisable" onchange="checkSelect('drpExceptionalPhoto')" required>
+                                                    <option style="display:none;"></option>
+                                                    <option value="Yes" @(PPF?.ExceptionalPhoto == "Yes" ? "selected" : "")>Yes</option>
+                                                    <option value="No" @(PPF?.ExceptionalPhoto == "No" ? "selected" : "")>No</option>
+                                                </select>
+                                                <span class="placeholder">Exceptional Photo?</span>
+                                                <div class="f-600"><small>Exceptional Photo? (Pre-series Full Car/Partial car with characteristics/ Cockpit). If Yes, Contact Comm’n & SO Dept.</small></div>
+                                            </div>
+
+                                            <div class="form-group col-md-12 col-12 input-block">
+
+                                                <textarea name="txtPurpose" class="bt-none inpDisable textareawidth photogrphy-textarea" id="txtPurpose" maxlength="500" rows="3" cols="200" required @(disabled)>@(PPF?.Purpose ?? "")</textarea>
+                                                <span class="placeholder TransView">Purpose</span>
+                                                <div id="hiddenApproverInformation"></div>
+                                            </div>
+
+                                            <!-- ZONE END -->
+
+                                        </div>
+
+                                        <div class="form-row">
+                                            <div class="form-group col-md-6 col-12 inputSelect">
+                                                @*<input type="date" name="txtValidFrom" id="txtValidFrom" @(disabled) class="author-width-validfrom" value="@(!IsNew ? (PPF?.ValidFrom.ToShortDateString() ?? " ") : " ")" min="@(PPF?.ValidFrom.ToString("yyyy-MM-dd"))" max="@(PPF?.ValidFrom.ToString("yyyy-MM-dd"))">*@
+
+                                                <input type="date" name="txtValidFrom" id="txtValidFrom" value="@(PPF?.ValidFrom.ToString("yyyy-MM-dd"))" @(disabled) onclick="setStartDate()" class="author-width-validfrom spanUpperSide">
+
+                                                <span class="placeholder TransView">Valid From</span>
+                                            </div>
+
+                                            <div class="form-group col-md-6 col-12 inputSelect">
+                                                @*<input @(disabled) type="date" name="txtValidTo" id="txtValidTo" class="author-width" min="@(PPF?.ValidTo.ToString("yyyy-MM-dd"))" max="@(PPF?.ValidTo.ToString("yyyy-MM-dd"))"></td>
+                                                    <td class="display-none">*@
+
+                                                <input type="date" onclick="date_val_end()" name="txtValidTo" id="txtValidTo" class="author-width spanUpperSide" value="@(PPF?.ValidTo.ToString("yyyy-MM-dd"))" @(disabled)>
+
+                                                <span class="placeholder TransView">Valid To</span>
+                                            </div>
+
+                                            <div>
+                                                <small>Note:<span class="ml-1 d-inline-block">(Validity: maximum 01 year for pre-series related photography, for other, 5 yrs for MobiIPL employees )</span></small>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header collapsed" id="headingThree" data-toggle="collapse" data-target="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven">
+                                    <h5 class="mb-0">
+                                        <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven">
+                                            <img src="~/assets/img/termsIcon.svg" width="24" height="24" class="mr-2" />  General Info / Terms & Conditions
+
+                                        </button>
+                                    </h5>
+                                </div>
+                                <div id="collapseSeven" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
+                                    <div class="card-body">
+                                        <table border="0" cellpadding="0" cellspacing="0" class="w-100">
+                                            <tr>
+                                                <td colspan="3" class="allFormLables borderLTB f-600">
+                                                    The designated user understands:
+                                                </td>
+
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3" class="allFormLables borderLTB f-600">
+                                                    <label class="photography-para"> • That he/she will refrain from making use of any video-capturing and/or picture-capturing facilities of the video camera/camera detailed above, for personal or any other usage other than authorized, within the premises of  MobiNext Technologies  Private Limited  unless explicit authorization is granted by the Head of Department.</label>
+
+                                                </td>
+
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3" class="allFormLables borderLTB f-600">
+                                                    <label class="photography-para">• That he/she will, without resistance, allow applicable authorities (Security Department) at MobiNext Technologies  Private Limited to perform an audit on the above mentioned video camera/ camera at any time while within the company premises.</label>
+
+                                                </td>
+
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3" class="allFormLables borderLTB f-600">
+                                                    <label class="photography-para">• That this form relates only to MobiNext Technologies  Private Limited premises and has no equity or influence within other companies in the Volkswagen Group.</label>
+                                                </td>
+
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3" class="allFormLables borderLTB f-600">
+                                                    <label class="photography-para">• That failing to comply with the above could result in disciplinary action, which may lead to dismissal in accordance with the merits of the case.</label>
+                                                </td>
+
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3" class="allFormLables borderLTB f-600">
+                                                    <label class="photography-para">• That in respect of non- MobiNext Technologies  Private Limited persons, should any breach of these provisions be identified.  MobiIPL shall be entitled to prevent access of such persons to the MobiIPL premises in future and reserves the right to initiate civil proceedings against such persons, in accordance with the merits of the transgression.</label>
+                                                </td>
+
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3" class="allFormLables borderLTB f-600">
+                                                    Please note: This from is only applicable to the above mentioned devices and for the stipulated period.
+                                                </td>
+
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3" class="allFormLables borderLTB f-600">
+                                                    <label id="lblchkDeclaration"></label>   Declaration
+                                                </td>
+
+                                            </tr>
+                                            @if (IsNewMode)
+                                            {
+                                                <tr>
+                                                    <td colspan="3"><input type="checkbox" id="termsAndConditions" name="termsAndConditions" value="" class="mr-1"><span class="f-600">I declare that I have read above mentioned instructions and will abide by it & will wear a photo ‘jacket’ in Red & Orange zone.</span></td>
+                                                </tr>
+                                            }
+                                            else if (IsEditMode)
+                                            {
+                                                <tr>
+                                                    <td colspan="3"><input type="checkbox" id="termsAndConditions" name="termsAndConditions" value="" class="f-600 mr-1" checked><span class="f-600">I declare that I have read above mentioned instructions and will abide by it & will wear a photo ‘jacket’ in Red & Orange zone.</span> </td>
+                                                </tr>
+                                            }
+                                            else if (IsViewMode)
+                                            {
+                                                <tr>
+                                                    <td colspan="3"><input type="checkbox" id="termsAndConditions" name="termsAndConditions" value="" class="f-600 mr-1" checked disabled><span class="f-600">I declare that I have read above mentioned instructions and will abide by it & will wear a photo ‘jacket’ in Red & Orange zone.</span> </td>
+                                                </tr>
+                                            }
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- END HERE ACCORDIAN -->
+
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        @if (IsViewMode || IsEditMode)
+        {
+            <div id="accordion">
+                <div class="card">
+                    <div class="card-header collapsed" id="headingFour" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                        <h5 class="mb-0">
+                            <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                                <img src="~/assets/img/approvalTracking.svg" width="24" height="24" class="mr-2" />Approval Tracking
+                            </button>
+                        </h5>
+                    </div>
+                    <div id="collapseFour" class="collapse" aria-labelledby="headingFour">
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="col-12">
+                                    <table class="table w-100 td-border showBorder">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Role</th>
+                                                <th>Processed on</th>
+                                                <th>Status</th>
+                                                <th class="text-center">Comments</th>
+                                                <th class="text-center">Approval Level</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @if (!IsNew || !IsEdit)
+                                            {
+                                                Html.RenderPartial("_ApprovalTracking", appList);
+                                            }
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @*<div id="accordion">
+                    <div class="card">
+                        <div class="card-header collapsed" id="headingFive" data-toggle="collapse" data-target="#collapseFive" aria-expanded="true" aria-controls="collapseFive">
+                            <h5 class="mb-0">
+                                <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFive" aria-expanded="true" aria-controls="collapseFive">
+                                    <img src="~/assets/img/approvalTracking.svg" width="24" height="24" class="mr-2" /> Action
+                                </button>
+                            </h5>
+                        </div>
+
+                        <div id="collapseFive" class="collapse" aria-labelledby="headingFive">
+                            <div class="card-body actionTab">
+                                <div class="form-row">
+                                    <div class="form-group col-md-4 col-12 input-block">
+                                        <table>
+                                            <tr class="bg-color-2">
+                                                <td colspan="3" class="bb-none align authorize-td">
+                                                    <label class="f-600 pr-2 text-capitalize">Valid from:</label>
+                                                    <input type="date" name="txtValidFrom" id="txtValidFrom" @(CurrentUserDesgn == SecurityDesgnString ? "" : "disabled") class="author-width-validfrom" value="@(!IsNew ? (PPF?.ValidFrom.ToShortDateString() ?? " ") : " ")" min="@(PPF?.ActivityStart.ToString("yyyy-MM-dd"))" max="@(PPF?.ActivityEnd.ToString("yyyy-MM-dd"))">
+                                                </td>
+                                                <td colspan="2" class="bb-none align authorize-td"><label class="f-600 pr-2 text-capitalize">Valid to:</label><input type="date" name="txtValidTo" id="txtValidTo" @(CurrentUserDesgn == SecurityDesgnString ? "" : "disabled") class="author-width" min="@(PPF?.ActivityStart.ToString("yyyy-MM-dd"))" max="@(PPF?.ActivityEnd.ToString("yyyy-MM-dd"))"></td>
+                                                <td class="display-none"></td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" class="style_size clr-2 f-12 align span-pl">
+                                                    <span class="style_size clr-2 f-12 span-pl">(Validity: maximum 01 year for pre-series related photography, for other, 5 yrs for MobiIPL employees )</span>
+                                                </td>
+                                                <td class="display-none"></td>
+                                                <td class="display-none"></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>*@
+        }
+
+        @if (IsNew)
+        {
+            if (!IsEdit)
+            {
+                <div class="card-footer align-content-center">
+                    <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                        Re-Submit
+                    </button>
+                    <button type="reset" class="btn btn-danger btn-sm cancl-btn" id="btnCancel">
+                        Cancel
+                    </button>
+                </div>
+            }
+            else
+            {
+                <div class="card-footer align-content-center">
+                    <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                        Submit
+                    </button>
+                    <button type="reset" class="btn btn-danger btn-sm cancl-btn" id="btnCancel">
+                        Cancel
+                    </button>
+                </div>
+            }
+        }
+    </form>
+</div>
+<div class="modal fade" id="successModel" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" >
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header modelHeader">
+                <span class="modal-title modalMsgTitle" id="modalTitle"></span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label id="modalBody" class="lableMsg">  </label>
+                <input type="hidden" id="tab" value="0" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="submitBomBtn publishBtn" id="modalOkButton" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var spinner = $('#loader');
+    var currentUserDesgn = @Html.Raw(Json.Encode(CurrentUserDesgn));
+    var IsNew = @Html.Raw(Json.Encode(IsNew));
+    var IsEdit = @Html.Raw(Json.Encode(IsEdit));
+    var IsNewMode = @Html.Raw(Json.Encode(IsNewMode));
+    var IsEditMode = @Html.Raw(Json.Encode(IsEditMode));
+    var IsViewMode = @Html.Raw(Json.Encode(IsViewMode));
+    var PPF = @Html.Raw(Json.Encode(PPF));
+    var appRowId = @Html.Raw(Json.Encode(AppRowId));
+    var approvalType =@Html.Raw(Json.Encode(ApprovalType));
+    var FlagRedirect = @Html.Raw(Json.Encode(FlagRedirect));
+    var SecurityDesgnString = @Html.Raw(Json.Encode(SecurityDesgnString));
+
+    pageLoad();
+    var errorCount = 0;
+    var errors = "";
+    function pageLoad() {
+        //
+        //console.log(PPF)
+        $("#headingErr").addClass('d-none');
+        getArea();
+
+        if (IsViewMode || IsEditMode) {
+
+            var selectedVideoCameraDevice = PPF.VideoCameraDevice;
+            var selectedCameraDevice = PPF.CameraDevice;
+            var selectedMobileDevice = PPF.MobileDevice;
+            var selectedTabletDevice = PPF.TabletDevice;
+            if (selectedVideoCameraDevice == "VideoCamera") {
+                $("#divVideoCamera").removeClass('d-none');
+                $("#drpVideoCameraSAVWIPLOwned").addClass('spanUpperSide');
+                
+                $("#drpVideoCameraCaptureVoiceSound").addClass('spanUpperSide');
+                $("#drpVideoCameraCaptureImages").addClass('spanUpperSide');
+                $("#drpVideoCameraBluetoothWireless").addClass('spanUpperSide');
+                $("#drpVideoCameraCaptureVideo").addClass('spanUpperSide');
+            }
+            if (selectedCameraDevice == "Camera") {
+                $("#divCamera").removeClass('d-none');
+                $("#drpCameraSAVWIPLOwned").addClass('spanUpperSide');
+                $("#drpCameraCaptureVoiceSound").addClass('spanUpperSide');
+                $("#drpCameraCapture").addClass('spanUpperSide');
+                $("#drpCameraCaptureImages").addClass('spanUpperSide');
+                $("#drpCameraBluetoothWireless").addClass('spanUpperSide');
+            }
+            if (selectedMobileDevice == "Mobile") {
+                $("#divMobile").removeClass('d-none');
+                $("#drpMobileSAVWIPLOwned").addClass('spanUpperSide');
+                $("#drpMobileCaptureVoiceSound").addClass('spanUpperSide');
+                $("#drpMobileCapture").addClass('spanUpperSide');
+                $("#drpMobileCaptureImages").addClass('spanUpperSide');
+                $("#drpMobileBluetoothWireless").addClass('spanUpperSide');
+            }
+            if (selectedTabletDevice == "Tablet") {
+                $("#divTablet").removeClass('d-none');
+                $("#drpTabletSAVWIPLOwned").addClass('spanUpperSide');
+                $("#drpTabletCaptureVoiceSound").addClass('spanUpperSide');
+                $("#drpTabletCapture").addClass('spanUpperSide');
+                $("#drpTabletCaptureImages").addClass('spanUpperSide');
+                $("#drpTabletBluetoothWireless").addClass('spanUpperSide');
+            }
+            $("#drpPAFLocation").addClass('spanUpperSide');
+            $("#drpPreSeriesCarOrPart").addClass('spanUpperSide');
+            $("#drpExceptionalPhoto").addClass('spanUpperSide');
+            $("#txtPurpose").addClass('spanUpperSide');
+
+        }
+        else if (IsViewMode)
+        { $("#divRequestSubmissionFor").addClass('d-none'); }
+    }
+
+    function successModal(txt) {
+        //
+        $('#modalTitle').html('Success');
+        if (txt == "approve") {
+            $('#modalBody').html('Form has been approved!');
+        }
+        else if (txt == "reject") {
+            $('#modalBody').html('Form has been rejected!');
+        }
+        else if (txt == "enquire") {
+            $('#modalBody').html('Form has been enquired!');
+        }
+        else if (txt == "cancelled") {
+            $('#modalBody').html('Form has been cancelled!');
+        }
+        else {
+            if (IsEditMode) {
+                $('#modalBody').html('Your form with ID: PAF' + txt + ' has been re-submitted! Kindly use this for future reference');
+            }
+            else {
+                $('#modalBody').html('Your form with ID: PAF' + txt + ' has been submitted! Kindly use this for future reference');
+            }
+
+        }
+        FlagRedirect = txt;
+        //$("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    //function failureModal() {
+    //    $('#modalTitle').html('Failure');
+    //    $('#modalBody').html('Some error occurred!');
+    //    $("#modalOkButton").attr('data-dismiss', 'modal');
+    //    $("#successModel").modal('show');
+    //}
+    function failureModal(txt) {
+        if (txt == null) {
+            $('#modalBody').html('Some error occurred!');
+        }
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html(txt);
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function permissionModal() {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html('No permssion granted since the device is not MobiIPL owned!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function requiredModal(text) {
+        $('#modalTitle').html('Required!');
+        $('#modalBody').html(text);
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function validityModal(txt) {
+        ////
+        if (txt == 'approve') {
+            DisplayAlert('error', 'Error', 'Please select the Type of Car');
+        }
+        else if (txt == 'reject') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for rejecting the form');
+        }
+        else if (txt == 'enquire') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for enquiring the form');
+        }
+
+    }
+
+    function getZoneByArea() {
+        //
+        var dropdown = document.getElementById("drpPAFLocation");
+        var costCenterNumberByZone = dropdown.options[dropdown.selectedIndex].id;
+        /*    $("#txtZoneHeadEmailId").val(zoneHeadEmailId);*/
+        $("#txtCostCenterNumberByZone").val(costCenterNumberByZone);
+        getZone();
+
+    }
+
+    function onChangeActivityStart() {
+        //var activityEnd = document.getElementById("txtActivityEnd");
+        //console.log(activityEnd);
+        //activityEnd.value = "";
+    }
+
+    function date_val() {
+        var today = new Date().toISOString().split('T')[0];
+        document.getElementsByName("txtActivityStart")[0].setAttribute("min", today);
+    }
+
+    function setInternalYear() {
+        //
+        if (!IsEdit) {
+            var value = JSON.stringify(PPF[0]);
+            var value_1 = JSON.parse(value);
+            var activityEndDate = value_1.Value[0].ActivityEnd;
+            var regExp = /\(([^)]+)\)/;
+            var valueNumber = regExp.exec(activityEndDate);
+            var x = parseInt(valueNumber[1]);
+            var valueNumberDate = new Date(x);
+            var valueNumberDateYear = valueNumberDate.getFullYear();
+
+            var year_string = document.getElementsByName("txtActivityStart")[0].value;
+            var parts = year_string.split("-");
+            var year = new Date(parts[0], parts[1] - 1, parts[2]);
+            var min_year = year;
+            let initial_year = parseInt(parts[0]);
+            let final_year = parseInt(parts[0]) + 5;
+            var s = '<option value="-1">Choose End Year</option>';
+            for (i = initial_year + 1; i <= final_year; i++) {
+                if (i == valueNumberDateYear) {
+                    s += '<option value="' + i + '" selected>' + i + '</option>';
+                }
+                else {
+                    s += '<option value="' + i + '">' + i + '</option>';
+                }
+            }
+            $("#drpActivityEnd").html(s);
+        }
+        else {
+            var year_string = document.getElementsByName("txtActivityStart")[0].value;
+            var parts = year_string.split("-");
+            var year = new Date(parts[0], parts[1] - 1, parts[2]);
+            var min_year = year;
+            let initial_year = min_year.getFullYear();
+            let final_year = min_year.getFullYear() + 5;
+            var s = '<option value="-1">Choose End Year</option>';;
+            for (i = initial_year + 1; i <= final_year; i++) {
+                s += '<option value=" ' + i + ' ">' + i + '</option>';
+            }
+            $("#drpActivityEnd").html(s);
+        }
+
+    }
+
+    //function date_val_end() {
+    //    
+    //    //var dropdownValEnd = document.getElementById("chkEmployeeType").value;
+    //    //if (dropdownValEnd == "Internal") {
+    //    //    var year_string = document.getElementsByName("txtActivityStart")[0].value;
+    //    //    var parts = year_string.split("-");
+    //    //    var year = new Date(parts[0], parts[1] - 1, parts[2]);
+    //    //    var min_year = year;
+    //    //    min_year.setDate(min_year.getDate() + 1);
+    //    //    var yearInternal = document.getElementById("drpActivityEnd").value;
+    //    //    console.log(yearInternal);
+    //    //    var max_year = year;
+    //    //    max_year.setFullYear(yearInternal);
+    //    //    max_year.setDate(max_year.getDate() - 1);
+    //    //    var final_year = max_year.toISOString().split('T')[0];
+    //    //    console.log(final_year);
+    //    //    document.getElementById("txtInternalActivityEnd").value = final_year;
+    //    //}
+
+    //    //else if (dropdownValEnd == "External") {
+    //    //    var week_string = document.getElementsByName("txtActivityStart")[0].value;
+    //    //    var parts = week_string.split("-");
+    //    //    var date = new Date(parts[0], parts[1] - 1, parts[2]);
+    //    //    var min_date = date;
+    //    //    min_date.setDate(min_date.getDate() + 1);
+    //    //    var initial_date = min_date.toISOString().split('T')[0];
+    //    //    var max_date = date;
+    //    //    max_date.setDate(max_date.getDate() + 6);
+    //    //    var final_date = max_date.toISOString().split('T')[0];
+    //    //    document.getElementsByName("txtActivityEnd")[0].setAttribute("min", initial_date);
+    //    //    document.getElementsByName("txtActivityEnd")[0].setAttribute("max", final_date);
+    //    //}
+    //    //else if (dropdownValEnd == "Partner Employee") {
+    //    //    var year_string = document.getElementsByName("txtActivityStart")[0].value;
+    //    //    var parts = year_string.split("-");
+    //    //    var year = new Date(parts[0], parts[1] - 1, parts[2]);
+    //    //    var min_year = year;
+    //    //    min_year.setDate(min_year.getDate() + 1);
+    //    //    var initial_year = min_year.toISOString().split('T')[0];
+    //    //    console.log(initial_year);
+    //    //    var max_year = year;
+    //    //    max_year.setFullYear(max_year.getFullYear() + 1);
+    //    //    max_year.setDate(max_year.getDate() - 1);
+    //    //    var final_year = max_year.toISOString().split('T')[0];
+    //    //    console.log(final_year);
+    //    //    document.getElementsByName("txtActivityEnd")[0].setAttribute("min", initial_year);
+    //    //    document.getElementsByName("txtActivityEnd")[0].setAttribute("max", final_year);
+    //    //}
+    //}
+
+    function allowNumbersOnly(e) {
+                                                                var code = (e.which) ? e.which : e.keyCode;
+                                                                if (code > 31 && (code < 48 || code > 57)) {
+                                                                e.preventDefault();
+                                                                }
+                                                                }
+
+    function getArea() {
+     
+
+        if (IsViewMode || IsEditMode) {
+                                                                var selectedLocation = PPF.PAFLocation;
+                                                                console.log(selectedLocation);
+                                                                $.ajax({
+                                                                url: '/PhotographyPermit/Areas',
+                                                                type: 'GET',
+                                                                data: {},
+                                                                dataType: 'JSON',
+                                                                success: (function (data) {
+                                                                locdata = data;
+
+                                                                console.log(data);
+                                                                var s = '<option style="display: none;"></option>';
+
+                                                                for (var i = 0; i < data.length; i++) {
+                                                                    if (data[i].PAFLocation == selectedLocation) {
+                                                                    s += '<option value="' + data[i].PAFLocation + '" id="' + data[i].CostCenterNumberByZone + '" selected>' + data[i].PAFLocation + '</option>';
+                                                                }
+                                                                else {
+                                                                    s += '<option value="' + data[i].PAFLocation + '" id="' + data[i].CostCenterNumberByZone + '">' + data[i].PAFLocation + '</option>';
+                                                                }
+                                                                }
+                                                                $("#drpPAFLocation").html(s);
+                                                                }),
+                                                                error: (function (data) {
+                                                                //code
+                                                                })
+                                                                })
+                                                                }
+                                                                else {
+                                                                $.ajax({
+                                                                    url: '/PhotographyPermit/Areas',
+                                                                type: 'GET',
+                                                                data: {},
+                                                                dataType: 'JSON',
+                                                                success: (function (data) {
+                                                                locdata = data;
+
+                                                                console.log(data);
+                                                                var s = '<option style="display: none;"></option>';
+
+                                                                for (var i = 0; i < data.length; i++) {
+                                                                    s += '<option value="' + data[i].PAFLocation + '" id="' + data[i].CostCenterNumberByZone + '">' + data[i].PAFLocation + '</option>';
+                                                                }
+                                                                $("#drpPAFLocation").html(s);
+
+
+                                                                }),
+                                                                error: (function (data) {
+                                                                //code
+                                                                })
+                                                                })
+                                                                }
+
+                                                                }
+
+    function getZone() {
+        //
+                                                                //
+                                                                $.ajax({
+                                                                    url: '/PhotographyPermit/Areas',
+                                                                type: 'GET',
+                                                                data: {},
+                                                                dataType: 'JSON',
+                                                                success: (function (data) {
+                                                                locdata = data;
+
+                                                                var selection = $("#drpPAFLocation").val();
+
+                                                                for (var i = 0; i < data.length; i++) {
+                                                                    if (data[i].PAFLocation == selection) {
+
+                                                                var zone = data[i].Zone;
+
+                                                                $("#txtZone").val(zone);
+                                                                }
+                                                                else if (-1 == selection) {
+                                                                var emptyValue = "";
+                                                                $("#txtZone").val(emptyValue)
+                                                                }
+                                                                }
+                                                                }),
+                                                                error: (function (data) {
+                                                                //code
+                                                                })
+                                                                })
+                                                                }
+
+    $("#btnSubmit").on('click', function (e) {
+        //
+        validateSubmitter();
+        validateApplicant();
+
+        if ($('.deviceCheck:checkbox:checked').length == 0) {
+            errors += "<li id='error" + errorCount + "'>" + "Device" + "</li>";
+            $("#chkVideoCamera").addClass('removeDevice');
+            $("#chkCamera").addClass('removeDevice');
+            $("#chkMobile").addClass('removeDevice');
+            $("#chkTablet").addClass('removeDevice');
+            AddError("lblDevice", 'removeDevice', errorCount);
+            errorCount++;
+        }
+
+        //if ($("#ChkThirdPartyPhotographer").prop("checked") == false) {
+        //    errors += "<li id='error" + errorCount + "'>" + "3rd Party Photographer" + "</li>";
+        //    $("#ChkThirdPartyPhotographer").addClass('removeThirdPartyPhotographer');
+        //    AddError("lblThirdPartyPhotographer", 'removeThirdPartyPhotographer', errorCount);
+        //    errorCount++;
+        //}
+
+
+        if ($("#chkVideoCamera").prop("checked") == true) {
+
+            var txtVideoCameraMake = document.getElementById("txtVideoCameraMake").value;
+            if (txtVideoCameraMake == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Video Camera Make" + "</li>";
+                AddError("txtVideoCameraMake", '', errorCount);
+                errorCount++;
+            }
+
+            var txtVideoCameraModel = document.getElementById("txtVideoCameraModel").value;
+            if (txtVideoCameraModel == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Video Camera Model" + "</li>";
+                AddError("txtVideoCameraModel", '', errorCount);
+                errorCount++;
+            }
+
+            var txtVideoCameraSerialIMEINo = document.getElementById("txtVideoCameraSerialIMEINo").value;
+            if (txtVideoCameraSerialIMEINo == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Video Camera Serial IMEI No" + "</li>";
+                AddError("txtVideoCameraSerialIMEINo", '', errorCount);
+                errorCount++;
+            }
+
+            var drpVideoCameraSAVWIPLOwned = $("#drpVideoCameraSAVWIPLOwned option:selected").val();
+            if (drpVideoCameraSAVWIPLOwned == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Video Camera MobiIPL Owned" + "</li>";
+                AddError("drpVideoCameraSAVWIPLOwned", '', errorCount);
+                errorCount++;
+            }
+
+            var drpVideoCameraCaptureVoiceSound = $("#drpVideoCameraCaptureVoiceSound option:selected").val();
+            if (drpVideoCameraCaptureVoiceSound == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Video Camera Capture Voice/Sound" + "</li>";
+                AddError("drpVideoCameraCaptureVoiceSound", '', errorCount);
+                errorCount++;
+            }
+
+            var drpVideoCameraCaptureVideo = $("#drpVideoCameraCaptureVideo option:selected").val();
+            if (drpVideoCameraCaptureVideo == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Video Camera Capture Video" + "</li>";
+                AddError("drpVideoCameraCaptureVideo", '', errorCount);
+                errorCount++;
+            }
+
+            var drpVideoCameraCaptureImages = $("#drpVideoCameraCaptureImages option:selected").val();
+            if (drpVideoCameraCaptureImages == "null") {
+                errors += "<li id='error" + errorCount + "'>" + "Video Camera Capture Images" + "</li>";
+                AddError("drpVideoCameraCaptureImages", '', errorCount);
+                errorCount++;
+            }
+
+            var drpVideoCameraBluetoothWireless = $("#drpVideoCameraBluetoothWireless option:selected").val();
+            if (drpVideoCameraBluetoothWireless == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Video Camera Bluetooth/Wireless" + "</li>";
+                AddError("drpVideoCameraBluetoothWireless", '', errorCount);
+                errorCount++;
+            }
+
+            //var txtVideoCameraOther = document.getElementById("txtVideoCameraOther").value;
+            //if (txtVideoCameraOther == "") {
+            //    errors += "<li id='error" + errorCount + "'>" + "Video Camera Other" + "</li>";
+            //    AddError("txtVideoCameraOther", '', errorCount);
+            //    errorCount++;
+            //}
+        }
+
+        if ($("#chkCamera").prop("checked") == true) {
+
+            var txtCameraMake = document.getElementById("txtCameraMake").value;
+            if (txtCameraMake == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Business Camera Make" + "</li>";
+                AddError("txtCameraMake", '', errorCount);
+                errorCount++;
+            }
+
+            var txtCameraModel = document.getElementById("txtCameraModel").value;
+            if (txtCameraModel == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Business Camera Model" + "</li>";
+                AddError("txtCameraModel", '', errorCount);
+                errorCount++;
+            }
+
+            var txtCameraSerialIMEINo = document.getElementById("txtCameraSerialIMEINo").value;
+            if (txtCameraSerialIMEINo == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Business Camera Serial IMEI No" + "</li>";
+                AddError("txtCameraSerialIMEINo", '', errorCount);
+                errorCount++;
+            }
+
+            var drpCameraSAVWIPLOwned = $("#drpCameraSAVWIPLOwned option:selected").val();
+            if (drpCameraSAVWIPLOwned == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Business Camera MobiIPL Owned" + "</li>";
+                AddError("drpCameraSAVWIPLOwned", '', errorCount);
+                errorCount++;
+            }
+
+            var drpCameraCaptureVoiceSound = $("#drpCameraCaptureVoiceSound option:selected").val();
+            if (drpCameraCaptureVoiceSound == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Business Camera Capture Voice/Sound" + "</li>";
+                AddError("drpCameraCaptureVoiceSound", '', errorCount);
+                errorCount++;
+            }
+
+            var drpCameraCapture = $("#drpCameraCapture option:selected").val();
+            if (drpCameraCapture == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Business Camera Capture Video" + "</li>";
+                AddError("drpCameraCapture", '', errorCount);
+                errorCount++;
+            }
+
+            var drpCameraCaptureImages = $("#drpCameraCaptureImages option:selected").val();
+            if (drpCameraCaptureImages == "null") {
+                errors += "<li id='error" + errorCount + "'>" + "Business Camera Capture Images" + "</li>";
+                AddError("drpCameraCaptureImages", '', errorCount);
+                errorCount++;
+            }
+
+            var drpCameraBluetoothWireless = $("#drpCameraBluetoothWireless option:selected").val();
+            if (drpCameraBluetoothWireless == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Business Camera Bluetooth/Wireless" + "</li>";
+                AddError("drpCameraBluetoothWireless", '', errorCount);
+                errorCount++;
+            }
+
+            //var txtCameraOther = document.getElementById("txtCameraOther").value;
+            //if (txtCameraOther == "") {
+            //    errors += "<li id='error" + errorCount + "'>" + "Camera Other" + "</li>";
+            //    AddError("txtCameraOther", '', errorCount);
+            //    errorCount++;
+            //}
+        }
+
+        if ($("#chkMobile").prop("checked") == true) {
+
+            var txtMobileMake = document.getElementById("txtMobileMake").value;
+            if (txtMobileMake == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Company Mobile Make" + "</li>";
+                AddError("txtMobileMake", '', errorCount);
+                errorCount++;
+            }
+
+            var txtMobileModel = document.getElementById("txtMobileModel").value;
+            if (txtMobileModel == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Company Mobile Model" + "</li>";
+                AddError("txtMobileModel", '', errorCount);
+                errorCount++;
+            }
+
+            var txtMobileSerialIMEINo = document.getElementById("txtMobileSerialIMEINo").value;
+            if (txtMobileSerialIMEINo == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Company Mobile Serial IMEI No" + "</li>";
+                AddError("txtMobileSerialIMEINo", '', errorCount);
+                errorCount++;
+            }
+
+            var drpMobileSAVWIPLOwned = $("#drpMobileSAVWIPLOwned option:selected").val();
+            if (drpMobileSAVWIPLOwned == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Company Mobile MobiIPL Owned" + "</li>";
+                AddError("drpMobileSAVWIPLOwned", '', errorCount);
+                errorCount++;
+            }
+
+            var drpMobileCaptureVoiceSound = $("#drpMobileCaptureVoiceSound option:selected").val();
+            if (drpMobileCaptureVoiceSound == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Company Mobile Capture Voice/Sound" + "</li>";
+                AddError("drpMobileCaptureVoiceSound", '', errorCount);
+                errorCount++;
+            }
+
+            var drpMobileCapture = $("#drpMobileCapture option:selected").val();
+            if (drpMobileCapture == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Company Mobile Capture Video" + "</li>";
+                AddError("drpMobileCapture", '', errorCount);
+                errorCount++;
+            }
+
+            var drpMobileCaptureImages = $("#drpMobileCaptureImages option:selected").val();
+            if (drpMobileCaptureImages == "null") {
+                errors += "<li id='error" + errorCount + "'>" + "Company Mobile Capture Images" + "</li>";
+                AddError("drpMobileCaptureImages", '', errorCount);
+                errorCount++;
+            }
+
+            var drpMobileBluetoothWireless = $("#drpMobileBluetoothWireless option:selected").val();
+            if (drpMobileBluetoothWireless == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Company Mobile Bluetooth/Wireless" + "</li>";
+                AddError("drpMobileBluetoothWireless", '', errorCount);
+                errorCount++;
+            }
+
+            //var txtMobileOther = document.getElementById("txtMobileOther").value;
+            //if (txtMobileOther == "") {
+            //    errors += "<li id='error" + errorCount + "'>" + "Mobile Other" + "</li>";
+            //    AddError("txtMobileOther", '', errorCount);
+            //    errorCount++;
+            //}
+        }
+
+        if ($("#chkTablet").prop("checked") == true) {
+
+            var txtTabletMake = document.getElementById("txtTabletMake").value;
+            if (txtTabletMake == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Company Tablet Make" + "</li>";
+                AddError("txtTabletMake", '', errorCount);
+                errorCount++;
+            }
+
+            var txtTabletModel = document.getElementById("txtTabletModel").value;
+            if (txtTabletModel == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Company Tablet Model" + "</li>";
+                AddError("txtTabletModel", '', errorCount);
+                errorCount++;
+            }
+
+            var txtTabletSerialIMEINo = document.getElementById("txtTabletSerialIMEINo").value;
+            if (txtTabletSerialIMEINo == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Company Tablet Serial IMEI No" + "</li>";
+                AddError("txtTabletSerialIMEINo", '', errorCount);
+                errorCount++;
+            }
+
+            var drpTabletSAVWIPLOwned = $("#drpTabletSAVWIPLOwned option:selected").val();
+            if (drpTabletSAVWIPLOwned == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Company Tablet MobiIPL Owned" + "</li>";
+                AddError("drpTabletSAVWIPLOwned", '', errorCount);
+                errorCount++;
+            }
+
+            var drpTabletCaptureVoiceSound = $("#drpTabletCaptureVoiceSound option:selected").val();
+            if (drpTabletCaptureVoiceSound == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Company Tablet Capture Voice/Sound" + "</li>";
+                AddError("drpTabletCaptureVoiceSound", '', errorCount);
+                errorCount++;
+            }
+
+            var drpTabletCapture = $("#drpTabletCapture option:selected").val();
+            if (drpTabletCapture == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Company Tablet Capture Video" + "</li>";
+                AddError("drpTabletCapture", '', errorCount);
+                errorCount++;
+            }
+
+            var drpTabletCaptureImages = $("#drpTabletCaptureImages option:selected").val();
+            if (drpTabletCaptureImages == "null") {
+                errors += "<li id='error" + errorCount + "'>" + "Company Tablet Capture Images" + "</li>";
+                AddError("drpTabletCaptureImages", '', errorCount);
+                errorCount++;
+            }
+
+            var drpTabletBluetoothWireless = $("#drpTabletBluetoothWireless option:selected").val();
+            if (drpTabletBluetoothWireless == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Company Tablet Bluetooth/Wireless" + "</li>";
+                AddError("drpTabletBluetoothWireless", '', errorCount);
+                errorCount++;
+            }
+
+            //var txtTabletOther = document.getElementById("txtTabletOther").value;
+            //if (txtTabletOther == "") {
+            //    errors += "<li id='error" + errorCount + "'>" + "Tablet Other" + "</li>";
+            //    AddError("txtTabletOther", '', errorCount);
+            //    errorCount++;
+            //}
+        }
+
+        var drpPAFLocation = $("#drpPAFLocation option:selected").val();
+        if (drpPAFLocation == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Location" + "</li>";
+            AddError("drpPAFLocation", '', errorCount);
+            errorCount++;
+        }
+
+        var drpPreSeriesCarOrPart = $("#drpPreSeriesCarOrPart option:selected").val();
+        if (drpPreSeriesCarOrPart == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Per-Series or Prototype" + "</li>";
+            AddError("drpPreSeriesCarOrPart", '', errorCount);
+            errorCount++;
+        }
+
+        var drpExceptionalPhoto = $("#drpExceptionalPhoto option:selected").val();
+        if (drpExceptionalPhoto == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Exceptional Photo" + "</li>";
+            AddError("drpExceptionalPhoto", '', errorCount);
+            errorCount++;
+        }
+
+        var txtPurpose = document.getElementById("txtPurpose").value;
+        if (txtPurpose == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Purpose" + "</li>";
+            AddError("txtPurpose", '', errorCount);
+            errorCount++;
+        }
+
+        var txtValidFrom = document.getElementById("txtValidFrom").value;
+        if (txtValidFrom == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Valid From" + "</li>";
+            AddError("txtValidFrom", '', errorCount);
+            errorCount++;
+        }
+
+        var txtValidTo = document.getElementById("txtValidTo").value;
+        if (txtValidTo == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Valid To" + "</li>";
+            AddError("txtValidTo", '', errorCount);
+            errorCount++;
+        }
+
+        var check = document.getElementById("termsAndConditions").checked;
+        if (check == false) {
+            errors += "<li id='error" + errorCount + "'>" + "Declaration checkbox not checked" + "</li>";
+            $("#collapseSeven").addClass('show');
+            $("#termsAndConditions").addClass('removelblchkDeclaration')
+            AddError("lblchkDeclaration", 'removelblchkDeclaration', errorCount);
+            errorCount++;
+        }
+
+        if (errors.length) {
+            errors = "<ol id='errorList'>" + errors + "</ol>";
+            $("#headingErr").removeClass('d-none');
+            document.getElementById("add_to_me").innerHTML = errors;
+            errors = "";
+            errorCount = 0;
+            $(window).scrollTop(0);
+            if (IsEditMode) {
+                $("#myModalEdit").scrollTop(0);
+                $("#myModalRequest").scrollTop(0);
+            }
+            else {
+                $(window).scrollTop(0);
+            }
+            return false;
+        }
+        $("#headingErr").addClass('d-none');
+        document.getElementById("add_to_me").innerHTML = '';
+
+        $('#ddEmpDesignation').prop("disabled", false);
+        $('#txtOnBehalfdesignation').prop("disabled", false);
+        $(".full-screen-container").removeClass('invisible');
+        $(".full-screen-container").show();
+        $("#pageLoader").removeClass('invisible');
+        $("#btnSubmit").text('Saving');
+        $("#btnSubmit").prop("disabled", true);
+        $("#btnCancel").prop("disabled", true);
+
+       // 
+        var form = $("#PPFForm");
+        var formData = new FormData(form[0]);
+        $.ajax({
+        url: '/PhotographyPermit/SavePPF',
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            data: formData,
+            enctype: 'multipart/form-data',
+            success: (function (data) {
+                if (data.Status == 200) {
+                    if (IsNew && IsEdit) {
+                        $("#btnSubmit").text('Submit');
+                    }
+                    else {
+                        $("#btnSubmit").text('Re-Submit');
+                    }
+                    $("#btnSubmit").prop("disabled", false);
+                    $("#btnCancel").prop("disabled", false);
+                    successModal(data.Message);
+                }
+                else {
+                    failureModal(data.Message);
+                    if (IsNew && IsEdit) {
+                        $("#btnSubmit").text('Submit');
+                    }
+                    else {
+                        $("#btnSubmit").text('Re-Submit');
+                    }
+                    $("#btnSubmit").prop("disabled", false);
+                    $("#btnCancel").prop("disabled", false);
+                    console.log("failure");
+                }
+
+                $("#loader").addClass('invisible');
+                $(".full-screen-container").hide();
+            }),
+            error: (function (data) {
+                failureModal(data.Message);
+                //failureModal();
+                console.log("error");
+                if (IsNew && IsEdit) {
+                    $("#btnSubmit").text('Submit');
+                }
+                else {
+                    $("#btnSubmit").text('Re-Submit');
+                }
+
+                $("#loader").addClass('invisible');
+                $(".full-screen-container").hide();
+                $("#btnSubmit").prop("disabled", false);
+                $("#btnCancel").prop("disabled", false);
+            })
+        })
+
+        $("#tab").val(2);
+    });
+
+    $("#btnCancel").on('click', function (e) {
+        window.location = "../Dashboard";
+    });
+
+    function saveResponse(text) {
+
+        $(".full-screen-container").removeClass('invisible');
+        $(".full-screen-container").show();
+        $("#pageLoader").removeClass('invisible');
+        var status = '', comment = '';
+        comment = $("#comment-" + text).val();
+        switch (text) {
+            case 'approve': {
+                status = 'Approved';
+                break;
+            }
+            case 'reject': {
+                status = 'Rejected';
+                if (comment == '') {
+                    validityModal(text);
+                    return;
+                }
+                break;
+            }
+            case 'enquire': {
+                status = 'Enquired';
+                if (comment == '') {
+                    validityModal(text);
+                    return;
+                }
+                break;
+            }
+        }
+        FormApproval(status, appRowId, comment, approvalType, text);
+        $("#tab").val(1);
+
+       
+    }
+
+    function FormApproval(status, appRowId, comment, approvalType, text) {
+        $(".full-screen-container").removeClass('invisible');
+        $(".full-screen-container").show();
+        $("#pageLoader").removeClass('invisible');
+        spinner.show();
+        $.ajax({
+            url: '/List/SaveResponse',
+            type: 'POST',
+            data: { response: status, appRowId: appRowId, comment: comment, approvalType: approvalType },
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data.Result == 1) {
+                    successModal(text);
+                    spinner.hide();
+                    //setTimeout(FilterMyTasks, 5000);
+
+                    $("#loader").addClass('invisible');
+                    $(".full-screen-container").hide();
+                    $("#pageLoader").addClass('invisible');
+                }
+                else {
+                    failureModal();
+
+                    $("#loader").addClass('invisible');
+                    $(".full-screen-container").hide();
+                    $("#pageLoader").addClass('invisible');
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+                $("#pageLoader").addClass('invisible');
+
+                $("#loader").addClass('invisible');
+                $(".full-screen-container").hide();
+            })
+        })
+
+        $("#tab").val(1);
+    }
+
+    $('#successModel').on('hidden.bs.modal', function () {
+        ////
+        var tab = $("#tab").val();
+        console.log(tab);
+        if (tab == 1) {
+            GetMyTaskTab();
+        }
+        else if (tab == 2) {
+            window.location = "../Dashboard?tab=" + tab;
+        }
+    })
+
+    $('#myModal').modal({ backdrop: 'static', keyboard: false })
+
+    $('input:checkbox[id="chkVideoCamera"]').click(function () {
+        if ($(this).prop("checked") == true) {
+            $("#divVideoCamera").removeClass('d-none');
+        }
+        else {
+            $("#divVideoCamera").addClass('d-none');
+        }
+    });
+
+    $('input:checkbox[id="chkCamera"]').click(function () {
+        if ($(this).prop("checked") == true) {
+            $("#divCamera").removeClass('d-none');
+        }
+        else {
+            $("#divCamera").addClass('d-none');
+        }
+    });
+
+    $('input:checkbox[id="chkMobile"]').click(function () {
+        if ($(this).prop("checked") == true) {
+            $("#divMobile").removeClass('d-none');
+        }
+        else {
+            $("#divMobile").addClass('d-none');
+        }
+    });
+
+    $('input:checkbox[id="chkTablet"]').click(function () {
+        if ($(this).prop("checked") == true) {
+            $("#divTablet").removeClass('d-none');
+        }
+        else {
+            $("#divTablet").addClass('d-none');
+        }
+    });
+
+    function checkSelect(id) {
+
+        if ($('#' + id).val() != '') {
+            $('#' + id).addClass('spanUpperSide');
+        }
+    }
+
+     function setStartDate() {
+        var today = new Date().toISOString().split('T')[0];
+
+         document.getElementsByName("txtValidFrom")[0].setAttribute("min", today);
+    }
+
+    function date_val_end() {
+        ////
+        var week_string = document.getElementsByName("txtValidFrom")[0].value;
+        console.log(week_string);
+        var parts = week_string.split("-");
+        var date = new Date(parts[0], parts[1] - 1, parts[2]);
+        var min_date = date;
+        min_date.setDate(min_date.getDate() + 1);
+        var initial_date = min_date.toISOString().split('T')[0];
+        document.getElementsByName("txtValidTo")[0].setAttribute("min", initial_date);
+    }
+
+    $("#txtValidFrom").on('change', function (e) {
+        
+        var drpPreSeriesCarOrPart = $("#drpPreSeriesCarOrPart").val();
+        if (drpPreSeriesCarOrPart == "Yes") {
+            var week_string = document.getElementsByName("txtValidFrom")[0].value;
+            console.log(week_string);
+            var parts = week_string.split("-");
+            var date = new Date(parts[0], parts[1] - 1, parts[2]);
+            var min_date = date;
+            min_date.setDate(min_date.getDate() + 1);
+            var selectedDate = document.getElementById("txtValidFrom").value;
+            var date = new Date(selectedDate);
+            var m = date.getMonth() + (date.getDate() == 1 ? 0 : 1), d = new Date(date.setDate(date.getDate() + 364)).getDate();
+            var month = m < 10 ? "0" + m : m;
+            var dt = d < 10 ? "0" + d : d;
+            var fDate = new Date(date.getFullYear() + "-" + month + "-" + dt).toISOString().slice(0, 10);
+            document.getElementsByName("txtValidTo")[0].setAttribute("max", fDate);
+
+        }
+        else if (drpPreSeriesCarOrPart == "No") {
+            var week_string = document.getElementsByName("txtValidFrom")[0].value;
+            console.log(week_string);
+            var parts = week_string.split("-");
+            var date = new Date(parts[0], parts[1] - 1, parts[2]);
+            var min_date = date;
+            min_date.setDate(min_date.getDate() + 1);
+            var selectedDate = document.getElementById("txtValidFrom").value;
+            var date = new Date(selectedDate);
+            var m = date.getMonth() + (date.getDate() == 1 ? 0 : 1), d = new Date(date.setDate(date.getDate() + (364*5))).getDate();
+            var month = m < 10 ? "0" + m : m;
+            var dt = d < 10 ? "0" + d : d;
+            var fDate = new Date(date.getFullYear() + "-" + month + "-" + dt).toISOString().slice(0, 10);
+            document.getElementsByName("txtValidTo")[0].setAttribute("max", fDate);
+        }
+
+    });
+
+</script>

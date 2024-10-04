@@ -1,0 +1,1033 @@
+﻿@model dynamic
+@{
+    bool IsNew = true;
+    dynamic CRF = null;
+    dynamic FlagRedirect = null;
+    bool IsEdit = true;
+    bool IsOHC = true;
+    int FormId = 0, AppRowId = 0, ApprovalType = 0;
+    Layout = ViewBag.Layout;
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IsNew = ViewBag.IsNew;
+        CRF = ViewBag.Model;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+        IsEdit = ViewBag.IsEdit;
+
+    }
+    var currentUser = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    ViewBag.Title = "Courier Request Form";
+    int count = 0;
+}
+
+<style>
+</style>
+<body>
+    <div class="right_col bg-transparent" role="main">
+        <form action="/CourierRequest/SaveCourierRequestForm" method="post" id="CRForm">
+            <div class="container">
+            @if(IsNew)
+            {
+                if(!IsEdit)
+                {
+                    <input type="hidden" id="FormSrId" name="FormSrId" value="@(CRF.one[0].Id)" />
+                    <input type="hidden" id="FormId" name="FormId" value="@(FormId)" />
+                    <input type="hidden" id="AppRowId" name="AppRowId" value="@(AppRowId)" />
+                }
+                else    
+                {
+                    <div class="breadcrumb-container">
+                        <div>
+                            <ol class="breadcrumb pl-0">
+                                <li>
+                                    <a href="dashboard.html">
+                                        Dashboard
+                                    </a>
+                                </li>
+
+                                <li class="active"><a href="hr_form.html">HR Department</a></li>
+                                <li class="active">Courier Request Form</li>
+                            </ol>
+                        </div>
+                    </div>
+                    <div class="container radius-5 border-info mb-5">
+                        <div class="row topContent">
+                            <div class="col-lg-6 col-md-6 ">
+                                <h4 class="font-h4 f-500 pl-2">Form Name : Courier Request Form</h4>
+                            </div>
+                            <div class="col-lg-6 col-md-6 text-right">
+                                <h4 class="font-h4 f-500">
+                                    Form Department | Owner
+                                </h4>
+                            </div>
+
+                        </div>
+                    </div>
+                }
+            }
+            @if(IsNew){
+                if (!IsEdit)
+                    {
+                        foreach (var item in CRF.one)
+                        {
+                            <div class="container form-container">
+                                <div class="card-header pb-4 pt-4">
+                                    <table class="w-95 m-auto">
+                                        <tr>
+                                            <td>
+                                                <table class="w-100 form-border">
+                                                    <tr>
+                                                        <td class="bb-0 topheaderCouries">MobiNext Technologies India Private Limited</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="bt-0 topheaderCouriesBorder">Courier Request Form</td>
+                                                    </tr>
+                                                </table>
+                                                <table class="w-100 form-outer-border">
+                                                    <tr>
+                                                        <td class="bb-0 topheaderCourierDate">Date :- <input class="inputTrans inpDisable" type="text" value="@(!IsEdit ? (Convert.ToDateTime(CRF.two[0].FormId.Created).ToShortDateString()) : DateTime.Now.ToShortDateString())" readonly></td>
+                                                    </tr>
+                                                </table>
+                                                <table class="w-100 form-outer-border">
+                                                    <tr>
+                                                        <td class="br-0">Self/On-behalf</td>
+                                                        <td class="borderLTB text-left" colspan="2">
+                                                            :<select name="drpRequestSubType" id="drpRequestSubType" class="inpDisable" onchange="RequestSubmission()" value="">
+                                                                 <option @(item.SelfOnBehalf=="Self" ? "selected" : "" ) value="Self">Self</option>
+                                                                 <option @(item.SelfOnBehalf == "OnBehalf" ? "selected" : "" ) value="OnBehalf">On Behalf</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr id="OtherEmpName">
+                                                        <td>
+                                                            <label id="lblOtherEmpName" class="control-label f-600">Name (Type at least 4 letters for faster results)*</label>
+                                                        </td>
+                                                        <td><input type="text" name="txtOtherEmpname" id="txtOtherEmpname" class="form-control" required="required"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="br-0">Employee Type</td>
+                                                        <td class="borderLTB text-left" colspan="2">
+                                                            :<select name="drpApplicantType" id="drpApplicantType" class="inpDisable" onchange="func()">
+                                                                <option @(item.EmployeeType == "Internal" ? "selected" : "" ) value="Internal">Internal</option>
+                                                                <option @(item.EmployeeType == "External" ? "selected" : "" ) value="External">External</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="br-1">
+                                                        <td class="br-0">Department</td>
+                                                        <td class="bl-0 br-0">:<select class="selectconsign inpDisable" name="drpDepartment" id="drpDepartment"></select></td>
+                                                        <td class="br-0 bl-0">Cost Centre</td>
+                                                        <td class="bl-0">:<select class="w-40 inpDisable" name="drpCostCentre" id="drpCostCentre" onchange="" value=""></select></td>
+                                                    </tr>
+                                                    <tr class="br-1">
+                                                        <td class="br-0">Name of Requestor</td>
+                                                        <td class="bl-0 br-0">:<input class="inputCourier inpDisable" id="txtRequestorName" name="txtRequestorName" type="text" value="@(!IsEdit ? (CRF.one[0].RequesterName ?? "") : "")"></td>
+                                                    </tr>
+                                                    <tr class="br-1">
+                                                        <td class="br-0">Mobile No of Requestor</td>
+                                                        <td class="br-0 bl-0">:<input class="inputCourier inpDisable" id="txtMobile" name="txtMobile" type="text" onkeypress="allowNumbersOnly(event)" value="@(!IsEdit ? (CRF.one[0].RequesterMobileNumber ?? "") : "")"></td>
+                                                    </tr>
+                                                    <tr class="br-1">
+                                                        <td class="w-26 br-0">Name & Address of Consignee</td>
+                                                        <td class="bl-0 br-0">:<textarea cols="50" rows="5" class="inpDisable" id="txtAddress" name="txtAddress">@(!IsEdit ? (CRF.one[0].ConsigneeNameAddress ?? "") : "")</textarea></td>
+                                                    </tr>
+                                                </table>
+                                                <table class="w-100 form-outer-border">
+                                                    <tr>
+                                                        <td class="w-26 br-0">Type of Consignment</td>
+                                                        <td class="bl-0">
+                                                            :<select class="selectconsign inpDisable" name="drpConsignmentType" id="drpConsignmentType" value="">
+                                                                <option @(item.ConsignmentType == "Material" ? "selected" : "" ) value="Material">Material</option>
+                                                                <option @(item.ConsignmentType == "Document" ? "selected" : "" ) value="Document">Document</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="br-0">Courier Type</td>
+                                                        <td class="bl-0">
+                                                            :<select class="selectconsign inpDisable" name="drpCourierType" id="drpCourierType" value="">
+                                                                <option @(item.CourierType == "Domestic - Interstate" ? "selected" : "" ) value="Domestic - Interstate">Domestic - Interstate</option>
+                                                                <option @(item.CourierType == "Domestic - Outerstate" ? "selected" : "" ) value="Domestic - Outerstate">Domestic - Outerstate</option>
+                                                                <option @(item.CourierType == "International" ? "selected" : "" ) value="International">International</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                                <table class="w-100 form-border">
+                                                    <tr>
+                                                        <td class="w-26 br-0 bt-0 bb-0">Name of HOD</td>
+                                                        <td class="bl-0 br-0 bt-0 bb-0">:<input class="inputCourier inpDisable" type="text" value="@(!IsEdit ? (CRF.three[0].UserName ?? " "): " ")" readonly></td>
+                                                        <td class="br-0 bl-0 bt-0 bb-0">Signature</td>
+                                                        <td class="bl-0 bt-0 bb-0">:<input class="inputCourier inpDisable" type="text" readonly value="@((!IsEdit && CRF.three[0].ApproverStatus != "Pending") ? (CRF.three[0].ApproverStatus + " on " + Convert.ToDateTime(CRF.two[0].Modified).ToShortDateString() + " " + Convert.ToDateTime(CRF.two[0].Modified).ToShortTimeString()) : "" )"></td>
+                                                    </tr>
+                                                    <tr class="br-1">
+                                                        <td class="br-0 bt-0 bb-0">Weight</td>
+                                                        <td colspan="3" class="bl-0 br-0 bt-0 bb-0">:<input class="inputCourier inpDisable" type="text" readonly></td>
+                                                    </tr>
+                                                    <tr class="br-1">
+                                                        <td class="br-0 bt-0 bb-0">OR</td>
+                                                    </tr>
+                                                    <tr class="br-1">
+                                                        <td class="br-0 bt-0 bb-0">Dimension</td>
+                                                        <td colspan="3" class="br-0 bl-0 bb-0 bt-0">:<input class="inputCourier inpDisable" type="text" readonly></td>
+                                                    </tr>
+                                                    <tr class="br-1">
+                                                        <td class="br-0 bt-0">Courier Inward Register Sl. No.</td>
+                                                        <td colspan="3" class="br-0 bl-0 bt-0">:<input class="inputCourier inpDisable" type="text" readonly></td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <table class="detail-sec-p">
+                                        <tr>
+                                            <td class="text-center">SF_SO/1_021.00</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="container form-container">
+                                <div class="card-header pb-4 pt-4">
+                                    <table class="w-95 m-auto">
+                                        <tr>
+                                            <td>
+
+                                                <table class="w-100 form-border">
+                                                    <tr>
+                                                        <td class="bb-0 topheaderCouries"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="bt-0 bb-0 topheaderCouriesBorder">Receipt</td>
+                                                    </tr>
+                                                </table>
+                                                <table class="w-100 form-outer-border">
+                                                    <tr>
+                                                        <td class="w-26 br-0">Courier Inward Register Sl. No.</td>
+                                                        <td class="bl-0">:<input class="inputCourier inpDisable" type="text" readonly></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="br-0">Name of Receiver</td>
+                                                        <td class="bl-0">:<input class="inputCourier inpDisable" type="text" readonly></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="br-0">Signature</td>
+                                                        <td class="bl-0">:<input class="inputCourier inpDisable" type="text" readonly></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="br-0">Date</td>
+                                                        <td class="bl-0">:<input class="inputCourier inpDisable" type="text" readonly></td>
+                                                    </tr>
+                                                </table>
+                                                <table class="w-100 form-border">
+                                                    <tr>
+                                                        <td class="bt-0 text-center">Stamp</td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <table class="detail-sec-p">
+                                        <tr>
+                                            <td class="text-center">SF_SO/1_021.00</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        }
+                    }
+                else
+                    {
+                    <div class="container form-container">
+                        <div class="card-header pb-4 pt-4">
+                            <table class="w-95 m-auto">
+                                <tr>
+                                    <td>
+                                        <table class="w-100 form-border">
+                                            <tr>
+                                                <td class="bb-0 topheaderCouries">MobiNext Technologies India Private Limited</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="bt-0 topheaderCouriesBorder">Courier Request Form</td>
+                                            </tr>
+                                        </table>
+                                        <table class="w-100 form-outer-border">
+                                            <tr>
+                                                <td class="bb-0 topheaderCourierDate">Date :- <input class="inputTrans" type="text" value="@(DateTime.Now.ToShortDateString())"></td>
+                                            </tr>
+                                        </table>
+                                        <table class="w-100 form-outer-border">
+                                            <tr>
+                                                <td class="br-0">Self/On-behalf</td>
+                                                <td class="borderLTB text-left" colspan="2">
+                                                    :<select name="drpRequestSubType" id="drpRequestSubType" class="" onchange="RequestSubmission()">
+                                                        <option value="null" selected disabled>Choose..</option>
+                                                        <option value="Self">Self</option>
+                                                        <option value="OnBehalf">On Behalf</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr id="OtherEmpName">
+                                                <td>
+                                                    <label id="lblOtherEmpName" class="control-label f-600">Name (Type at least 4 letters for faster results)*</label>
+                                                </td>
+                                                <td><input type="text" name="txtOtherEmpname" id="txtOtherEmpname" class="form-control" required="required"></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="br-0">Employee Type</td>
+                                                <td class="borderLTB text-left" colspan="2">
+                                                    :<select name="drpApplicantType" id="drpApplicantType" class="" onchange="func()">
+                                                        <option value="null" selected disabled>Choose..</option>
+                                                        <option value="Internal Employee">Internal Employee</option>
+                                                        <option value="External Agency">External Agency</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr class="br-1">
+                                                <td class="br-0">Department</td>
+                                                <td class="bl-0 br-0">:<select class="w-40 drpDisable" name="drpDepartment" id="drpDepartment" required></select></td>
+                                                <td class="br-0 bl-0">Cost Centre</td>
+                                                <td class="bl-0">:<select class="w-40 drpDisable" name="drpCostCentre" id="drpCostCentre" onchange="" required></select></td>
+                                            </tr>
+                                            <tr class="br-1">
+                                                <td class="br-0">Name of Requestor</td>
+                                                <td class="bl-0 br-0">:<input class="inputCourier" id="txtRequestorName" name="txtRequestorName" type="text"></td>
+                                            </tr>
+                                            <tr class="br-1">
+                                                <td class="br-0">Mobile No of Requestor</td>
+                                                <td class="br-0 bl-0">:<input class="inputCourier" id="txtMobile" name="txtMobile" type="text" onkeypress="allowNumbersOnly(event)"></td>
+                                            </tr>
+                                            <tr class="br-1">
+                                                <td class="w-26 br-0">Name & Address of Consignee</td>
+                                                <td class="bl-0 br-0">:<textarea cols="50" rows="5" id="txtAddress" name="txtAddress"></textarea></td>
+                                            </tr>
+                                        </table>
+                                        <table class="w-100 form-outer-border">
+                                            <tr>
+                                                <td class="w-26 br-0">Type of Consignment</td>
+                                                <td class="bl-0">
+                                                    :<select class="selectconsign" name="drpConsignmentType" id="drpConsignmentType">
+                                                        <option value="" selected disabled>Select</option>
+                                                        <option value="Material">Material</option>
+                                                        <option value="Document">Document</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="br-0">Courier Type</td>
+                                                <td class="bl-0">
+                                                    :<select class="selectconsign" name="drpCourierType" id="drpCourierType">
+                                                        <option value="" selected disabled>Select</option>
+                                                        <option value="Domestic - Interstate">Domestic - Interstate</option>
+                                                        <option value="Domestic - Outerstate">Domestic - Outerstate</option>
+                                                        <option value="International">International</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        @*<table class="w-100 form-border">
+                                            <tr>
+                                                <td class="w-26 br-0 bt-0 bb-0">Name of HOD</td>
+                                                <td class="bl-0 br-0 bt-0 bb-0">:<input class="inputCourier" type="text"></td>
+                                                <td class="br-0 bl-0 bt-0 bb-0">Signature</td>
+                                                <td class="bl-0 bt-0 bb-0">:<input class="inputCourier" type="text"></td>
+                                            </tr>
+                                            <tr class="br-1">
+                                                <td class="br-0 bt-0 bb-0">Weight</td>
+                                                <td colspan="3" class="bl-0 br-0 bt-0 bb-0">:<input class="inputCourier" type="text"></td>
+                                            </tr>
+                                            <tr class="br-1">
+                                                <td class="br-0 bt-0 bb-0">OR</td>
+                                            </tr>
+                                            <tr class="br-1">
+                                                <td class="br-0 bt-0 bb-0">Dimension</td>
+                                                <td colspan="3" class="br-0 bl-0 bb-0 bt-0">:<input class="inputCourier" type="text"></td>
+                                            </tr>
+                                            <tr class="br-1">
+                                                <td class="br-0 bt-0">Courier Inward Register Sl. No.</td>
+                                                <td colspan="3" class="br-0 bl-0 bt-0">:<input class="inputCourier" type="text"></td>
+                                            </tr>
+                                        </table>*@
+
+                                    </td>
+                                </tr>
+                            </table>
+                            <table class="detail-sec-p">
+                                <tr>
+                                    <td class="text-center">SF_SO/1_021.00</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    @*<div class="container form-container">
+                        <div class="card-header pb-4 pt-4">
+                            <table class="w-95 m-auto">
+                                <tr>
+                                    <td>
+
+                                        <table class="w-100 form-border">
+                                            <tr>
+                                                <td class="bb-0 topheaderCouries"></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="bt-0 bb-0 topheaderCouriesBorder">Receipt</td>
+                                            </tr>
+                                        </table>
+                                        <table class="w-100 form-outer-border">
+                                            <tr>
+                                                <td class="w-26 br-0">Courier Inward Register Sl. No.</td>
+                                                <td class="bl-0">:<input class="inputCourier" type="text"></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="br-0">Name of Receiver</td>
+                                                <td class="bl-0">:<input class="inputCourier" type="text"></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="br-0">Signature</td>
+                                                <td class="bl-0">:<input class="inputCourier" type="text"></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="br-0">Date</td>
+                                                <td class="bl-0">:<input class="inputCourier" type="date"></td>
+                                            </tr>
+                                        </table>
+                                        <table class="w-100 form-border">
+                                            <tr>
+                                                <td class="bt-0 text-center">Stamp</td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                            <table class="detail-sec-p">
+                                <tr>
+                                    <td class="text-center">SF_SO/1_021.00</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>*@
+                    }
+            }
+            else
+            {
+                
+                <div class="container form-container">
+                    <div class="card-header pb-4 pt-4">
+                        <table class="w-95 m-auto">
+                            <tr>
+                                <td>
+                                    <table class="w-100 form-border">
+                                        <tr>
+                                            <td class="bb-0 topheaderCouries">MobiNext Technologies India Private Limited</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="bt-0 topheaderCouriesBorder">Courier Request Form</td>
+                                        </tr>
+                                    </table>
+                                    <table class="w-100 form-outer-border">
+                                        <tr>
+                                            <td class="bb-0 topheaderCourierDate">Date :- <input class="inputTrans inpDisable" type="text" value="@(!IsNew ? (Convert.ToDateTime(CRF.two[0].FormId.Created).ToShortDateString()) : DateTime.Now.ToShortDateString())"></td>
+                                        </tr>
+                                    </table>
+                                    <table class="w-100 form-outer-border">
+                                        <tr>
+                                            <td class="br-0">Self/On-behalf</td>
+                                            <td class="borderLTB text-left" colspan="2">
+                                                :<input type="text" name="drpRequestSubType" id="drpRequestSubType" class="inpDisable" onchange="RequestSubmission()" value="@(!IsNew ? (CRF.one[0].SelfOnBehalf ?? "") : "")">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="br-0">Employee Type</td>
+                                            <td class="borderLTB text-left" colspan="2">
+                                                :<input type="text" name="drpApplicantType" id="drpApplicantType" class="inpDisable" onchange="func()" value="@(!IsNew ? (CRF.one[0].EmployeeType ?? "") : "")">
+                                            </td>
+                                        </tr>
+                                        <tr class="br-1">
+                                            <td class="br-0">Department</td>
+                                            <td class="bl-0 br-0">:<input type="text" class="selectconsign inpDisable" name="drpConsignmentType" id="drpConsignmentType" value="@(!IsNew ? (CRF.one[0].Department ?? "") : "")"></td>
+                                            <td class="br-0 bl-0">Cost Centre</td>
+                                            <td class="bl-0">:<input type="text" class="w-40 inpDisable" name="drpCostCentre" id="drpCostCentre" onchange="" value="@(!IsNew ? (CRF.one[0].CostCenter ?? "") : "")"></td>
+                                        </tr>
+                                        <tr class="br-1">
+                                            <td class="br-0">Name of Requestor</td>
+                                            <td class="bl-0 br-0">:<input class="inputCourier inpDisable" id="txtRequestorName" name="txtRequestorName" type="text" value="@(!IsNew ? (CRF.one[0].RequesterName ?? "") : "")"></td>
+                                        </tr>
+                                        <tr class="br-1">
+                                            <td class="br-0">Mobile No of Requestor</td>
+                                            <td class="br-0 bl-0">:<input class="inputCourier inpDisable" id="txtMobile" name="txtMobile" type="text" onkeypress="allowNumbersOnly(event)" value="@(!IsNew ? (CRF.one[0].RequesterMobileNumber ?? "") : "")"></td>
+                                        </tr>
+                                        <tr class="br-1">
+                                            <td class="w-26 br-0">Name & Address of Consignee</td>
+                                            <td class="bl-0 br-0">:<textarea cols="50" rows="5" class="inpDisable" id="txtAddress" name="txtAddress">@(!IsNew ? (CRF.one[0].ConsigneeNameAddress ?? "") : "")</textarea></td>
+                                        </tr>
+                                    </table>
+                                    <table class="w-100 form-outer-border">
+                                        <tr>
+                                            <td class="w-26 br-0">Type of Consignment</td>
+                                            <td class="bl-0">
+                                                :<input type="text" class="selectconsign inpDisable" name="drpConsignmentType" id="drpConsignmentType" value="@(!IsNew ? (CRF.one[0].ConsignmentType ?? "") : "")">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="br-0">Courier Type</td>
+                                            <td class="bl-0">
+                                                :<input type="text" class="selectconsign inpDisable" name="drpCourierType" id="drpCourierType" value="@(!IsNew ? (CRF.one[0].CourierType ?? "") : "")">
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <table class="w-100 form-border">
+                                        <tr>
+                                            <td class="w-26 br-0 bt-0 bb-0">Name of HOD</td>
+                                            <td class="bl-0 br-0 bt-0 bb-0">:<input class="inputCourier inpDisable" type="text" value="@(!IsNew ? (CRF.three[0].UserName ?? " "): " ")"></td>
+                                            <td class="br-0 bl-0 bt-0 bb-0">Signature</td>
+                                            <td class="bl-0 bt-0 bb-0">:<input class="inputCourier inpDisable" type="text" value="@((!IsNew && CRF.three[0].ApproverStatus != "Pending") ? (CRF.three[0].ApproverStatus + " on " + Convert.ToDateTime(CRF.two[0].Modified).ToShortDateString() + " " + Convert.ToDateTime(CRF.two[0].Modified).ToShortTimeString()) : "" )"></td>
+                                        </tr>
+                                        <tr class="br-1">
+                                            <td class="br-0 bt-0 bb-0">Weight</td>
+                                            <td colspan="3" class="bl-0 br-0 bt-0 bb-0">:<input class="inputCourier inpDisable" type="text"></td>
+                                        </tr>
+                                        <tr class="br-1">
+                                            <td class="br-0 bt-0 bb-0">OR</td>
+                                        </tr>
+                                        <tr class="br-1">
+                                            <td class="br-0 bt-0 bb-0">Dimension</td>
+                                            <td colspan="3" class="br-0 bl-0 bb-0 bt-0">:<input class="inputCourier inpDisable" type="text"></td>
+                                        </tr>
+                                        <tr class="br-1">
+                                            <td class="br-0 bt-0">Courier Inward Register Sl. No.</td>
+                                            <td colspan="3" class="br-0 bl-0 bt-0">:<input class="inputCourier inpDisable" type="text"></td>
+                                        </tr>
+                                    </table>
+
+                                </td>
+                            </tr>
+                        </table>
+                        <table class="detail-sec-p">
+                            <tr>
+                                <td class="text-center">SF_SO/1_021.00</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="container form-container">
+                    <div class="card-header pb-4 pt-4">
+                        <table class="w-95 m-auto">
+                            <tr>
+                                <td>
+
+                                    <table class="w-100 form-border">
+                                        <tr>
+                                            <td class="bb-0 topheaderCouries"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="bt-0 bb-0 topheaderCouriesBorder">Receipt</td>
+                                        </tr>
+                                    </table>
+                                    <table class="w-100 form-outer-border">
+                                        <tr>
+                                            <td class="w-26 br-0">Courier Inward Register Sl. No.</td>
+                                            <td class="bl-0">:<input class="inputCourier inpDisable" type="text"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="br-0">Name of Receiver</td>
+                                            <td class="bl-0">:<input class="inputCourier inpDisable" type="text"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="br-0">Signature</td>
+                                            <td class="bl-0">:<input class="inputCourier inpDisable" type="text"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="br-0">Date</td>
+                                            <td class="bl-0">:<input class="inputCourier inpDisable" type="text"></td>
+                                        </tr>
+                                    </table>
+                                    <table class="w-100 form-border">
+                                        <tr>
+                                            <td class="bt-0 text-center">Stamp</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                        <table class="detail-sec-p">
+                            <tr>
+                                <td class="text-center">SF_SO/1_021.00</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                
+            }            
+            </div>
+            @if (IsNew)
+            {
+                if (!IsEdit)
+                {
+                    <div class="card-footer align-content-center">
+                        <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                            Re-Submit
+                        </button>
+                        <button type="reset" class="btn btn-danger btn-sm cancl-btn">
+                            Cancel
+                        </button>
+                    </div>
+                }
+                else
+                {
+                    <div class="card-footer align-content-center">
+                        <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                            Submit
+                        </button>
+                        <button type="reset" class="btn btn-danger btn-sm cancl-btn">
+                            Cancel
+                        </button>
+                    </div>
+                }
+            }
+        </form>
+    </div>
+</body>
+<div class="modal fade" id="successModel" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header modelHeader">
+                <span class="modal-title modalMsgTitle" id="modalTitle"></span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label id="modalBody" class="lableMsg">  </label>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="submitBomBtn publishBtn" id="modalOkButton">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var FlagRedirect = @Html.Raw(Json.Encode(FlagRedirect));
+    var IsNew = @Html.Raw(Json.Encode(IsNew));
+    var CRF = @Html.Raw(Json.Encode(CRF));
+    var appRowId = @Html.Raw(Json.Encode(AppRowId));
+    var approvalType =@Html.Raw(Json.Encode(ApprovalType));
+    var IsEdit = @Html.Raw(Json.Encode(IsEdit));
+    pageLoad();
+
+    function pageLoad() {
+        var data = "";
+        if (!IsNew) {
+            $("#OtherEmpName").hide();
+            $(".inpDisable").attr("disabled", "disabled");
+        }
+        if (!IsNew) {
+            $(".drpDisable").attr("disabled", "disabled");
+        }
+        //if (IsNew) {
+        //    $(".inpIsNewDisable").attr("disabled", "disabled");
+        //}
+        if (!IsEdit) {
+            
+        }
+        if (IsNew) {
+            if (!IsEdit) {
+                //console.log();
+                //
+                var value = JSON.stringify(CRF[0]);
+                var value_1 = JSON.parse(value);
+                var selfOnBehalf = value_1.Value[0].SelfOnBehalf;
+                if (selfOnBehalf == "OnBehalf") {
+                    $("#OtherEmpName").show();
+                }
+                else {
+                    $("#OtherEmpName").hide();
+                }
+                GetCostCenter();
+                getDepartment();
+            }
+            else {
+                $("#OtherEmpName").hide();
+                GetCostCenter();
+                getDepartment();
+            }
+        }
+    }
+
+    function RequestSubmission() {
+        ////
+        var drpRequestSubType = $("#drpRequestSubType").val();
+        if (drpRequestSubType == "OnBehalf") {
+            $("#OtherEmpName").show();
+            $("#txtOtherEmpnametxtOtherEmpname").val('');
+            $('#drpApplicantType').val("null");
+            $('#txtRequestorName').val('');
+            $('#drpCostCentr').val('');
+            $('#drpDepartment').val('');
+        }
+        else if (drpRequestSubType == "Self") {
+            $('#drpApplicantType').val("Internal Employee");
+            $("#OtherEmpName").hide();
+            func();
+            $('#drpApplicantType').trigger('change');
+        }
+        else {
+            $('#drpApplicantType').val("null");
+            $("#OtherEmpName").hide();
+            $('#txtSurname').val('');
+            $('#txtFirstName').val('');
+            $('#txtEmpId').val('');
+            $('#txtDepartment').val('');
+        }
+
+    }
+
+    function func() {
+        ////
+        var dropdown = document.getElementById("drpApplicantType");
+        var selection = dropdown.value;
+        var dropdown1 = document.getElementById("drpRequestSubType");
+        var selection1 = dropdown1.value;
+
+        if (selection1 != "OnBehalf") {
+            if (selection == "Internal Employee") {
+                var firstName = document.getElementById("txtRequestorName");
+                var department = document.getElementById("drpDepartment");
+                var costCenter = document.getElementById("drpCostCentre");
+                firstName.value = "@currentUser.FirstName" + ' ' + "@currentUser.LastName";;
+                department.value = "@currentUser.Department";
+                costCenter.value = "515600";
+                //document.getElementById("txtFirstName").readOnly = true;
+                //document.getElementById("txtSurname").readOnly = true;
+                //document.getElementById("txtDepartment").readOnly = true;
+                //document.getElementById("txtEmpId").readOnly = true;
+
+            }
+            else if (selection == "External Agency") {
+                var firstName = document.getElementById("txtRequestorName");
+                var department = document.getElementById("drpDepartment");
+                var costCenter = document.getElementById("drpCostCentre");
+                console.log(activityEnd);
+                firstName.value = "";
+                department.value = "";
+                costCenter.value = "";
+            }
+        }
+    }
+
+    function allowNumbersOnly(e) {
+        var code = (e.which) ? e.which : e.keyCode;
+        if (code > 31 && (code < 48 || code > 57)) {
+            e.preventDefault();
+        }
+    }
+
+    $("#txtOtherEmpname").autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                url: "/CourierRequest/GetCRFEmployeeDetails",
+                dataType: "json",
+                cache: false,
+                async: false,
+                data: {
+                    searchText: $("#txtOtherEmpname").val()
+                },
+                success: function (data) {
+                    ////
+                    response($.map(data, function (item) {
+                        console.log(data, 'data');
+                        return { label: item.UserName, value: item.UserName, raw: item };
+                    }));
+                }
+            });
+        },
+        search: function (event, ui) {
+            var value = $("#txtOtherEmpname").val();
+            // If less than three chars, cancel the search event
+            if (value.length < 4) {
+                event.preventDefault();
+            }
+        },
+        min_length: 4,
+        delay: 0,
+        select: function (event, ui) {
+            //
+            var empOtherDetails = ui.item['raw'];
+            //$('#txtOtherUserId').val(empOtherDetails.UserID);
+            //$('#txtOtherEmpDept').val(empOtherDetails.EmployeeDept);
+            //$('#txtOtherEmpEmailId').val(empOtherDetails.Email);
+            //Get the other details like Cost Center Code, Employee Number from DB.
+            $.ajax({
+                url: "/CourierRequest/GetCRFExistingEmployeeDetails",
+                dataType: "json",
+                cache: false,
+                async: false,
+                data: {
+                    otherEmpUserId: empOtherDetails.UserId,
+                    //otherEmpEmail: empOtherDetails.Email
+                },
+                success: function (data) {
+                    console.log(data, 'data');
+                    //$('#txtOtherEmpCCCode').val(data.CostCenter);
+                    $('#drpDepartment').val(data.Department);
+                    $('#txtRequestorName').val(data.EmployeeName);
+                    $('#drpCostCentre').val(data.Department);
+                    /*$('#txtTelephone').val(data.PhoneNumber);*/
+
+                }
+            });
+        }
+    });
+
+    function GetCostCenter() {
+        ////
+        if (IsNew) {
+            if (!IsEdit) {
+                var value = JSON.stringify(CRF[0]);
+                var value_1 = JSON.parse(value);
+                var selectedLocation = value_1.Value[0].CostCenter;
+                console.log(selectedLocation);
+
+                $.ajax({
+                    url: '/CourierRequest/CostCenter',
+                    type: 'GET',
+                    data: {},
+                    dataType: 'JSON',
+                    success: (function (data) {
+                        //locdata = data;
+
+                        //console.log(data);
+                        var s = '<option value="-1" selected disabled>Please Select Cost Center</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            if (data[i].CostCenter == selectedLocation) {
+                                s += '<option value="' + data[i].CostCenter + '" location="' + data[i].Location + '"' + 'id="' + data[i].Id + '" selected>' + data[i].CostCenter + '</option>';
+                            }
+                            else {
+                                s += '<option value="' + data[i].CostCenter + '" location="' + data[i].Location + '"' + 'id="' + data[i].Id + '">' + data[i].CostCenter + '</option>';
+                            }
+                        }
+                        $("#drpCostCentre").html(s);
+
+
+                    }),
+                    error: (function (data) {
+                        //code
+                    })
+                })
+            }
+            else {
+                $.ajax({
+                    url: '/CourierRequest/CostCenter',
+                    type: 'GET',
+                    data: {},
+                    dataType: 'JSON',
+                    success: (function (data) {
+                        locdata = data;
+
+                        //console.log(data);
+                        var s = '<option value="-1" selected disabled>Please Select Cost Center</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            s += '<option value="' + data[i].CostCenter + '" location="' + data[i].Location + '"' + 'id="' + data[i].Id + '">' + data[i].CostCenter + '</option>';
+                        }
+                        $("#drpCostCentre").html(s);
+
+
+                    }),
+                    error: (function (data) {
+                        //code
+                    })
+                })
+            }
+        }
+    }
+
+    function getDepartment() {
+        if (IsNew) {
+            if (!IsEdit) {
+                //
+                var value = JSON.stringify(CRF[0]);
+                var value_1 = JSON.parse(value);
+                var selectedLocation = value_1.Value[0].Department;
+                console.log(selectedLocation);
+
+                $.ajax({
+                    url: '/CourierRequest/Department',
+                    type: 'GET',
+                    data: {},
+                    dataType: 'JSON',
+                    success: (function (data) {
+                        //locdata = data;
+
+                        //console.log(data);
+                        var s = '<option value="-1" selected disabled>Please Select Department</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            if (data[i].Department == selectedLocation) {
+                                s += '<option value="' + data[i].Department + '" id="' + data[i].Id + '" selected>' + data[i].Department + '</option>';
+                            }
+                            else {
+                                s += '<option value="' + data[i].Department + '" id="' + data[i].Id + '">' + data[i].Department + '</option>';
+                            }
+                        }
+                        $("#drpDepartment").html(s);
+
+
+                    }),
+                    error: (function (data) {
+                        //code
+                    })
+                })
+            }
+            else {
+                $.ajax({
+                    url: '/CourierRequest/Department',
+                    type: 'GET',
+                    data: {},
+                    dataType: 'JSON',
+                    success: (function (data) {
+                        locdata = data;
+
+                        //console.log(data);
+                        var s = '<option value="-1" selected disabled>Please Select Department</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            s += '<option value="' + data[i].Department + '" id="' + data[i].Id + '">' + data[i].Department + '</option>';
+                        }
+                        $("#drpDepartment").html(s);
+
+
+                    }),
+                    error: (function (data) {
+                        //code
+                    })
+                })
+            }
+        }
+    }
+
+    function successModal(txt) {
+        ////
+        $('#modalTitle').html('Success');
+        if (txt == "approve") {
+            $('#modalBody').html('Form has been approved!');
+        }
+        else if (txt == "reject") {
+            $('#modalBody').html('Form has been rejected!');
+        }
+        else if (txt == "enquire") {
+            $('#modalBody').html('Form has been enquired!');
+        }
+        else if (txt == "cancelled") {
+            $('#modalBody').html('Form has been cancelled!');
+        }
+        else {
+            $('#modalBody').html('Your form with ID: CRF' + txt + ' has been submitted! Kindly use this for future reference');
+            FlagRedirect = txt;
+        }
+        //$('#modalBody').html('Your form has been submitted!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function failureModal() {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html('Some error occurred!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function requiredModal(text) {
+        $('#modalTitle').html('Required!');
+        $('#modalBody').html(text);
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    $("#modalOkButton").on('click', function () {
+        ////
+        if (FlagRedirect != null) {
+            window.location = "../Dashboard";
+        }
+    });
+
+    $("#btnSubmit").on('click', function (e) {
+        ////
+        var drpEmployeeType = $("#drpApplicantType option:selected").val();
+        var firstname = document.getElementById("txtRequestorName").value;
+        var cost = $("#drpCostCentre option:selected").val();
+        var dept = $("#drpDepartment option:selected").val();
+        var mobileNo = document.getElementById("txtMobile").value;
+        var address = document.getElementById("txtAddress").value;
+        var consignmentType = $("#drpConsignmentType option:selected").val();
+        var courierType = $("#drpCourierType option:selected").val();
+
+        if (drpEmployeeType == "null") {
+            requiredModal("Please select the Employee Type");
+            return false;
+        }
+        if (firstname == "") {
+            requiredModal("Please enter the Requestor Name");
+            return false;
+        }
+        if (cost == -1) {
+            requiredModal("Please select the Cost Centre");
+            return false;
+        }
+        if (dept == -1) {
+            requiredModal("Please select the Department");
+            return false;
+        }
+        if (mobileNo == "") {
+            requiredModal("Please enter the Mobile Number");
+            return false;
+        }
+        if (address == "") {
+            requiredModal("Please enter the Address");
+            return false;
+        }
+        if (consignmentType == "") {
+            requiredModal("Please select the Consignment Type");
+            return false;
+        }
+        if (courierType == "") {
+            requiredModal("Please select the Courier Type");
+            return false;
+        }
+        var form = $("#CRForm").serialize();
+        $.ajax({
+            url: '/CourierRequest/SaveCourierRequestForm',
+            type: 'POST',
+            data: form,
+            dataType: 'JSON',
+            success: (function (data) {
+                ////
+                if (data[0].Value == 1) {
+                    successModal(data[1].Value);
+                    $("#CRForm").trigger("reset");
+                    if (IsNew) {
+                        if (!IsEdit) {
+                            setTimeout(function () {// wait for 4 secs(2)
+                                location.reload(); // then reload the page.(3)
+                            }, 4000);
+                        }
+                    }
+                    //$("#pageLoader").addClass('invisible');
+                }
+                else {
+                    ///$("#pageLoader").addClass('invisible');
+                    failureModal();
+                    $("#CRForm").trigger("reset");
+                }
+            }),
+            error: (function (data) {
+                /// $("#pageLoader").addClass('invisible');
+                failureModal();
+                $("#CRForm").trigger("reset");
+            })
+        })
+    });
+</script>
+
+

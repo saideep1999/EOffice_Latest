@@ -1,0 +1,134 @@
+﻿@model Skoda_DCMS.Models.EmailApproverStatusModel
+@{
+    var EAStatus = Model.Status;
+    var EAUrl = Model.Url;
+    var EAResponse = Model.Response;
+    var AppRowId = Model.AppRowId;
+    var UserName = Model.UserName;
+    var UserFullname = Model.UserFullname;
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>SaveResponse</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/7.2.0/sweetalert2.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/7.2.0/sweetalert2.all.min.js"></script>
+</head>
+<body>
+    <div>
+    </div>
+    <script>
+        var eaStatus = @Html.Raw(Json.Encode(EAStatus));
+        var routeUrl = @Html.Raw(Json.Encode(EAUrl));
+        var eaResponse = @Html.Raw(Json.Encode(EAResponse));
+        var appRowId = @Html.Raw(Json.Encode(AppRowId));
+        var userName = @Html.Raw(Json.Encode(UserName));
+        var userFullname = @Html.Raw(Json.Encode(UserFullname));
+        var Comment ="";
+        var textarea ="";
+        var Responce = eaResponse == "Rejected" ? "Rejected" :"Approved";
+        $(document).ready(function () {
+            
+            if (eaStatus == 1) {
+                
+                if (eaResponse == "Approved") {
+                    swal({
+                        title: "Success!",
+                        text: "Form has been Approved!",
+                        type: "success"
+                    }).then(function () { window.top.close(); });
+                }
+                if (eaResponse == "Rejected") {
+                    swal({
+                        title: "Success!",
+                        text: "Form has been Rejected!",
+                        type: "success"
+                    }).then(function () { window.top.close(); });
+                }
+                if (eaResponse == "Enquired") {
+                    swal({
+                        title: "Success!",
+                        text: "Form has been Enquired!",
+                        type: "success"
+                    }).then(function () { window.top.close(); });
+                }
+            }
+            else if (eaStatus == 2) {
+                
+                swal({
+                    title: 'Comments',
+                    input: 'textarea',
+                    showCancelButton: true,
+                    closeOnCancel: true,
+                    confirmButtonText: 'Submit',
+                    showLoaderOnConfirm: true,
+                    preConfirm: function (e) {
+                        return new Promise(function (resolve, reject) {
+                            
+                            setTimeout(function () {
+                                
+                                if (e === '') {
+                                    reject('Write Something')
+                                } else {
+                                    Comment = e;
+                                    resolve()
+                                }
+                            }, 2000)
+                        })
+                    },
+                    allowOutsideClick: false
+                }).then(function (e) {
+                    
+                    if (e.dismiss === 'cancel') {
+                        swal(
+                            'Cancelled!',
+                            'Action not performed',
+                            'warning'
+                        ).then(function () { window.top.close(); })
+                    }
+                    else {
+                        $.ajax({
+                            url: '/Login/SaveResponse',
+                            type: 'GET',
+                            data: { response: eaResponse, appRowId: appRowId, UserName: userName, UserFullname: userFullname, comment: Comment, IsEnquired: 1 },
+                            dataType: 'JSON',
+                            success: (function (data) {
+                                
+                                swal({
+                                    title: "Success!",
+                                    text: "Form has been Enquired!",
+                                    type: "success"
+                                }).then(function () { window.top.close(); })
+                                //spinner.hide();
+
+                            }),
+                            error: (function (data) {
+                                
+                                swal({
+                                    type: 'error',
+                                    title: 'Error',
+                                    html: 'Some error occurs!',
+                                }).then(function () { window.top.close(); })
+                            })
+                        })
+                    }
+                })
+            }
+            else {
+                
+                swal({
+                    title: "Error!",
+                    text: "Action Already taken",
+                    type: "error"
+                }).then(function () { window.top.close(); })
+            }
+        });
+    </script>
+</body>
+</html>

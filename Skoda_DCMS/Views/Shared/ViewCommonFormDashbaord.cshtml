@@ -1,0 +1,353 @@
+﻿
+@model Skoda_DCMS.Models.DashboardModel
+
+<table id="dtBasicExample" class="table table-striped" cellspacing="0" width="100%">
+    <thead>
+        <tr class="status-table-row">
+            <th class="th-sm">
+                ID
+                <span class="caret-icon">
+                    <a href="" class="caret-up">
+                        <i class="fa fa-caret-up"></i>
+                    </a>
+                    <a href="" class="caret-down">
+                        <i class="fa fa-caret-down"></i>
+                    </a>
+                </span>
+            </th>
+            <th class="w-20 th-sm">
+                Form Name
+                <span class="caret-icon">
+                    <a href="" class="caret-up">
+                        <i class="fa fa-caret-up"></i>
+                    </a>
+                    <a href="" class="caret-down">
+                        <i class="fa fa-caret-down"></i>
+                    </a>
+                </span>
+            </th>
+            <th class="w-20 th-sm">
+                Request From (User Name)
+                <span class="caret-icon">
+                    <a href="" class="caret-up">
+                        <i class="fa fa-caret-up"></i>
+                    </a>
+                    <a href="" class="caret-down">
+                        <i class="fa fa-caret-down"></i>
+                    </a>
+                </span>
+            </th>
+            <th class="th-sm">
+                Details/Business Needs
+                <span class="caret-icon">
+                    <a href="" class="caret-up">
+                        <i class="fa fa-caret-up"></i>
+                    </a>
+                    <a href="" class="caret-down">
+                        <i class="fa fa-caret-down"></i>
+                    </a>
+                </span>
+            </th>
+            <th class="th-sm">
+                Status
+                <span class="caret-icon">
+                    <a href="" class="caret-up">
+                        <i class="fa fa-caret-up"></i>
+                    </a>
+                    <a href="" class="caret-down">
+                        <i class="fa fa-caret-down"></i>
+                    </a>
+                </span>
+            </th>
+            <th class="w-10 th-sm">
+                Received Date
+                <span class="caret-icon">
+                    <a href="" class="caret-up">
+                        <i class="fa fa-caret-up"></i>
+                    </a>
+                    <a href="" class="caret-down">
+                        <i class="fa fa-caret-down"></i>
+                    </a>
+                </span>
+            </th>
+            <th class="w-10 th-sm">
+                Action
+                
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Data.Forms)
+        {
+            <tr>
+                <td class="align-middle">@($"{item.UniqueFormName}{item.UniqueFormId}")</td>
+                <td class="align-middle">@item.FormName</td>
+                <td class="align-middle">@item.Author.Submitter</td>
+                <td class="align-middle" title="@item.BusinessNeed">
+                    <input value="@item.BusinessNeed" class="inputTooltipFontNormal" maxlength="10" readonly />
+                </td>
+
+                <td>@item.Status</td>
+
+                <td data-order="@item.RecievedDate.ToString("MM/dd/yyyy HH:mm")">@item.RecievedDate.ToString("MM/dd/yyyy")</td>
+
+
+                <td>
+                    <div class="container col-lg-12 d-flex justify-content-sm-between" style="text-align: center;">
+                        <button type="button" data-toggle="tooltip" data-placement="bottom" title="View" class="btn btn-xs btn-default photography-action-btn"
+                                onclick="GoToViewForm('@item.UniqueFormName',@item.DataRowId,@item.UniqueFormId,@item.Id,'@item.ControllerName')">
+                            <i class="fa fa-eye" aria-hidden="true"></i>
+                        </button>
+
+                        @if (item.Status == "Submitted" || item.Status == "Initiated" || item.Status == "Enquired" || item.Status == "Resubmitted")
+                        {
+                            <button type="button" class="btn btn-xs btn-default  photography-action-btn" data-toggle="tooltip" data-placement="bottom" title="Edit" onclick="GoToEditForm('@item.UniqueFormName',@item.DataRowId,@item.Id,'@item.ControllerName')">
+                                <i class="fa fa-edit" aria-hidden="true"></i>
+                            </button>
+                        }
+                        else
+                        {
+                            if (item.Status == "Cancelled")
+                            {
+                                <button type="button" class="btn btn-xs btn-default photography-action-btn" data-toggle="tooltip" data-placement="bottom" title="Edit" onclick="failure5Modal()">
+                                    <i class="fa fa-edit" aria-hidden="true"></i>
+                                </button>
+                            }
+                            else
+                            {
+                                <button type="button" class="btn btn-xs btn-default photography-action-btn" data-toggle="tooltip" data-placement="bottom" title="Edit" onclick="failure4Modal()">
+                                    <i class="fa fa-edit" aria-hidden="true"></i>
+                                </button>
+                            }
+                        }
+                        <button type="button" class="btn btn-xs btn-default photography-action-btn" data-toggle="tooltip" data-placement="bottom" title="Download">
+                            <a href=@Url.Action("PrintIndex","List",new { formName=item.UniqueFormName, formId=item.UniqueFormId, rowId=item.DataRowId, appRowId=item.Id}) class="txt-primary download-icon">
+                                <i class="fa fa-download"></i>
+                            </a>
+                        </button>
+
+                        <button type="button" class="btn btn-xs btn-default photography-action-btn" data-toggle="tooltip" data-placement="bottom" title="Cancel" onclick="GoToCancelForm(@item.UniqueFormId)">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        }
+
+    </tbody>
+</table>
+<div class="modal fade" id="successModel" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header modelHeader">
+                <span class="modal-title modalMsgTitle" id="modalTitle"></span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label id="modalBody" class="lableMsg">  </label>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="submitBomBtn publishBtn" id="modalOkButton">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    function successModal() {
+        $('#modalTitle').html('Success');
+        $('#modalBody').html('Your form has been cancelled!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function failureModal() {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html('Some error occurred while cancelling the form!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function failure2Modal() {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html('Cannot cancel the form as approver has already taken an action');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function failure3Modal() {
+        $('#modalTitle').html('Error');
+        $('#modalBody').html('Form has already been cancelled');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function failure4Modal() {
+        swal({
+            title: "Warning!",
+            text: "Cannot Edit the Form since approver has already taken action",
+            type: "Warning"
+        }).then(function () {
+            $('#loader').hide();
+        });
+        DisplayAlert('error', 'Warning', 'Cannot Edit the Form since approver has already taken action');
+    }
+
+    function failure5Modal() {
+        swal({
+            title: "Warning!",
+            text: "Cannot Edit the Form since its been cancelled",
+            type: "error"
+        }).then(function () {
+            $('#loader').hide();
+        });
+        DisplayAlert('error', 'Warning', 'Cannot Edit the Form since its been cancelled');
+    }
+
+    function GoToViewForm(formName, rowId, formId, appRowId, ControllerName) {
+       
+        //console.log('here');
+        //console.log(formId);
+        $("#pageLoader").removeClass('invisible');
+        $.ajax({
+            url: '/List/ViewFilledFormNew',
+            type: 'GET',
+            data: { formName: formName, rowId: rowId, formId: formId, appRowId: appRowId, ControllerName: ControllerName },
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data.isValid) {
+                    //console.log(data);
+                    $("#viewForm").html(data.view);
+                    $("#myModal").modal('show');
+                    $("#pageLoader").addClass('invisible');
+                }
+                else {
+                    $("#pageLoader").addClass('invisible');
+                    alert("There was an issue while opening the form. Please contact your administrator");
+                }
+            }),
+            error: (function (data) {
+                $("#loader").addClass('invisible');
+            })
+        })
+    }
+
+    function GoToEditForm(formName, rowId, formId, ControllerName) {
+        ////
+        //console.log('here');
+        //console.log(formId);
+        $("#pageLoader").removeClass('invisible');
+        $.ajax({
+            url: '/List/EditForm',
+            type: 'GET',
+            data: { formName: formName, rowId: rowId, formId: formId, ControllerName: ControllerName },
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data.isValid) {
+                    //console.log(data);
+                    $("#viewForm").html(data.view);
+                    $("#myModal").modal();
+                    $("#pageLoader").addClass('invisible');
+                }
+                else {
+                    $("#pageLoader").addClass('invisible');
+                    alert("There was an issue while opening the form. Please contact your administrator");
+                }
+            }),
+            error: (function (data) {
+                $("#loader").addClass('invisible');
+            })
+        })
+    }
+
+    function GoToCancelForm(formId) {
+        ////
+        //console.log('gotocancelform');
+        //console.log(formId);
+        $("#pageLoader").removeClass('invisible');
+        $.ajax({
+            url: '/List/CancelForm',
+            type: 'POST',
+            data: { formId: formId },
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data == 1) {
+                    //console.log(data);
+                    successModal();
+                    //console.log('Modal Triggered');
+                    //setTimeout(window.location.reload, 5000)
+                    setTimeout(function () {// wait for 5 secs(2)
+                        location.reload(); // then reload the page.(3)
+                    }, 4000);
+                    $("#pageLoader").addClass('invisible');
+                    //console.log('Refresh Triggered');
+                }
+                else {
+                    if (data == 2) {
+                        //console.log('failure2modal');
+                        $("#pageLoader").addClass('invisible');
+                        failure2Modal();
+                        setTimeout(function () {// wait for 5 secs(2)
+                            location.reload(); // then reload the page.(3)
+                        }, 4000);
+                    }
+                    else if (data == 3) {
+                        $("#pageLoader").addClass('invisible');
+                        failure3Modal();
+                        setTimeout(function () {// wait for 5 secs(2)
+                            location.reload(); // then reload the page.(3)
+                        }, 4000);
+                    }
+                    else {
+                        $("#pageLoader").addClass('invisible');
+                        failureModal();
+                        setTimeout(function () {// wait for 5 secs(2)
+                            location.reload(); // then reload the page.(3)
+                        }, 4000);
+                    }
+                    //$("#pageLoader").addClass('invisible');
+                    //alert("There was an issue while opening the form. Please contact your administrator");
+                }
+            }),
+            error: (function (data) {
+                $("#loader").addClass('invisible');
+                failureModal();
+            })
+        })
+    }
+
+    $(document).ready(function () {
+        ////
+        $('#dtBasicExample').dataTable({
+            "lengthChange": false,
+            "searching": true,
+            "info": false,
+            "responsive": true,
+            "oLanguage": { "sSearch": "" },
+            "bAutoWidth": false,
+            language: {
+                searchPlaceholder: "Search",
+                paginate: {
+                    next: '&#8811;', // or '→'
+                    previous: '&#8810;' // or '←'
+                }
+            },
+            columnDefs: [{ type: 'date', 'targets': [5] }],
+            order: [[5, 'desc']],
+        });
+    });
+
+    $('#btn-show-all-children').on('click', function () {
+        // Expand row details
+        table.rows(':not(.parent)').nodes().to$().find('td:first-child').trigger('click');
+    });
+
+    // Handle click on "Collapse All" button
+    $('#btn-hide-all-children').on('click', function () {
+        // Collapse row details
+        table.rows('.parent').nodes().to$().find('td:first-child').trigger('click');
+    });
+
+</script>

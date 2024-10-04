@@ -1,0 +1,208 @@
+﻿<script type="text/javascript">
+    $(function () {
+        $("#modal-window").on("click", "#btnClose", function () {
+            $("#modal-window").modal("hide");
+            window.location.reload();
+        });
+
+        $("#txtApproverName").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: "../Search/GetEmployeeDetails",
+                    dataType: "json",
+                    cache: false,
+                    async: false,
+                    data: {
+                        searchText: $("#txtApproverName").val()
+                    },
+                    success: function (data) {
+                        ////
+                        response($.map(data, function (item) {
+                            return { label: item.DisplayName, value: item.DisplayName, raw: item };
+                        }));
+                    }
+                });
+            },
+            search: function (event, ui) {
+                var value = $("#txtApproverName").val();
+                // If less than three chars, cancel the search event
+                if (value.length < 4) {
+                    event.preventDefault();
+                }
+            },
+            min_length: 4,
+            delay: 0,
+            select: function (event, ui) {
+                ////
+                var empOtherDetails = ui.item['raw'];
+
+                $('#txtDept').val(empOtherDetails.EmployeeDept);
+                $('#txtEmailId').val(empOtherDetails.Email);
+
+                //Get the other details like Cost Center Code, Employee Number from DB.
+                $.ajax({
+                    url: "../Search/GetExistingEmployeeDetails",
+                    dataType: "json",
+                    cache: false,
+                    async: false,
+                    data: {
+                        otherEmpUserId: empOtherDetails.VWUserID,
+                        otherEmpEmail: empOtherDetails.Email
+                    },
+                    success: function (data) {
+                        $('#txtCostCenter').val(data.EmployeeCCCode);
+                        $('#txtEmployeeCode').val(data.EmployeeNumber);
+                        $('#txtUserId').val(data.EmployeeDept);
+                    }
+
+                });
+
+            }
+
+        });
+
+        $("#modal-window").on("click", "#btnForward", function () {
+
+            var approverNameMissing = $("#txtApproverName").val() == "" ? true : false;
+            var commentsMissing = $("#txtForwardComments").val() == "" ? true : false;
+
+            if (approverNameMissing == true && commentsMissing == false) {
+                $("#forwardErrorSummary").show();
+                $('#forwardErrorSummaryItems').empty();
+                $('<li>' + 'Name of the person to whom you want to forward the request is mandatory.' + '</li>').appendTo('#forwardErrorSummaryItems');
+                return;
+            }
+            else if (commentsMissing == true && approverNameMissing == false) {
+                $("#forwardErrorSummary").show();
+                $('#forwardErrorSummaryItems').empty();
+                $('<li>' + 'Comments are mandatory.' + '</li>').appendTo('#forwardErrorSummaryItems');
+                return;
+            }
+            else if (commentsMissing == true && approverNameMissing == true) {
+                $("#forwardErrorSummary").show();
+                $('#forwardErrorSummaryItems').empty();
+                $('<li>' + 'Name of the person to whom you want to forward the request is mandatory.' + '</li>').appendTo('#forwardErrorSummaryItems');
+                $('<li>' + 'Comments are mandatory.' + '</li>').appendTo('#forwardErrorSummaryItems');
+                return;
+            }
+            else {
+                $('#forwardErrorSummaryItems').empty();
+                $("#forwardErrorSummary").hide();
+            }
+            ////
+            $.ajax({
+                type: "GET",
+                url: "../MyWork/ForwardRequest",
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                cache: false,
+                async: false,
+                data: {
+                    requestId: $("#lblRequestIdVal").text(),
+                    suggestedAprroverEmpNumber: $("#txtEmployeeCode").val(),
+                    comments: $("#txtForwardComments").val()
+                },
+                success: function (response) {
+                    //Request is forwarded successfully.
+                    $("#divRequestSuccessMsg").show();
+                    $("#btnForward").prop("disabled", true);
+
+                },
+                error: function (response) {
+                    ////
+                    $("#divRequestSuccessMsg").hide();
+                }
+            });
+        });
+    });
+
+
+</script>
+
+<div id="modal-window" style="display:none;" title="Forward Request" class="modal fade">
+    <div class="modal-dialog" style="width: 50%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                @*<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>*@
+                <h4 class="modal-title">Forward Request to your colleague</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row" hidden="hidden" id="forwardErrorSummary">
+                    <div class="col-lg-12">
+                        <div class="panel-group">
+                            <div class="panel panel-warning">
+                                <div class="panel-heading">Please correct the below errors and proceed again.</div>
+                                <div class="panel-body"><ul id="forwardErrorSummaryItems" style="color:red;"></ul></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-lg-12">
+                        <div class="form-group col-lg-3 right-padding">
+                            <label id="lblRequestId" class="control-label">Request Id:</label>
+                            <label id="lblRequestIdVal" class="control-label"></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-lg-12">
+                        <div class="form-group col-lg-4 required right-padding">
+                            <label id="lblOwnerName" class="control-label">Name of the person:</label>
+                            <div class="inner-addon right-addon">
+                                <i class="glyphicon glyphicon-search"></i>
+                                <input type="text" id="txtApproverName" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-group col-lg-12">
+                        <div class="form-group col-lg-3 right-padding">
+                            <label id="lblDept" class="control-label">Department:</label>
+                            <input type="text" id="txtDept" class="form-control" disabled>
+                        </div>
+                        <div class="form-group col-lg-3 required right-padding">
+                            <label id="lblEmailId" class="control-label">Email Id:</label>
+                            <input type="text" id="txtEmailId" class="form-control" disabled>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-lg-12">
+                        <div class="form-group col-lg-3 required right-padding">
+                            <label id="lblCC" class="control-label">Cost Center:</label>
+                            <input type="text" id="txtCostCenter" class="form-control" disabled>
+                        </div>
+                        <div class="form-group col-lg-3 right-padding">
+                            <label id="lblEmpCode" class="control-label">Employee Code:</label>
+                            <input type="text" id="txtEmployeeCode" class="form-control" disabled>
+                        </div>
+                        <div class="form-group col-lg-3 right-padding">
+                            <label id="lblUserId" class="control-label">Employee User Id:</label>
+                            <input type="text" id="txtUserId" class="form-control" disabled>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-lg-12 required">
+                        <label id="lblForwardCommentes">Comments</label>
+                        <textarea class="form-control" rows="5" id="txtForwardComments" maxlength="2000"></textarea>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-lg-12">
+                        <button type="button" id="btnForward" class="btn btn-success">Forward Request</button>
+                        <button type="button" id="btnClose" class="btn btn-primary">Close</button>
+                    </div>
+                </div>
+                <div id="divRequestSuccessMsg" class="row" style="display:none;">
+                    <div class="form-group col-lg-12">
+                        <label id="lblRequestSuccessMsg" class="alert-success">Request is forwarded successfully!!!</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

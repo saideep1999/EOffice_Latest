@@ -1,0 +1,813 @@
+﻿@model dynamic
+@{
+    var currentUser = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    ViewBag.Title = "POCR Form";
+    bool IsNewMode = true, IsEditMode = false, IsViewMode = false;
+    bool IsValidityCheck = true;
+    Skoda_DCMS.Models.POCRFormModel POCRF = null;
+    Skoda_DCMS.Models.GetUserDetailsModel user = null;
+    dynamic FlagRedirect = null;
+    Layout = ViewBag.Layout;
+    int FormId = 0;
+    List<Skoda_DCMS.Models.ApprovalDataModel> appList = new List<Skoda_DCMS.Models.ApprovalDataModel>();
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        FormId = ViewBag.FormId;
+        IsNewMode = ViewBag.IsNewMode;
+        IsEditMode = ViewBag.IsEditMode;
+        IsViewMode = ViewBag.IsViewMode;
+        POCRF = ViewBag.Model.one[0] as Skoda_DCMS.Models.POCRFormModel;
+        user = ViewBag.Model.one[0] as Skoda_DCMS.Models.GetUserDetailsModel;
+
+        appList = ViewBag.Model?.four as List<Skoda_DCMS.Models.ApprovalDataModel>;
+    }
+
+    // int count = 0;
+}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <style type="text/css">
+        *:visited,
+        *:focus {
+            box-shadow: none;
+        }
+
+        input,
+        select,
+        input:focus,
+        select:focus,
+        textarea,
+        textarea:focus {
+            border: 1px solid #000;
+        }
+
+        input,
+        textarea {
+            padding: 5px;
+        }
+
+        .asset {
+            border: 1px solid black;
+            height: 20px;
+        }
+
+        .signature-table thead td {
+            border-bottom: 1px solid black;
+            border-left: 1px solid black;
+            border-collapse: collapse;
+        }
+
+        .signature-table tbody,
+        .signature-table td {
+            border: none;
+            border-left: 1px solid black;
+            border-collapse: collapse;
+            padding: 5px;
+        }
+
+            .signature-table td:first-child {
+                border-left: none;
+            }
+
+        .signature-table {
+            border: 1px solid black;
+        }
+
+        @@font-face {
+            font-family: 'SKODANext-Black';
+            src: url('../../fonts/SKODANextfont/SKODANext-Black.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Bold.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Light.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Regular.ttf') format('truetype');
+        }
+
+        body {
+            font-family: 'SKODANext-Black';
+        }
+
+        .form_lbl {
+            color: #000;
+            font-weight: 600;
+        }
+
+        #formlbl {
+            width: 250px;
+        }
+
+        label {
+            font-family: "Trebuchet MS", Verdana, Halvetica, Arial;
+            font-size: 20px;
+            font-weight: normal;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+            table td,
+            th {
+                padding-left: 10px;
+            }
+    </style>
+
+</head>
+
+<body>
+
+    <table style="width: 100%; font-size: 14px; color: #000; font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+        <tr>
+            <td>
+                <table style="width: 100%;" cellspadding="0" cellspacing="0">
+                    <tr>
+                        <td colspan="6" width="60%" style="text-align: right;">
+                            @*<img style="width: 50%;" src="/assets/img/SAVWIPL_Merger_Logo.JPG" />*@
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="6" align="center">
+                <h2 style="font-weight:bold"> POCR Form </h2>
+            </td>
+        </tr>
+
+        <tr>
+            <td style="padding: 15px;">
+                <table cellspacing="0" border="" cellpadding="0" width="100%">
+
+                    <tr>
+                        <td colspan="6" align='left'>
+                            <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Submitter Details</u></b></h6>
+                        </td>
+                    </tr>
+
+                    <tr style="margin-top:5px;">
+                        <td>
+                            Type of Employee
+                        </td>
+                        <td align='left'>
+                            @(POCRF.EmployeeType)
+                        </td>
+                        <td align='left'>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "></span>
+                        </td>
+                    </tr>
+
+                    <tr style="margin-top:5px;">
+                        <td style="width:20%; font-weight: bold;">
+                            Employee Name
+                        </td>
+                        <td style="width: 30%; font-weight: normal;" colspan="2" align='left'>
+                            <span style="height: 25px; width:85%; border-radius: 0; "> @(POCRF.EmployeeName)</span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">
+                            Employee Code
+                        </td>
+                        <td style="width: 30%; font-weight: normal;" colspan="2" align='left'>
+                            <span style="height: 25px; width:85%; border-radius: 0; "> @(POCRF.EmployeeCode) </span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Cost Center Number
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(POCRF.EmployeeCCCode)</span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">
+                            UserID
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(POCRF.EmployeeUserId)</span>
+                        </td>
+                    </tr>
+
+                    <tr style="margin-top:5px;">
+                        <td style="width:20%; font-weight: bold;">
+                            Designation
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(POCRF.EmployeeDesignation) </span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">
+                            Location
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(POCRF.EmployeeLocation)</span>
+                        </td>
+                    </tr>
+
+                    <tr style="margin-top:5px;">
+                        <td style="width:20%; font-weight: bold;">
+                            Department
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@(POCRF.EmployeeDepartment)</span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">
+                            Contact Number
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@(POCRF.EmployeeContactNo)</span>
+                        </td>
+                    </tr>
+
+                    @*<tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Submission Type
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "></span>
+                            </td>
+                            <td style="width:10%; font-weight: bold;">
+                                Form Type
+                            </td>
+                            <td>
+                                <input disabled type="checkbox" class="wd" id="chkWeight" name="chkWeight">
+                                SAVWIPL Employee
+                            </td>
+                            <td>
+                                <input disabled type="checkbox" class="wd" id="chkWeight" name="chkWeight">
+                                Blue Collar Employee
+                            </td>
+                        </tr>*@
+
+                    @if (POCRF.EmployeeType == "SAVWIPLEmployee")
+                    {
+                        <tr>
+                            <td colspan="6" align='left'>
+                                <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Applicants Details</u></b></h6>
+                            </td>
+                        </tr>
+                        <tr>
+
+                            <td style="width:20%; font-weight: bold;">
+                                Employee Name
+                            </td>
+                            <td style="width: 30%" colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(POCRF.OtherEmployeeName) </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Employee Code
+                            </td>
+                            <td style="width: 30%" colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(POCRF.OtherEmployeeCode) </span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Designation
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(POCRF.OtherEmployeeDesignation) </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Location
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(POCRF.OtherEmployeeLocation) </span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Department
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(POCRF.OtherEmployeeDepartment) </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Contact Number
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(POCRF.OtherEmployeeContactNo) </span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Cost Center Number
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(POCRF.OtherEmployeeCCCode) </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                UserID
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(POCRF.OtherEmployeeUserId) </span>
+                            </td>
+
+                        </tr>
+                    }
+                    else if (POCRF.EmployeeType == "New")
+                    {
+                        <tr>
+                            <td colspan="6" align='left'>
+                                <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Applicants Details</u></b></h6>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Employee Name
+                            </td>
+                            <td style="width: 30%" colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(POCRF.OtherEmployeeName) </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Employee Code
+                            </td>
+                            <td style="width: 30%" colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(POCRF.OtherEmployeeCode) </span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Designation
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(POCRF.OtherEmployeeDesignation) </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Location
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(POCRF.OtherEmployeeLocation) </span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Department
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(POCRF.OtherEmployeeDepartment) </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Contact Number
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(POCRF.OtherEmployeeContactNo) </span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Cost Center Number
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(POCRF.OtherEmployeeCCCode) </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                UserID
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(POCRF.OtherEmployeeUserId) </span>
+                            </td>
+
+                        </tr>
+                    }
+                    <tr>
+                        <td colspan="6" align='left'>
+                            <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Transaction Field</u></b></h6>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="6" align='left'>
+                            <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>FIL Person Details</u></b></h6>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Name of TSE
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(POCRF.TSEName)</span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">Name of ZSM/RSM </td>
+                        <td colspan="2" align='left'><span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@(POCRF.ZSMName) </span></td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Name of ASM
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@(POCRF.ASMName) </span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">Location of TSE</td>
+                        <td colspan="2" align='left'><span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@(POCRF.TSELocation) </span></td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            State
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@(POCRF.State) </span>
+                        </td>
+                        <td colspan="3" style="width:20%; font-weight: bold;"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="6" align='left'>
+                            <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Dealer Details</u></b></h6>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Dealer Code
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@(POCRF.DealerCode) </span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">Name of the Dealer</td>
+                        <td colspan="2" align='left'><span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@(POCRF.DealerName) </span></td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Dealer Location
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(POCRF.DealerLocation)</span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">FIL Dealership Since</td>
+                        <td colspan="2" align='left'><span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@(POCRF.FILDealership) </span></td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Dealer Sales – Last Year (Rs. Lakhs)
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(POCRF.DealerSalesLastYr)</span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">Dealer Sales – Till Date (Rs. Lakhs)</td>
+                        <td colspan="2" align='left'><span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@(POCRF.DealerSalesTill) </span></td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Exclusive/Non-exclusive Status
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(POCRF.Status)</span>
+                        </td>
+                        <td colspan="3" style="width:20%; font-weight: bold;"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="6" align='left'>
+                            <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Builder Details</u></b></h6>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Name of Builder/Customer & Location
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">  @(POCRF.BuilderName)</span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">Project Name</td>
+                        <td colspan="2" align='left'><span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> </span></td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Site Name/Location
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@(POCRF.ProjectName) </span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">RERA Number</td>
+                        <td colspan="2" align='left'><span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@(POCRF.RERANumber) </span></td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Project Brochure
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(POCRF.ProjectBrochure)</span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">Project Website</td>
+                        <td colspan="2" align='left'><span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@(POCRF.ProjectWebsite) </span></td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Reference From/Customer
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(POCRF.CustomerReference)</span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">Frequency of Customer</td>
+                        <td colspan="2" align='left'><span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@(POCRF.CustomerReference) </span></td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Date of Enquiry
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@(POCRF.DateofEnquiry) </span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">Approx.Order Value in Rs Lakhs</td>
+                        <td colspan="2" align='left'><span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@(POCRF.OrderValue) </span></td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Preferred Plant
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(POCRF.PreferredPlant)</span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">First Lifting- Value (Rs. in Lakhs)</td>
+                        <td colspan="2" align='left'><span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@(POCRF.FirstLifting) </span></td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Delivery Schedule (From)
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(POCRF.DateFrom)</span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">Delivery Schedule (To)</td>
+                        <td colspan="2" align='left'><span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(POCRF.DateTo) </span></td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            First Lifting- Date
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">  @(POCRF.FirstLifting)</span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">POCR Request For</td>
+                        <td colspan="2" align='left'><span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@(POCRF.POCRRequest) </span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="6" align='left'>
+                            <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Material Details</u></b></h6>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            %age additional discount per material group
+                        </td>
+                        <td colspan="5" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(POCRF.AddDisMaterial)</span>
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td colspan="6" align='left'>
+                            <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Validity Details</u></b></h6>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Credit Required
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@(POCRF.CreditReq) </span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">Credit Period (Days)</td>
+                        <td colspan="2" align='left'><span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@(POCRF.CreditPer) </span></td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Interest Cost
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@(POCRF.InterstCost) </span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">Credit Limit (Rs. in Lakhs)</td>
+                        <td colspan="2" align='left'><span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@(POCRF.CreditLimit) </span></td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Project Discount Validity
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@(POCRF.ProDisValid) </span>
+                        </td>
+                        <td colspan="3" style="width:20%; font-weight: bold;"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="6" align='left'>
+                            <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Dealer Details</u></b></h6>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Brief Overview of Customer
+                        </td>
+                        <td colspan="3" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@(POCRF.CustOverview) </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Why we should go for the Project
+                        </td>
+                        <td colspan="3" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@(POCRF.WhyProject) </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="6" align='left'>
+                            <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Competitor Details</u></b></h6>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Competitor Names 1
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@(POCRF.CompName) </span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">Competitor Names 2</td>
+                        <td colspan="2" align='left'><span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@(POCRF.CompName) </span></td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Quotation/Invoice
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(POCRF.Invoice)</span>
+                        </td>
+                        <td colspan="3" style="width:20%; font-weight: bold;"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="6" align='left'>
+                            <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Freight Details</u></b></h6>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Freight Value (From)
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(POCRF.Freight)</span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">Freight Value (To) </td>
+                        <td colspan="2" align='left'><span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@(POCRF.Freight) </span></td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Freight Value (Avg)
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@(POCRF.Freight) </span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">Volume of Truck (in MT) (From)</td>
+                        <td colspan="2" align='left'><span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@(POCRF.Freight) </span></td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Volume of Truck (in MT) (To)
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(POCRF.TruckVol)</span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">Volume of Truck (in MT) (Avg) </td>
+                        <td colspan="2" align='left'><span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(POCRF.TruckVol) </span></td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Place (From)
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(POCRF.Place) </span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">Place (To) </td>
+                        <td colspan="2" align='left'><span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@(POCRF.Place) </span></td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Place (Avg)
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@(POCRF.Place) </span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">Value of Vehicle (Rs. in Lakhs) (From)</td>
+                        <td colspan="2" align='left'><span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@(POCRF.VehValue) </span></td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Value of Vehicle (Rs. in Lakhs) (To)
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@(POCRF.VehValue) </span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">Value of Vehicle (Rs. in Lakhs) (Avg)</td>
+                        <td colspan="2" align='left'><span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@(POCRF.VehValue) </span></td>
+                    </tr>
+
+
+                    <tr>
+            </td>
+        </tr>
+        @if (appList.Count > 0)
+        {
+            if (appList.Any(x => x.ApproverStatus.Contains("Approved")))
+            {
+                <tr>
+                    <td colspan="6" align='left'>
+                        <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Approval Tracking</u></b></h6>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">Name</td>
+                    <td colspan="2">Proccessed On</td>
+                    <td colspan="1">Status</td>
+                    <td colspan="1">Level</td>
+                </tr>
+                foreach (var item in appList)
+                {
+                    <tr>
+                        <td colspan="2">
+                            <div style="margin-bottom: 10px; font-weight: normal;">
+                                <div>@item.ApproverName</div>
+                                <div>@item.Designation</div>
+                            </div>
+                        </td>
+                        <td colspan="2" style="font-weight: normal;">
+                            @if (item.Logic == "OR")
+                            {
+                                if (item.ApproverStatus != "Pending")
+                                {
+                                    <div>
+                                        @item.TimeStamp
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div>
+                                    @item.TimeStamp
+                                </div>
+                            }
+                        </td>
+                        <td colspan="1" style="font-weight: normal;">
+                            @if (item.Logic == "OR")
+                            {
+                                if (item.ApproverStatus != "Pending")
+                                {
+                                    <div>
+                                        @item.ApproverStatus
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div>
+                                    @item.ApproverStatus
+                                </div>
+                            }
+                        </td>
+                        <td colspan="1" style="font-weight: normal;">
+                            <div>
+                                @item.Level
+                            </div>
+                        </td>
+                    </tr>
+                }
+
+            }
+
+        }
+        <tr>
+            <td colspan="6" align='left'>
+                <h6 style="margin-top:5px;margin-left:5px;color:black;font-weight:bold"><b>SF_II_024</b></h6>
+            </td>
+        </tr>
+    </table>
+    </td>
+    </tr>
+    </table>
+
+
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

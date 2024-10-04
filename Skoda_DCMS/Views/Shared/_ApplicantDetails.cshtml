@@ -1,0 +1,1224 @@
+
+@{
+    var user = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    bool IsNew = true;
+    bool IsEdit = true;
+    dynamic Model = null;
+    var IsOnBehalfSAVWIPLEmployee = false;
+    var IsOnBehalfOthers = false;
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IsNew = ViewBag.IsNew;
+        IsEdit = ViewBag.IsEdit;
+        Model = ViewBag.Model;
+        IsOnBehalfSAVWIPLEmployee = Model.one[0].RequestSubmissionFor == "OnBehalf" && Model.one[0].OnBehalfOption == "SAVWIPLEmployee";
+        IsOnBehalfOthers = Model.one[0].RequestSubmissionFor == "OnBehalf" && Model.one[0].OnBehalfOption == "Others";
+    }
+}
+<div id="accordion">
+    @*Existing*@
+    @*@if (IsNew)
+        {
+            if (!IsEdit)
+            {
+                /*Applicant Detail Edit Page*/
+                <div class="card" id="SAVWIPLEmployeeDetailsSection">
+                    <div class="card-header collapsed" id="headingTwo" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                        <h5 class="mb-0">
+                            <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                                <img src="~/assets/img/empIcon.svg" width="24" height="24" class="mr-2" /> <span class="d-inline-block mt-2"> Applicant Details</span>
+
+                            </button>
+                        </h5>
+                    </div>
+
+                    <div id="collapseTwo" class="collapse show" aria-labelledby="headingTwo">
+                        <div class="card-body empDetailsBg">
+                            <div class="row">
+
+                                <div class="col-md-12 col-lg-12 col-12">
+                                    <div class="otherEmpDetailsFields">
+
+                                        <div class="row">
+
+                                            <div class="form-group col-md-3 col-lg-3 col-12 input-block autocomplete-div">
+                                                <input type="text" class="w-100" name="txtOtherEmployeeName" id="txtOtherEmployeeName" value="@(IsOnBehalfSAVWIPLEmployee ? (Model.one[0].OtherEmployeeName ?? ""):"")" onkeypress="alphaOnly(event)" required />
+                                                <span class="placeholder">Name (Type 4 letters)<span class="astColor">*</span></span>
+                                            </div>
+                                            <div class="form-group col-md-2 col-lg-2 col-12 input-block">
+                                                <input type="text" class="w-100 isEditable" id="txtOtherEmployeeCode" name="txtOtherEmployeeCode" value="@(IsOnBehalfSAVWIPLEmployee ? (Model.one[0].OtherEmployeeCode ?? ""):"")" onkeypress="allowNumbersOnly(event)" required />
+                                                <span class="placeholder">Employee Code<span class="astColor">*</span></span>
+                                            </div>
+                                            <div class="form-group col-md-2 col-lg-2 col-12 input-block">
+                                                <input type="text" class="w-100 isEditable" name="txtOtherCostcenterCode" id="txtOtherCostcenterCode" value="@(IsOnBehalfSAVWIPLEmployee ? (Model.one[0].OtherEmployeeCCCode ?? ""):"")" onkeypress="allowNumbersOnly(event)" required />
+                                                <span class="placeholder">Cost Center No<span class="astColor">*</span></span>
+                                            </div>
+                                            <div class="form-group col-md-2 col-lg-2 col-12 input-block">
+                                                <input type="text" class="w-100 isEditable" name="txtOtherUserId" id="txtOtherUserId" value="@(IsOnBehalfSAVWIPLEmployee ? (Model.one[0].OtherEmployeeUserId ?? ""):"")" required />
+                                                <span class="placeholder">User-Id<span class="astColor">*</span></span>
+                                            </div>
+                                            <div class="form-group col-md-3 col-lg-3 col-12 input-block">
+
+                                                <input type="text" class="w-100" name="txtOtherContactNo" id="txtOtherContactNo" value="@(IsOnBehalfSAVWIPLEmployee ? (Model.one[0].OtherEmployeeContactNo ?? ""):"")" maxlength="10" onkeypress="allowNumbersOnly(event)" required />
+                                                <span class="placeholder">Contact No</span>
+                                            </div>
+                                            <div class="form-group col-md-5 col-lg-5 col-12 input-block">
+                                                <input type="text" class="w-100 isEditable" name="txtOtherEmailId" id="txtOtherEmailId" value="@(IsOnBehalfSAVWIPLEmployee ? (Model.one[0].OtherEmployeeEmailId ?? ""):"")" required />
+                                                <span class="placeholder">Email-Id<span class="astColor">*</span></span>
+                                            </div>
+                                            <div class="form-group col-md-3 col-lg-3 col-12 input-block">
+                                                <input type="text" class="w-100 isEditable" name="txtOtherDepartment" id="txtOtherDepartment" value="@(IsOnBehalfSAVWIPLEmployee ? (Model.one[0].OtherEmployeeDepartment ?? ""):"")" onkeypress="alphaOnly(event)" required />
+                                                <span class="placeholder">Department<span class="astColor">*</span></span>
+                                            </div>
+
+                                            <div class="form-group col-md-4 col-lg-4 col-12 inputSelect">
+                                                <select name="ddOtherEmpDesignation" class="w-100" id="ddOtherEmpDesignation" onchange="checkSelect('ddOtherEmpDesignation')" required></select>
+                                                <span class="placeholder">Designation<span class="astColor">*</span></span>
+                                            </div>
+
+                                            <div class="form-group col-md-3 col-lg-3 col-12 inputSelect">
+                                                <select name="ddOtherEmpLocation" class="w-100" id="ddOtherEmpLocation" onchange="checkSelect('ddOtherEmpLocation')" required></select>
+                                                <span class="placeholder">Location<span class="astColor">*</span></span>
+                                            </div>
+                                            <div class="d-flex col-md-5 col-lg-5 mt-3" style="justify-content:space-between;">
+                                                <div class="form-group">
+                                                    <label id="lblSAVWIPLEmployeeTypeOfEmp" readOnly class="f-600">Type of Employee<span class="astColor">*</span></label>
+                                                </div>
+                                                <div class="form-group ">
+
+                                                    <label class="checkbox-container">
+
+                                                        <label class="f-600">Internal</label>
+                                                        @if (IsOnBehalfSAVWIPLEmployee == true && Model.one[0].OtherEmployeeType == "Internal")
+                                                        {
+                                                            <input type="checkbox" class="" name="chkOtherInternal" id="chkOtherInternal" onclick="getOtherEmployeeType()" checked>
+                                                        }
+                                                        else
+                                                        {
+                                                            <input type="checkbox" class="" name="chkOtherInternal" id="chkOtherInternal" onclick="getOtherEmployeeType()">
+                                                        }
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">External</label>
+                                                        @if (IsOnBehalfSAVWIPLEmployee == true && Model.one[0].OtherEmployeeType == "External")
+                                                        {
+                                                            <input type="checkbox" class="" name="chkOtherExternal" id="chkOtherExternal" onclick="getOtherEmployeeType()" checked>
+                                                        }
+                                                        else
+                                                        {
+                                                            <input type="checkbox" class="" name="chkOtherExternal" id="chkOtherExternal" onclick="getOtherEmployeeType()">
+                                                        }
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                    <input type="hidden" name="chkOtherEmployeeType" id="chkOtherEmployeeType" value="@(IsOnBehalfSAVWIPLEmployee ? (Model.one[0].OtherEmployeeType ?? ""):"")" />
+                                                </div>
+
+
+                                            </div>
+
+                                            @if (IsOnBehalfSAVWIPLEmployee == true && Model.one[0].OtherEmployeeType == "External")
+                                            {
+
+                                                <div class="form-group col-md-4 col-lg-4 col-12 input-block" id="divOtherExtOtherOrg">
+                                                    <input type="text" class="w-100 spanUpperSide" name="txtOtherExternalOtherOrganizationName" id="txtOtherExternalOtherOrganizationName" value="@(IsOnBehalfSAVWIPLEmployee ? (Model.one[0].OtherExternalOtherOrganizationName ?? ""):"")" />
+                                                    <span class="placeholder">External Organization Name</span>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="form-group col-md-4 col-lg-4 col-12 input-block d-none" id="divOtherExtOtherOrg">
+                                                    <input type="text" class="w-100 spanUpperSide" name="txtOtherExternalOtherOrganizationName" id="txtOtherExternalOtherOrganizationName" value="" />
+                                                    <span class="placeholder">External Organization Name</span>
+                                                </div>
+                                            }
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card" id="OthersEmployeeDetailsSection">
+                    <div class="card-header collapsed" id="headingTwo" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                        <h5 class="mb-0">
+                            <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                                <img src="~/assets/img/empIcon.svg" width="24" height="24" class="mr-2" />
+                                Filling on behalf of Details
+                                Applicant Details
+                            </button>
+                        </h5>
+                    </div>
+
+                    <div id="collapseTwo" class="collapse show" aria-labelledby="headingTwo">
+                        <div class="card-body empDetailsBg">
+                            <div class="row">
+
+                                <div class="col-md-12 col-lg-12 col-12">
+                                    <div class="otherEmpDetailsFields">
+
+                                        <div class="row">
+
+                                            <div class="form-group col-md-3 col-lg-3 col-12 input-block autocompleteCC-div">
+                                                <input type="text" class="w-100 txtDisable" name="txtOtherNewCostcenterCode" id="txtOtherNewCostcenterCode" value="@(IsOnBehalfOthers ? (Model.one[0].OtherEmployeeCCCode ?? ""):"")" onkeypress="allowNumbersOnly(event)" required />
+                                                <span class="placeholder">Cost Center No. (Type 2 No.)<span class="astColor">*</span></span>
+
+                                            </div>
+                                            <div class="form-group col-md-2 col-lg-2 col-12 input-block">
+
+                                                <input type="text" class="w-100 txtDisable" id="txtOtherNewEmployeeCode" name="txtOtherNewEmployeeCode" value="@(IsOnBehalfOthers ? (Model.one[0].OtherEmployeeCode ?? ""):"")" maxlength="12" onkeypress="allowNumbersOnly(event)" required />
+                                                <span class="placeholder">Employee Code <span class="astColor">*</span></span>
+                                            </div>
+                                            <div class="form-group col-md-2 col-lg-2 col-12 input-block">
+                                                <input type="text" class="w-100 txtDisable" name="txtOtherNewEmployeeName" id="txtOtherNewEmployeeName" value="@(IsOnBehalfOthers ? (Model.one[0].OtherEmployeeName ?? ""):"")" onkeypress="alphaOnly(event)" required />
+                                                <span class="placeholder">Name<span class="astColor">*</span></span>
+
+                                            </div>
+                                            <div class="form-group col-md-2 col-lg-2 col-12 input-block">
+
+                                                <input type="text" class="w-100 txtDisable" name="txtOtherNewUserId" id="txtOtherNewUserId" value="@(IsOnBehalfOthers ? (Model.one[0].OtherEmployeeUserId ?? ""):"")" required />
+                                                <span class="placeholder">User-Id<span class="astColor">*</span></span>
+                                            </div>
+                                            <div class="form-group col-md-3 col-lg-3 col-12 input-block">
+
+                                                <input type="text" class="w-100 txtDisable" name="txtOtherNewContactNo" id="txtOtherNewContactNo" value="@(IsOnBehalfOthers ? (Model.one[0].OtherEmployeeContactNo ?? ""):"")" maxlength="10" onkeypress="allowNumbersOnly(event)" required />
+                                                <span class="placeholder">Contact No</span>
+                                            </div>
+                                            <div class="form-group col-md-5 col-lg-5 col-12 input-block">
+
+                                                <input type="text" class="w-100 txtDisable" name="txtOtherNewEmailId" id="txtOtherNewEmailId" value="@(IsOnBehalfOthers ? (Model.one[0].OtherEmployeeEmailId ?? ""):"")" required />
+                                                <span class="placeholder">Email-Id<span class="astColor">*</span></span>
+                                            </div>
+                                            <div class="form-group col-md-3 col-lg-3 col-12 input-block">
+
+                                                <input type="text" class="w-100 txtDisable" name="txtOtherNewDepartment" id="txtOtherNewDepartment" value="@(IsOnBehalfOthers ? (Model.one[0].OtherEmployeeDepartment ?? ""):"")" onkeypress="alphaOnly(event)" required />
+                                                <span class="placeholder">Department<span class="astColor">*</span></span>
+                                            </div>
+
+
+
+                                            <div class="form-group col-md-4 col-lg-4 col-12 inputSelect">
+
+                                                <select name="ddOtherNewEmpDesignation" class="w-100" id="ddOtherNewEmpDesignation" onchange="checkSelect('ddOtherNewEmpDesignation')" required></select>
+                                                <span class="placeholder">Designation<span class="astColor">*</span></span>
+                                            </div>
+
+                                            <div class="form-group col-md-3 col-lg-3 col-12 inputSelect">
+
+                                                <select name="ddOtherNewEmpLocation" class="w-100" id="ddOtherNewEmpLocation" onchange="checkSelect('ddOtherNewEmpLocation')" required></select>
+                                                <span class="placeholder">Location<span class="astColor">*</span></span>
+                                            </div>
+
+                                            <div class="d-flex col-md-5 col-lg-5 mt-3" style="justify-content:space-between;">
+                                                <div class="form-group">
+                                                    <label id="lblOthrTypeOfEmp" readOnly class="f-600">Type of Employee<span class="astColor">*</span></label>
+                                                </div>
+                                                <div class="form-group">
+
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Internal</label>
+                                                        @if (IsOnBehalfOthers == true && Model.one[0].OtherEmployeeType == "Internal")
+                                                        {
+                                                            <input type="checkbox" class="inpDisable" name="chkOtherNewInternal" id="chkOtherNewInternal" onclick="getOtherNewEmployeeType()" checked>
+                                                        }
+                                                        else
+                                                        {
+                                                            <input type="checkbox" class="inpDisable" name="chkOtherNewInternal" id="chkOtherNewInternal" onclick="getOtherNewEmployeeType()">
+                                                        }
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">External</label>
+                                                        @if (IsOnBehalfOthers == true && Model.one[0].OtherEmployeeType == "External")
+                                                        {
+                                                            <input type="checkbox" class="inpDisable" name="chkOtherNewExternal" id="chkOtherNewExternal" onclick="getOtherNewEmployeeType()" checked>
+                                                        }
+                                                        else
+                                                        {
+                                                            <input type="checkbox" class="inpDisable" name="chkOtherNewExternal" id="chkOtherNewExternal" onclick="getOtherNewEmployeeType()">
+                                                        }
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                    <input type="hidden" name="chkOtherNewEmployeeType" id="chkOtherNewEmployeeType" value="@(Model.one[0].OtherEmployeeType ?? "")" />
+                                                </div>
+                                            </div>
+                                            @if (IsOnBehalfOthers == true && Model.one[0].OtherEmployeeType == "External")
+                                            {
+                                                <div class="form-group col-md-4 col-lg-4 col-12 input-block" id="divOtherNewExtOtherOrg">
+                                                    <input type="text" class="w-100 spanUpperSide" placeholder="" name="txtOtherNewExternalOtherOrganizationName" id="txtOtherNewExternalOtherOrganizationName" value="@(IsOnBehalfOthers ? (Model.one[0].OtherExternalOtherOrganizationName ?? ""):"")" />
+                                                    <span class="placeholder">External Organization Name</span>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="form-group col-md-4 col-lg-4 col-12 input-block d-none" id="divOtherNewExtOtherOrg">
+                                                    <input type="text" class="w-100" placeholder="" name="txtOtherNewExternalOtherOrganizationName" id="txtOtherNewExternalOtherOrganizationName" value="" required />
+                                                    <span class="placeholder">External Organization Name</span>
+                                                </div>
+                                            }
+
+
+
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            }
+            else
+            {
+                /*Applicant Detail Create Page Existing*/
+                <div class="card d-none" id="SAVWIPLEmployeeDetailsSection">
+                    <div class="card-header collapsed" id="headingTwo" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                        <h5 class="mb-0">
+                            <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                                <img src="~/assets/img/empIcon.svg" width="24" height="24" class="mr-2" />Applicant Details
+                            </button>
+                        </h5>
+                    </div>
+
+                    <div id="collapseTwo" class="collapse show" aria-labelledby="headingTwo">
+                        <div class="card-body empDetailsBg">
+                            <div class="row">
+
+                                <div class="col-md-12 col-lg-12 col-12">
+                                    <div class="otherEmpDetailsFields">
+
+                                        <div class="row">
+                                            <div class="form-group col-md-3 col-lg-3 col-12 input-block">
+
+                                                <input type="text" class="w-100 txtDisable" name="txtOtherEmployeeName" id="txtOtherEmployeeName" value="" onkeypress="" required />
+                                                <span class="placeholder">Name (Type 4 letters)<span class="astColor">*</span></span>
+
+                                            </div>
+
+                                            <div class="form-group col-md-2 col-lg-2 col-12 input-block">
+
+                                                <input type="text" class="w-100 txtDisable" name="txtOtherEmployeeCode" id="txtOtherEmployeeCode" value="" onkeypress="allowNumbersOnly(event)" required />
+                                                <span class="placeholder">Employee Code<span class="astColor">*</span></span>
+
+                                            </div>
+                                            <div class="form-group col-md-2 col-lg-2 col-12 input-block">
+
+                                                <input type="text" class="w-100 txtDisable" name="txtOtherCostcenterCode" id="txtOtherCostcenterCode" value="" onkeypress="allowNumbersOnly(event)" required />
+                                                <span class="placeholder">Cost Center No.<span class="astColor">*</span> </span>
+                                            </div>
+
+
+                                            <div class="form-group col-md-2 col-lg-2 col-12 input-block">
+                                                <input type="text" class="w-100 txtDisable" name="txtOtherUserId" id="txtOtherUserId" value="" required />
+                                                <span class="placeholder">User-Id<span class="astColor">*</span> </span>
+                                            </div>
+                                            <div class="form-group col-md-3 col-lg-3 col-12 input-block">
+
+                                                <input type="text" class="w-100 txtDisable" name="txtOtherContactNo" id="txtOtherContactNo" value="" onkeypress="allowNumbersOnly(event)" maxlength="10" required />
+                                                <span class="placeholder">Contact No </span>
+                                            </div>
+                                            <div class="form-group col-md-5 col-lg-5 col-12 input-block">
+
+                                                <input type="text" class="w-100 txtDisable" name="txtOtherEmailId" id="txtOtherEmailId" value="" required />
+                                                <span class="placeholder">Email-Id<span class="astColor">*</span></span>
+                                            </div>
+                                            <div class="form-group col-md-3 col-lg-3 col-12 input-block">
+
+                                                <input type="text" class="w-100 txtDisable" name="txtOtherDepartment" id="txtOtherDepartment" value="" onkeypress="alphaOnly(event)" required />
+                                                <span class="placeholder">Department<span class="astColor">*</span></span>
+                                            </div>
+
+
+
+                                            <div class="form-group col-md-4 col-lg-4 col-12 inputSelect">
+
+                                                <select name="ddOtherEmpDesignation" class="" id="ddOtherEmpDesignation" onchange="checkSelect('ddOtherEmpDesignation')" required></select>
+
+                                                <span class="placeholder">Designation<span class="astColor">*</span></span>
+                                            </div>
+
+                                            <div class="form-group col-md-3 col-lg-3 col-12 inputSelect">
+
+                                                <select name="ddOtherEmpLocation" class="" id="ddOtherEmpLocation" onchange="checkSelect('ddOtherEmpLocation')"></select>
+                                                <span class="placeholder">Location<span class="astColor">*</span></span>
+                                            </div>
+
+
+                                            <div class="d-flex form-group col-md-5 col-lg-5 col-12 mt-3" style="justify-content:space-between;">
+                                                <div class="form-group">
+                                                    <label id="lblSAVWIPLEmployeeTypeOfEmp" readOnly class="f-600">Type of Employee<span class="astColor">*</span></label>
+                                                </div>
+                                                <div class="form-group">
+
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Internal</label>
+                                                        <input type="checkbox" class="" name="chkOtherInternal" id="chkOtherInternal" onclick="getOtherEmployeeType()">
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">External</label>
+                                                        <input type="checkbox" class="" name="chkOtherExternal" id="chkOtherExternal" onclick="getOtherEmployeeType()">
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                    <input type="hidden" name="chkOtherEmployeeType" id="chkOtherEmployeeType" value="" />
+                                                </div>
+
+                                            </div>
+                                            <div class="form-group col-md-4 col-lg-4 col-12 input-block d-none" id="divOtherExtOtherOrg">
+                                                <input type="text" class="w-100" placeholder="" name="txtOtherExternalOtherOrganizationName" id="txtOtherExternalOtherOrganizationName" required />
+                                                <span class="placeholder">External Organization Name</span>
+                                            </div>
+
+                                        </div>
+
+
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                /*Applicant Detail Create Page New*/
+                <div class="card d-none" id="OthersEmployeeDetailsSection">
+                    <div class="card-header collapsed" id="headingTwo" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                        <h5 class="mb-0">
+                            <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                                <img src="~/assets/img/empIcon.svg" width="24" height="24" class="mr-2" />Applicant Details
+                            </button>
+                        </h5>
+                    </div>
+
+                    <div id="collapseTwo" class="collapse show" aria-labelledby="headingTwo">
+                        <div class="card-body empDetailsBg">
+                            <div class="row">
+
+                                <div class="col-md-12 col-lg-12 col-12">
+                                    <div class="otherEmpDetailsFields">
+
+                                        <div class="row">
+                                            <div class="form-group col-md-3 col-lg-3 col-12 input-block">
+                                                <input type="text" class="w-100 txtDisable" name="txtOtherNewCostcenterCode" id="txtOtherNewCostcenterCode" value="" onkeypress="allowNumbersOnly(event)" required />
+                                                <span class="placeholder">Cost Center No. (Type 2 No.)<span class="astColor">*</span></span>
+                                            </div>
+                                            <div class="form-group col-md-2 col-lg-2 col-12 input-block">
+                                                <input type="text" class="w-100 txtDisable" id="txtOtherNewEmployeeCode" name="txtOtherNewEmployeeCode" value="" onkeypress="allowNumbersOnly(event)" maxlength="12" required />
+                                                <span class="placeholder">Employee Code<span class="astColor">*</span></span>
+                                            </div>
+                                            <div class="form-group col-md-2 col-lg-2 col-12 input-block">
+                                                <input type="text" class="w-100 txtDisable" name="txtOtherNewEmployeeName" id="txtOtherNewEmployeeName" value="" onkeypress="alphaOnly(event)" required />
+                                                <span class="placeholder">Name<span class="astColor">*</span></span>
+
+                                            </div>
+
+
+                                            <div class="form-group col-md-2 col-lg-2 col-12 input-block">
+                                                <input type="text" class="w-100 txtDisable" name="txtOtherNewUserId" id="txtOtherNewUserId" value="" required />
+                                                <span class="placeholder">User-Id<span class="astColor">*</span></span>
+                                            </div>
+                                            <div class="form-group col-md-3 col-lg-3 col-12 input-block">
+                                                <input type="text" class="w-100 txtDisable" name="txtOtherNewContactNo" id="txtOtherNewContactNo" value="" onkeypress="allowNumbersOnly(event)" maxlength="10" required />
+                                                <span class="placeholder">Contact No</span>
+                                            </div>
+                                            <div class="form-group col-md-5 col-lg-5 col-12 input-block">
+                                                <input type="text" class="w-100 txtDisable" name="txtOtherNewEmailId" id="txtOtherNewEmailId" value="" required />
+                                                <span class="placeholder">Email-Id<span class="astColor">*</span></span>
+                                            </div>
+                                            <div class="form-group col-md-3 col-lg-3 col-12 input-block">
+                                                <input type="text" class="w-100 txtDisable" name="txtOtherNewDepartment" id="txtOtherNewDepartment" value="" onkeypress="alphaOnly(event)" required />
+                                                <span class="placeholder">Department<span class="astColor">*</span></span>
+                                            </div>
+
+
+                                            <div class="form-group col-md-4 col-lg-4 col-12 inputSelect">
+                                                <select name="ddOtherNewEmpDesignation" class="" id="ddOtherNewEmpDesignation" onchange="checkSelect('ddOtherNewEmpDesignation')" required></select>
+                                                <span class="placeholder">Designation<span class="astColor">*</span></span>
+                                            </div>
+
+                                            <div class="form-group col-md-3 col-lg-3 col-12 inputSelect">
+                                                <select name="ddOtherNewEmpLocation" class="" id="ddOtherNewEmpLocation" onchange="checkSelect('ddOtherNewEmpLocation')" required></select>
+                                                <span class="placeholder">Location<span class="astColor">*</span></span>
+                                            </div>
+
+                                            <div class=" d-flex col-md-5 col-lg-5 col-12 mt-3" style="justify-content:space-between;">
+                                                <div class="form-group">
+                                                    <label id="lblOthrTypeOfEmp" readOnly class="f-600">Type of Employee<span class="astColor">*</span></label>
+                                                </div>
+                                                <div class="form-group ">
+
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Internal</label>
+                                                        <input type="checkbox" class="" name="chkOtherNewInternal" id="chkOtherNewInternal" onclick="getOtherNewEmployeeType()">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">External</label>
+                                                        <input type="checkbox" class="" name="chkOtherNewExternal" id="chkOtherNewExternal" onclick="getOtherNewEmployeeType()">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                    <input type="hidden" name="chkOtherNewEmployeeType" id="chkOtherNewEmployeeType" value="" />
+                                                </div>
+
+                                            </div>
+
+                                            <div class="form-group col-md-4 col-lg-4 col-12 input-block d-none" id="divOtherNewExtOtherOrg">
+                                                <input type="text" class="w-100" placeholder="" name="txtOtherNewExternalOtherOrganizationName" id="txtOtherNewExternalOtherOrganizationName" value="" required />
+                                                <span class="placeholder">External Organization Name</span>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }*@
+
+    @*@if (Model?.one[0].RequestSubmissionFor == "OnBehalf")//else !IsNew &&
+    {*@
+        @*/*Applicant Detail View Page*/*@
+        @*if (Model?.one[0].OnBehalfOption == "SAVWIPLEmployee")
+            {*@
+        @*/*Applicant Detail View Page For Existing Employee*/*@
+        <div class="card @((Model?.one[0].RequestSubmissionFor == "OnBehalf" && Model?.one[0].OnBehalfOption == "SAVWIPLEmployee") ? "" : "d-none")" id="SAVWIPLEmployeeDetailsSection">
+            <div class="card-header collapsed" id="headingTwo" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                <h5 class="mb-0">
+                    <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapsetwo" aria-expanded="true" aria-controls="collapseTwo">
+                        <img src="~/assets/img/empIcon.svg" width="24" height="24" class="mr-2" />Applicant Details
+                    </button>
+                </h5>
+            </div>
+
+            <div id="collapseTwo" class="collapse show" aria-labelledby="headingtwo">
+                <div class="card-body empDetailsBg">
+                    <div class="row">
+
+                        <div class="col-md-12 col-lg-12 col-12">
+                            <div class="otherEmpDetailsFields">
+                                <div class="row">
+                                    <div class="form-group col-md-3 col-lg-3 col-12 input-block">
+                                        <input type="text" class="w-100 txtDisable" name="txtOtherEmployeeName" id="txtOtherEmployeeName" value="@(Model?.one[0].OtherEmployeeName ?? "")" onkeypress="alphaOnly(event)" required/>
+                                        <span class="placeholder">Name<span class="astColor">*</span></span>
+                                    </div>
+                                    <div class="form-group col-md-2 col-lg-2 col-12 input-block">
+                                        <input type="text" class="w-100 txtDisable" id="txtOtherEmployeeCode" name="txtOtherEmployeeCode" value="@(Model?.one[0].OtherEmployeeCode ?? "")" onkeypress="allowNumbersOnly(event)" required
+                                        <span class="placeholder">Employee Code<span class="astColor">*</span></span>
+                                    </div>
+                                    <div class="form-group col-md-2 col-lg-2 col-12 input-block">
+                                        <input type="text" class="w-100 txtDisable" name="txtOtherCostcenterCode" id="txtOtherCostcenterCode" value="@(Model?.one[0].OtherEmployeeCCCode ?? "")" onkeypress="allowNumbersOnly(event)" required/>
+                                        <span class="placeholder">Cost Center No.<span class="astColor">*</span></span>
+                                    </div>
+                                    <div class="form-group col-md-2 col-lg-2 col-12 input-block">
+                                        <input type="text" class="w-100 txtDisable" name="txtOtherUserId" id="txtOtherUserId" value="@(Model?.one[0].OtherEmployeeUserId ?? "")" required/>
+                                        <span class="placeholder">User-Id<span class="astColor">*</span></span>
+                                    </div>
+                                    <div class="form-group col-md-3 col-lg-3 col-12 input-block">
+
+                                        <input type="text" class="w-100 txtDisable" name="txtOtherContactNo" id="txtOtherContactNo" value="@(Model?.one[0].OtherEmployeeContactNo ?? "")" onkeypress="allowNumbersOnly(event)" required/>
+                                        <span class="placeholder">Contact No</span>
+                                    </div>
+                                    <div class="form-group col-md-5 col-lg-5 col-12 input-block">
+                                        <input type="text" class="w-100 txtDisable" name="txtOtherEmailId" id="txtOtherEmailId" value="@(Model?.one[0].OtherEmployeeEmailId ?? "")" required/>
+                                        <span class="placeholder">Email-Id<span class="astColor">*</span></span>
+                                    </div>
+                                    <div class="form-group col-md-3 col-lg-3 col-12 input-block">
+                                        <input type="text" class="w-100 txtDisable" name="txtOtherDepartment" id="txtOtherDepartment" value="@(Model?.one[0].OtherEmployeeDepartment ?? "")" onkeypress="alphaOnly(event)" required/>
+                                        <span class="placeholder">Department<span class="astColor">*</span></span>
+                                    </div>
+
+
+
+                                    <div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                        <select name="ddOtherEmpDesignation" class="w-100" id="ddOtherEmpDesignation" onchange="checkSelect('ddOtherEmpDesignation')" required></select>
+                                        @*<input type="text" class="w-100 txtDisable" name="txtOtherEmpDesignation" id="txtOtherEmpDesignation" value="@(Model?.one[0].OtherEmployeeDesignation ?? "")" />*@
+                                        <span class="placeholder">Designation<span class="astColor">*</span></span>
+                                    </div>
+
+                                    <div class="form-group col-md-3 col-lg-3 col-12 input-block">
+                                        <select name="ddOtherNewEmpLocation" class="" id="ddOtherEmpLocation" onchange="checkSelect('ddOtherNewEmpLocation')" required></select>
+                                        @*<input type="text" class="w-100 txtDisable" name="txtOtherEmpLocation" id="txtOtherEmpLocation" value="@(Model?.one[0].OtherEmployeeLocation ?? "")" />*@
+                                        <span class="placeholder">Location<span class="astColor">*</span></span>
+                                    </div>
+                                    <div class="d-flex col-md-5 col-lg-5 mt-3" style="justify-content:space-between;">
+                                        <div class="form-group">
+                                            <label id="lblSAVWIPLEmployeeTypeOfEmp" readOnly class="f-600">Type of Employee<span class="astColor">*</span></label>
+                                        </div>
+                                        <div class="form-group">
+
+                                            <label class="checkbox-container">
+                                                <label class="f-600">Internal</label>
+                                                @if (Model?.one[0].OtherEmployeeType == "Internal")
+                                                {
+                                                    <input type="checkbox" class="inpDisable" name="chkOtherInternal" id="chkOtherInternal" checked disabled>
+                                                }
+                                                else
+                                                {
+                                                    <input type="checkbox" class="inpDisable" name="chkOtherInternal" id="chkOtherInternal" disabled>
+                                                }
+
+                                                <span class="checkmark"></span>
+                                            </label>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="checkbox-container">
+                                                <label class="f-600">External</label>
+                                                @if (Model?.one[0].OtherEmployeeType == "External")
+                                                {
+                                                    <input type="checkbox" class="inpDisable" name="chkOtherExternal" id="chkOtherExternal" checked disabled>
+                                                }
+                                                else
+                                                {
+                                                    <input type="checkbox" class="inpDisable" name="chkOtherExternal" id="chkOtherExternal" disabled>
+                                                }
+                                                <span class="checkmark"></span>
+                                            </label>
+                                            <input type="hidden" name="chkOtherEmployeeType" id="chkOtherEmployeeType" value="@(Model?.one[0].OtherEmployeeType ?? "")" />
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group col-md-4 col-lg-4 col-12 input-block @(Model?.one[0].OtherEmployeeType == "External" ? "" : "d-none")" id="divOtherExtOtherOrg">
+                                        <input type="text" class="w-100 txtDisable" placeholder="" name="txtOtherExternalOtherOrganizationName" id="txtOtherExternalOtherOrganizationName" value="@(Model?.one[0].OtherExternalOtherOrganizationName ?? "")" />
+                                        <span class="placeholder">External Organization Name</span>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @*}
+            else if (Model?.one[0].OnBehalfOption == "Others")
+            {*@
+        @*/*Applicant Detail View Page For New Employee*/*@
+        <div class="card @((Model?.one[0].RequestSubmissionFor == "OnBehalf" && Model?.one[0].OnBehalfOption == "Others") ? "" : "d-none")" id="OthersEmployeeDetailsSection">
+            <div class="card-header collapsed" id="headingTwo" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                <h5 class="mb-0">
+                    <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapsetwo" aria-expanded="true" aria-controls="collapseTwo">
+                        <img src="~/assets/img/empIcon.svg" width="24" height="24" class="mr-2" />Applicant Details
+                    </button>
+                </h5>
+            </div>
+
+            <div id="collapseTwo" class="collapse show" aria-labelledby="headingtwo">
+                <div class="card-body empDetailsBg">
+                    <div class="row">
+
+                        <div class="col-md-12 col-lg-12 col-12">
+                            <div class="otherEmpDetailsFields">
+                                <div class="row">
+                                    <div class="form-group col-md-3 col-lg-3 col-12 input-block">
+                                        <input type="text" class="w-100 txtDisable" name="txtOtherNewCostcenterCode" id="txtOtherNewCostcenterCode" value="@(Model?.one[0].OtherEmployeeCCCode ?? "")" onkeypress="allowNumbersOnly(event)" required/>
+                                        <span class="placeholder">Cost Center No.<span class="astColor">*</span></span>
+
+                                    </div>
+                                    <div class="form-group col-md-2 col-lg-2 col-12 input-block">
+
+                                        <input type="text" class="w-100 txtDisable" id="txtOtherNewEmployeeCode" name="txtOtherNewEmployeeCode" value="@(Model?.one[0].OtherEmployeeCode ?? "")" onkeypress="allowNumbersOnly(event)" required/>
+                                        <span class="placeholder">Employee Code<span class="astColor">*</span></span>
+                                    </div>
+                                    <div class="form-group col-md-2 col-lg-2 col-12 input-block">
+
+                                        <input type="text" class="w-100 txtDisable" name="txtOtherNewEmployeeName" id="txtOtherNewEmployeeName" value="@(Model?.one[0].OtherEmployeeName ?? "")" onkeypress="alphaOnly(event)" required/>
+                                        <span class="placeholder">Name<span class="astColor">*</span></span>
+
+                                    </div>
+                                    <div class="form-group col-md-2 col-lg-2 col-12 input-block">
+
+                                        <input type="text" class="w-100 txtDisable" name="txtOtherNewUserId" id="txtOtherNewUserId" value="@(Model?.one[0].OtherEmployeeUserId ?? "")" required/>
+                                        <span class="placeholder">User-Id<span class="astColor">*</span></span>
+                                    </div>
+                                    <div class="form-group col-md-3 col-lg-3 col-12 input-block">
+
+                                        <input type="text" class="w-100 txtDisable" name="txtOtherNewContactNo" id="txtOtherNewContactNo" value="@(Model?.one[0].OtherEmployeeContactNo ?? "")" onkeypress="allowNumbersOnly(event)" required/>
+                                        <span class="placeholder">Contact No</span>
+                                    </div>
+                                    <div class="form-group col-md-5 col-lg-5 col-12 input-block">
+
+                                        <input type="text" class="w-100 txtDisable" name="txtOtherNewEmailId" id="txtOtherNewEmailId" value="@(Model?.one[0].OtherEmployeeEmailId ?? "")" required/>
+                                        <span class="placeholder">Email-Id<span class="astColor">*</span></span>
+
+                                    </div>
+                                    <div class="form-group col-md-3 col-lg-3 col-12 input-block">
+
+                                        <input type="text" class="w-100 txtDisable" name="txtOtherNewDepartment" id="txtOtherNewDepartment" value="@(Model?.one[0].OtherEmployeeDepartment ?? "")" onkeypress="alphaOnly(event)" required/>
+                                        <span class="placeholder">Department<span class="astColor">*</span></span>
+                                    </div>
+
+
+
+                                    <div class="form-group col-md-4 col-lg-4 col-12 input-block">
+
+                                        <input type="text" class="w-100 txtDisable" name="txtOtherNewEmpDesignation" id="txtOtherNewEmpDesignation" value="@(Model?.one[0].OtherEmployeeDesignation ?? "")" required/>
+                                        <span class="placeholder">Designation<span class="astColor">*</span></span>
+                                    </div>
+
+                                    <div class="form-group col-md-3 col-lg-3 col-12 input-block">
+
+                                        <input type="text" class="w-100 txtDisable" name="txtOtherNewEmpLocation" id="txtOtherNewEmpLocation" value="@(Model?.one[0].OtherEmployeeLocation ?? "")" required/>
+                                        <span class="placeholder">Location<span class="astColor">*</span></span>
+                                    </div>
+                                    <div class="d-flex col-md-5 col-lg-5 mt-3" style="justify-content:space-between;">
+                                        <div class="form-group">
+                                            <label id="lblSAVWIPLEmployeeTypeOfEmp" readOnly class="f-600">Type of Employee<span class="astColor">*</span></label>
+                                        </div>
+                                        <div class="form-group">
+
+                                            <label class="checkbox-container">
+                                                <label class="f-600">Internal</label>
+                                                @*@if (Model?.one[0].OtherEmployeeType == "Internal")
+                                                {
+                                                    <input type="checkbox" class="inpDisable" name="chkOtherInternal" id="chkOtherInternal" checked disabled>
+                                                }
+                                                else
+                                                {
+                                                    <input type="checkbox" class="inpDisable" name="chkOtherInternal" id="chkOtherInternal" disabled>
+                                                }*@
+                                                <input type="checkbox" class="inpDisable" name="chkOtherInternal" id="chkOtherInternal" @(Model?.one[0].OtherEmployeeType == "Internal" ? "checked" : "")>
+                                                <span class="checkmark"></span>
+                                            </label>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="checkbox-container">
+                                                <label class="f-600">External</label>
+                                                @*@if (Model?.one[0].OtherEmployeeType == "External")
+                                                {
+                                                    <input type="checkbox" class="inpDisable" name="chkOtherExternal" id="chkOtherExternal" checked disabled>
+                                                }
+                                                else
+                                                {
+                                                    <input type="checkbox" class="inpDisable" name="chkOtherExternal" id="chkOtherExternal" disabled>
+                                                }*@
+                                                <input type="checkbox" class="inpDisable" name="chkOtherExternal" id="chkOtherExternal" @(Model?.one[0].OtherEmployeeType == "External" ? "checked" : "")>
+                                                <span class="checkmark"></span>
+                                            </label>
+                                            <input type="hidden" name="chkOtherEmployeeType" id="chkOtherEmployeeType" value="@(Model?.one[0].OtherEmployeeType ?? "")" />
+                                        </div>
+
+                                    </div>
+                                    @*@if (Model?.one[0].OtherEmployeeType == "External")
+                                    {*@
+                                    <div class="form-group col-md-4 col-lg-4 col-12 input-block @(Model?.one[0].OtherEmployeeType == "External" ? "" : "d-none")" id="divOtherExtOtherOrg">
+                                        <input type="text" class="w-100 txtDisable" placeholder="" name="txtOtherExternalOtherOrganizationName" id="txtOtherExternalOtherOrganizationName" value="@(Model?.one[0].OtherExternalOtherOrganizationName ?? "")" />
+                                        <span class="placeholder">External Organization Name</span>
+                                    </div>
+                                    @*}*@
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @*}*@
+        @*}*@
+    </div>
+
+<script>
+    $(document).ready(function () {
+        getOtherEmployeeType();
+        getOtherNewEmployeeType();
+    })
+
+    $("#txtOtherEmployeeName").autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                url: "/List/GetEmployeeDetails",
+                dataType: "json",
+                cache: false,
+                async: true,
+                data: {
+                    searchText: $("#txtOtherEmployeeName").val()
+                },
+                success: function (data) {
+                    ////
+                    data = data.filter(function (e) {
+                        return e.Email !== "@user.Email";
+                    });
+
+                    response($.map(data, function (item) {
+                        return { label: item.FirstName, value: item.FullName, raw: item };
+                    }));
+                }
+            });
+        },
+        search: function (event, ui) {
+            var value = $("#txtOtherEmployeeName").val();
+            console.log(value);
+            // If less than three chars, cancel the search event
+            if (value.length < 4) {
+                event.preventDefault();
+            }
+        },
+        min_length: 4,
+        change: function (event, ui) {
+            if (!ui.item) {
+                $(this).val('');
+                $('#txtOtherEmployeeCode').val('');
+                $('#txtOtherCostcenterCode').val('');
+                $('#txtOtherUserId').val('');
+                $('#txtOtherContactNo').val('');
+                $('#txtOtherEmailId').val('');
+                $('#txtOtherDepartment').val('');
+                $("#ddOtherEmpDesignation").prop("selectedIndex", 0);
+                $('#ddOtherEmpDesignation').removeClass("spanUpperSide");
+                $("#ddOtherEmpLocation").prop("selectedIndex", 0);
+                $('#ddOtherEmpLocation').removeClass("spanUpperSide");
+            }
+        },
+        delay: 0,
+        select: function (event, ui) {
+            ////
+            var empOtherDetails = ui.item['raw'];
+            //Get the other details like Cost Center Code, Employee Number from DB.
+            if (!empOtherDetails.Email) {
+                document.getElementById('txtOtherEmployeeName').value = '';
+                DisplayAlert('success', 'Info', 'Please select a user with valid Email', 4000);
+                event.preventDefault();
+                return;
+            }
+            $.ajax({
+                url: "/List/GetExistingEmployeeDetails",
+                dataType: "json",
+                cache: false,
+                async: true,
+                data: {
+                    otherEmpUserId: empOtherDetails.Email,
+                },
+                success: function (data) {
+                    ////
+                    $('input[id="chkOtherExternal"]').prop("disabled", true);
+                    $('input[id="chkOtherInternal"]').prop("disabled", true);
+
+                    $('#txtOtherEmployeeName').val(data.FullName);
+                    data.EmpNumber == 0 || data.EmpNumber == null ? $('#txtOtherEmployeeCode').val('').prop("readOnly", false) : $('#txtOtherEmployeeCode').val(data.EmpNumber).prop("readOnly", true);
+                    data.CostCenter == 0 || data.CostCenter == null ? $('#txtOtherCostcenterCode').val('').prop("readOnly", false) : $('#txtOtherCostcenterCode').val(data.CostCenter).prop("readOnly", true);
+                    data.UserName == " " || data.UserName == null ? $('#txtOtherUserId').val('').prop("readOnly", false) : $('#txtOtherUserId').val(data.UserName).prop("readOnly", true);
+                    $('#txtOtherContactNo').val(data.PhoneNumber);
+                    data.Email == " " || data.Email == null ? $('#txtOtherEmailId').val('').prop("readOnly", false) : $('#txtOtherEmailId').val(data.Email).prop("readOnly", true);
+                    data.Department == " " || data.Department == null ? $('#txtOtherDepartment').val('').prop("readOnly", false) : $('#txtOtherDepartment').val(data.Department).prop("readOnly", true);
+
+                    EmailId = data.Email;
+                    //console.log(EmailId);
+                    var emailExt = getTypeOfEmployeeByEmail(EmailId);
+                    var extdesignation = "Team Member";
+                    if (emailExt == true) {
+                        $('input[id="chkOtherExternal"]').prop("checked", true).change();
+                        $('input[id="chkOtherInternal"]').prop("checked", false).change();
+                        $("#chkOtherEmployeeType").val('External');
+                        $("#ddOtherEmpDesignation option[value='" + extdesignation + "']").prop('selected', 'selected');
+                        $('#ddOtherEmpDesignation').prop("disabled", true);
+                        $('#ddOtherEmpDesignation').addClass("spanUpperSide");
+                        var company = data.CompanyName;
+                        console.log("other company=" + company);
+                        if (company == null) {
+                            $('#divOtherExtOtherOrg').addClass('d-none');
+                            $('#txtOtherExternalOtherOrganizationName').val("");
+                        }
+                        else {
+                            $('#divOtherExtOtherOrg').removeClass('d-none');
+                            $('#txtOtherExternalOtherOrganizationName').val(data.CompanyName).prop("readOnly", true);
+                        }
+                    }
+                    else {
+                        $('input[id="chkOtherInternal"]').prop("checked", true).change();
+                        $('input[id="chkOtherExternal"]').prop("checked", false).change();
+                        $("#chkOtherEmployeeType").val('Internal');
+                        $("#ddOtherEmpDesignation").prop("disabled", false);
+                        $("#ddOtherEmpDesignation").prop("selectedIndex", 0);
+                        $('#ddOtherEmpDesignation').removeClass("spanUpperSide");
+                        $('#divOtherExtOtherOrg').addClass('d-none');
+                    }
+                    $("#ddOtherEmpLocation").prop("selectedIndex", 0);
+                    $('#ddOtherEmpLocation').removeClass("spanUpperSide");
+                }
+            });
+        }
+
+    });
+
+    $("#txtOtherEmployeeName").autocomplete("option", "appendTo", ".autocomplete-div");
+
+    $("#txtOtherNewCostcenterCode").autocomplete({
+        source: function (request, response) {
+            $.ajax
+                ({
+                    url: "/List/GetCostCenterDetails",
+                    dataType: "json",
+                    cache: false,
+                    async: true,
+                    data: {
+                        searchText: $("#txtOtherNewCostcenterCode").val()
+                    },
+                    success: function (data) {
+                        ////
+                        console.log("Cost center=" + data);
+                        response($.map(data, function (item) {
+                            return { label: item, value: item, raw: item };
+                        }));
+                    },
+                    error: (function (data) {
+                        failureModal();
+                    })
+                })
+        },
+        minLength: 2,
+        change: function (event, ui) {
+            if (!ui.item) {
+                $(this).val('');
+            }
+        }//This is the Char length of inputTextBox
+    });
+
+    $("#txtOtherNewCostcenterCode").autocomplete("option", "appendTo", ".autocompleteCC-div");
+
+    function getOtherNewEmployeeType() {
+        var extdesignation = "Team Member";
+        var x = 0;
+        $('input:checkbox[id="chkOtherNewInternal"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                console.log("other New Internal");
+                $('input[id="chkOtherNewInternal"]').prop('disabled', true);
+                $('input[id="chkOtherNewExternal"]').prop('checked', false).change();
+                $('input[id="chkOtherNewExternal"]').prop("disabled", false);
+                $('#chkOtherNewEmployeeType').val('Internal');
+
+                $('#divOtherNewExtOtherOrg').addClass('d-none');
+
+                $('#txtOtherNewExternalOtherOrganizationName').val('');
+
+                console.log("other new internal x=" + x);
+                if (OtherEmpOrg) {
+                    $("#ddOtherNewEmpDesignation option[value='" + OtherEmpOrg + "']").prop('selected', 'selected');
+                    $('#ddOtherNewEmpDesignation').addClass("spanUpperSide");
+                }
+                if (x == 1) {
+                    $("#ddOtherNewEmpDesignation").prop("disabled", false);
+                    $("#ddOtherNewEmpDesignation").prop("selectedIndex", 0);
+                    $('#ddOtherNewEmpDesignation').removeClass("spanUpperSide");
+                }
+            }
+        });
+
+        $('input:checkbox[id="chkOtherNewExternal"]').click(function () {
+            var v = $("#ddOtherNewEmpDesignation").val();
+            if (v !== "Team Member") {
+                OtherEmpOrg = $("#ddOtherNewEmpDesignation").val();
+            }
+            if ($(this).prop("checked") == true) {
+                console.log("other New External");
+                x = 1;
+                console.log("other new external x=" + x);
+                $('#chkOtherNewEmployeeType').val('External');
+                $('input[id="chkOtherNewExternal"]').prop('disabled', true);
+                $('input[id="chkOtherNewInternal"]').prop("checked", false).change();
+                $('input[id="chkOtherNewInternal"]').prop("disabled", false);
+                $('#divOtherNewExtOtherOrg').removeClass('d-none');
+
+                $("#ddOtherNewEmpDesignation option[value='" + extdesignation + "']").prop('selected', 'selected');
+                $('#ddOtherNewEmpDesignation').addClass("spanUpperSide");
+                $('#ddOtherNewEmpDesignation').prop("disabled", true);
+
+            }
+        });
+    }
+
+    function getOtherEmployeeType() {
+        var extdesignation = "Team Member";
+        var y = 0;
+        $('input:checkbox[id="chkOtherInternal"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                console.log("other Internal");
+                $('input[id="chkOtherInternal"]').prop('disabled', true);
+                $('input[id="chkOtherExternal"]').prop('checked', false).change();
+                $('input[id="chkOtherExternal"]').prop("disabled", false);
+                $('#chkOtherEmployeeType').val('Internal');
+                console.log("other internal y=" + y);
+                if (y == 1) {
+                    $("#ddOtherEmpDesignation").prop("disabled", false).change();
+                    $("#ddOtherEmpDesignation").prop("selectedIndex", 0).change();
+                    $('#ddOtherEmpDesignation').removeClass("spanUpperSide");
+                }
+
+                $('#divOtherExtOtherOrg').addClass('d-none');
+
+
+                $('#txtOtherExternalOtherOrganizationName').val('');
+
+            }
+        });
+
+        $('input:checkbox[id="chkOtherExternal"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                console.log("other External");
+                y = 1;
+                console.log("other external y=" + y);
+                $('#chkOtherEmployeeType').val('External');
+                $('input[id="chkOtherExternal"]').prop('disabled', true);
+                $('input[id="chkOtherInternal"]').prop("checked", false).change();
+                $('input[id="chkOtherInternal"]').prop("disabled", false);
+                $('#divOtherExtOtherOrg').removeClass('d-none');
+                $("#ddOtherEmpDesignation option[value='" + extdesignation + "']").prop('selected', 'selected');
+                $('#ddOtherEmpDesignation').addClass("spanUpperSide");
+                $('#ddOtherEmpDesignation').prop("disabled", true);
+            }
+        });
+    }
+
+    function validateApplicant() {
+        var requestSubmissionFor = $("#drpRequestSubmissionFor option:selected").val();
+        //console.log(requestSubmissionFor);
+
+        if (requestSubmissionFor == "OnBehalf") {
+            if (($('input:radio[value="SAVWIPLEmployee"]').prop("checked") == false) && ($('input:radio[value="Others"]').prop("checked") == false)) {
+                errors += "<li id='error" + errorCount + "'>" + "Employee Type" + "</li>";
+
+                $('input:radio[value="SAVWIPLEmployee"]').addClass('removeEmpType');
+                $('input:radio[value="Others"]').addClass('removeEmpType');
+
+                AddError("lblEmpType", 'removeEmpType', errorCount);
+                errorCount++;
+            }
+            else {
+                RemoveError("lblEmpType");
+
+                var onBehalfOptionSelected = $("#rdOnBehalfOptionSelected").val();
+                if (onBehalfOptionSelected == "SAVWIPLEmployee") {
+
+                    var otherExistName = document.getElementById("txtOtherEmployeeName").value;
+                    if (otherExistName == "") {
+                        errors += "<li id='error" + errorCount + "'>" + "Applicant Employee Name " + "</li>";
+                        AddError("txtOtherEmployeeName", '', errorCount);
+                        errorCount++;
+                    }
+                    else {
+                        RemoveError("txtOtherEmployeeName");
+                    }
+
+                    var otherCostCenterNumlen = $("#txtOtherCostcenterCode").val().length;
+                    if (otherCostCenterNumlen == 0 || otherCostCenterNumlen < 0) {
+                        errors += "<li id='error" + errorCount + "'>" + "Applicant Cost Center Code " + "</li>";
+                        AddError("txtOtherCostcenterCode", '', errorCount);
+                        errorCount++;
+                    }
+                    else {
+                        RemoveError("txtOtherCostcenterCode");
+                    }
+
+                    var otherEmployeeCodelen = $("#txtOtherEmployeeCode").val().length;
+                    if (otherEmployeeCodelen == 0 || otherEmployeeCodelen < 0) {
+                        errors += "<li id='error" + errorCount + "'>" + "Applicant Employee Code" + "</li>";
+                        AddError("txtOtherEmployeeCode", '', errorCount);
+                        errorCount++;
+                    }
+                    else {
+                        RemoveError("txtOtherEmployeeCode");
+                    }
+
+                    var otherUserId = document.getElementById("txtOtherUserId").value;
+                    if (otherUserId == "") {
+                        errors += "<li id='error" + errorCount + "'>" + "Applicant User Id " + "</li>";
+                        AddError("txtOtherUserId", '', errorCount);
+                        errorCount++;
+                    }
+                    else {
+                        RemoveError("txtOtherUserId");
+                    }
+
+                    var otherDepartment = document.getElementById("txtOtherDepartment").value;
+                    if (otherDepartment == "") {
+                        errors += "<li id='error" + errorCount + "'>" + "Applicant Department " + "</li>";
+                        AddError("txtOtherDepartment", '', errorCount);
+                        errorCount++;
+                    }
+                    else {
+                        RemoveError("txtOtherDepartment");
+                    }
+
+                    var otherEmailId = document.getElementById("txtOtherEmailId").value;
+                    //
+                    if (otherEmailId != "") {
+                        RemoveError("txtOtherEmailId");
+                        var IsValidEmail = validateEmail(otherEmailId, DomainID);
+
+                        if (IsValidEmail == false) {
+                            errors += "<li id='error" + errorCount + "'>" + "Invalid Email-Id in Applicant Details" + "</li>";
+                            AddError("txtOtherEmailId", '', errorCount);
+
+                            errorCount++;
+                        }
+                        else {
+                            RemoveError("txtOtherEmailId");
+                        }
+                    }
+                    else {
+                        errors += "<li id='error" + errorCount + "'>" + "Applicant Email-Id" + "</li>";
+                        AddError("txtOtherEmailId", '', errorCount);
+                        errorCount++;
+                    }
+
+                    var otherDesignation = $("#ddOtherEmpDesignation option:selected").val();
+                    if (otherDesignation == "") {
+                        errors += "<li id='error" + errorCount + "'>" + "Applicant Designation" + "</li>";
+                        AddError("ddOtherEmpDesignation", '', errorCount);
+                        errorCount++;
+                    }
+                    else {
+                        RemoveError("ddOtherEmpDesignation");
+                    }
+
+                    var otherLocation = $("#ddOtherEmpLocation option:selected").val();
+                    if (otherLocation == "") {
+                        errors += "<li id='error" + errorCount + "'>" + "Applicant Location" + "</li>";
+                        AddError("ddOtherEmpLocation", '', errorCount);
+                        errorCount++;
+                    }
+                    else {
+                        RemoveError("ddOtherEmpLocation");
+                    }
+
+                    if (($("#chkOtherInternal").prop("checked") == false) && ($("#chkOtherExternal").prop("checked") == false)) {
+                        errors += "<li id='error" + errorCount + "'>" + "Applicant : Type of Employee " + "</li>";
+                        $("#chkOtherInternal").addClass('removeSAVWIPLEmployeeTypeOfEmp');
+                        $("#chkOtherExternal").addClass('removeSAVWIPLEmployeeTypeOfEmp');
+                        AddError("lblSAVWIPLEmployeeTypeOfEmp", 'removeSAVWIPLEmployeeTypeOfEmp', errorCount);
+                        errorCount++;
+                    }
+                    else {
+                        RemoveError("lblSAVWIPLEmployeeTypeOfEmp");
+                    }
+
+                }
+                else if (onBehalfOptionSelected == "Others") {
+                    var otherNewName = document.getElementById("txtOtherNewEmployeeName").value;
+                    if (otherNewName == "") {
+                        errors += "<li id='error" + errorCount + "'>" + "Applicant Employee Name " + "</li>";
+                        AddError("txtOtherNewEmployeeName", '', errorCount);
+                        errorCount++;
+                    }
+                    else {
+                        RemoveError("txtOtherNewEmployeeName");
+                    }
+
+                    var otherCostCenterNumlen = $("#txtOtherNewCostcenterCode").val().length;
+                    if (otherCostCenterNumlen == 0 || otherCostCenterNumlen < 0) {
+                        errors += "<li id='error" + errorCount + "'>" + "Applicant Cost Center Code " + "</li>";
+                        AddError("txtOtherNewCostcenterCode", '', errorCount);
+                        errorCount++;
+                    }
+                    else {
+                        RemoveError("txtOtherNewCostcenterCode");
+                    }
+
+                    var otherEmployeeCodelen = $("#txtOtherNewEmployeeCode").val().length;
+                    if (otherEmployeeCodelen == 0 || otherEmployeeCodelen < 0) {
+                        errors += "<li id='error" + errorCount + "'>" + "Applicant Employee Code" + "</li>";
+                        AddError("txtOtherNewEmployeeCode", '', errorCount);
+                        errorCount++;
+                    }
+                    else {
+                        RemoveError("txtOtherNewEmployeeCode");
+                    }
+
+                    var otherUserId = document.getElementById("txtOtherNewUserId").value;
+                    if (otherUserId == "") {
+                        errors += "<li id='error" + errorCount + "'>" + "Applicant User Id " + "</li>";
+                        AddError("txtOtherNewUserId", '', errorCount);
+                        errorCount++;
+                    }
+                    else {
+                        RemoveError("txtOtherNewUserId");
+                    }
+
+                    var otherDepartment = document.getElementById("txtOtherNewDepartment").value;
+                    if (otherDepartment == "") {
+                        errors += "<li id='error" + errorCount + "'>" + "Applicant Department " + "</li>";
+                        AddError("txtOtherNewDepartment", '', errorCount);
+                        errorCount++;
+                    }
+                    else {
+                        RemoveError("txtOtherNewDepartment");
+                    }
+
+                    var otherEmailId = document.getElementById("txtOtherNewEmailId").value;
+                    if (otherEmailId != "") {
+                        RemoveError("txtOtherNewEmailId");
+                        var IsValidEmail = validateEmail(otherEmailId, DomainID);
+                        if (IsValidEmail == false) {
+                            errors += "<li id='error" + errorCount + "'>" + "Invalid Email-Id in Applicant Details" + "</li>";
+                            AddError("txtOtherNewEmailId", '', errorCount);
+                            errorCount++;
+                        }
+                        else {
+                            RemoveError("txtOtherNewEmailId");
+                        }
+                    }
+                    else {
+                        errors += "<li id='error" + errorCount + "'>" + "Applicant Email-Id" + "</li>";
+                        AddError("txtOtherNewEmailId", '', errorCount);
+                        errorCount++;
+                    }
+
+                    var otherDesignation = $("#ddOtherNewEmpDesignation option:selected").val();
+                    if (otherDesignation == "") {
+                        errors += "<li id='error" + errorCount + "'>" + "Applicant Designation" + "</li>";
+                        AddError("ddOtherNewEmpDesignation", '', errorCount);
+                        errorCount++;
+                    }
+                    else {
+                        RemoveError("ddOtherNewEmpDesignation");
+                    }
+
+                    var otherLocation = $("#ddOtherNewEmpLocation option:selected").val();
+                    if (otherLocation == 0) {
+                        errors += "<li id='error" + errorCount + "'>" + "Applicant Location" + "</li>";
+                        AddError("ddOtherNewEmpLocation", '', errorCount);
+                        errorCount++;
+                    }
+                    else {
+                        RemoveError("ddOtherNewEmpLocation");
+                    }
+
+                    if (($("#chkOtherNewInternal").prop("checked") == false) && ($("#chkOtherNewExternal").prop("checked") == false)) {
+                        errors += "<li id='error" + errorCount + "'>" + "Applicant : Type of Employee " + "</li>";
+                        $("#chkOtherNewInternal").addClass('removeOthrTypeOfEmp');
+                        $("#chkOtherNewExternal").addClass('removeOthrTypeOfEmp');
+                        AddError("lblOthrTypeOfEmp", 'removeOthrTypeOfEmp', errorCount);
+                        errorCount++;
+                    }
+                    else {
+                        RemoveError("lblOthrTypeOfEmp");
+                    }
+                }
+            }
+        }
+    }
+
+    function getTypeOfEmployeeByEmail(txt) {
+        console.log("email-validation");
+        var result = txt.includes("extern");
+        return result;
+    }
+</script>

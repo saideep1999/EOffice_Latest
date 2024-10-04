@@ -1,0 +1,75 @@
+﻿@model Skoda_DCMS.Models.UserData
+
+<div id="submiiterEmp" class="panel-group mb-2">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" href="#collapseSubmitterEmp">Submitter Employee Details</a>
+            </h4>
+        </div>
+        <div id="collapseSubmitterEmp" class="panel-collapse collapse show">
+            <div class="panel-body">
+                <div class="row">
+                    <div class="form-group col-md-12 col-lg-12 required right-padding">
+                        <label id="lblEmpType" class="radio control-label">Type of Employee</label>
+                        <input type="radio" id="internal" name="TypeOfEmployee" value="Internal" checked>
+                        <label for="internal" class="label_style">Internal</label>
+                        <input type="radio" id="external" name="TypeOfEmployee" value="External">
+                        <label for="external" class="label_style">External</label>
+                        @*<input type="radio" name="TypeOfEmployee" value="Internal"> Internal
+                            <input type="radio" name="TypeOfEmployee" value="External">*@
+                    </div>
+                    <div class="form-group col-md-3 col-lg-3">
+                        <label id="lblExternalOrg" style="display: none;" class="control-label">External Organisation Name:</label>
+                        <select name="ddEmpOrganization" id="ddEmpOrganization" class="form-control" style="display: none"></select>
+                    </div>
+                    <div id="divOtherExtOrgName" class="form-group col-md-3 col-lg-3" style="display: none;">
+                        <label id="lblOtherExternalOrg" class="control-label">Other External Organisation Name:</label>
+                        <input type="text" id="txtOtherExtOrgName" class="form-control" maxlength="100">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 col-lg-12 no_padd">
+                        <div class="form-group col-lg-3 required right-padding">
+                            <label id="lblEmpCode" class="control-label">Employee Code</label>
+                            <input type="text" name="txtEmpCode" id="txtEmpCode" class="form-control" required="required" disabled="disabled" value="@Model.EmpNumber">
+                        </div>
+                        <div class="form-group col-lg-3 required right-padding">
+                            <label id="lblEmpUserID" class="control-label">User ID</label>
+                            <input type="text" name="txtUserId" id="txtUserId" class="form-control" required="required" disabled="disabled" value="@Model.UserId">
+                        </div>
+                        <div class="form-group col-lg-3 required right-padding">
+                            <label id="lblEmpname" class="control-label">Employee Name</label>
+                            <input type="text" name="txtEmpname" id="txtEmpname" class="form-control" required="required" disabled="disabled" value="@Model.UserName">
+                        </div>
+                        <div class="form-group col-lg-3 required right-padding">
+                            <label id="lblEmpDept" class="control-label">EmployeeDept</label>
+                            <input type="text" name="txtdept" id="txtDept" class="form-control" required="required" disabled="disabled" value="@Model.Department">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12 no_padd">
+                        <div class="form-group col-lg-2 required right-padding">
+                            <label id="lblEmpCCCode" class="control-label">Cost Center Code</label>
+                            <input type="text" name="txtCCCode" id="txtCCCode" class="form-control" required="required" disabled="disabled" value="@Model.CostCenter">
+                        </div>
+                        <div class="form-group col-lg-3 required right-padding">
+                            <label id="lblEmpLevel" class="control-label">Designation</label>
+                            <select name="ddEmpDesignation" id="ddEmpDesignation" class="form-control"></select>
+                        </div>
+                        <div class="form-group col-lg-3 required right-padding">
+                            <label id="lblLocation" class="control-label">Location</label>
+                            <select name="ddEmpLocation" id="ddEmpLocation" class="form-control"></select>
+                        </div>
+                        <div class="form-group col-lg-4 required right-padding">
+                            <label id="lblEmpContactNo" class="control-label">Contact No. (Sample Format: 111-111-1111 or 1111)</label>
+                            <input type="text" name="txtContactNo" id="txtContactNo" class="form-control" maxlength="12">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

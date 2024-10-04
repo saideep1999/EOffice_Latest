@@ -1,0 +1,3485 @@
+﻿@model Skoda_DCMS.Models.DashboardModel
+@{ ViewBag.Title = "Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var user = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    var tab = ViewBag.Tab ?? 1;
+}
+
+
+<style>
+    .filterAdvButton {
+        background: #0C6980;
+        border-radius: 5px;
+        padding: 0 1rem;
+        height: 30px;
+        text-transform: uppercase;
+        color: #fff;
+    }
+
+    #filterBtn1 {
+        display: none;
+    }
+
+    #loaderMyReq {
+        width: 1rem;
+        height: 1rem;
+        top: -3px;
+        left: 3px;
+        position: relative;
+        border-width: 0.2em;
+    }
+
+    #loaderMytsk {
+        width: 1rem;
+        height: 1rem;
+        top: -3px;
+        left: 3px;
+        position: relative;
+        border-width: 0.2em;
+    }
+
+    .clrBtn {
+        margin-top: 10px;
+        cursor: pointer;
+        color: #0C6980;
+    }
+
+  /*  table.dataTable thead .sorting,
+    table.dataTable thead .sorting_asc,
+    table.dataTable thead .sorting_desc {
+        background: none;
+    }*/
+
+    /*New code*/
+
+    /*.ui-autocomplete-input {
+        border: none;
+        font-size: 14px;
+        width: 300px;
+        height: 24px;
+        margin-bottom: 5px;
+        padding-top: 2px;
+        border: 1px solid #DDD !important;*/
+      /*  padding-top: 0px !important;*/
+        /*z-index: 1;
+        position: relative;
+    }*/
+
+    .ui-menu .ui-menu-item a {
+        font-size: 12px;
+    }
+
+    .ui-autocomplete {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 1 !important;
+        float: left;
+        display: none;
+        padding: 4px 0;
+        margin: 2px 0 0 0;
+        list-style: none;
+        background-color: #ffffff;
+        border-color: #ccc;
+        border-color: rgba(0, 0, 0, 0.2);
+        border-style: solid;
+        border-width: 1px;
+        -webkit-border-radius: 2px;
+        -moz-border-radius: 2px;
+        border-radius: 2px;
+        -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        -webkit-background-clip: padding-box;
+        -moz-background-clip: padding;
+        background-clip: padding-box;
+        *border-right-width: 2px;
+        *border-bottom-width: 2px;
+        max-height: 200px;
+    }
+
+    .ui-menu-item > a.ui-corner-all {
+        display: block;
+        padding: 3px 15px;
+        clear: both;
+        font-weight: normal;
+        line-height: 18px;
+        color: #555555;
+        white-space: nowrap;
+        text-decoration: none;
+    }
+
+    .ui-state-hover, .ui-state-active {
+        color: #ffffff;
+        text-decoration: none;
+        background-color: #0088cc;
+        border-radius: 0px;
+        -webkit-border-radius: 0px;
+        -moz-border-radius: 0px;
+        background-image: none;
+    }
+
+
+
+    body {
+        overflow-x: hidden;
+    }
+
+    /*Custom radio buttons start here*/
+
+    .custRadio {
+        display: block;
+        position: relative;
+        padding-left: 23px;
+        margin-bottom: 0px;
+        cursor: pointer;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        /* Pri_text */
+        display: flex;
+        align-items: center;
+        color: #201F1F;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+        /* Hide the browser's default radio button */
+        .custRadio input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+    /* Create a custom radio button */
+    .checkmarkRadio {
+        position: absolute;
+        top: 8px;
+        left: 0;
+        height: 14px;
+        width: 14px;
+        background-color: #eee;
+        border-radius: 50%;
+    }
+
+    /* On mouse-over, add a grey background color */
+    .custRadio:hover input ~ .checkmarkRadio {
+        background-color: #ccc;
+    }
+
+    /* When the radio button is checked, add a blue background */
+    .custRadio input:checked ~ .checkmarkRadio {
+        background: #201F1F;
+    }
+
+    /* Create the indicator (the dot/circle - hidden when not checked) */
+    .checkmarkRadio:after {
+        content: "";
+        position: absolute;
+        display: none;
+    }
+
+    /* Show the indicator (dot/circle) when checked */
+    .custRadio input:checked ~ .checkmarkRadio:after {
+        display: block;
+    }
+
+    /* Style the indicator (dot/circle) */
+    .custRadio .checkmarkRadio:after {
+        top: 4px;
+        left: 4px;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: white;
+    }
+    .forClose {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 45px;
+        background-color: rgb(115, 177, 221) !important;
+        box-sizing: border-box;
+        border-radius: 5px;
+    }
+    .forApprove {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 45px;
+        background-color: #98DB82;
+        border-radius: 5px;
+    }
+
+    .forReject {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 45px;
+        background-color: rgb(210, 38, 48);
+        box-sizing: border-box;
+        border-radius: 5px;
+    }
+
+    .forEnqire {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 45px;
+        background-color: rgb(190, 190, 190);
+
+        box-sizing: border-box;
+        border-radius: 5px;
+    }
+
+
+    textarea {
+        width: 100%;
+        max-width: inherit;
+        border: 1px solid #BFBFBF !important;
+        max-width: 98.7%;
+        height: 115px;
+        background: #F8F8F8;
+        box-sizing: border-box;
+        border-radius: 5px;
+        padding-left: 10px;
+    }
+
+    .submit-btn {
+        background-color: rgb(115, 177, 221) !important;
+        border-radius: 5px !important;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px !important;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem !important;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #FFFFFF;
+        border-color: transparent !important;
+    }
+
+    .cancl-btn {
+        background-color: rgb(255, 209, 0) !important;
+        border-radius: 5px !important;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px !important;
+        border-color: transparent !important;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem !important;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #212221;
+        margin-left: 10px;
+    }
+
+
+
+
+
+    /* dashboard css */
+
+    .searchButton {
+        background: #4ba82e;
+        border-top-left-radius: 0px;
+        border-bottom-left-radius: 0px;
+        border-top-right-radius: 5x;
+        border-bottom-right-radius: 5px;
+        border: 1px solid #4ba82e;
+        font-size: 1rem;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0 1rem;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #FFFFFF;
+    }
+
+    .searchAdvButton {
+        background: #0C6980;
+        border-radius: 5px;
+        border: 1px solid #0C6980;
+        font-size: 1rem;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        position: relative;
+        padding: 0 1rem;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        justify-content: center;
+        text-transform: uppercase;
+        color: #fff;
+    }
+
+    .applyNowBtn {
+        padding: 0 3rem 0 3rem !important;
+    }
+
+    .searchAdvButton:focus {
+        border-color: #FAE99B;
+        outline: none;
+    }
+
+    .searchAdvButton img {
+        position: absolute;
+        right: 38px;
+        top: 22px;
+    }
+
+    .inpSearch {
+        background: #FFFFFF;
+        border: 1px solid #BFBFBF;
+        box-sizing: border-box;
+        border-radius: 5px !important;
+        height: 44px;
+        padding-left: 38px;
+        flex: auto;
+    }
+
+    .searchIcon {
+        position: absolute;
+        z-index: 4;
+        display: block;
+        width: 2.375rem;
+        height: 2.375rem;
+        line-height: 2.375rem;
+        text-align: center;
+        pointer-events: none;
+        color: #fff;
+        top: 8px;
+        right: 0px;
+    }
+
+    .form-control:focus {
+        color: #000;
+        background-color: #fff;
+        border-color: #BFBFBF;
+        outline: 0;
+        box-shadow: none;
+    }
+
+    .lblTextSearch {
+        font-size: 20px;
+        line-height: 173.7%;
+        display: flex;
+        align-items: center;
+        color: #201F1F;
+    }
+
+    .drpdwnBtn {
+        position: absolute !important;
+        right: 0;
+        z-index: 4;
+        height: 44px;
+    }
+
+    .advSearchDrop {
+        background: #FFFFFF;
+        border: 1px solid #BFBFBF;
+        box-sizing: border-box;
+        border-radius: 5px !important;
+        height: 44px;
+        flex: auto;
+    }
+
+    .custom-select {
+        height: 44px;
+    }
+
+    .dropDownLeftAttachedBtn {
+        background: #929292;
+        color: #fff;
+    }
+
+    .dropDownLeftAttachedBtn:hover {
+        background: #929292;
+        color: #fff;
+    }
+
+    button:focus {
+        outline: none !important;
+        box-shadow: none !important;
+    }
+
+    input:focus {
+        outline: none !important;
+        box-shadow: none !important;
+    }
+
+    select:focus {
+        outline: none !important;
+        box-shadow: none !important;
+    }
+
+    #tabs h6.section-title {
+        color: #eee;
+    }
+
+    #tabs .nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {
+        /*background-color: #0C6980 !important;*/
+        font-size: 18px;
+        line-height: 22px;
+        color: #fff !important;
+        font-weight: 500;
+        border: 1px solid #189ab4;
+    }
+
+    #tabs .nav-tabs .nav-link {
+        font-size: 16px;
+        line-height: 42px;
+        color: #fff;
+        font-weight: 500;
+        padding-bottom:0px;
+        padding-top: 2px;
+        margin-left: 26px;
+        border-radius: 0px;
+    }
+    .nav-tabs .nav-link {
+         border: 0 !important;
+         border-top-left-radius: 0 !important;
+         border-top-right-radius: 0 !important;
+    }
+
+       @* #tabs .nav-tabs .nav-link:after {
+            background: url('../../assets/img/active-ght.png');
+            content: "";
+            position: absolute;
+            top: 0;
+            height: 60px;
+        }*@
+
+    #tabs .nav-tabs .nav-link:hover {
+        color: #fff;
+        background-color: #0C6980 !important;
+        border: 1px solid #189ab4;
+        font-weight: 500;
+    }
+
+    .forCurve {
+        position: relative;
+        border-bottom-color: #30D5C8 !important;
+        /*background-color: #8BF9CA;*/
+        background-color: #30D5C8 !important;
+    }
+
+    .forCurveActive {
+        position: relative;
+        background-color: #00697f;
+        font-size: 18px;
+        line-height: 22px;
+        color: #fff !important;
+        font-weight: 500;
+        border: 1px solid #30D5C8 !important;
+    }
+
+    .noMarginLeft {
+        margin-left: 0 !important;
+    }
+
+    .mr40 {
+        margin-right: 24px !important;
+    }
+
+    .forCurveActive:after {
+        background: url('../../assets/img/active-ght.png') !important;
+        content: "";
+        position: absolute;
+        right: -35px;
+        top: 0px;
+        width: 37px;
+        height: 45px;
+        transform: rotateX(180deg) rotateY(180deg);
+        z-index: 2;
+    }
+
+    .forCurveActive:before {
+        background: url('../../assets/img/active-left.png') !important;
+        content: "";
+        position: absolute;
+        left: -36px;
+        top: 0px;
+        width: 37px;
+        height: 45px;
+        transform: rotateX(180deg) rotateY(180deg);
+        z-index: 1;
+    }
+
+    .forCurve:hover:after {
+        background: url('../../assets/img/active-ght.png');
+        content: "";
+        position: absolute;
+        right: -35px;
+        top: 0px;
+        width: 37px;
+        height: 45px;
+        transform: rotateX(180deg) rotateY(180deg);
+        z-index: 1;
+    }
+
+    .forCurve:hover:before {
+        background: url('../../assets/img/active-left.png');
+        content: "";
+        position: absolute;
+        left: -36px;
+        top: 0px;
+        width: 37px;
+        height: 45px;
+        transform: rotateX(180deg) rotateY(180deg);
+        z-index: 1;
+    }
+
+
+    .navTabsInactiveFirst:before {
+        background: url('../../assets/img/active-gh2.png');
+        content: "";
+        position: absolute;
+        left: -36px;
+        top: 0px;
+        width: 37px;
+        height: 45px;
+        transform: rotateX(180deg) rotateY(180deg);
+    }
+
+
+    .navTabsInactiveLast:after {
+        background: url('../../assets/img/active-left2.png');
+        content: "";
+        position: absolute;
+        right: -35px;
+        top: 0px;
+        width: 37px;
+        height: 45px;
+        transform: rotateX(180deg) rotateY(180deg);
+    }
+
+    .nav-tabs {
+        @*margin-right: 40px;
+        margin-left: 40px;
+        *@ border-radius: 6px;
+        box-shadow: none;
+    }
+
+    .tbl th {
+        font-size: 14px;
+        line-height: 17px;
+        /* identical to box height */
+
+        display: flex;
+        align-items: center;
+        text-transform: uppercase;
+        /* Text_white */
+
+        color: #FFFFFF;
+    }
+
+    .tab-content table th {
+        background: transparent;
+        border: o !important;
+        font-size: 14px;
+        line-height: 17px;
+        /* identical to box height */
+        text-transform: uppercase;
+        /* Text_white */
+        color: #0C6980;
+    }
+
+    .tab-content table tr td {
+        font-size: 15px;
+        line-height: 25px;
+        /* identical to box height */
+        font-weight: 600;
+        color: #3E3E3E;
+    }
+
+    .tab-content .fa {
+        cursor: pointer;
+    }
+
+    .form-check-input {
+        margin-left: 0px;
+    }
+
+    .page-item.active .page-link {
+        color: #fff;
+        background-color: #3D3D3D;
+        border-color: #3D3D3D;
+    }
+
+    element.style {
+    }
+
+    .page-item:last-child .page-link {
+        border-top-right-radius: .25rem;
+        border-bottom-right-radius: .25rem;
+    }
+
+    .page-link {
+        position: relative;
+        display: block;
+        padding: .5rem .75rem;
+        margin-left: -1px;
+        line-height: 1.25;
+        color: #979797;
+        background-color: #fff;
+        border: 1px solid #979797;
+    }
+
+    /* MATERIAL */
+
+    div.input-block {
+        position: relative;
+    }
+
+    div.input-block input {
+        font-weight: 500;
+        font-size: 1rem;
+        color: #495055;
+        width: 165px;
+        padding: 15px 15px;
+        border-bottom-left-radius: 5px !important;
+        border-top-left-radius: 5px !important;
+        border-bottom-right-radius: 0px !important;
+        border-top-right-radius: 0px !important;
+        border: 1px solid #D9D9D9;
+        outline: none;
+    }
+
+    div.input-block span.placeholder {
+        position: absolute;
+        margin: 12px 0 !important;
+        padding: 0 4px;
+        font-family: Roboto, sans-serif;
+        /*color: #000 !important;*/
+        display: flex;
+        align-items: center;
+        font-size: 1rem;
+        top: 0;
+        left: 15px;
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+        background: none;
+        pointer-events: none;
+    }
+        div.input-block textarea {
+        font-weight: 500;
+        font-size: 1rem;
+        color: #495055;
+        width: 100%;
+        padding: 15px 15px;
+        border-bottom-left-radius: 5px !important;
+        border-top-left-radius: 5px !important;
+        border-bottom-right-radius: 0px !important;
+        border-top-right-radius: 0px !important;
+        background-color: #fff;
+        border: 1px solid #D9D9D9;
+        outline: none;
+    }
+    div.input-block input:valid + span.placeholder,
+    div.input-block input:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: #fff;
+    }
+
+    div.input-block.forWhiteLble input:valid + span.placeholder,
+    div.input-block input:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: #fff !important;
+    }
+
+    div.input-block textarea:valid + span.placeholder {
+        transform: none!important;
+        background: #fff !important;
+    }
+    div.input-block textarea:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px)!important;
+        background-color: #fff !important;
+    }
+
+    div.inputSelect span.placeholder {
+        position: absolute;
+        margin: 12px 0;
+        padding: 0 4px;
+        font-family: Roboto, sans-serif;
+        color: #000;
+        display: flex;
+        align-items: center;
+        font-size: 1rem;
+        top: 0;
+        left: 15px;
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+        background: none;
+        pointer-events: none;
+    }
+
+    div.inputSelect select:focus + span.placeholder {
+        transform: scale(0.8) translateY(-30px);
+        background: #fff;
+        z-index: 9;
+    }
+
+    div.inputSelect select:not([value=""]):valid + span.placeholder {
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+    }
+
+    div.input-block input:focus {
+        border-color: #bfbfbf;
+    }
+
+    div.input-block input:focus + span.placeholder {
+        color: #284B63;
+    }
+
+    .nav_menu {
+        position: fixed;
+        float: left;
+        left: 0;
+        background: #30D5C8 !important;
+        margin-bottom: 0px;
+        width: 100%;
+        z-index: 9;
+    }
+
+    /*body.nav-sm .container.body .right_col {
+        margin-top: 93px;
+        padding: 10px 20px;
+        z-index: 2;
+    }*/
+
+    .breadcrumb {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+        padding: .75rem 1rem;
+        margin-bottom: 0;
+        list-style: none;
+        background-color: #FFFFFF;
+        border-radius: .25rem;
+    }
+
+    body.nav-sm .container.body .left_col {
+        width: 70px;
+        padding: 0;
+        position: fixed;
+        height: 45%;
+        z-index: 8;
+    }
+
+    .dropdown-toggle::after {
+        display: none;
+        width: 0;
+        height: 0;
+        margin-left: .255em;
+        vertical-align: .255em;
+        content: "";
+        border-top: .3em solid;
+        border-right: .3em solid transparent;
+        border-bottom: 0;
+        border-left: .3em solid transparent;
+    }
+
+    body.nav-sm span.fa, body.nav-sm .menu_section h3 {
+        display: block !important;
+    }
+
+    .indications {
+        display: flex;
+        justify-content: end;
+        text-transform: uppercase;
+        font-size: 14px;
+        font-weight: 400;
+        align-items: baseline;
+        margin-right: 30px;
+        margin-bottom: 4px;
+        vertical-align: sub;
+    }
+
+    .indications span:not(:last-child) {
+        display: inline-block;
+        margin-right: 20px;
+        vertical-align: sub;
+    }
+
+    .tab-pane table tr td:nth-child(1) {
+        padding-left: 20px !important;
+    }
+
+    table.dataTable tbody tr.even {
+        background-color:transparent !important;
+    }
+    table.dataTable tbody tr.odd {
+        background-color: rgba(242,242,242,0.6) !important;
+    }
+    table.dataTable thead th, table.dataTable thead td {
+        padding: 12px 8px !important;
+    }
+
+    select.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    .rowGreen:nth-child(1) {
+        border-left: 4px solid #81c26d;
+    }
+
+    .rowYellow:nth-child(1) {
+        border-left: 4px solid #00a7a8;
+    }
+
+    .rowOrange:nth-child(1) {
+        border-left: 4px solid #00697f
+    }
+    .twoDays {
+        color: #81c26d;
+    }
+    .twoFourDays {
+        color: #ffd200;
+    }
+    .moreThan {
+        color: #d22630;
+    }
+    .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 120px;
+        background-color: black;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px 0;
+        /* Position the tooltip */
+        position: absolute;
+        z-index: 1;
+    }
+    div.input-block textarea:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: rgb(213 238 238) !important;
+    }
+    .comment-approved {
+        margin-bottom: 30px;
+        margin-top: -15px;
+    }
+
+    .serviceDeskContactLeft {
+        position: fixed;
+        padding: 4px 7px 0 4px;
+        left: 5px;
+        width: 8.1rem;
+        top: 43%;
+        left: 5px;
+        font-size: 12px;
+        color: #000;
+        border-radius: 5px;
+        border: 1px solid #94a2c9;
+        background-color:#fff;
+        margin-top: 32px;
+    }
+
+    .serviceDeskContactLeft ul {
+        padding-left: 0.2rem;
+        word-break: break-all;
+        list-style: none;
+        line-height: 22px;
+    }
+
+    .serviceDeskContactLeft ul li a {
+        text-decoration: none;
+        cursor: pointer;
+        color: #000;
+    }
+
+    .serviceDeskContactLeft ul li  {
+        margin-bottom:7px;
+    }
+
+    .serviceDeskContactLeft ul li a:hover {
+        text-decoration: underline;
+    }
+    .btns{
+        text-transform:uppercase;
+        margin-top:10px;
+    }
+
+    .active-action {
+        padding-bottom: 10px;
+        border-bottom: 3px solid white;
+        min-width: 154px;
+    }
+
+    #approveSubmit, #enquireSubmit, #rejectSubmit {
+        background-color: rgb(115, 177, 221) !important;
+    }
+
+    #cancelBtnEnquire, #cancelBtnReject, #cancelBtnApprove {
+        display: none !important;
+    }
+    .custom-select:focus {
+        border-color: #bfbfbf;
+    }
+    .bgYellowBtn {
+        background-color: rgb(255, 209, 0) !important;
+    }
+    .loaderSpin {
+        width: 3rem !important;
+        height: 3rem !important;
+    }
+    .submit-btn {
+        background: #3D3D3D;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 173.7%;
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #FFFFFF;
+        border-color: transparent !important;
+    }
+    .cancl-btn {
+        background: #FAE99B;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        border-color: transparent !important;
+        line-height: 173.7%;
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #212221;
+        margin-left: 10px;
+    }
+    .TransView {
+        background-color: rgb(255,255,255) !important;
+    }
+    .fa .fa-edit {
+        vertical-align: middle;
+    }
+
+    #tabs .nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {
+        /*background-color: #0C6980 !important;*/
+        font-size: 16px;
+        line-height: 22px;
+        color: #fff !important;
+    }
+    .loader {
+        border: 10px solid #eee;
+        border-radius: 50%;
+        border-top: 10px solid #0087FF;
+        width: 80px;
+        height: 80px;
+        -webkit-animation: spin 2s linear infinite;
+        animation: spin 2s linear infinite;
+    }
+
+
+</style>
+
+<div class="modal fade" id="ApprovedForm">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="w-100 d-flex">
+                    <h2 class="mb-0">Approved Form</h2>
+                    <button type="button" class="close" data-dismiss="modal">
+                        ×
+                    </button>
+                </div>
+
+
+            </div>
+            <div class="modal-body">
+                <div class="" id="myMobileApprovedLists">
+
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger btn-sm cancl-btn" data-dismiss="modal">
+                    Close
+                </button>
+                @*<button type="button" class="btn btn-primary btn-sm submit-btn">
+                        Ok
+                    </button>*@
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="right_col ab2" role="main">
+
+    <div class="row">
+        <div class="col-md-4 col-10">
+            <div class="input-group position-relative input-block forWhiteLble">
+                <input type="text" autocomplete="off" name="Searchforms" id="Searchforms" class="inpSearch Searchforms" onclick="AutoCompleteSearch();" required="" spellcheck="false">
+                <span class="placeholder TransView">
+                    Search by Form Name
+                </span>
+                <input type="hidden" id="formName" name="formName" value="">
+                <input type="hidden" id="UniqueFormId" name="UniqueFormId" value="">
+                <input type="hidden" id="UniqueFormName" name="UniqueFormName" value="">
+                <input type="hidden" id="IsDisable" name="IsDisable" value="">
+                <input type="hidden" id="Message" name="Message" value="">
+
+            </div>
+        </div>
+        <div class="col-md-2 col-2">
+            <button type="button" class="input-group-text w-100 searchAdvButton" id="srBtn"><i class="fa fa-search"></i></button>
+        </div>
+    </div><hr>
+
+    <div class="row box1">
+        <div class="box" id="totalTask" onclick="GetTotalTask('Total');">
+            <div class="col-md-12 col-12">
+                <label class="cardLabels">Total&nbsp;Task</label>
+            </div>
+            <div class="col-md-12 col-12">
+                <label class="fSize ttc" id="totaltask1"> </label>&nbsp;&nbsp;&nbsp;
+                <label style="font-size:14px;"><i class="fa fa-th-list" aria-hidden="true"></i></label>
+            </div>
+        </div>
+
+        <div class="box" id="approvedTask" onclick="GetTotalTask('Approved');">
+            <div class="col-md-12 col-12">
+                <label class="cardLabels">Approved</label>
+            </div>
+            <div class="col-md-12 col-12">
+                <label class="fSize atc" id="approvedtask1"> </label>&nbsp;&nbsp;&nbsp;
+                <label style="font-size:14px;"><i class="fa fa-check" aria-hidden="true"></i></label>
+            </div>
+        </div>
+        <div class="box" id="revisedTask" onclick="GetTotalTask('Revised');">
+            <div class="col-md-12 col-12">
+                <label class="cardLabels">Revised</label>
+            </div>
+            <div class="col-md-12 col-12">
+                <label class="fSize rtc" id="revisedtask1"> </label>&nbsp;&nbsp;&nbsp;
+                <label style="font-size:14px;"><i class="fa fa-question" aria-hidden="true"></i></label>
+            </div>
+        </div>
+    </div>
+
+    <div class="row box2">
+        <div class="box" id="pendingTask" onclick="GetTotalTask('Pending');">
+            <div class="col-md-12 col-12">
+                <label class="cardLabels">Pending</label>
+            </div>
+            <div class="col-md-12 col-12">
+                <label class="fSize ptc" id="pendingtask1"> </label>&nbsp;&nbsp;&nbsp;
+                <label style="font-size:14px;"><i class="fa fa-hourglass-start" aria-hidden="true"></i></label>
+            </div>
+        </div>
+        <div class="box" id="rejectdTask" onclick="GetTotalTask('Rejected');">
+            <div class="col-md-12 col-12">
+                <label class="cardLabels">Rejected</label>
+            </div>
+            <div class="col-md-12 col-12">
+                <label class="fSize rjtc" id="rejectdtask1"> </label>&nbsp;&nbsp;&nbsp;
+                <label style="font-size:14px;"><i class="fa fa-ban" aria-hidden="true"></i></label>
+            </div>
+        </div>
+        <div class="box" id="closedTask" onclick="GetTotalTask('Cancelled');">
+            <div class="col-md-12 col-12">
+                <label class="cardLabels">Cancelled</label>
+            </div>
+            <div class="col-md-12 col-12">
+                <label class="fSize ctc" id="closedtask1"> </label>&nbsp;&nbsp;&nbsp;
+                <label style="font-size:14px;"><i class="fa fa-times-circle" aria-hidden="true"></i></label>
+            </div>
+        </div>
+    </div>
+    <hr>
+
+    <h6 class="text-center"><b>My Task</b></h6>
+
+    <div class="right_col ab2" role="main">
+        <div id="myTaskViewMobile">
+
+        </div>
+    </div>
+
+</div>
+
+
+<div class="ab4">
+    <div class="box-container dvdashboard">
+        <div class="card-boxes" onclick="GetTotalTask('Total');">
+            <div class="card-header">
+                <div class="col-8">
+                    <div class="text">
+                        <h2 class="topic-heading tt ttc">40</h2>
+                    </div>
+                </div>
+                <div class="col-4 iconStyle">
+                    <i class="fa fa-tasks icondes" style="-webkit-text-stroke: 2px white;"></i>
+                </div>
+            </div>
+            <div class="card-footer1"><h2 class="topic">Total Task</h2></div>
+        </div>
+
+        <div class="card-boxes" onclick="GetTotalTask('Approved');">
+            <div class="card-header">
+                <div class="col-8">
+                    <div class="text">
+                        <h2 class="topic-heading at atc">0</h2>
+                    </div>
+                </div>
+                <div class="col-4 iconStyle">
+                    <i class="fa fa-check-square-o icondes" style="-webkit-text-stroke: 2px white;"></i>
+                </div>
+            </div>
+            <div class="card-footer2"><h2 class="topic">Approved</h2></div>
+        </div>
+
+        <div class="card-boxes" onclick="GetTotalTask('Revised');">
+            <div class="card-header">
+                <div class="col-8">
+                    <div class="text">
+                        <h2 class="topic-heading rt rtc">18</h2>
+                    </div>
+                </div>
+                <div class="col-4 iconStyle">
+                    <i class="fa fa-history icondes" style="-webkit-text-stroke: 1px white;"></i>
+                </div>
+            </div>
+            <div class="card-footer3"><h2 class="topic">Revised</h2></div>
+        </div>
+
+        <div class="card-boxes" onclick="GetTotalTask('Pending');">
+            <div class="card-header">
+                <div class="col-8">
+                    <div class="text">
+                        <h2 class="topic-heading pt ptc">0</h2>
+                    </div>
+                </div>
+                <div class="col-4 iconStyle">
+                    <i class="fa fa-hourglass-1 icondes" style="-webkit-text-stroke: 1px white;"></i>
+                </div>
+            </div>
+            <div class="card-footer4"><h2 class="topic">Pending</h2></div>
+        </div>
+
+        <div class="card-boxes" onclick="GetTotalTask('Rejected');">
+            <div class="card-header">
+                <div class="col-8">
+                    <div class="text">
+                        <h2 class="topic-heading rjt rjtc">0</h2>
+                    </div>
+                </div>
+                <div class="col-4 iconStyle">
+                    <i class="fa fa-thumbs-down icondes" style="-webkit-text-stroke: 2px white;"></i>
+                </div>
+            </div>
+            <div class="card-footer5"><h2 class="topic">Rejected</h2></div>
+        </div>
+
+        <div class="card-boxes" onclick="GetTotalTask('Cancelled');">
+            <div class="card-header">
+                <div class="col-8">
+                    <div class="text">
+                        <h2 class="topic-heading ct ctc">6</h2>
+                    </div>
+                </div>
+                <div class="col-4 iconStyle">
+                    <i class="fa fa-times icondes" style="-webkit-text-stroke: 2px white;"></i>
+                </div>
+            </div>
+            <div class="card-footer6"><h2 class="topic">Cancelled</h2></div>
+        </div>
+
+    </div>
+
+    <div class="searchbar mt-4 dvdashboard">
+        <div class="test">
+            <div class="input-group col-md-6" style="margin-left: -15px;">
+                @*<input type="search" autocomplete="off" name="Searchforms" id="Searchforms" class="form-control py-2 border-right-0 border Searchforms" onclick="AutoCompleteSearch();" required spellcheck="false">*@
+                @* <input class="form-control py-2 border-right-0 border" type="search" id="example-search-input" placeholder="Search By Form Name">*@
+                <input type="search" autocomplete="off" name="Searchforms" id="Searchforms" class="form-control py-2 border-right-0 border Searchforms" onclick="AutoCompleteSearch();" required spellcheck="false">
+                <input type="hidden" id="formName" name="formName" value="">
+                <input type="hidden" id="UniqueFormId" name="UniqueFormId" value="">
+                <input type="hidden" id="UniqueFormName" name="UniqueFormName" value="">
+                <input type="hidden" id="IsDisable" name="IsDisable" value="">
+                <input type="hidden" id="Message" name="Message" value="">
+                <span class="input-group-append">
+                    <button onclick="javascript: $('#myFilterModal').modal('show');" type="button" class="btn btn-outline-secondary border-left-0 border" data-bs-toggle="modal" data-bs-target="#myFilterModal">
+                        <i class="fa fa-pencil"></i>
+                    </button>
+                </span>
+            </div>
+
+            @* <button onclick="javascript: $('#myFilterModal').modal('show');" type="button" class="view" data-bs-toggle="modal" data-bs-target="#myFilterModal">Filter</button>
+            *@
+
+        </div>
+    </div>
+
+    <div class="report-container dvdashboard" id="dvdashboard">
+        <div class="report-header">
+            <h4 class="recent-Articles">My Task</h4>
+            @*<button class="view">View All</button>*@
+        </div><br>
+
+        <div class="report-body">
+            <div style="overflow-x:auto;">
+                <div class="table-responsive" id="myTaskView">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="report-container" id="dvMyRequest">
+        <div class="report-header">
+            <h4 class="recent-Articles">My Request</h4>
+            @*<button class="view">View All</button>*@
+        </div>
+
+        <div class="report-body">
+            <div style="overflow-x:auto;">
+                <div class="table-responsive" id="nav-myrequest">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="report-container" id="dvMyReport">
+        <div class="report-header">
+            <h4 class="recent-Articles">My Report</h4>
+            @*<button class="view">View All</button>*@
+        </div>
+
+        <div class="report-body">
+
+            <div class="table-responsive" id="nav-myReport">
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- The Modal -->
+
+    <div class="modal fade" id="myModalEdit" role="dialog">
+        <div class="modal-dialog modal-xl">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header modal_header_block">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="viewForm"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="myModal5" role="dialog">
+        <div class="modal-dialog modal-xl">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header modal_header_block">
+                    <button type="button" id="crossClose" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="formView"></div>
+                </div>
+                <div class="col-12 approvalWindow">
+                    <form action="" id="approveFooter" class="comment-approved" style="display: none; text-align:center;">
+                        <div class="radio-box">
+                            <label class="radio-inline" style="display:none">
+                                <input type="radio" name="optradio" data-toggle="modal" data-target="#Signature" class="mr-1" disabled>Signature Canvas
+                            </label>
+                            <div class="modal fade" id="Signature" role="dialog">
+                                <div class="modal-dialog signature-modal-dialog">
+                                    <!-- Modal content-->
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                            <h4 class="modal-title">Signature Canvas</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <!-- Content -->
+                                            <div class="container">
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <h1>E-Signature</h1>
+                                                        <p>Sign in the canvas below and save your signature as an image!</p>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <canvas id="sig-canvas" width="435" height="160">
+                                                            Get a better browser, bro.
+                                                        </canvas>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-12 signature-row">
+                                                        <button class="btn btn-primary" id="sig-submitBtn">Submit Signature</button>
+                                                        <button class="btn btn-default" id="sig-clearBtn">Clear Signature</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <label class="radio-inline pl-2" style="display:none">
+                                <input type="radio" name="optradio" class="mr-1" disabled>Sign using PKI Certificate
+                            </label>
+                        </div>
+                        <div class="input-block">
+                            <textarea id="comment-approve" rows="4" cols="50" style="background-color:#fff;" name="comment" placeholder="Comments..." form="usrform"></textarea>
+                            <!-- <span class="placeholder">Comments</span>-->
+                        </div>
+                        <div class="comment-submit col-12 d-flex">
+                            <input type="button" id="approveSubmit" class="submit-btn" onclick="saveResponse('approve')" value="Submit">
+                            <button type="button" id="cancelBtnApprove" class="btn btn-default close-btn-border cancl-btn">Close</button>
+                        </div>
+                    </form>
+                    <form action="" id="rejectFooter" class="comment-reject" style="display: none; text-align: center;">
+                        <textarea id="comment-reject" rows="4" cols="50" name="comment" form="usrform" placeholder="Comments..."></textarea>
+                        <div class="comment-submit col-12 d-flex">
+                            <input type="button" id="rejectSubmit" class="submit-btn" onclick="saveResponse('reject')" value="Submit">
+                            <button type="button" id="cancelBtnReject" class="btn btn-default close-btn-border cancl-btn">Close</button>
+                        </div>
+                    </form>
+                    <form action="" id="enquireFooter" class="comment-enquire" style="display: none; text-align: center;">
+                        <textarea id="comment-enquire" rows="4" cols="50" name="comment" form="usrform" placeholder="Comments..."></textarea>
+                        <div class="comment-submit col-12 d-flex">
+                            <input type="button" id="enquireSubmit" class="submit-btn" onclick="saveResponse('enquire')" value="Submit">
+                            <button type="button" id="cancelBtnEnquire" class="btn btn-default close-btn-border cancl-btn">Close</button>
+                        </div>
+                    </form>
+                    <div class="modal-footer">
+                        <div data-role="fieldcontain" class="margin_center">
+                            <fieldset data-role="controlgroup" class="d-md-flex">
+                                <input type="hidden" id="hiddenFormName" name="hiddenFormName" value="" />
+                                <div class="active-action mr-3">
+                                    <div class="forApprove position-relative" id="btnApprove">
+                                        <label class="btns">
+                                            Approve
+
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="active-action mr-3">
+                                    <div class="forEnqire position-relative" id="btnEnquire">
+                                        <label class="btns">
+                                            Enquire
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="active-action mr-3">
+                                    <div class="forReject position-relative" id="btnReject">
+                                        <label class="btns">
+                                            <span id="labelReject">Reject</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="active-action mr-3">
+                                    <div class="forClose bgYellowBtn position-relative" id="btnClose">
+                                        <label class="btns">
+                                            <span id="labelReject">Close</span>
+
+                                        </label>
+                                    </div>
+                                </div>
+
+                            </fieldset>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="myModalRequest" role="dialog">
+        <div class="modal-dialog modal-xl">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header modal_header_block">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="viewFormRequest"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- The Modal -->
+    <div class="modal fade" id="myFilterModal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Filter</h4>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-12 col-lg-12 col-12 mt-2">
+                            <input class="form-control py-2 border Searchforms" name="Searchforms" type="search" id="example-search-input" placeholder="Search By Form Name" onclick="AutoCompleteSearch();" required spellcheck="false">
+                            <input type="hidden" id="formName" name="formName" value="">
+                            <input type="hidden" id="UniqueFormId" name="UniqueFormId" value="">
+                            <input type="hidden" id="UniqueFormName" name="UniqueFormName" value="">
+                            <input type="hidden" id="IsDisable" name="IsDisable" value="">
+                            <input type="hidden" id="Message" name="Message" value="">
+                        </div>
+                        <div class="col-sm-12 col-md-12 col-lg-12 col-12 mt-2">
+                            <select class="form-control DashinputGroupSelect02" id="inputGroupSelect04" onchange="checkSelect('inputGroupSelect04')" name="inputGroupSelect02" required>
+                            </select>
+                        </div>
+                        <div class="col-sm-12 col-md-12 col-lg-12 col-12 mt-2">
+                            <select class="form-control DashinputGroupSelect01" id="inputGroupSelect05" onchange="checkSelect('inputGroupSelect05')" name="inputGroupSelect01">
+                            </select>
+                        </div>
+                        <div class="col-sm-12 col-md-12 col-12 mt-2">
+                            <button type="button" class="input-group-text searchAdvButton w-100 searchBtn" id="searchBtn">Search</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- .delegation -->
+<div class="modal fade" id="MydelList">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="w-100 d-flex">
+                    <h2 class="mb-0">Delegation</h2>
+                    <button type="button" class="close" data-dismiss="modal">
+                        ×
+                    </button>
+                </div>
+
+
+            </div>
+            <div class="modal-body">
+
+                @{
+                    Html.RenderPartial("DelegationList");
+                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger btn-sm cancl-btn" data-dismiss="modal">
+                    Close
+                </button>
+                @*<button type="button" class="btn btn-primary btn-sm submit-btn">
+                        Ok
+                    </button>*@
+            </div>
+        </div>
+    </div>
+</div>
+<!--    -->
+<div class="modal fade" id="ChangePassword">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="w-100 d-flex">
+                    <h2 class="mb-0">Password Change</h2>
+                    <button type="button" class="close" data-dismiss="modal">
+                        ×
+                    </button>
+                </div>
+
+
+            </div>
+            <div class="modal-body">
+
+                @{
+                    Html.RenderPartial("PasswordChange");
+                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger btn-sm cancl-btn" data-dismiss="modal">
+                    Close
+                </button>
+                @*<button type="button" class="btn btn-primary btn-sm submit-btn">
+                        Ok
+                    </button>*@
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="appComments" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog w42 modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header modelHeader">
+                <span class="modal-title modalMsgTitle f-600" id="modalTitle">Comments</span>
+                <button type="button" class="close" aria-label="Close" id="cmntBtnClose">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body commentSection">
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="submit-btn publishBtn" id="cmntBtn">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="exampleModalMBS" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="exampleModalMBSTitle"> </h3>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12 col-md-12 col-lg-12">
+                        <div class="row mt-2">
+                            <div class="col-sm-12 col-md-12">
+                                <div class="">
+                                    <div>
+                                        @*<div id="buttons" style="margin-right:-250px"></div>*@
+                                        <div id="buttons1" style="margin-right:-2px"></div>
+                                    </div>
+                                    <table class="table table-bordered w-100" id="tblMBSItem">
+                                        <thead>
+                                            <tr>
+                                                <th>Form ID</th>
+                                                <th>Form Name </th>
+                                                <th>Requested From</th>
+                                                <th>Received Date</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                @*<button type="button" class="btn btn-primary">Save changes</button>*@
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="exampleModalMyRequest" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">My Request </h3>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12 col-md-12 col-lg-12">
+                        <div class="row mt-2">
+                            <div class="col-sm-12 col-md-12">
+                                <div class="">
+                                    <div>
+                                        @*<div id="buttons" style="margin-right:-250px"></div>*@
+                                        <div id="MyRequestExcel" style="margin-right:-2px"></div>
+                                    </div>
+                                    <table class="table table-bordered w-100" id="tblMyRequestItem">
+                                        <thead>
+                                            <tr>
+                                                <th>Form ID</th>
+                                                <th>Form Name </th>
+                                                <th>Requested From</th>
+                                                <th>Received Date</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                @*<button type="button" class="btn btn-primary">Save changes</button>*@
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="exampleModalMyRequest" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">My Request </h3>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12 col-md-12 col-lg-12">
+                        <div class="row mt-2">
+                            <div class="col-sm-12 col-md-12">
+                                <div class="">
+                                    <div>
+                                        @*<div id="buttons" style="margin-right:-250px"></div>*@
+                                        <div id="MyRequestExcel" style="margin-right:-2px"></div>
+                                    </div>
+                                    <table class="table table-bordered w-100" id="tblMyRequestItem">
+                                        <thead>
+                                            <tr>
+                                                <th>Form ID</th>
+                                                <th>Form Name </th>
+                                                <th>Requested From</th>
+                                                <th>Received Date</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                @*<button type="button" class="btn btn-primary">Save changes</button>*@
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="exampleModalApproved" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Approved Form </h3>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12 col-md-12 col-lg-12">
+                        <div class="row mt-2">
+                            <div class="col-sm-12 col-md-12">
+                                <div class="">
+                                    <div>
+                                        <div id="MyApprovedExcel" style="margin-right:-2px"></div>
+                                    </div>
+                                    <table class="table table-bordered w-100" id="tblApprovedItem">
+                                        <thead>
+                                            <tr>
+                                                <th>Form ID</th>
+                                                <th>Form Name </th>
+                                                <th>Requested From</th>
+                                                <th>Received Date</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                @*<button type="button" class="btn btn-primary">Save changes</button>*@
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    function GoToForm(uniqueFormName, Id, formName) {
+        window.location.href = '/List/CreateForm?uniqueFormName=' + uniqueFormName + ',formParentId=' + Id + ',formName=' + formName;
+    };
+
+    $(document).ready(function () {
+        GetMyTasks_MobileView(0, 0);
+        $(".DashinputGroupSelect01").prop("disabled", true);
+
+
+        $("#Approve").hide();
+        if ('@tab' == '2') {
+            //DisplayMyRequestTab();
+            $('#nav-myrequest-tab').click();
+        }
+
+        $('#myModalEdit').on('hidden.bs.modal', function () {
+            $("#viewForm").empty();
+        })
+
+        $('#myModal5').on('hidden.bs.modal', function () {
+            $("#formView").empty();
+        })
+
+        $('#myModalRequest').on('hidden.bs.modal', function () {
+            $("#viewFormRequest").empty();
+        })
+
+        $(".comment-toggle-1").on('click', function () {
+            $(".comment-enquire").toggle();
+        });
+
+        $(".comment-toggle").on('click', function () {
+            $(".comment-reject").toggle();
+        });
+
+        $(".comment-toggle-2").on('click', function () {
+            $(".comment-approved").toggle();
+        });
+
+        $("#btnClose").on('click', function () {
+            $("#approveFooter").hide();
+            $("#rejectFooter").hide();
+            $("#enquireFooter").hide();
+            window.location.reload();
+        });
+
+        $("#crossClose").on('click', function () {
+            $("#approveFooter").hide();
+            $("#rejectFooter").hide();
+            $("#enquireFooter").hide();
+            window.location.reload();
+        });
+
+        $("#approveSubmit").on('click', function () {
+            $("#approveFooter").hide();
+            $("#rejectFooter").hide();
+            $("#enquireFooter").hide();
+            $("#comment-approve").val('');
+            $("#btnApprove").prop('checked', false);
+            //window.location.reload();
+        });
+
+        $("#rejectSubmit").on('click', function () {
+            $("#approveFooter").hide();
+            $("#rejectFooter").hide();
+            $("#enquireFooter").hide();
+            $("#comment-reject").val('');
+            $("#btnReject").prop('checked', false);
+            //window.location.reload();
+        });
+
+        $("#enquireSubmit").on('click', function () {
+            $("#approveFooter").hide();
+            $("#rejectFooter").hide();
+            $("#enquireFooter").hide();
+            $("#comment-enquire").val('');
+            $("#btnEnquire").prop('checked', false);
+            //window.location.reload();
+        });
+
+        $("#btnApprove").on('click', function () {
+            //$("#approveFooter").hide();
+            var objDiv = $("#myModal5");
+            var h = objDiv.get(0).scrollHeight;
+            objDiv.animate({ scrollTop: h });
+            $(this).parent().css("border-color", "#98DB82");
+            $('#btnEnquire').parent().css("border-color", "white");
+            $('#btnReject').parent().css("border-color", "white");
+            $("#approveFooter").show();
+            $("#rejectFooter").hide();
+            $("#enquireFooter").hide();
+
+            //window.location.reload();
+        });
+
+        $("#btnReject").on('click', function () {
+            var objDiv = $("#myModal5");
+            var h = objDiv.get(0).scrollHeight;
+            objDiv.animate({ scrollTop: h });
+            $('#btnApprove').parent().css("border-color", "white");
+            $('#btnEnquire').parent().css("border-color", "white");
+            $('#btnReject').parent().css("border-color", "rgb(210, 38, 48)");
+            $("#approveFooter").hide();
+            $("#rejectFooter").show();
+            //$("#rejectFooter").hide();
+            $("#enquireFooter").hide();
+            //window.location.reload();
+        });
+
+        $("#btnEnquire").on('click', function () {
+            var objDiv = $("#myModal5");
+            var h = objDiv.get(0).scrollHeight;
+            objDiv.animate({ scrollTop: h });
+            $('#btnApprove').parent().css("border-color", "white");
+            $('#btnEnquire').parent().css("border-color", "rgb(190, 190, 190)");
+            $('#btnReject').parent().css("border-color", "white");
+            $("#approveFooter").hide();
+            $("#rejectFooter").hide();
+            $("#enquireFooter").show();
+            //$("#enquireFooter").hide();
+            //window.location.reload();
+        });
+
+        $("#dashboardListItem").addClass("current-page");
+
+        var option = {
+            animation: true,
+            autohide: true,
+            delay: 2000
+        };
+        $('.toast').toast(option);
+        Getmobiletask();
+
+    });
+
+
+    function PostUser(userName) {
+        $.ajax({
+            url: '/Dashboard/PostUser',
+            type: 'POST',
+            data: { userName: userName },
+            dataType: 'JSON',
+            success: (function (data) {
+                console.log(data);
+            }),
+            error: (function (data) {
+                console.log(data);
+                console.log("There was an issue while refreshing tasks. Please reload the page");
+            })
+        })
+    }
+
+    //(function () {
+    //    window.requestAnimFrame = (function (callback) {
+    //        return window.requestAnimationFrame ||
+    //            window.webkitRequestAnimationFrame ||
+    //            window.mozRequestAnimationFrame ||
+    //            window.oRequestAnimationFrame ||
+    //            window.msRequestAnimaitonFrame ||
+    //            function (callback) {
+    //                window.setTimeout(callback, 1000 / 60);
+    //            };
+    //    })();
+
+    //    var canvas = document.getElementById("sig-canvas");
+    //    var ctx = canvas.getContext("2d");
+    //    ctx.strokeStyle = "#222222";
+    //    ctx.lineWidth = 4;
+
+    //    var drawing = false;
+    //    var mousePos = {
+    //        x: 0,
+    //        y: 0
+    //    };
+    //    var lastPos = mousePos;
+
+    //    canvas.addEventListener("mousedown", function (e) {
+    //        drawing = true;
+    //        lastPos = getMousePos(canvas, e);
+    //    }, false);
+
+    //    canvas.addEventListener("mouseup", function (e) {
+    //        drawing = false;
+    //    }, false);
+
+    //    canvas.addEventListener("mousemove", function (e) {
+    //        mousePos = getMousePos(canvas, e);
+    //    }, false);
+
+    //    // Add touch event support for mobile
+    //    canvas.addEventListener("touchstart", function (e) {
+
+    //    }, false);
+
+    //    canvas.addEventListener("touchmove", function (e) {
+    //        var touch = e.touches[0];
+    //        var me = new MouseEvent("mousemove", {
+    //            clientX: touch.clientX,
+    //            clientY: touch.clientY
+    //        });
+    //        canvas.dispatchEvent(me);
+    //    }, false);
+
+    //    canvas.addEventListener("touchstart", function (e) {
+    //        mousePos = getTouchPos(canvas, e);
+    //        var touch = e.touches[0];
+    //        var me = new MouseEvent("mousedown", {
+    //            clientX: touch.clientX,
+    //            clientY: touch.clientY
+    //        });
+    //        canvas.dispatchEvent(me);
+    //    }, false);
+
+    //    canvas.addEventListener("touchend", function (e) {
+    //        var me = new MouseEvent("mouseup", {});
+    //        canvas.dispatchEvent(me);
+    //    }, false);
+
+    //    function getMousePos(canvasDom, mouseEvent) {
+    //        var rect = canvasDom.getBoundingClientRect();
+    //        return {
+    //            x: mouseEvent.clientX - rect.left,
+    //            y: mouseEvent.clientY - rect.top
+    //        }
+    //    }
+
+    //    function getTouchPos(canvasDom, touchEvent) {
+    //        var rect = canvasDom.getBoundingClientRect();
+    //        return {
+    //            x: touchEvent.touches[0].clientX - rect.left,
+    //            y: touchEvent.touches[0].clientY - rect.top
+    //        }
+    //    }
+
+    //    function renderCanvas() {
+    //        if (drawing) {
+    //            ctx.moveTo(lastPos.x, lastPos.y);
+    //            ctx.lineTo(mousePos.x, mousePos.y);
+    //            ctx.stroke();
+    //            lastPos = mousePos;
+    //        }
+    //    }
+
+    //    // Prevent scrolling when touching the canvas
+    //    document.body.addEventListener("touchstart", function (e) {
+    //        if (e.target == canvas) {
+    //            e.preventDefault();
+    //        }
+    //    }, false);
+    //    document.body.addEventListener("touchend", function (e) {
+    //        if (e.target == canvas) {
+    //            e.preventDefault();
+    //        }
+    //    }, false);
+    //    document.body.addEventListener("touchmove", function (e) {
+    //        if (e.target == canvas) {
+    //            e.preventDefault();
+    //        }
+    //    }, false);
+
+    //    (function drawLoop() {
+    //        requestAnimFrame(drawLoop);
+    //        renderCanvas();
+    //    })();
+
+    //    function clearCanvas() {
+    //        canvas.width = canvas.width;
+    //    }
+
+    //    // Set up the UI
+    //    var sigText = document.getElementById("sig-dataUrl");
+    //    var sigImage = document.getElementById("sig-image");
+    //    var clearBtn = document.getElementById("sig-clearBtn");
+    //    var submitBtn = document.getElementById("sig-submitBtn");
+    //    clearBtn.addEventListener("click", function (e) {
+    //        clearCanvas();
+    //        sigText.innerHTML = "Data URL for your signature will go here!";
+    //        sigImage.setAttribute("src", "");
+    //    }, false);
+    //    submitBtn.addEventListener("click", function (e) {
+    //        var dataUrl = canvas.toDataURL();
+    //        sigText.innerHTML = dataUrl;
+    //        sigImage.setAttribute("src", dataUrl);
+    //    }, false);
+
+    //})();
+
+    function ViewFormDash(formName) {
+        $.ajax({
+            url: '/Dashboard/ViewFormDash',
+            type: 'GET',
+            data: { formName: formName },
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data.isValid) {
+                }
+                else {
+                    alert("There was an issue while opening the form. Please contact your administrator");
+                }
+            }),
+            error: (function (data) {
+                console.log(data);
+                alert("error")
+            })
+        })
+    }
+
+    $(document).ready(function () {
+
+        if (@tab== 2) {
+            GetMyRequestTab();
+        }
+        else {
+            GetMyTaskTab();
+        }
+
+       $.ajax({
+            url: '/Dashboard/GetDashBoardDept',
+            type: 'GET',
+            data: {  },
+            dataType: 'JSON',
+           success: (function (data) {
+              /* //*/
+                var s = '<option value="" style="display:none;"></option>';
+                for (var i = 0; i < data.length; i++) {
+                    s += '<option value="' + data[i] + '">' + data[i] + '</option>';
+                }
+                $(".DashinputGroupSelect02").html(s);
+
+            }),
+            error: (function (data) {
+                //code
+            })
+        })
+
+        var dept = $(".DashinputGroupSelect02 option:selected").text();
+        $.ajax({
+            url: '/Dashboard/GetDashboardFormsList',
+            type: 'GET',
+            data: { department: dept },
+            dataType: 'JSON',
+            success: (function (data) {
+                /**/
+                var s = '<option value="" style="display:none;"></option> <option value="">Select</option>';
+                for (var i = 0; i < data.Forms.length; i++) {
+                    s += '<option value="' + data.Forms[i].UniqueFormName + '" UniqueFormName="' + data.Forms[i].UniqueFormName + '"' + '>' + data.Forms[i].FormName + '</option>';
+                }
+                $(".DashinputGroupSelect01").html(s);
+
+            }),
+            error: (function (data) {
+                //code
+            })
+        })
+
+        //Department table
+        $('#Dept_table').dataTable({
+            "bPaginate": true,
+            "bLengthChange": false,
+            "bFilter": true,
+            "bInfo": false,
+            "oLanguage": { "sSearch": "" },
+            "bAutoWidth": false,
+            language: {
+                searchPlaceholder: "Search",
+                paginate: {
+                    next: '&#8811;', // or '→'
+                    previous: '&#8810;' // or '←'
+                }
+            },
+
+        });
+
+
+        //My Task table
+
+        $('#taskTable').DataTable({
+            destroy: true,
+            "bLengthChange": false,
+            "iDisplayLength": 10,
+            "bFilter": false,
+            "bInfo": false,
+            "searching": false,
+            "responsive": true,
+            language: {
+                searchPlaceholder: "Search",
+                paginate: {
+                    next: '&#8811;', // or '→'
+                    previous: '&#8810;' // or '←'
+                }
+            },
+            "oLanguage": { "sSearch": "" },
+            "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                var today = new Date();
+                var dd = today.getDate();
+                var mm = today.getMonth() + 1;
+                var yyyy = today.getFullYear();
+                if (dd < 10) {
+                    dd = '0' + dd;
+                }
+                if (mm < 10) {
+                    mm = '0' + mm;
+                }
+                today = mm + '/' + dd + '/' + yyyy;
+                // console.log(today);
+
+                var date2 = new Date(today);
+
+                /*      var date = new Date(aData[5]);*/
+                /*       var date = new Date(aData[6]);*/
+                var date = new Date(aData[5].display);
+                /* console.log(((date.getMonth() > 8) ? (date.getMonth() + 1) : ('0' + (date.getMonth() + 1))) + '/' + ((date.getDate() > 9) ? date.getDate() : ('0' + date.getDate())) + '/' + date.getFullYear());*/
+                ((date.getMonth() > 8) ? (date.getMonth() + 1) : ('0' + (date.getMonth() + 1))) + '/' + ((date.getDate() > 9) ? date.getDate() : ('0' + date.getDate())) + '/' + date.getFullYear();
+
+                // To calculate the time difference of two dates
+                var Difference_In_Time = date2.getTime() - date.getTime();
+
+                // To calculate the no. of days between two dates
+                var diffDays = Difference_In_Time / (1000 * 3600 * 24);
+
+                if (diffDays <= 2) {
+                    $('td', nRow).addClass('rowGreen');
+                    $(nRow).attr('Filter', 'Green');
+                    $(nRow).attr('Id', aData[0]);
+                } else if (diffDays > 2 && diffDays <= 5) {
+                    $('td', nRow).addClass('rowYellow');
+                    $(nRow).attr('Filter', 'Yellow');
+                    $(nRow).attr('Id', aData[0]);
+                }
+                else if (diffDays > 5) {
+                    $('td', nRow).addClass('rowOrange');
+                    $(nRow).attr('Filter', 'Orange');
+                    $(nRow).attr('Id', aData[0]);
+                }
+                else {
+                    $(nRow).attr('Filter', 'NoColor');
+                    $(nRow).attr('Id', aData[0]);
+                }
+            },
+            //'columnDefs': [{
+            //    'targets': 0,
+            //    'searchable': false,
+            //    'orderable': false,
+            //    'className': 'dt-body-center',
+            //    'render': function (data, type, full, meta) {
+            //        return '<input type="checkbox" name="id[]" value="' + $('<div/>').text(data).html() + '">';
+            //    }
+            //}],
+            columnDefs: [{ type: 'date', 'targets': [5] }],
+            order: [[5, 'desc']],
+});
+
+        var dt = $('#taskTable').DataTable();
+        //hide the first column
+        dt.column(0).visible(false);
+
+        $("#best_practise_card").on("change", "input[type='checkbox']", function () {
+
+            //
+
+            $(this).closest("li").toggleClass("active", this.checked);
+            var check_class = $(this).closest("li").children().children().children().addClass("checked");
+
+            var text_data = $(this).closest("li").children().children().children();
+            var text_label = $(this).closest("li").children().children().text().trim();
+            var a = $(this).closest("li").hasClass("active");
+
+            if (text_label == "less than 2 days" && $(text_data).hasClass("checked") && a) {
+                $('#taskTable').dataTable().fnDestroy();
+                FilterMyTasks(2, 1);
+
+            }
+            else if (text_label == "2 days to 4 days" && $(text_data).hasClass("checked") && a) {
+                $('#taskTable').dataTable().fnDestroy();
+                FilterMyTasks(4, 1);
+            }
+            else if (text_label == "more than 4 to 5 days" && $(text_data).hasClass("checked") && a) {
+                $('#taskTable').dataTable().fnDestroy();
+                FilterMyTasks(5, 1);
+            }
+            else {
+                $(this).closest("li").children().children().children().removeClass("checked");
+                $('#taskTable').dataTable().fnDestroy();
+                FilterMyTasks(0, 1);
+                $('#taskTable').dataTable().fnDestroy();
+                MyTaskTable();
+            }
+
+        });
+
+
+
+        $('#MyTaskSearch').on('keyup', function () {
+            // ////
+            $('#taskTable').dataTable().fnDestroy();
+            var table = $('#taskTable').DataTable({
+                "bLengthChange": false,
+                "iDisplayLength": 10,
+                "dom": "lrtip",
+                //"bFilter": false,
+                "bInfo": false,
+                /*    "order": [[0, 'desc']],*/
+                "rowReorder": {
+                    selector: 'td:nth-child(2)'
+                },
+                "responsive": true,
+                language: {
+                    searchPlaceholder: "Search",
+                    paginate: {
+                        next: '&#8811;', // or '→'
+                        previous: '&#8810;' // or '←'
+                    }
+                },
+                "oLanguage": { "sSearch": "" },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    var today = new Date();
+                    var dd = today.getDate();
+                    var mm = today.getMonth() + 1;
+                    var yyyy = today.getFullYear();
+                    if (dd < 10) {
+                        dd = '0' + dd;
+                    }
+                    if (mm < 10) {
+                        mm = '0' + mm;
+                    }
+                    today = mm + '/' + dd + '/' + yyyy;
+                    // console.log(today);
+
+                    var date2 = new Date(today);
+
+                    /*      var date = new Date(aData[5]);*/
+                    /*   var date = new Date(aData[6]);*/
+                    var date = new Date(aData[6].display);
+                    /* console.log(((date.getMonth() > 8) ? (date.getMonth() + 1) : ('0' + (date.getMonth() + 1))) + '/' + ((date.getDate() > 9) ? date.getDate() : ('0' + date.getDate())) + '/' + date.getFullYear());*/
+                    ((date.getMonth() > 8) ? (date.getMonth() + 1) : ('0' + (date.getMonth() + 1))) + '/' + ((date.getDate() > 9) ? date.getDate() : ('0' + date.getDate())) + '/' + date.getFullYear();
+
+                    // To calculate the time difference of two dates
+                    var Difference_In_Time = date2.getTime() - date.getTime();
+
+                    // To calculate the no. of days between two dates
+                    var diffDays = Difference_In_Time / (1000 * 3600 * 24);
+
+                    if (diffDays <= 2) {
+                        $('td', nRow).addClass('rowGreen');
+                        $(nRow).attr('Filter', 'Green');
+                        $(nRow).attr('Id', aData[0]);
+                    } else if (diffDays > 2 && diffDays <= 4) {
+                        $('td', nRow).addClass('rowYellow');
+                        $(nRow).attr('Filter', 'Yellow');
+                        $(nRow).attr('Id', aData[0]);
+                    }
+                    else if (diffDays >= 5) {
+                        $('td', nRow).addClass('rowOrange');
+                        $(nRow).attr('Filter', 'Orange');
+                        $(nRow).attr('Id', aData[0]);
+                    }
+                    else {
+                        $(nRow).attr('Filter', 'NoColor');
+                        $(nRow).attr('Id', aData[0]);
+                    }
+                },
+                'columnDefs': [{
+                    'targets': 0,
+                    'searchable': false,
+                    'orderable': false,
+                    'className': 'dt-body-center',
+                    'render': function (data, type, full, meta) {
+                        return '<input type="checkbox" name="id[]" value="' + $('<div/>').text(data).html() + '">';
+                    }
+                }],
+                /*    'order': [[1, 'asc']]*/
+                "order": [[6, 'desc']],
+            });
+            //hide the first column
+            table.search(this.value).draw();
+            table.column(0).visible(false);
+            table.attr('aria-hidden', 'taskTable').hide();
+        });
+
+
+        //Green Color Filter
+        $("#GreenColor").click(function () {
+            $('#taskTable').dataTable().fnDestroy();
+            FilterMyTasks(2, 1);
+        });
+        //Orange Color Filter
+        $("#OrangeColor").click(function () {
+            $('#taskTable').dataTable().fnDestroy();
+            FilterMyTasks(4, 1);
+        });
+        //Yellow Color Filter
+        $("#YellowColor").click(function () {
+            $('#taskTable').dataTable().fnDestroy();
+            FilterMyTasks(5, 1);
+        });
+        //Clear Color Filter
+        $("#ClearBtn").click(function () {
+            $('#taskTable').dataTable().fnDestroy();
+            FilterMyTasks(0, 1);
+            $('#taskTable').dataTable().fnDestroy();
+            MyTaskTable();
+        });
+
+        function FilterMyTasks(Filter1, Checked1) {
+            ////
+            var Filter = Filter1;
+            var Checked = Checked1;
+            $("#myTaskView").html("");
+            $('#taskTable').dataTable().fnDestroy();
+            $.ajax({
+                url: '/Dashboard/GetMyTasks',
+                type: 'GET',
+                dataType: 'html',
+                data: { Checked: Checked, Filter: Filter },
+                success: (function (data) {
+                    $('#taskTable').dataTable().fnDestroy();
+                    $("#myTaskView").html(data);
+                    MyTaskTable();
+                }),
+                error: (function (data) {
+                    console.log("There was an issue while refreshing tasks. Please reload the page");
+                })
+            })
+        }
+
+        ////Master table
+        //$('#tblMaster').dataTable({
+        //    "bPaginate": true,
+        //    "bLengthChange": false,
+        //    "bFilter": false,
+        //    "bInfo": false,
+        //    "ordering": false,
+        //    "oLanguage": { "sSearch": "" },
+        //    "bAutoWidth": false,
+        //    language: {
+        //        searchPlaceholder: "Search",
+        //        paginate: {
+        //            next: '&#8811;', // or '→'
+        //            previous: '&#8810;' // or '←'
+        //        }
+        //    },
+        //});
+
+        ////Admin table
+        //$('#tblAdmin').dataTable({
+        //    "bPaginate": true,
+        //    "bLengthChange": false,
+        //    "bFilter": false,
+        //    "ordering": false,
+        //    "bInfo": false,
+        //    "oLanguage": { "sSearch": "" },
+        //    "bAutoWidth": false,
+        //    language: {
+        //        searchPlaceholder: "Search",
+        //        paginate: {
+        //            next: '&#8811;', // or '→'
+        //            previous: '&#8810;' // or '←'
+        //        }
+        //    },
+        //});
+    });
+
+    function MyTaskTable() {
+       /* alert('data coming');*/
+        $('#taskTable').DataTable({
+            destroy: true,
+            "bLengthChange": false,
+            "iDisplayLength": 10,
+            "bFilter": true,
+            "bInfo": true,
+            "responsive": true,
+            language: {
+                searchPlaceholder: "Search",
+                paginate: {
+                    next: '&#8811;', // or '→'
+                    previous: '&#8810;' // or '←'
+                }
+            },
+            "oLanguage": { "sSearch": "" },
+            "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                var today = new Date();
+                var dd = today.getDate();
+                var mm = today.getMonth() + 1;
+                var yyyy = today.getFullYear();
+                if (dd < 10) {
+                    dd = '0' + dd;
+                }
+                if (mm < 10) {
+                    mm = '0' + mm;
+                }
+                today = mm + '/' + dd + '/' + yyyy;
+                // console.log(today);
+
+                var date2 = new Date(today);
+
+                var date = new Date(aData[5].display);
+
+                ((date.getMonth() > 8) ? (date.getMonth() + 1) : ('0' + (date.getMonth() + 1))) + '/' + ((date.getDate() > 9) ? date.getDate() : ('0' + date.getDate())) + '/' + date.getFullYear();
+
+                // To calculate the time difference of two dates
+                var Difference_In_Time = date2.getTime() - date.getTime();
+
+                // To calculate the no. of days between two dates
+                var diffDays = Difference_In_Time / (1000 * 3600 * 24);
+
+                if (diffDays <= 2) {
+                    $('td', nRow).addClass('rowGreen');
+                    $(nRow).attr('Filter', 'Green');
+                    $(nRow).attr('Id', aData[0]);
+                } else if (diffDays > 2 && diffDays <= 5) {
+                    $('td', nRow).addClass('rowYellow');
+                    $(nRow).attr('Filter', 'Yellow');
+                    $(nRow).attr('Id', aData[0]);
+                }
+                else if (diffDays > 5) {
+                    $('td', nRow).addClass('rowOrange');
+                    $(nRow).attr('Filter', 'Orange');
+                    $(nRow).attr('Id', aData[0]);
+                }
+                else {
+                    $(nRow).attr('Filter', 'NoColor');
+                    $(nRow).attr('Id', aData[0]);
+                }
+
+            },
+            //'columnDefs': [{
+            //    'targets': 0,
+            //    'searchable': false,
+            //    'orderable': false,
+            //    'className': 'dt-body-center',
+            //    'render': function (data, type, full, meta) {
+            //        return '<input type="checkbox" name="id[]" value="' + $('<div/>').text(data).html() + '">';
+            //    }
+            //}],
+            columnDefs: [{ type: 'date', 'targets': [5] }],
+            order: [[5, 'desc']],
+        });
+
+        //var dt = $('#taskTable').DataTable();
+        ////hide the first column
+        //dt.column(0).visible(false);
+    }
+
+    $("#bulk_btn").on('click', function () {
+
+
+        $('#taskTable').dataTable().fnDestroy();
+        $('#taskTable').DataTable({
+            "bLengthChange": false,
+            "iDisplayLength": 10,
+            "bInfo": false,
+            /*   "order": [[0, 'desc']],*/
+            //"rowReorder": {
+            //    selector: 'td:nth-child(2)'
+            //},
+            "responsive": true,
+            language: {
+                searchPlaceholder: "Search",
+                //"search": "<i class='fa fa-search'></i>",
+                paginate: {
+                    next: '&#8811;', // or '→'
+                    previous: '&#8810;' // or '←'
+                }
+            },
+            "oLanguage": { "sSearch": "" },
+            "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                var today = new Date();
+                var dd = today.getDate();
+                var mm = today.getMonth() + 1;
+                var yyyy = today.getFullYear();
+                if (dd < 10) {
+                    dd = '0' + dd;
+                }
+                if (mm < 10) {
+                    mm = '0' + mm;
+                }
+                today = mm + '/' + dd + '/' + yyyy;
+                // console.log(today);
+
+                var date2 = new Date(today);
+
+                /*var date = new Date(aData[5]);*/
+                /*        var date = new Date(aData[6]);*/
+                var date = new Date(aData[6].display);
+                /* console.log(((date.getMonth() > 8) ? (date.getMonth() + 1) : ('0' + (date.getMonth() + 1))) + '/' + ((date.getDate() > 9) ? date.getDate() : ('0' + date.getDate())) + '/' + date.getFullYear());*/
+                ((date.getMonth() > 8) ? (date.getMonth() + 1) : ('0' + (date.getMonth() + 1))) + '/' + ((date.getDate() > 9) ? date.getDate() : ('0' + date.getDate())) + '/' + date.getFullYear();
+
+                // To calculate the time difference of two dates
+                var Difference_In_Time = date2.getTime() - date.getTime();
+
+                // To calculate the no. of days between two dates
+                var diffDays = Difference_In_Time / (1000 * 3600 * 24);
+
+                if (diffDays <= 2) {
+                    $('td', nRow).addClass('rowGreen');
+                    $(nRow).attr('Filter', 'Green');
+                    $(nRow).attr('Id', aData[0]);
+                } else if (diffDays > 2 && diffDays <= 4) {
+                    $('td', nRow).addClass('rowYellow');
+                    $(nRow).attr('Filter', 'Yellow');
+                    $(nRow).attr('Id', aData[0]);
+                }
+                else if (diffDays => 5) {
+                    $('td', nRow).addClass('rowOrange');
+                    $(nRow).attr('Filter', 'Orange');
+                    $(nRow).attr('Id', aData[0]);
+                }
+                else {
+                    $(nRow).attr('Filter', 'NoColor');
+                    $(nRow).attr('Id', aData[0]);
+                }
+            },
+            'columnDefs': [{
+                'targets': 0,
+                'searchable': false,
+                'orderable': false,
+                'className': 'dt-body-center',
+                'render': function (data, type, full, meta) {
+                    return '<input type="checkbox" name="id[]" value="' + $('<div/>').text(data).html() + '">';
+                }
+            }],
+            /*         'order': [[1, 'asc']]*/
+            "order": [[6, 'desc']],
+        });
+
+        $(".bulk_btn").hide();
+        $("#Approve").show();
+
+    });
+
+
+    // Handle click on "Select all" control
+    $('#example-select-all').on('click', function () {
+        // Get all rows with search applied
+        var table = $('#taskTable').DataTable();
+        var rows = table.rows({ 'search': 'applied' }).nodes();
+        // Check/uncheck checkboxes for all rows in the table
+        $('input[type="checkbox"]', rows).prop('checked', this.checked);
+    });
+
+
+    // Handle form submission event
+        $("#Approve").on('click', function (e) {
+            /**/
+        /*    $('#Approve').on('submit', function (e) {*/
+        //
+        var form = this;
+        var status = 'Approved', comment = '', appRowId = '';
+
+        var table = $('#taskTable').DataTable();
+        // Iterate over all checkboxes in the table
+        table.$('input[type="checkbox"]').each(function () {
+            // If checkbox doesn't exist in DOM
+            //if (!$.contains(document, this)) {
+            //    // If checkbox is checked
+            //    if (this.checked) {
+            //        // Create a hidden element
+            //        $(form).append(
+            //            $('<input>')
+            //                .attr('type', 'hidden')
+            //                .attr('name', this.name)
+            //                .val(this.value)
+            //        );
+            //    }
+            //}
+            if (this.checked) {
+                /*//*/
+                $.ajax({
+                    url: '/List/SaveResponse',
+                    type: 'POST',
+                    data: { response: status, appRowId: appRowId, comment: comment },
+                    dataType: 'JSON',
+                    success: (function (data) {
+                        if (data == 1) {
+                            successModal();
+                            //$("#IDCForm").trigger("reset");
+                            removeVal();
+                            setTimeout(FilterMyTasks, 8000)
+                        }
+                        else {
+                            failureModal();
+                            //$("#IDCForm").trigger("reset");
+                            removeVal();
+                        }
+                    }),
+                    error: (function (data) {
+                        failureModal();
+                        $("#IDCForm").trigger("reset");
+                        removeVal();
+
+                    })
+                })
+            }
+            return false;
+        });
+    });
+
+    var tempHolder;
+
+        function AutoCompleteSearch() {
+        $(".Searchforms").autocomplete({
+            /*minLength: 2,*/
+            source: function (request, response) {
+                $.ajax({
+                    url: "/Dashboard/SearchForms",
+                    type: "POST",
+                    dataType: "json",
+
+                    data: { Prefix: request.term },
+
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            $("#IsDisable").val(item.IsDisable);
+                            $("#Message").val(item.Message);
+                            return { label: item.FormName + " | " + item.UniqueName, value: item.FormName };
+                        }))
+                    },
+                    error: function (response) {
+                        //console.log(response)
+                    },
+                    failure: function (response) {
+                        //console.log(response);
+                    }
+                });
+            },
+            position: { my: "left top", at: "left bottom" },
+            select: function (event, ui) {
+                //console.log("select");
+                //console.log(ui);
+                $("#formName").val(ui.item.value);
+                SearchFormByText();
+                //$("#UniqueFormId").val(ui.item.label);
+                //$("#UniqueFormName").val(ui.item.text);
+            }
+        });
+    }
+
+    $("#SearchformsBtn").on('click', function () {
+        ////
+        var formName = $("#formName").val();
+        var UniqueFormId = null;
+        var UniqueFormName = null;
+        var ControllerName = null;
+        if (formName != null && formName != "") {
+            $.ajax({
+                url: '/Dashboard/FormLink',
+                type: 'GET',
+                data: { formName: formName },
+                dataType: 'JSON',
+                success: (function (data) {
+                    //console.log(data);
+                    if (data.length > 0) {
+                        UniqueFormId = data[0].UniqueFormId;
+                        UniqueFormName = data[0].UniqueFormName;
+                        ControllerName = data[0].ControllerName;
+                        if (formName != null && UniqueFormId != null && UniqueFormName != null) {
+                            var url = "List/CreateForm?uniqueFormName=" + encodeURIComponent(UniqueFormName) + "&formParentId=" + encodeURIComponent(UniqueFormId) + "&formName=" + encodeURIComponent(formName) + "&ControllerName=" + encodeURIComponent(ControllerName);
+
+                            window.location.href = url;
+
+                        }
+                    }
+                }),
+                error: (function (data) {
+                    //code
+                })
+            })
+        }
+        return false;
+    });
+
+    function SearchInNewForms() {
+        var search = $("#SearchNewForm").val();
+        //if (search == '' || search == null)
+        //    return;
+        //else {
+        $.ajax({
+            url: '/Dashboard/GetFormsBySearch',
+            type: 'GET',
+            dataType: 'json',
+            data: { Search: search },
+            success: (function (data) {
+                console.log(data);
+                $(".searchHere").each(function (i, v) {
+                    $('.itBestPractices').owlCarousel('remove', i);
+                });
+                $('.itBestPractices').owlCarousel('update');
+
+                if (data.length <= 2) {
+                    for (i = 0; i < data.length; i++) {
+                        var temp = '<div class="content"> <div class="item">';
+                        if (typeof data[i] !== 'undefined') {
+                            temp += '<div class="p_box">' +
+                                '<div class="job_value value_position" style="color: #333333;">' + data[i].FormCount + '</div>' +
+                                '<div class="job text-uppercase text_position searchHere" style="font-weight:bold"> ' + data[i].FormName + '</div>' +
+                                '<div class="job text-uppercase added_form_icon"> <div class="plus_icon_margin">' +
+                                '<a class="sfo_icons_info" href="/List/CreateForm?uniqueFormName=' + data[i].UniqueFormName + '&formParentId=' + data[i].UniqueFormId + '&formName=' + data[i].FormName + '&ControllerName=' + data[i].ControllerName + '"> Create new </a></div> ' +
+                                '<div> <a href="/Dashboard/GetMyFormsByName?formName=' + data[i].UniqueFormName + '&formParentId=' + data[i].UniqueFormId + '&fullName=' + data[i].FormName + '&Department=' + data[i].Department + '&FormOwner=' + data[i].FormOwner + '&ControllerName=' + data[i].ControllerName + '" class="sfo_icons_info">  View </a>' +
+                                '</div> </div></div></div></div>'
+                        };
+                        temp += '</div></div>';
+                        $('.itBestPractices').trigger('add.owl.carousel', temp).trigger('refresh.owl.carousel');
+                    }
+                }
+                else {
+                    for (i = 0; i < data.length; i++) {
+                        var temp = '<div class="content"> <div class="item">';
+                        if (typeof data[i] !== 'undefined') {
+                            temp += '<div class="p_box">' +
+                                '<div class="job_value value_position" style="color: #333333;">' + data[i].FormCount + '</div>' +
+                                '<div class="job text-uppercase text_position searchHere" style="font-weight:bold"> ' + data[i].FormName + '</div>' +
+                                '<div class="job text-uppercase added_form_icon"> <div class="plus_icon_margin">' +
+                                '<a class="sfo_icons_info" href="/List/CreateForm?uniqueFormName=' + data[i].UniqueFormName + '&formParentId=' + data[i].UniqueFormId + '&formName=' + data[i].FormName + '&ControllerName=' + data[i].ControllerName + '"> Create new </a></div> ' +
+                                '<div> <a href="/Dashboard/GetMyFormsByName?formName=' + data[i].UniqueFormName + '&formParentId=' + data[i].UniqueFormId + '&fullName=' + data[i].FormName + '&Department=' + data[i].Department + '&FormOwner=' + data[i].FormOwner + '&ControllerName=' + data[i].ControllerName + '" class="sfo_icons_info">  View </a>' +
+                                '</div> </div></div></div></div>'
+                        };
+                        if (typeof data[i + 1] !== 'undefined') {
+                            temp += '<div class="p_box"> <div class="job_value value_position" style="color: #333333;">' + data[i + 1].FormCount + '</div>' +
+                                '<div class="job text-uppercase text_position searchHere"> ' + data[i + 1].FormName + '</div>' +
+                                '<div class="job text-uppercase added_form_icon" style="font-weight:bold"> <div class="plus_icon_margin">' +
+                                '<a class="sfo_icons_info" href="/List/CreateForm?uniqueFormName=' + data[i + 1].UniqueFormName + '&formParentId=' + data[i + 1].UniqueFormId + '&formName=' + data[i + 1].FormName + '&ControllerName=' + data[i + 1].ControllerName + '"> Create new </a></div> ' +
+                                '<div> <a href="/Dashboard/GetMyFormsByName?formName=' + data[i + 1].UniqueFormName + '&formParentId=' + data[i + 1].UniqueFormId + '&fullName=' + data[i + 1].FormName + '&Department=' + data[i + 1].Department + '&FormOwner=' + data[i + 1].FormOwner + '&ControllerName=' + data[i + 1].ControllerName + '" class="sfo_icons_info">  View </a>' +
+                                '</div> </div></div>'
+                            i++;
+                            /*console.log(i, 'i');*/
+                        };
+                        temp += '</div></div>';
+                        $('.itBestPractices').trigger('add.owl.carousel', temp).trigger('refresh.owl.carousel');
+                    }
+                }
+
+                error: (function (data) {
+                    console.log(data);
+                })
+            })
+        })
+        //}
+    }
+
+    function SearchFreqForms() {
+        var search = $("#freqFormSearchInput").val();
+        //if (search == '' || search == null)
+        //    return;
+        //else {
+        $.ajax({
+            url: '/Dashboard/GetFreqFormsBySearch',
+            type: 'GET',
+            dataType: 'json',
+            data: { search: search },
+            success: (function (data) {
+                console.log(data);
+                $(".freqForms").each(function (i, v) {
+                    $('.busipract').owlCarousel('remove', i);
+                });
+                $('.busipract').owlCarousel('update');
+
+                if (data.length <= 2) {
+                    for (i = 0; i < data.length; i++) {
+                        var temp = '<div class="content"> <div class="item">';
+                        if (typeof data[i] !== 'undefined') {
+                            temp += '<div class="p_box">' +
+                                '<div class="job_value value_position" style="color: #333333;">' + data[i].FormCount + '</div>' +
+                                '<div class="job text-uppercase text_position freqForms" style="font-weight:bold"> ' + data[i].FormName + '</div>' +
+                                '<div class="job text-uppercase added_form_icon"> <div class="plus_icon_margin">' +
+                                '<a class="sfo_icons_info" href="/List/CreateForm?uniqueFormName=' + data[i].UniqueFormName + '&formParentId=' + data[i].UniqueFormId + '&formName=' + data[i].FormName + '&ControllerName=' + data[i].ControllerName + '"> Create new </a></div> ' +
+                                '<div> <a href="/Dashboard/GetMyFormsByName?formName=' + data[i].UniqueFormName + '&formParentId=' + data[i].UniqueFormId + '&fullName=' + data[i].FormName + '&Department=' + data[i].Department + '&FormOwner=' + data[i].FormOwner + '&ControllerName=' + data[i].ControllerName + '" class="sfo_icons_info">  View </a>' +
+                                '</div> </div></div></div></div>'
+                        };
+                        temp += '</div></div>';
+                        $('.busipract').trigger('add.owl.carousel', temp).trigger('refresh.owl.carousel');
+                    }
+                }
+                else {
+                    for (i = 0; i < data.length; i++) {
+                        var temp = '<div class="content"> <div class="item">';
+                        if (typeof data[i] !== 'undefined') {
+                            temp += '<div class="p_box">' +
+                                '<div class="job_value value_position" style="color: #333333;">' + data[i].FormCount + '</div>' +
+                                '<div class="job text-uppercase text_position freqForms" style="font-weight:bold"> ' + data[i].FormName + '</div>' +
+                                '<div class="job text-uppercase added_form_icon"> <div class="plus_icon_margin">' +
+                                '<a class="sfo_icons_info" href="/List/CreateForm?uniqueFormName=' + data[i].UniqueFormName + '&formParentId=' + data[i].UniqueFormId + '&formName=' + data[i].FormName + '&ControllerName=' + data[i].ControllerName + '"> Create new </a></div> ' +
+                                '<div> <a href="/Dashboard/GetMyFormsByName?formName=' + data[i].UniqueFormName + '&formParentId=' + data[i].UniqueFormId + '&fullName=' + data[i].FormName + data[i].Department + '&FormOwner=' + data[i].FormOwner + '&ControllerName=' + data[i].ControllerName + '" class="sfo_icons_info">  View </a>' +
+                                '</div> </div></div></div></div>'
+                        };
+                        if (typeof data[i + 1] !== 'undefined') {
+                            temp += '<div class="p_box"> <div class="job_value value_position" style="color: #333333;">' + data[i + 1].FormCount + '</div>' +
+                                '<div class="job text-uppercase text_position searchHere" style="font-weight:bold"> ' + data[i + 1].FormName + '</div>' +
+                                '<div class="job text-uppercase added_form_icon"> <div class="plus_icon_margin">' +
+                                '<a class="sfo_icons_info" href="/List/CreateForm?uniqueFormName=' + data[i + 1].UniqueFormName + '&formParentId=' + data[i + 1].UniqueFormId + '&formName=' + data[i + 1].FormName + '&ControllerName=' + data[i + 1].ControllerName + '"> Create new </a></div> ' +
+                                '<div> <a href="/Dashboard/GetMyFormsByName?formName=' + data[i + 1].UniqueFormName + '&formParentId=' + data[i + 1].UniqueFormId + '&fullName=' + data[i + 1].FormName + '&Department=' + data[i + 1].Department + '&FormOwner=' + data[i + 1].FormOwner + '&ControllerName=' + data[i + 1].ControllerName + '" class="sfo_icons_info">  View </a>' +
+                                '</div> </div></div>'
+                            i++;
+                            /*console.log(i, 'i');*/
+                        };
+                        temp += '</div></div>';
+                        $('.busipract').trigger('add.owl.carousel', temp).trigger('refresh.owl.carousel');
+                    }
+                }
+
+                error: (function (data) {
+                    console.log(data);
+                })
+            })
+        })
+        //}
+    }
+
+    $('#SearchNewForm').on('keyup', function () {
+        SearchInNewForms();
+        return
+    });
+    $('#freqFormSearchInput').on('keyup', function () {
+        SearchFreqForms();
+        return
+    });
+
+    $("#freqFormSearchInput").on('keypress', function (event) {
+        if (event.keyCode == 13) {
+            SearchFreqForms();
+        } else {
+            return true;
+        }
+    })
+
+    $("#SearchNewForm").on('keypress', function (event) {
+        if (event.keyCode == 13) {
+            SearchInNewForms();
+        } else {
+            return true;
+        }
+    })
+
+    $("#modalOkButton").on('click', function () {
+        $(".modal").css("overflow", "scroll !important");
+        $("body").css("overflow", "hidden");
+
+    });
+    function scrollDown() {
+        document.getElementById('scroll').scrollTop = document.getElementById('scroll').scrollHeight
+    }
+
+    $("#cancelBtnApprove").on('click', function () {
+        window.location = "../Dashboard";
+    });
+    $("#cancelBtnReject").on('click', function () {
+        window.location = "../Dashboard";
+    });
+    $("#cancelBtnEnquire").on('click', function () {
+        window.location = "../Dashboard";
+    });
+    function checkSelect(id) {
+        //////
+        if ($('#' + id).val() != '') {
+            $('#' + id).addClass('spanUpperSide');
+        }
+    }
+
+        $('#inputGroupSelect02').on('change', function (id) {
+            /**/
+            $("#inputGroupSelect01").prop("disabled", false);
+            var dept = "";
+            dept = $("#inputGroupSelect02 option:selected").text();
+        if (dept != "") {
+
+            $.ajax({
+                url: '/Dashboard/GetDashboardFormsList',
+                type: 'GET',
+                data: { department: dept },
+                dataType: 'JSON',
+                success: (function (data) {
+                    var s = '<option value=""></option>';
+                    for (var i = 0; i < data.Forms.length; i++) {
+                        s += '<option value="' + data.Forms[i].UniqueFormName + '" UniqueFormName="' + data.Forms[i].UniqueFormName + '"' + '>' + data.Forms[i].FormName + '</option>';
+                    }
+                    $(".DashinputGroupSelect01").html(s);
+
+                }),
+                error: (function (data) {
+                    //code
+                })
+            })
+        }
+        else {
+            $("#inputGroupSelect01").val('');
+            $.ajax({
+                url: '/Dashboard/GetDashboardFormsList',
+                type: 'GET',
+                data: { department: dept },
+                dataType: 'JSON',
+                success: (function (data) {
+                    var s = '<option value=""></option>';
+                    for (var i = 0; i < data.Forms.length; i++) {
+                        s += '<option value="' + data.Forms[i].UniqueFormName + '" UniqueFormName="' + data.Forms[i].UniqueFormName + '"' + '>' + data.Forms[i].FormName + '</option>';
+                    }
+                    $(".DashinputGroupSelect01").html(s);
+
+                }),
+                error: (function (data) {
+                    //code
+                })
+            })
+            $('.DashinputGroupSelect02').removeClass('spanUpperSide');
+        }
+
+        });
+
+        $('#inputGroupSelect04').on('change', function (id) {
+            /**/
+            $("#inputGroupSelect05").prop("disabled", false);
+            var dept = "";
+            dept = $("#inputGroupSelect04 option:selected").text();
+            if (dept != "") {
+
+                $.ajax({
+                    url: '/Dashboard/GetDashboardFormsList',
+                    type: 'GET',
+                    data: { department: dept },
+                    dataType: 'JSON',
+                    success: (function (data) {
+                        var s = '<option value=""></option>';
+                        for (var i = 0; i < data.Forms.length; i++) {
+                            s += '<option value="' + data.Forms[i].UniqueFormName + '" UniqueFormName="' + data.Forms[i].UniqueFormName + '"' + '>' + data.Forms[i].FormName + '</option>';
+                        }
+                        $(".DashinputGroupSelect01").html(s);
+
+                    }),
+                    error: (function (data) {
+                        //code
+                    })
+                })
+            }
+            else {
+                $("#inputGroupSelect01").val('');
+                $.ajax({
+                    url: '/Dashboard/GetDashboardFormsList',
+                    type: 'GET',
+                    data: { department: dept },
+                    dataType: 'JSON',
+                    success: (function (data) {
+                        var s = '<option value=""></option>';
+                        for (var i = 0; i < data.Forms.length; i++) {
+                            s += '<option value="' + data.Forms[i].UniqueFormName + '" UniqueFormName="' + data.Forms[i].UniqueFormName + '"' + '>' + data.Forms[i].FormName + '</option>';
+                        }
+                        $(".DashinputGroupSelect01").html(s);
+
+                    }),
+                    error: (function (data) {
+                        //code
+                    })
+                })
+                $('.DashinputGroupSelect02').removeClass('spanUpperSide');
+            }
+
+        });
+
+    $('.searchBtn').on('click', function () {
+        //////
+        var searchForm = $(".Searchforms").val();
+        var dept = $(".DashinputGroupSelect02 option:selected").text();
+        var formName = $(".DashinputGroupSelect01 option:selected").text();
+        if (!searchForm && (!formName || formName == "Select")) {
+            DisplayAlert('error', 'Warning', 'Enter atleast text or select value in the dropdown');
+            //$("#toastTitle").text("Alert");
+            //$(".toast-body").text("Enter atleast text or select value in the dropdown");
+            //$(".toast").toast('show');
+            return;
+        }
+        if (searchForm && (formName && formName != "Select")) {
+            DisplayAlert('error', 'Warning', 'You can only try searching by selecting drop-down or text');
+            //$("#toastTitle").text("Alert");
+            //$(".toast-body").text("You can only try searching by selecting drop-down or text");
+            //$(".toast").toast('show');
+            return;
+        }
+        //if (formName == "OCRF Form" || formName == "Employee Clearance Form") {
+        //    DisplayAlert('error', 'Warning', 'This form is disable till further notice. For more information please contact your respective HR.');
+        //    return;
+        //}
+        if (searchForm != "") {
+            SearchFormByText();
+        }
+        if (formName != "") {
+            var UniqueFormId = null;
+            var UniqueFormName = null;
+            var ControllerName = null;
+            if (formName != null) {
+                $.ajax({
+                    url: '/Dashboard/FormLink',
+                    type: 'GET',
+                    data: { formName: formName },
+                    dataType: 'JSON',
+                    success: (function (data) {
+                        //console.log(data);
+                        if (data.length > 0) {
+                            UniqueFormId = data[0].UniqueFormId;
+                            UniqueFormName = data[0].UniqueFormName;
+                            ControllerName = data[0].ControllerName;
+                            if (formName != null && UniqueFormId != null && UniqueFormName != null) {
+                                var url = "List/CreateForm?uniqueFormName=" + encodeURIComponent(UniqueFormName) + "&formParentId=" + encodeURIComponent(UniqueFormId) + "&formName=" + encodeURIComponent(formName) + "&ControllerName=" + encodeURIComponent(ControllerName);
+
+                                window.location.href = url;
+
+                            }
+                        }
+                    }),
+                    error: (function (data) {
+                        //code
+                    })
+                })
+            }
+            return
+        }
+        else {
+            return
+        }
+    });
+
+    function SearchFormByText() {
+        //
+        var formName = $("#formName").val();
+        var isDisable = $("#IsDisable").val();
+        var message = $("#Message").val();
+        var UniqueFormId = null;
+        var UniqueFormName = null;
+        var ControllerName = null;
+        if (!formName) {
+            DisplayAlert('error', 'Warning', 'Invalid form name');
+            //$("#toastTitle").text("Alert");
+            //$(".toast-body").text("Invalid form name");
+            //$(".toast").toast('show');
+            return;
+        }
+        //if (formName == "OCRF Form" || formName == "Employee Clearance Form") {
+        //    DisplayAlert('error', 'Warning', 'This form is disable till further notice. For more information please contact your respective HR.');
+        //    return;
+        //}
+        if (formName != null && formName != "") {
+            if (isDisable == 1) {
+                DisplayAlert('error', 'Warning', message, 10000);
+                return false;
+            }
+
+            $.ajax({
+                url: '/Dashboard/FormLink',
+                type: 'GET',
+                data: { formName: formName },
+                dataType: 'JSON',
+                success: (function (data) {
+                    //console.log(data);
+                    if (data.length > 0) {
+                        UniqueFormId = data[0].UniqueFormId;
+                        UniqueFormName = data[0].UniqueFormName;
+                        ControllerName = data[0].ControllerName;
+                        if (formName != null && UniqueFormId != null && UniqueFormName != null) {
+                            var url = "List/CreateForm?uniqueFormName=" + encodeURIComponent(UniqueFormName) + "&formParentId=" + encodeURIComponent(UniqueFormId) + "&formName=" + encodeURIComponent(formName) + "&ControllerName=" + encodeURIComponent(ControllerName);
+                            console.log(window.location.href);
+                            window.location.href = url;
+
+                        }
+                    }
+                }),
+                error: (function (data) {
+                    //code
+                })
+            })
+        }
+        return false;
+    }
+
+    $('#nav-reports-tab').on('click', function () {
+        window.location = "/Dashboard/GetMyReport?status=Report";
+    });
+
+
+
+    //function DisplayMyTaskTab() {
+    //    $("#indications").show();
+    //    $("#nav-mytask-tab").removeClass("forCurve");
+    //    $("#nav-mytask-tab").addClass("forCurveActive");
+    //    $("#nav-myrequest-tab").removeClass("forCurveActive");
+    //    $("#nav-myrequest-tab").addClass("forCurve");
+    //    $("#nav-masters-tab").removeClass("forCurveActive");
+    //    $("#nav-masters-tab").addClass("forCurve");
+    //    $("#nav-admin-tab").removeClass("forCurveActive");
+    //    $("#nav-admin-tab").addClass("forCurve");
+    //}
+
+
+
+    @*function DisplayMyRequestTab() {
+
+        $("#nav-myrequest-tab").removeClass("forCurve");
+        $("#nav-myrequest-tab").addClass("forCurveActive");
+        $("#nav-mytask-tab").removeClass("forCurveActive");
+        $("#nav-mytask-tab").addClass("forCurve");
+        $("#nav-masters-tab").removeClass("forCurveActive");
+        $("#nav-masters-tab").addClass("forCurve");
+        $("#nav-admin-tab").removeClass("forCurveActive");
+        $("#nav-admin-tab").addClass("forCurve");
+        $("#indications").hide();
+        if (@tab== 2) {
+            $("#nav-myrequest").addClass('show active');
+            $("#nav-mytask").removeClass('show active');
+        }
+
+    }
+
+    $('#nav-masters-tab').on('click', function () {
+        $("#nav-masters-tab").removeClass("forCurve");
+        $("#nav-masters-tab").addClass("forCurveActive");
+        $("#nav-mytask-tab").removeClass("forCurveActive");
+        $("#nav-mytask-tab").addClass("forCurve");
+        $("#nav-admin-tab").removeClass("forCurveActive");
+        $("#nav-admin-tab").addClass("forCurve");
+        $("#nav-myrequest-tab").removeClass("forCurveActive");
+        $("#nav-myrequest-tab").addClass("forCurve");
+        $("#indications").hide();
+    });
+
+    $('#nav-admin-tab').on('click', function () {
+        $("#nav-admin-tab").removeClass("forCurve");
+        $("#nav-admin-tab").addClass("forCurveActive");
+        $("#nav-mytask-tab").removeClass("forCurveActive");
+        $("#nav-mytask-tab").addClass("forCurve");
+        $("#nav-masters-tab").removeClass("forCurveActive");
+        $("#nav-masters-tab").addClass("forCurve");
+        $("#nav-myrequest-tab").removeClass("forCurveActive");
+        $("#nav-myrequest-tab").addClass("forCurve");
+        $("#indications").hide();
+    });
+
+    $('#nav-reports-tab').on('click', function () {
+        $("#nav-reports-tab").removeClass("forCurve");
+        $("#nav-reports-tab").addClass("forCurveActive");
+        $("#nav-mytask-tab").removeClass("forCurveActive");
+        $("#nav-mytask-tab").addClass("forCurve");
+        $("#nav-masters-tab").removeClass("forCurveActive");
+        $("#nav-masters-tab").addClass("forCurve");
+        $("#nav-myrequest-tab").removeClass("forCurveActive");
+        $("#nav-myrequest-tab").addClass("forCurve");
+        $("#nav-admin-tab").removeClass("forCurveActive");
+        $("#nav-admin-tab").addClass("forCurve");
+    });*@
+
+
+
+        function approveStaticData(id) {
+            swal({
+                title: "Success!",
+                text: "Form has been Approved!",
+                type: "success"
+            }).then(function () {
+                $("#" + id + "").hide();
+                $('#loader').hide();
+            });
+        }
+
+    function Getmobiletask() {
+            $.ajax({
+                url: 'Dashboard/GetAllMobileTask',
+                type: 'GET',
+                success: (function (data) {
+                    console.log(data);
+                    //  alert(data.Cancelcount);
+                    $(".ttc").text(data.Totalcount);
+                    $(".atc").text(data.Approvercount);
+                    $(".rtc").text(data.Enquirecount);
+                    $(".ptc").text(data.Pendingcount);
+                    $(".rjtc").text(data.Rejectcount);
+                    $(".ctc").text(data.Cancelcount);
+                }),
+                error: (function (data) {
+                    console.log("There was an issue while refreshing tasks. Please reload the page");
+                    $("#loaderMytsk").addClass('d-none');
+                })
+            })
+        }
+
+
+        function GetApprovertab() {
+            var Filter = " ";
+            var Checked = " ";
+            $("#myMobileApprovedLists").html("");
+            $.ajax({
+                url: '/Dashboard/GetMobilePTask',
+                type: 'GET',
+                dataType: 'html',
+                data: { Checked: Checked, Filter: Filter },
+                success: (function (data) {
+                    $("#myMobileApprovedLists").html(data);
+                    $('#ApprovedForm').modal('show');
+                }),
+                error: (function (data) {
+                    console.log("There was an issue while refreshing tasks. Please reload the page");
+                })
+            })
+    }
+    //function GetMyRequestMobileTab() {
+    //        var Filter = " ";
+    //        var Checked = " ";
+    //        $("#myMobileMyRequestLists").html("");
+    //        $.ajax({
+    //            url: '/Dashboard/GetMyRequestMobile',
+    //            type: 'GET',
+    //            dataType: 'html',
+    //            data: { Checked: Checked, Filter: Filter },
+    //            success: (function (data) {
+    //                $("#myMobileMyRequestLists").html(data);
+    //                $('#MyRequestForm').modal('show');
+    //            }),
+    //            error: (function (data) {
+    //                console.log("There was an issue while refreshing tasks. Please reload the page");
+    //            })
+    //        })
+    //    }
+    function GetMyTasks_MobileView(Filter1, Checked1) {
+        var Filter = Filter1;
+        var Checked = Checked1;
+        $("#myTaskViewMobile").html("");
+        $.ajax({
+            url: '/Dashboard/GetMyTasks_MobileView',
+            type: 'GET',
+            dataType: 'html',
+            data: { Checked: Checked, Filter: Filter },
+            success: (function (data) {
+                console.log(data);
+                $("#myTaskViewMobile").html(data);
+            }),
+            error: (function (data) {
+                console.log("There was an issue while refreshing tasks. Please reload the page");
+            })
+        })
+    }
+
+    function GetTotalTask(value) {
+        var values = value;
+        $.ajax({
+            type: 'GET',
+            url: "/Dashboard/GetTotalTask",
+            contentType: "application/json; charset=utf-8",
+            data: { values: values },
+            dataType: "json",
+            async: true,
+            success: function (jsonResult) {
+                $("#exampleModalMBS").modal("show");
+                $("#exampleModalMBSTitle").html(value + ' Task')
+                $('#tblMBSItem').DataTable({
+                    "destroy": true,
+                    "bLengthChange": false,
+                    "aaData": jsonResult,
+                    "bPaginate": true,
+                    "bInfo": true,
+                    "paging": true,
+                    order: [],
+                    "searching": true,
+                    // "dom": '<"top"i>rt<"bottom float-left m-3"p><"newQuote bottom float-right m-3"><"clear">',
+                    "columns": [
+
+                        {
+                            "data": "FormID",
+                            className: 'text-center'
+                        },
+                        {
+                            "data": "FormName",
+                            className: 'text-left'
+                        },
+                        {
+                            "data": "RequestedBy",
+                            className: 'text-left'
+                        },
+                        {
+                            "data": "ReceivedDate",
+                            className: 'text-center'
+                        }
+
+
+                        //<button class=\"btn btn-sm btn-success\"  data-toggle=\"tooltip\" data-placement=\"bottom\" data-original-title=\"Print\"  onclick=\"openPDFView('" + row.PONO + "')\"><i class=\"fa fa-print\"></i></button><button class=\"btn btn-sm btn-warning\" data-toggle=\"tooltip\" data-placement=\"bottom\" data-original-title=\"Send for Approval\" onclick=\"sendForApproval('" + row.PONO + "')\"><i class=\"fa fa-gear\"></i></button></div>
+                    ],
+                    mark: true
+                });
+                table = $('#tblMBSItem').DataTable();
+                var buttons = new $.fn.dataTable.Buttons(table, {
+                    buttons: [
+                        {
+                            extend: 'excelHtml5',
+                            text: '<i class="fa fa-file-excel-o text-white"></i>',
+                            titleAttr: 'Excel',
+                            className: 'btn btn-success',
+                            title: 'Task Summary'
+                        }
+                    ]
+                }).container().appendTo($('#buttons1'));
+
+            },
+            error: function (error) {
+                $("#global-loader").fadeOut();
+                alert(error.responseText);
+            }
+        });
+    }
+
+    function GetMyRequestMobileTab(value) {
+        var values = value;
+        $.ajax({
+            type: 'GET',
+            url: "/Dashboard/GetMyRequestMobile",
+            contentType: "application/json; charset=utf-8",
+            data: {},
+            dataType: "json",
+            async: true,
+            success: function (jsonResult) {
+                $("#exampleModalMyRequest").modal("show");
+                $('#tblMyRequestItem').DataTable({
+                    "destroy": true,
+                    "bLengthChange": false,
+                    "aaData": jsonResult,
+                    "bPaginate": true,
+                    "bInfo": true,
+                    "paging": true,
+                    order: [],
+                    "searching": true,
+                    // "dom": '<"top"i>rt<"bottom float-left m-3"p><"newQuote bottom float-right m-3"><"clear">',
+                    "columns": [
+
+                        {
+                            "data": "Id",
+                            className: 'text-center'
+                        },
+                        {
+                            "data": "FormName",
+                            className: 'text-left'
+                        },
+                        {
+                            "data": "ApplicantName",
+                            className: 'text-left'
+                        },
+                        {
+                            "data": "strRecievedDate",
+                            className: 'text-center'
+                        }
+
+
+                        //<button class=\"btn btn-sm btn-success\"  data-toggle=\"tooltip\" data-placement=\"bottom\" data-original-title=\"Print\"  onclick=\"openPDFView('" + row.PONO + "')\"><i class=\"fa fa-print\"></i></button><button class=\"btn btn-sm btn-warning\" data-toggle=\"tooltip\" data-placement=\"bottom\" data-original-title=\"Send for Approval\" onclick=\"sendForApproval('" + row.PONO + "')\"><i class=\"fa fa-gear\"></i></button></div>
+                    ],
+                    mark: true
+                });
+                table = $('#tblMyRequestItem').DataTable();
+                var buttons = new $.fn.dataTable.Buttons(table, {
+                    buttons: [
+                        {
+                            extend: 'excelHtml5',
+                            text: '<i class="fa fa-file-excel-o text-white"></i>',
+                            titleAttr: 'Excel',
+                            className: 'btn btn-success',
+                            title: 'Task Summary'
+                        }
+                    ]
+                }).container().appendTo($('#MyRequestExcel'));
+
+            },
+            error: function (error) {
+                $("#global-loader").fadeOut();
+                alert(error.responseText);
+            }
+        });
+    }
+    function GetMyApprovedMobileTab(value) {
+        var values = value;
+        $.ajax({
+            type: 'GET',
+            url: "/Dashboard/GetMobilePTask",
+            contentType: "application/json; charset=utf-8",
+            data: { Checked: "", Filter:""},
+            dataType: "json",
+            async: true,
+            success: function (jsonResult) {
+                debugger;
+                $("#exampleModalApproved").modal("show");
+                $('#tblApprovedItem').DataTable({
+                    "destroy": true,
+                    "bLengthChange": false,
+                    "aaData": jsonResult,
+                    "bPaginate": true,
+                    "bInfo": true,
+                    "paging": true,
+                    order: [],
+                    "searching": true,
+                    // "dom": '<"top"i>rt<"bottom float-left m-3"p><"newQuote bottom float-right m-3"><"clear">',
+                    "columns": [
+
+                        {
+                            "data": "FormRelation.Id",
+                            className: 'text-center'
+                        },
+                        {
+                            "data": "FormRelation.FormName",
+                            className: 'text-left'
+                        },
+                        {
+                            "data": "Author.Submitter",
+                            className: 'text-left'
+                        },
+                        {
+                            "data": "FormRelation.StringRecievedDate",
+                            className: 'text-center'
+                        }
+
+
+                        //<button class=\"btn btn-sm btn-success\"  data-toggle=\"tooltip\" data-placement=\"bottom\" data-original-title=\"Print\"  onclick=\"openPDFView('" + row.PONO + "')\"><i class=\"fa fa-print\"></i></button><button class=\"btn btn-sm btn-warning\" data-toggle=\"tooltip\" data-placement=\"bottom\" data-original-title=\"Send for Approval\" onclick=\"sendForApproval('" + row.PONO + "')\"><i class=\"fa fa-gear\"></i></button></div>
+                    ],
+                    mark: true
+                });
+                table = $('#tblApprovedItem').DataTable();
+                var buttons = new $.fn.dataTable.Buttons(table, {
+                    buttons: [
+                        {
+                            extend: 'excelHtml5',
+                            text: '<i class="fa fa-file-excel-o text-white"></i>',
+                            titleAttr: 'Excel',
+                            className: 'btn btn-success',
+                            title: 'Task Summary'
+                        }
+                    ]
+                }).container().appendTo($('#MyApprovedExcel'));
+
+            },
+            error: function (error) {
+                $("#global-loader").fadeOut();
+                alert(error.responseText);
+            }
+        });
+    }
+</script>
+
+
+

@@ -1,0 +1,2803 @@
+﻿@model dynamic
+@{
+    ViewBag.Title = "Software Requisition";
+    var user = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    bool IsNew = true;
+    bool IsEdit = true;
+    dynamic FlagRedirect = null;
+    dynamic SRF = null;
+    Layout = ViewBag.Layout;
+    int RowId = 0, FormId = 0, AppRowId = 0, ApprovalType = 0;
+    int FormSrId = 0;
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IsNew = ViewBag.IsNew;
+        IsEdit = ViewBag.IsEdit;
+        SRF = ViewBag.Model;
+        RowId = ViewBag.RowId;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+        FormSrId = SRF.one[0].Id;
+    }
+}
+<style type="text/css">
+    .astColor {
+        color: red;
+    }
+
+    .errorMsg {
+        border: 2px solid red;
+    }
+
+    .table-middle tr td, .table-middle tr th {
+        text-align: center !important;
+    }
+
+    .per-checkbox {
+        padding-left: 61px !important;
+    }
+
+    .bg-color td, .bg-color th {
+        border: 1px solid #dee2e6;
+        background-color: rgb(219,238,213) !important;
+    }
+
+
+    #OtherEmpName #txtOtherEmpname {
+        border-radius: 0;
+        height: 20%;
+        font-size: 12px;
+    }
+
+    .bg-color-2 td {
+        background-color: rgba(75,168,46,0.4) !important;
+        border: 1px solid rgba(75,168,46,0.1) !important;
+    }
+
+    .bg-color-2 th {
+        background-color: rgba(75,168,46,0.4) !important;
+        border: 1px solid rgba(75,168,46,0.1) !important;
+    }
+
+    .bg-color-3 td {
+        background-color: rgba(75,168,46,0.2) !important;
+        border: 1px solid rgba(75,168,46,0.1) !important;
+        border-bottom: 1px solid rgba(75,168,46,0.1) !important;
+    }
+
+    #loader {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        
+        z-index: 10000;
+    }
+
+    .ui-front {
+        z-index: 9999999 !important;
+    }
+</style>
+
+<div class="right_col bg-transparent" role="main">
+    <div class="container">
+        <form action="/List/CreateSoftwareRequisitionRequest" id="SRForm" method="post">
+            @if (IsNew)
+            {
+                if (!IsEdit)
+                {
+                    <div>
+                        <input type="hidden" id="FormSrId" name="FormSrId" value="@(SRF.one[0].Id)" />
+                        <input type="hidden" id="FormId" name="FormId" value="@(FormId)" />
+                        <input type="hidden" id="AppRowId" name="AppRowId" value="@(AppRowId)" />
+                    </div>
+                }
+                else
+                {
+                    <div class="breadcrumb-container">
+                        <div>
+                            <ol class="breadcrumb pl-0">
+                                <li>
+                                    <a href="/Dashboard?formName=SRF">
+                                        Dashboard
+                                    </a>
+                                </li>
+                                <li class="active">
+                                    <a href="/Dashboard/GetDepartmentWiseForms?department=HR">
+                                        HR Department
+                                    </a>
+                                </li>
+                                <li class="active">Software Requisition Form</li>
+                            </ol>
+                        </div>
+                    </div>
+                    <div class="form-main-container margin_space">
+                        <div class="row topContent">
+                            <div class="col-lg-9 col-md-7 padd_space">
+
+                                <h5>Form Name : Software Requisition Form</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-7 padd_space float-right text-right">
+
+                                <h5> @*Form Department | Owner*@</h5>
+
+                            </div>
+                        </div>
+                    </div>
+
+                }
+            }
+            <div class="container form-container">
+                <div class="card-header pb-4 pt-4">
+                    <table class="w-100 m-auto">
+                        <tr>
+                            <td>
+                                <table class="table mainTbl table-bordered form-table-container bg-color">
+                                    <tbody>
+                                        <tr>
+                                            <td class="f-600 text-left pl-3">Classification</td>
+                                            <td class="f-600 text-left pl-3">Internal</td>
+                                            <td rowspan="2" class="text-right"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="f-600 text-left pl-3">Version</td>
+                                            <td class="f-600 text-left pl-3">01</td>
+                                            <!-- <td rowspan="2"></td> -->
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table mainTbl table-bordered form-table-container bg-color">
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="6" class="heading form-heading">
+                                                <span>Software Requisition Form</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table mainTbl table-bordered form-table-container-2 bg-color">
+                                    <tbody>
+                                        <tr>
+                                            <td style="width:30%;" class="allFormLables borderLTB f-600">
+                                                <label class="f-600">Date</label>
+                                            </td>
+                                            <td colspan="2" class="borderLTB text-left">
+                                                <input type="text" name="txtDate" placeholder="/ /" class="w-100" value="@(!IsNew || !IsEdit ? (Convert.ToDateTime(SRF.one[0].FormID.CreatedDate).ToShortDateString()) : DateTime.Now.ToShortDateString())" readonly>
+                                            </td>
+
+                                            @if (!IsNew || !IsEdit)
+                                            {
+                                                <td class="allFormLables borderLTB f-600 align" colspan="2">
+
+                                                    <label class="f-600">Form Id</label>
+
+                                                </td>
+                                                <td colspan="2" class="borderLTB text-right">
+
+                                                    <input type="text" name="txtFormId" class="w-100" value="@(!IsNew || !IsEdit ? ("SRF" + SRF.one[0].FormID.Id ?? "") : "" )" readonly>
+                                                </td>
+                                            }
+                                        </tr>
+
+
+                                        @if (IsNew)
+                                        {
+                                            if (!IsEdit)
+                                            {
+                                                <tr>
+                                                    <td class="allFormLables borderLTB f-600">
+                                                        <label class="f-600">Type of Employee<span class="astColor">*</span></label>
+                                                    </td>
+                                                    <td class="borderLTB">
+                                                        <label class="checkbox-container">
+                                                            <label class="f-600">Internal</label>
+                                                            @if (SRF.one[0].EmployeeType == "Internal")
+                                                            {
+                                                                <input type="checkbox" class="" name="chkInternal" id="chkInternal" onclick="getEmployeeType()" checked>
+                                                            }
+                                                            else
+                                                            {
+                                                                <input type="checkbox" class="" name="chkInternal" id="chkInternal" onclick="getEmployeeType()">
+                                                            }
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                    </td>
+
+                                                    <td class="borderLTB text-left align">
+                                                        <label class="checkbox-container">
+                                                            <label class="f-600">External</label>
+                                                            @if (SRF.one[0].EmployeeType == "External")
+                                                            {
+                                                                <input type="checkbox" class="" name="chkExternal" id="chkExternal" onclick="getEmployeeType()" checked>
+                                                            }
+                                                            else
+                                                            {
+                                                                <input type="checkbox" class="" name="chkExternal" id="chkExternal" onclick="getEmployeeType()">
+                                                            }
+
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                        <input type="hidden" name="chkEmployeeType" id="chkEmployeeType" value="@(SRF.one[0].EmployeeType ?? "")" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    @if ((SRF.one[0].EmployeeType == "External") && (SRF.one[0].ExternalOrganizationName == "Other"))
+                                                    {
+                                                        <td class="" id="lblExternalOrganizationName">
+                                                            <label class="f-600">External Organization Name</label>
+                                                        </td>
+                                                        <td id="ExternalOrganizationName" colspan="2">
+                                                            <select class="w-100" name="ddExternalOrganizationName" id="ddExternalOrganizationName"></select>
+                                                        </td>
+                                                        <td id="lblExternalOtherOrganizationName" colspan="2" class="align">
+                                                            <label class="f-600"> Other External Organization Name</label>
+                                                        </td>
+                                                        <td id="ExternalOtherOrganizationName" class="text-right">
+                                                            <input type="text" class="w-100" placeholder="Other External Organization Name" name="txtExternalOtherOrganizationName" id="txtExternalOtherOrganizationName" value="@(SRF.one[0].ExternalOtherOrganizationName ?? "")" />
+                                                        </td>
+                                                    }
+
+                                                    @if ((SRF.one[0].EmployeeType == "External") && (SRF.one[0].ExternalOrganizationName != "Other"))
+                                                    {
+                                                        <td class="" id="lblExternalOrganizationName">
+                                                            <label class="f-600">External Organization Name</label>
+                                                        </td>
+                                                        <td id="ExternalOrganizationName" colspan="2">
+                                                            <select class="w-100" name="ddExternalOrganizationName" id="ddExternalOrganizationName"></select>
+                                                        </td>
+                                                    }
+
+                                                    <td id="lblExternalOtherOrganizationName" colspan="2" class="align" style="display:none;">
+                                                        <label class="f-600"> Other External Organization Name</label>
+                                                    </td>
+                                                    <td id="ExternalOtherOrganizationName" class="text-right" style="display:none;">
+                                                        <input type="text" class="w-100" placeholder="Other External Organization Name" name="txtExternalOtherOrganizationName" id="txtExternalOtherOrganizationName" />
+                                                    </td>
+
+                                                </tr>
+                                            }
+                                            else
+                                            {
+                                                <tr>
+                                                    <td class="allFormLables borderLTB f-600">
+                                                        <label class="f-600">Type of Employee<span class="astColor">*</span></label>
+                                                    </td>
+                                                    <td class="borderLTB">
+                                                        <label class="checkbox-container">
+                                                            <label class="f-600">Internal</label>
+                                                            <input type="checkbox" class="" name="chkInternal" id="chkInternal" onclick="getEmployeeType()">
+
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                    </td>
+
+                                                    <td class="borderLTB text-left align">
+                                                        <label class="checkbox-container">
+                                                            <label class="f-600">External</label>
+                                                            <input type="checkbox" class="" name="chkExternal" id="chkExternal" onclick="getEmployeeType()">
+
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                        <input type="hidden" name="chkEmployeeType" id="chkEmployeeType" value="" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="" id="lblExternalOrganizationName" style="display:none;">
+                                                        <label class="f-600">External Organization Name</label>
+
+                                                    </td>
+                                                    <td id="ExternalOrganizationName" colspan="2" style="display:none;">
+                                                        <select name="ddExternalOrganizationName" id="ddExternalOrganizationName"></select>
+                                                    </td>
+
+
+                                                    <td id="lblExternalOtherOrganizationName" colspan="2" class="align" style="display:none;">
+                                                        <label class="f-600"> Other External Organization Name</label>
+
+                                                    </td>
+                                                    <td id="ExternalOtherOrganizationName" class="text-right" style="display:none;">
+                                                        <input type="text" class="w-100" placeholder="Other External Organization Name" name="txtExternalOtherOrganizationName" id="txtExternalOtherOrganizationName" />
+                                                    </td>
+
+                                                </tr>
+                                            }
+                                        }
+                                        else if (!IsNew)
+                                        {
+                                            if (SRF.one[0].RequestSubmissionFor == "Self")
+                                            {
+                                            <tr>
+                                                <td class="w-20 allFormLables borderLTB f-600">
+                                                    <label class="f-600">Type of Employee</label>
+                                                </td>
+                                                <td class="borderLTB">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Internal</label>
+                                                        @if (SRF.one[0].EmployeeType == "Internal")
+                                                        {
+                                                            <input type="checkbox" class="" name="chkInternal" id="chkInternal" onclick="getEmployeeType()" checked>
+                                                        }
+                                                        else
+                                                        {
+                                                            <input type="checkbox" class="" name="chkInternal" id="chkInternal" onclick="getEmployeeType()">
+                                                        }
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </td>
+
+                                                <td class="borderLTB text-left align">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">External</label>
+                                                        @if (SRF.one[0].EmployeeType == "External")
+                                                        {
+                                                            <input type="checkbox" class="" name="chkExternal" id="chkExternal" onclick="getEmployeeType()" checked>
+                                                        }
+                                                        else
+                                                        {
+                                                            <input type="checkbox" class="" name="chkExternal" id="chkExternal" onclick="getEmployeeType()">
+                                                        }
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                    <input type="hidden" name="chkEmployeeType" id="chkEmployeeType" value="@(SRF.one[0].EmployeeType ?? "")" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                @if ((SRF.one[0].EmployeeType == "External") && (SRF.one[0].ExternalOrganizationName == "Other"))
+                                                {
+                                                    <td class="" id="lblExternalOrganizationName">
+                                                        <label class="f-600">External Organization Name</label>
+                                                    </td>
+                                                    <td id="ExternalOrganizationName" colspan="2">
+                                                        <input type="text" class="w-100 txtDisable" name="txtExternalOrganizationName" id="txtExternalOrganizationName" value="@(SRF.one[0].ExternalOrganizationName ?? "")" />
+                                                    </td>
+                                                    <td id="lblExternalOtherOrganizationName" colspan="2" class="align">
+                                                        <label class="f-600"> Other External Organization Name</label>
+                                                    </td>
+                                                    <td id="ExternalOtherOrganizationName" class="text-right">
+                                                        <input type="text" class="w-100 txtDisable" name="txtExternalOtherOrganizationName" id="txtExternalOtherOrganizationName" value="@(SRF.one[0].ExternalOtherOrganizationName ?? "")" />
+                                                    </td>
+                                                }
+
+                                                @if ((SRF.one[0].EmployeeType == "External") && (SRF.one[0].ExternalOrganizationName != "Other"))
+                                                {
+                                                    <td class="" id="lblExternalOrganizationName">
+                                                        <label class="f-600">External Organization Name</label>
+                                                    </td>
+                                                    <td id="ExternalOrganizationName" colspan="2">
+                                                        <input type="text" class="w-100 txtDisable" name="txtExternalOrganizationName" id="txtExternalOrganizationName" value="@(SRF.one[0].ExternalOrganizationName ?? "")" />
+                                                    </td>
+                                                }
+                                            </tr>
+                                            }
+                                        }
+
+                                        @if (IsNew)
+                                        {
+                                            if (!IsEdit)
+                                            {
+                                                <tr>
+                                                    <td class="allFormLables borderLTB f-600">
+                                                        <label class="f-600">Employee Name</label>
+                                                    </td>
+                                                    <td colspan="2" class="borderLTB">
+                                                        <input type="text" class="w-100 txtDisable empName" name="txtEmployeeName" id="txtEmployeeName" value="@(SRF.one[0].EmployeeName ?? "")" readonly />
+                                                    </td>
+                                                    <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                        <label class="f-600">Cost Center No</label>
+                                                    </td>
+                                                    <td class="borderLTB text-right" colspan="2">
+                                                        <input type="text" class="w-100 txtDisable" name="txtCostcenterCode" id="txtCostcenterCode" value="@(SRF.one[0].EmployeeCCCode ?? "")" readonly />
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td class="allFormLables borderLTB f-600">
+                                                        <label class="f-600">Employee Code</label>
+                                                    </td>
+                                                    <td colspan="2" class="borderLTB">
+                                                        <input type="text" class="w-100 txtDisable" id="txtEmployeeCode" name="txtEmployeeCode" value="@(SRF.one[0].EmployeeCode ?? "")" readonly />
+                                                    </td>
+                                                    <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                        <label class="f-600">User Id</label>
+                                                    </td>
+                                                    <td class="borderLTB text-right" colspan="2">
+                                                        <input type="text" class="w-100 txtDisable" name="txtUserId" id="txtUserId" value="@(SRF.one[0].EmployeeUserId ?? "")" readonly />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="allFormLables borderLTB f-600">
+                                                        <label class="f-600">Department</label>
+                                                    </td>
+                                                    <td colspan="2" class="borderLTB">
+                                                        <input type="text" class="w-100 txtDisable" name="txtDepartment" id="txtDepartment" value="@(SRF.one[0].EmployeeDepartment ?? "")" readonly />
+                                                    </td>
+                                                    <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                        <label class="f-600">Contact No</label>
+                                                    </td>
+                                                    <td class="borderLTB text-right" colspan="2">
+                                                        <input type="text" class="w-100 txtDisable" name="txtContactNo" id="txtContactNo" value="@(SRF.one[0].EmployeeContactNo ?? "")" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="allFormLables borderLTB f-600">
+                                                        <label class="f-600">Designation</label>
+                                                    </td>
+                                                    <td colspan="2" class="borderLTB">
+                                                        <select name="ddEmpDesignation" class="w-100 drpSize" id="ddEmpDesignation"></select>
+                                                    </td>
+                                                    <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                        <label class="f-600">Location</label>
+                                                    </td>
+                                                    <td class="borderLTB text-right" colspan="2">
+                                                        <select name="ddEmpLocation" class="w-100 drpSize" id="ddEmpLocation"></select>
+                                                    </td>
+
+
+                                                </tr>
+                                            }
+                                            else
+                                            {
+                                                <tr>
+                                                    <td class="allFormLables borderLTB f-600">
+                                                        <label class="f-600">Employee Name</label>
+                                                    </td>
+                                                    <td colspan="2" class="borderLTB">
+                                                        <input type="text" class="w-100 txtDisable empName" name="txtEmployeeName" id="txtEmployeeName" value="@user.FirstName @user.LastName" readonly />
+                                                    </td>
+                                                    <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                        <label class="f-600">Cost Center No</label>
+                                                    </td>
+                                                    <td class="borderLTB text-right" colspan="2">
+                                                        <input type="text" class="w-100 txtDisable" name="txtCostcenterCode" id="txtCostcenterCode" value="@user.CostCenter" readonly />
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td class="allFormLables borderLTB f-600">
+                                                        <label class="f-600">Employee Code<span class="astColor">*</span></label>
+                                                    </td>
+                                                    <td colspan="2" class="borderLTB">
+                                                        <input type="text" class="w-100 txtDisable" id="txtEmployeeCode" name="txtEmployeeCode" value="@user.EmpNumber" readonly />
+                                                    </td>
+                                                    <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                        <label class="f-600">Cost Center No<span class="astColor">*</span></label>
+                                                    </td>
+                                                    <td class="borderLTB text-right" colspan="2">
+                                                        <input type="text" class="w-100 txtDisable" name="txtUserId" id="txtUserId" value="@user.UserId" readonly />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="allFormLables borderLTB f-600">
+                                                        <label class="f-600">Department<span class="astColor">*</span></label>
+                                                    </td>
+                                                    <td colspan="2" class="borderLTB">
+                                                        <input type="text" class="w-100 txtDisable" name="txtDepartment" id="txtDepartment" value="@user.Department" readonly />
+                                                    </td>
+                                                    <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                        <label class="f-600">Contact No</label>
+                                                    </td>
+                                                    <td class="borderLTB text-right" colspan="2">
+                                                        <input type="text" class="w-100 txtDisable" name="txtContactNo" id="txtContactNo" value="@user.PhoneNumber" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+
+
+                                                    <td class="allFormLables borderLTB f-600">
+                                                        <label class="f-600">Designation<span class="astColor">*</span></label>
+                                                    </td>
+                                                    <td colspan="2" class="borderLTB">
+                                                        <select name="ddEmpDesignation" class="w-100 drpSize" id="ddEmpDesignation"></select>
+                                                    </td>
+                                                    <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                        <label class="f-600">Location<span class="astColor">*</span></label>
+                                                    </td>
+                                                    <td class="borderLTB text-right" colspan="2">
+                                                        <select name="ddEmpLocation" class="w-100 drpSize" id="ddEmpLocation"></select>
+                                                    </td>
+
+                                                </tr>
+                                            }
+                                        }
+                                        else if (!IsNew)
+                                        {
+                                            if (SRF.one[0].RequestSubmissionFor == "Self")
+                                            {
+                                            <tr>
+                                                <td class="allFormLables borderLTB f-600">
+                                                    <label class="f-600">Employee Name</label>
+                                                </td>
+                                                <td colspan="2" class="borderLTB">
+                                                    <input type="text" class="w-100 txtDisable empName" name="txtEmployeeName" id="txtEmployeeName" value="@(SRF.one[0].EmployeeName ?? "")" readonly />
+                                                </td>
+                                                <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                    <label class="f-600">Cost Center No</label>
+                                                </td>
+                                                <td class="borderLTB text-right" colspan="2">
+                                                    <input type="text" class="w-100 txtDisable" name="txtCostcenterCode" id="txtCostcenterCode" value="@(SRF.one[0].EmployeeCCCode ?? "")" readonly />
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td class="allFormLables borderLTB f-600">
+                                                    <label class="f-600">Employee Code</label>
+                                                </td>
+                                                <td colspan="2" class="borderLTB">
+                                                    <input type="text" class="w-100 txtDisable" id="txtEmployeeCode" name="txtEmployeeCode" value="@(SRF.one[0].EmployeeCode ?? "")" readonly />
+                                                </td>
+                                                <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                    <label class="f-600">Cost Center No</label>
+                                                </td>
+                                                <td class="borderLTB text-right" colspan="2">
+                                                    <input type="text" class="w-100 txtDisable" name="txtUserId" id="txtUserId" value="@(SRF.one[0].EmployeeUserId ?? "")" readonly />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="allFormLables borderLTB f-600">
+                                                    <label class="f-600">Department</label>
+                                                </td>
+                                                <td colspan="2" class="borderLTB">
+                                                    <input type="text" class="w-100 txtDisable" name="txtDepartment" id="txtDepartment" value="@(SRF.one[0].EmployeeDepartment ?? "")" readonly />
+                                                </td>
+                                                <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                    <label class="f-600">Contact No</label>
+                                                </td>
+                                                <td class="borderLTB text-right" colspan="2">
+                                                    <input type="text" class="w-100 txtDisable" name="txtContactNo" id="txtContactNo" value="@(SRF.one[0].EmployeeContactNo ?? "")" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="allFormLables borderLTB f-600">
+                                                    <label class="f-600">Designation</label>
+                                                </td>
+                                                <td colspan="2" class="borderLTB">
+                                                    <input type="text" class="w-100 txtDisable" name="txtdesignation" id="txtdesignation" value="@(!IsNew ? (SRF.one[0].EmployeeDesignation ?? "") : "")" />
+                                                </td>
+                                                <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                    <label class="f-600">Location</label>
+                                                </td>
+                                                <td class="borderLTB text-right" colspan="2">
+                                                    <input type="text" class="w-100 txtDisable" name="txtLocation" id="txtLocation" value="@(!IsNew ? (SRF.one[0].EmployeeLocation ?? "") : "")" />
+                                                </td>
+                                            </tr>
+                                            }
+                                        }
+
+                                        @if (IsNew)
+                                        {
+                                            if (!IsEdit)
+                                            {
+                                                foreach (var item in SRF.one)
+                                                {
+                                                    <tr>
+
+                                                        <td class="w-20 allFormLables borderLTB f-600">
+                                                            <label class="f-600">Request Submission For<span class="astColor">*</span></label>
+                                                        </td>
+                                                        <td colspan="2" class="borderLTB">
+                                                            <select name="drpRequestSubmissionFor" id="drpRequestSubmissionFor" class="choice" onchange="RequestSubmissionFor()">
+                                                                <option value="null">Choose</option>
+                                                                <option value="Self" @(item.RequestSubmissionFor == "Self" ? "selected" : "")> Self </option>
+                                                                <option value="OnBehalf" @(item.RequestSubmissionFor == "OnBehalf" ? "selected" : "")> On Behalf </option>
+                                                            </select>
+                                                        </td>
+                                                        <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                            <label class="f-600"></label>
+                                                        </td>
+                                                        <td class="borderLTB text-left" colspan="2">
+                                                        </td>
+                                                    </tr>
+                                                }
+
+                                                if (SRF.one[0].RequestSubmissionFor == "OnBehalf")
+                                                {
+                                                    <tr id="OtherEmployeeOptions">
+                                                        <td class="w-20 allFormLables borderLTB f-600">
+                                                            <label class="f-600"></label>
+                                                        </td>
+                                                        <td class="borderLTB">
+                                                            @if (SRF.one[0].OnBehalfOption == "Existing")
+                                                            {
+                                                                <input type="radio" class="" name="rdOnBehalfOption" id="rdOnBehalfOption" value="Existing" checked />
+                                                            }
+                                                            else
+                                                            {
+                                                                <input type="radio" class="" name="rdOnBehalfOption" id="rdOnBehalfOption" value="Existing" checked />
+                                                            }
+                                                            <label class="f-600">Existing</label>
+                                                        </td>
+
+                                                        <td class="borderLTB">
+                                                            @if (SRF.one[0].OnBehalfOption == "New")
+                                                            {
+                                                                <input type="radio" class="" name="rdOnBehalfOption" id="rdOnBehalfOption" value="New" checked />
+                                                            }
+                                                            else
+                                                            {
+                                                                <input type="radio" class="" name="rdOnBehalfOption" id="rdOnBehalfOption" value="New" />
+                                                            }
+                                                            <label class="f-600">New</label>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                                else
+                                                {
+                                                    <tr id="OtherEmployeeOptions" style="display:none;">
+                                                        <td class="w-20 allFormLables borderLTB f-600">
+                                                            <label class="f-600">Other Employee Type</label>
+                                                        </td>
+                                                        <td class="borderLTB">
+                                                            <input type="radio" class="" name="rdOnBehalfOption" id="rdOnBehalfOption" value="Existing" checked />
+                                                            <label class="f-600">Existing</label>
+                                                        </td>
+
+                                                        <td class="borderLTB">
+                                                            <input type="radio" class="" name="rdOnBehalfOption" id="rdOnBehalfOption" value="New" />
+                                                            <label class="f-600">New</label>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <tr>
+                                                    <td class="w-20 allFormLables borderLTB f-600">
+                                                        <label class="f-600">Request Submission For<span class="astColor">*</span></label>
+                                                    </td>
+                                                    <td colspan="2" class="borderLTB">
+                                                        <select name="drpRequestSubmissionFor" id="drpRequestSubmissionFor" class="choice" onchange="RequestSubmissionFor()">
+                                                            <option value="null">Choose</option>
+                                                            <option value="Self">Self</option>
+                                                            <option value="OnBehalf">On Behalf</option>
+                                                        </select>
+                                                    </td>
+                                                    <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                        <label class="f-600"></label>
+                                                    </td>
+                                                    <td class="borderLTB text-left" colspan="2">
+                                                    </td>
+
+                                                </tr>
+                                                <tr id="OtherEmployeeOptions" style="display:none;">
+                                                    <td class="w-20 allFormLables borderLTB f-600">
+                                                        <label class="f-600">Other Employee Type</label>
+                                                    </td>
+                                                    <td class="borderLTB">
+                                                        <input type="radio" class="" name="rdOnBehalfOption" id="rdOnBehalfOption" value="Existing" />
+                                                        <label class="f-600">Existing</label>
+                                                    </td>
+
+                                                    <td class="borderLTB">
+                                                        <input type="radio" class="" name="rdOnBehalfOption" id="rdOnBehalfOption" value="New" />
+                                                        <label class="f-600">New</label>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+
+                                        @*Other Existing Emp Section*@
+                                        @if (IsNew)
+                                        {
+                                            if (!IsEdit)
+                                            {
+
+                                                if (SRF.one[0].RequestSubmissionFor == "OnBehalf")
+                                                {
+                                                    <table id="otherEmployeeDetailsSection">
+                                                        <tr><label><b>Other Employee Details</b></label></tr>
+                                                        <tr>
+                                                            <td class="allFormLables borderLTB f-600">
+                                                                <label class="f-600">Type of Employee<span class="astColor">*</span></label>
+                                                            </td>
+                                                            <td class="borderLTB">
+                                                                <label class="checkbox-container">
+                                                                    <label class="f-600">Internal</label>
+                                                                    @if (SRF.one[0].OtherEmployeeType == "Internal")
+                                                                    {
+                                                                        <input type="checkbox" class="inpDisable" name="chkOtherInternal" id="chkOtherInternal" checked>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" class="inpDisable" name="chkOtherInternal" id="chkOtherInternal">
+                                                                    }
+                                                                    <span class="checkmark"></span>
+                                                                </label>
+                                                            </td>
+
+                                                            <td class="borderLTB text-left align">
+                                                                <label class="checkbox-container">
+                                                                    <label class="f-600">Internal</label>
+                                                                    @if (SRF.one[0].OtherEmployeeType == "External")
+                                                                    {
+                                                                        <input type="checkbox" class="inpDisable" name="chkOtherExternal" id="chkOtherExternal" checked>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" class="inpDisable" name="chkOtherExternal" id="chkOtherExternal">
+                                                                    }
+                                                                    <input type="hidden" name="chkOtherEmployeeType" id="chkOtherEmployeeType" value="@(SRF.one[0].OtherEmployeeType)" />
+                                                                    <span class="checkmark"></span>
+                                                                </label>
+                                                            </td>
+                                                        </tr>
+                                                        @if (SRF.one[0].OtherEmployeeType == "External")
+                                                        {
+                                                            <tr>
+                                                                <td class="" id="OtherlblExternalOrganizationName">
+                                                                    <label class="f-600">External Organization Name</label>
+
+                                                                </td>
+                                                                <td id="OtherExternalOrganizationName" colspan="2">
+                                                                    <input type="text" name="txtOtherExternalOrganizationName" id="txtOtherExternalOrganizationName" value="@(SRF.one[0].OtherExternalOtherOrganizationName)" />
+                                                                </td>
+
+                                                                @if (SRF.one[0].OtherExternalOrganizationName == "Other")
+                                                                {
+                                                                    <td id="OtherlblExternalOtherOrganizationName" colspan="2" class="align">
+                                                                        <label class="f-600"> Other External Organization Name</label>
+
+                                                                    </td>
+                                                                    <td id="OtherExternalOtherOrganizationName" class="text-right">
+                                                                        <input type="text" class="w-100" placeholder="Other External Organization Name" name="txtOtherExternalOtherOrganizationName" id="txtOtherExternalOtherOrganizationName" value="@(SRF.one[0].OtherExternalOtherOrganizationName)" />
+                                                                    </td>
+                                                                }
+                                                            </tr>
+                                                        }
+                                                        <tr>
+                                                            <td class="allFormLables borderLTB f-600">
+                                                                <label class="f-600">Employee Name<span class="astColor">*</span></label>
+                                                            </td>
+                                                            <td colspan="2" class="borderLTB">
+                                                                <input type="text" class="w-100 txtDisable" name="txtOtherEmployeeName" id="txtOtherEmployeeName" value="@(SRF.one[0].OtherEmployeeName ?? "")" onkeypress="alphaOnly(event)" />
+                                                            </td>
+                                                            <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                                <label class="f-600">Cost Center No<span class="astColor">*</span></label>
+                                                            </td>
+                                                            <td class="borderLTB text-right" colspan="2">
+                                                                <input type="text" class="w-100 txtDisable" name="txtOtherCostcenterCode" id="txtOtherCostcenterCode" value="@(SRF.one[0].OtherEmployeeCCCode ?? "")" onkeypress="allowNumbersOnly(event)" />
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="allFormLables borderLTB f-600">
+                                                                <label class="f-600">Employee Code<span class="astColor">*</span></label>
+                                                            </td>
+                                                            <td colspan="2" class="borderLTB">
+                                                                <input type="text" class="w-100 txtDisable" id="txtOtherEmployeeCode" name="txtOtherEmployeeCode" value="@(SRF.one[0].OtherEmployeeCode ?? "")" onkeypress="allowNumbersOnly(event)" />
+                                                            </td>
+                                                            <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                                <label class="f-600">User Id<span class="astColor">*</span></label>
+                                                            </td>
+                                                            <td class="borderLTB text-right" colspan="2">
+                                                                <input type="text" class="w-100 txtDisable" name="txtOtherUserId" id="txtOtherUserId" value="@(SRF.one[0].OtherEmployeeUserId ?? "")" onkeypress="allowNumbersOnly(event)" />
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="allFormLables borderLTB f-600">
+                                                                <label class="f-600">Department<span class="astColor">*</span></label>
+                                                            </td>
+                                                            <td colspan="2" class="borderLTB">
+                                                                <input type="text" class="w-100 txtDisable" name="txtOtherDepartment" id="txtOtherDepartment" value="@(SRF.one[0].OtherEmployeeDepartment ?? "")" onkeypress="alphaOnly(event)" />
+                                                            </td>
+                                                            <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                                <label class="f-600">Email Id<span class="astColor">*</span></label>
+                                                            </td>
+                                                            <td class="borderLTB text-right" colspan="2">
+                                                                <input type="text" class="w-100 txtDisable" name="txtOtherEmailId" id="txtOtherEmailId" value="@(SRF.one[0].OtherEmployeeEmailId ?? "")" />
+                                                            </td>
+
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="allFormLables borderLTB f-600">
+                                                                <label class="f-600">Designation<span class="astColor">*</span></label>
+                                                            </td>
+                                                            <td colspan="2" class="borderLTB">
+                                                                <select name="ddOtherEmpDesignation" class="w-100 " id="ddOtherEmpDesignation"></select>
+                                                            </td>
+                                                            <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                                <label class="f-600">Location<span class="astColor">*</span></label>
+                                                            </td>
+                                                            <td class="borderLTB text-right" colspan="2">
+                                                                <select name="ddOtherEmpLocation" class="w-100 " id="ddOtherEmpLocation"></select>
+                                                            </td>
+
+                                                        <tr>
+                                                            <td class="allFormLables borderLTB f-600 align">
+                                                                <label class="f-600">Contact No</label>
+                                                            </td>
+                                                            <td class="borderLTB" colspan="2">
+                                                                <input type="text" class="w-100 txtDisable" name="txtOtherContactNo" id="txtOtherContactNo" value="@(SRF.one[0].EmployeeContactNo ?? "")" onkeypress="allowNumbersOnly(event)" />
+                                                            </td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td class="allFormLables borderLTB f-600">
+                                                                <label class="f-600">Type of Employee<span class="astColor">*</span></label>
+                                                            </td>
+                                                            <td class="borderLTB">
+                                                                <label class="checkbox-container">
+                                                                    <label class="f-600">Internal</label>
+                                                                    <input type="checkbox" class="" name="chkOtherInternal" id="chkOtherInternal" onclick="getOtherEmployeeType()">
+
+                                                                    <span class="checkmark"></span>
+                                                                </label>
+                                                            </td>
+
+                                                            <td class="borderLTB text-left align">
+                                                                <label class="checkbox-container">
+                                                                    <label class="f-600">External</label>
+                                                                    <input type="checkbox" class="" name="chkOtherExternal" id="chkOtherExternal" onclick="getOtherEmployeeType()">
+
+                                                                    <span class="checkmark"></span>
+                                                                </label>
+                                                                <input type="hidden" name="chkOtherEmployeeType" id="chkOtherEmployeeType" value="" />
+                                                            </td>
+                                                        </tr>
+
+
+                                                    </table>
+                                                }
+                                            }
+                                            else
+                                            {
+
+                                                <table id="otherEmployeeDetailsSection" style="display:none;" class="table mainTbl table-bordered form-table-container-2 bg-color">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td class="" id="OtherlblExternalOrganizationName" style="display:none;">
+                                                                <label class="f-600">External Organization Name</label>
+
+                                                            </td>
+                                                            <td id="OtherExternalOrganizationName" colspan="2" style="display:none;">
+                                                                <select name="ddOtherExternalOrganizationName" id="ddOtherExternalOrganizationName"></select>
+                                                            </td>
+
+
+                                                            <td id="OtherlblExternalOtherOrganizationName" colspan="2" class="align" style="display:none;">
+                                                                <label class="f-600"> Other External Organization Name</label>
+
+                                                            </td>
+                                                            <td id="OtherExternalOtherOrganizationName" class="text-right" style="display:none;">
+                                                                <input type="text" class="w-100" placeholder="Other External Organization Name" name="txtOtherExternalOtherOrganizationName" id="txtOtherExternalOtherOrganizationName" />
+                                                            </td>
+
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="allFormLables borderLTB f-600">
+                                                                <label class="f-600">Employee Name<span class="astColor">*</span></label>
+                                                            </td>
+                                                            <td colspan="2" class="borderLTB">
+                                                                <input type="text" class="w-100 txtDisable" name="txtOtherEmployeeName" id="txtOtherEmployeeName" value="" onkeypress="alphaOnly(event)" />
+                                                            </td>
+                                                            <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                                <label class="f-600">Cost Center No<span class="astColor">*</span></label>
+                                                            </td>
+                                                            <td class="borderLTB text-right" colspan="2">
+                                                                <input type="text" class="w-100 txtDisable" name="txtOtherCostcenterCode" id="txtOtherCostcenterCode" value="" onkeypress="allowNumbersOnly(event)" />
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="allFormLables borderLTB f-600">
+                                                                <label class="f-600">Employee Code<span class="astColor">*</span></label>
+                                                            </td>
+                                                            <td colspan="2" class="borderLTB">
+                                                                <input type="text" class="w-100 txtDisable" id="txtOtherEmployeeCode" name="txtOtherEmployeeCode" value="" onkeypress="allowNumbersOnly(event)" />
+                                                            </td>
+                                                            <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                                <label class="f-600">User Id<span class="astColor">*</span></label>
+                                                            </td>
+                                                            <td class="borderLTB text-right" colspan="2">
+                                                                <input type="text" class="w-100 txtDisable" name="txtOtherUserId" id="txtOtherUserId" value="" onkeypress="allowNumbersOnly(event)" />
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="allFormLables borderLTB f-600">
+                                                                <label class="f-600">Department<span class="astColor">*</span></label>
+                                                            </td>
+                                                            <td colspan="2" class="borderLTB">
+                                                                <input type="text" class="w-100 txtDisable" name="txtOtherDepartment" id="txtOtherDepartment" value="" onkeypress="alphaOnly(event)" />
+                                                            </td>
+                                                            <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                                <label class="f-600">Email Id<span class="astColor">*</span></label>
+                                                            </td>
+                                                            <td class="borderLTB text-right" colspan="2">
+                                                                <input type="text" class="w-100 txtDisable" name="txtOtherEmailId" id="txtOtherEmailId" value="" />
+                                                            </td>
+
+                                                        </tr>
+                                                        <tr>
+
+                                                            <td class="allFormLables borderLTB f-600">
+                                                                <label class="f-600">Designation<span class="astColor">*</span></label>
+                                                            </td>
+                                                            <td colspan="2" class="borderLTB">
+                                                                <select name="ddOtherEmpDesignation" class="w-100" id="ddOtherEmpDesignation"></select>
+                                                            </td>
+                                                            <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                                <label class="f-600">Location<span class="astColor">*</span></label>
+                                                            </td>
+                                                            <td class="borderLTB text-right" colspan="2">
+                                                                <select name="ddOtherEmpLocation" class="w-100" id="ddOtherEmpLocation"></select>
+                                                            </td>
+
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="allFormLables borderLTB f-600 align">
+                                                                <label class="f-600">Contact No</label>
+                                                            </td>
+                                                            <td class="borderLTB" colspan="2">
+                                                                <input type="text" class="w-100 txtDisable" name="txtOtherContactNo" id="txtOtherContactNo" value="" onkeypress="allowNumbersOnly(event)" />
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="allFormLables borderLTB f-600">
+                                                                <label class="f-600">Type of Employee<span class="astColor">*</span></label>
+                                                            </td>
+                                                            <td class="borderLTB">
+                                                                <label class="checkbox-container">
+                                                                    <label class="f-600">Internal</label>
+                                                                    <input type="checkbox" class="" name="chkOtherInternal" id="chkOtherInternal" onclick="getOtherEmployeeType()">
+
+                                                                    <span class="checkmark"></span>
+                                                                </label>
+                                                            </td>
+
+                                                            <td class="borderLTB text-left align">
+                                                                <label class="checkbox-container">
+                                                                    <label class="f-600">External</label>
+                                                                    <input type="checkbox" class="" name="chkOtherExternal" id="chkOtherExternal" onclick="getOtherEmployeeType()">
+
+                                                                    <span class="checkmark"></span>
+                                                                </label>
+                                                                <input type="hidden" name="chkOtherEmployeeType" id="chkOtherEmployeeType" value="" />
+                                                            </td>
+                                                        </tr>
+
+                                                    </tbody>
+                                                </table>
+                                            }
+                                        }
+                                        else if (!IsNew)
+                                        {
+                                            if (SRF.one[0].RequestSubmissionFor == "OnBehalf")
+                                            {
+                                                <div id="otherEmployeeDetailsSection" class="table mainTbl table-bordered form-table-container-2 bg-color">
+                                                    <tr>
+                                                        <td class="allFormLables borderLTB f-600">
+                                                            <label class="f-600">Type of Employee</label>
+                                                        </td>
+                                                        <td class="borderLTB">
+                                                            <label class="checkbox-container">
+                                                                <label class="f-600">Internal</label>
+                                                                @if (SRF.one[0].OtherEmployeeType == "Internal")
+                                                                {
+                                                                    <input type="checkbox" class="inpDisable" name="chkOtherInternal" id="chkOtherInternal" checked>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <input type="checkbox" class="inpDisable" name="chkOtherInternal" id="chkOtherInternal">
+                                                                }
+                                                                <span class="checkmark"></span>
+                                                            </label>
+                                                        </td>
+
+                                                        <td class="borderLTB text-left align">
+                                                            <label class="checkbox-container">
+                                                                <label class="f-600">Internal</label>
+                                                                @if (SRF.one[0].OtherEmployeeType == "External")
+                                                                {
+                                                                    <input type="checkbox" class="inpDisable" name="chkOtherExternal" id="chkOtherExternal" checked>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <input type="checkbox" class="inpDisable" name="chkOtherExternal" id="chkOtherExternal">
+                                                                }
+                                                                <input type="hidden" name="chkOtherEmployeeType" id="chkOtherEmployeeType" value="@(SRF.one[0].OtherEmployeeType)" />
+                                                                <span class="checkmark"></span>
+                                                            </label>
+                                                        </td>
+                                                    </tr>
+                                                    @if (SRF.one[0].OtherEmployeeType == "External")
+                                                    {
+                                                        <tr>
+                                                            <td class="" id="OtherlblExternalOrganizationName">
+                                                                <label class="f-600">External Organization Name</label>
+
+                                                            </td>
+                                                            <td id="OtherExternalOrganizationName" colspan="2">
+                                                                <input type="text" name="txtOtherExternalOrganizationName" id="txtOtherExternalOrganizationName" value="@(SRF.one[0].OtherExternalOtherOrganizationName)" />
+                                                            </td>
+
+                                                            @if (SRF.one[0].OtherExternalOrganizationName == "Other")
+                                                            {
+                                                                <td id="OtherlblExternalOtherOrganizationName" colspan="2" class="align">
+                                                                    <label class="f-600"> Other External Organization Name</label>
+
+                                                                </td>
+                                                                <td id="OtherExternalOtherOrganizationName" class="text-right">
+                                                                    <input type="text" class="w-100" placeholder="Other External Organization Name" name="txtOtherExternalOtherOrganizationName" id="txtOtherExternalOtherOrganizationName" value="@(SRF.one[0].OtherExternalOtherOrganizationName)" />
+                                                                </td>
+                                                            }
+                                                        </tr>
+                                                    }
+                                                    <tr>
+                                                        <td class="allFormLables borderLTB f-600">
+                                                            <label class="f-600">Employee Name</label>
+                                                        </td>
+                                                        <td colspan="2" class="borderLTB">
+                                                            <input type="text" class="w-100 txtDisable" name="txtOtherEmployeeName" id="txtOtherEmployeeName" value="@(SRF.one[0].OtherEmployeeName ?? "")" onkeypress="alphaOnly(event)" />
+                                                        </td>
+                                                        <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                            <label class="f-600">Cost Center No</label>
+                                                        </td>
+                                                        <td class="borderLTB text-right" colspan="2">
+                                                            <input type="text" class="w-100 txtDisable" name="txtOtherCostcenterCode" id="txtOtherCostcenterCode" value="@(SRF.one[0].OtherEmployeeCCCode ?? "")" onkeypress="allowNumbersOnly(event)" />
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="allFormLables borderLTB f-600">
+                                                            <label class="f-600">Employee Code</label>
+                                                        </td>
+                                                        <td colspan="2" class="borderLTB">
+                                                            <input type="text" class="w-100 txtDisable" id="txtOtherEmployeeCode" name="txtOtherEmployeeCode" value="@(SRF.one[0].OtherEmployeeCode ?? "")" onkeypress="allowNumbersOnly(event)" />
+                                                        </td>
+                                                        <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                            <label class="f-600">User Id</label>
+                                                        </td>
+                                                        <td class="borderLTB text-right" colspan="2">
+                                                            <input type="text" class="w-100 txtDisable" name="txtOtherUserId" id="txtOtherUserId" value="@(SRF.one[0].OtherEmployeeUserId ?? "")" onkeypress="allowNumbersOnly(event)" />
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="allFormLables borderLTB f-600">
+                                                            <label class="f-600">Department</label>
+                                                        </td>
+                                                        <td colspan="2" class="borderLTB">
+                                                            <input type="text" class="w-100 txtDisable" name="txtOtherDepartment" id="txtOtherDepartment" value="@(SRF.one[0].OtherEmployeeDepartment ?? "")" onkeypress="alphaOnly(event)" />
+                                                        </td>
+                                                        <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                            <label class="f-600">Email Id</label>
+                                                        </td>
+                                                        <td class="borderLTB text-right" colspan="2">
+                                                            <input type="text" class="w-100 txtDisable" name="txtOtherEmailId" id="txtOtherEmailId" value="@(SRF.one[0].OtherEmployeeEmailId ?? "")" />
+                                                        </td>
+
+                                                    </tr>
+                                                    <tr>
+
+                                                        <td class="allFormLables borderLTB f-600">
+                                                            <label class="f-600">Designation</label>
+                                                        </td>
+                                                        <td colspan="2" class="borderLTB">
+                                                            <input type="text" class="w-100 txtDisable" name="ddOtherEmpDesignation" id="ddOtherEmpDesignation" value="@(SRF.one[0].EmployeeDesignation ?? "")" />
+                                                        </td>
+                                                        <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                            <label class="f-600">Location</label>
+                                                        </td>
+                                                        <td class="borderLTB text-right" colspan="2">
+                                                            <input type="text" class="w-100 txtDisable" name="ddOtherEmpLocation" id="ddOtherEmpLocation" value="@(SRF.one[0].EmployeeLocation ?? "")" />
+                                                        </td>
+
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="allFormLables borderLTB f-600 align">
+                                                            <label class="f-600">Contact No</label>
+                                                        </td>
+                                                        <td class="borderLTB" colspan="2">
+                                                            <input type="text" class="w-100 txtDisable" name="txtOtherContactNo" id="txtOtherContactNo" value="@(SRF.one[0].EmployeeContactNo ?? "")" onkeypress="allowNumbersOnly(event)" />
+                                                        </td>
+                                                    </tr>
+                                                </div>
+                                            }
+                                        }
+                                </table>
+
+                                @if (IsNew)
+                                {
+                                    if (!IsEdit)
+                                    {
+                                        <table class="table mainTbl table-bordered form-table-container-2 bg-color">
+                                            <tr>
+                                                <td class="w-15 f-600">Request Type<span class="astColor">*</span></td>
+                                                <td class="w-20 per-checkbox">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Permanent</label>
+                                                        @if (SRF.one[0].EmployeeRequestType == "Permanent")
+                                                        {
+                                                            <input type="checkbox" class="" name="chkPermanent" id="chkPermanent" value="Permanent" onclick="getRequestType()" checked />
+                                                        }
+                                                        else
+                                                        {
+                                                            <input type="checkbox" class="" name="chkPermanent" id="chkPermanent" value="Permanent" onclick="getRequestType()" />
+                                                        }
+
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </td>
+                                                <td class="w-10 align">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Temporary</label>
+                                                        @if (SRF.one[0].EmployeeRequestType == "Temporary")
+                                                        {
+                                                            <input type="checkbox" class="" name="chkTemporary" id="chkTemporary" value="Permanent" onclick="getRequestType()" checked />
+                                                        }
+                                                        else
+                                                        {
+                                                            <input type="checkbox" class="" name="chkTemporary" id="chkTemporary" value="Permanent" onclick="getRequestType()" />
+                                                        }
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </td>
+                                                <td><input type="hidden" name="chkRequestType" id="chkRequestType" value="@(SRF.one[0].EmployeeRequestType ?? "")" /></td>
+
+                                                @if (SRF.one[0].EmployeeRequestType == "Temporary")
+                                                {
+                                                    <td id="TemporaryDateFrom">
+                                                        <label class="f-600" for="TempFrom" id="lblTempFrom">if Temporary from</label>
+
+                                                        <input type="date" name="txtTempFrom" id="txtTempFrom" value="@(SRF.one[0].TempFrom.ToString("yyyy-MM-dd"))" onclick="date_val()" />
+                                                    </td>
+                                                }
+                                                else
+                                                {
+                                                    <td id="TemporaryDateFrom" style="display:none;">
+                                                        <label for="TempFrom" id="lblTempFrom">if Temporary from</label>
+                                                        <input type="date" name="txtTempFrom" id="txtTempFrom" onclick="date_val()" />
+                                                    </td>
+                                                }
+
+                                                @if (SRF.one[0].EmployeeRequestType == "Temporary")
+                                                {
+                                                    <td id="TemporaryDateTo">
+                                                        <label class="f-600" for="TempTo" id="lblTempTo">to</label>
+                                                        <input type="date" name="txtTempTo" id="txtTempTo" value="@(SRF.one[0].TempTo.ToString("yyyy-MM-dd"))" />
+                                                    </td>
+                                                }
+                                                else
+                                                {
+                                                    <td id="TemporaryDateTo" style="display:none;">
+                                                        <label for="TempTo" id="lblTempTo">to</label>
+                                                        <input type="date" name="txtTempTo" id="txtTempTo" />
+                                                    </td>
+                                                }
+                                            </tr>
+                                        </table>
+                                    }
+                                    else
+                                    {
+                                        <table class="table mainTbl table-bordered form-table-container-2 bg-color">
+                                            <tr>
+                                                <td class="w-15 f-600">Request Type<span class="astColor">*</span></td>
+                                                <td class="w-20 per per-checkbox">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Permanent</label>
+                                                        <input type="checkbox" class="" name="chkPermanent" id="chkPermanent" value="Permanent" onclick="getRequestType()" />
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </td>
+                                                <td class="w-10 align">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Temporary</label>
+                                                        <input type="checkbox" class="temp-checkbox" name="chkTemporary" id="chkTemporary" value="Permanent" onclick="getRequestType()" />
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </td>
+                                                <td><input type="hidden" name="chkRequestType" id="chkRequestType" value="" /></td>
+                                                <td id="TemporaryDateFrom" style="display:none;">
+                                                    <label class="f-600" for="TempFrom" id="lblTempFrom">if Temporary from</label>
+                                                    <input type="date" name="txtTempFrom" id="txtTempFrom" onclick="date_val()" />
+                                                </td>
+                                                <td class="align" id="TemporaryDateTo" style="display:none;">
+                                                    <label class="f-600" for="TempTo" id="lblTempTo">to</label>
+                                                    <input type="date" class="w-90" name="txtTempTo" id="txtTempTo" />
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    }
+                                }
+
+                                else
+                                {
+                                    if (!IsNew)
+                                    {
+                                        <table class="table mainTbl table-bordered form-table-container-2 bg-color">
+                                            <tbody>
+                                                <tr>
+                                                    <td class="w-15 f-600">Request Type<span class="astColor">*</span></td>
+                                                    <td class="w-20 per per-checkbox">
+                                                        <label class="checkbox-container">
+                                                            <label class="f-600">Permanent</label>
+                                                            @if (SRF.one[0].EmployeeRequestType == "Permanent")
+                                                            {
+                                                                <input type="checkbox" class="inpDisable" name="chkPermanent" id="chkPermanent" value="Permanent" checked />
+                                                            }
+                                                            else
+                                                            {
+                                                                <input type="checkbox" class="inpDisable" name="chkPermanent" id="chkPermanent" value="Permanent" />
+                                                            }
+
+
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                    </td>
+                                                    <td class="w-10 align">
+                                                        <label class="checkbox-container">
+                                                            <label class="f-600">Temporary</label>
+                                                            @if (SRF.one[0].EmployeeRequestType == "Temporary")
+                                                            {
+                                                                <input type="checkbox" class="inpDisable" name="chkTemporary" id="chkTemporary" value="Permanent" checked />
+                                                            }
+                                                            else
+                                                            {
+                                                                <input type="checkbox" class="inpDisable" name="chkTemporary" id="chkTemporary" value="Permanent" />
+                                                            }
+
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                    </td>
+                                                    <td><input type="hidden" name="chkRequestType" id="chkRequestType" value="@(SRF.one[0].EmployeeRequestType ?? "")" /></td>
+                                                    @if (SRF.one[0].EmployeeRequestType == "Temporary")
+                                                    {
+                                                        <td id="TemporaryDateFrom">
+                                                            <label class="f-600" for="TempFrom" id="lblTempFrom">if Temporary from</label>
+                                                            <input type="text" class="w-50 txtDisable" name="txtTempFrom" id="txtTempFrom" value="@(SRF.one[0].TempFrom.ToString("yyyy-MM-dd"))" />
+                                                        </td>
+                                                    }
+
+                                                    @if (SRF.one[0].EmployeeRequestType == "Temporary")
+                                                    {
+                                                        <td id="TemporaryDateTo">
+                                                            <label class="f-600" for="TempTo" id="lblTempTo">to</label>
+                                                            <input type="text" class="w-90 txtDisable" name="txtTempTo" id="txtTempTo" value="@(SRF.one[0].TempTo.ToString("yyyy-MM-dd"))" />
+                                                        </td>
+                                                    }
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    }
+                                }
+                                </tbody>
+                    </table>
+                    <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="lblOtherSoftware">
+                        <tr>
+                            <td class="f-600 text-left pl-4">*To search for software please type at least 4 letters.</td>
+                        </tr>
+                    </table>
+                    <table class="table mainTbl table-bordered form-table-container-2 bg-color">
+                        <tr>
+                            <td class="bt-0 bb-0">
+                                <table class="w-100 mx-auto form-border text-center">
+
+                                    <thead class="form-head-1">
+                                        <tr>
+                                            <td></td>
+                                            <th>
+                                                Software Details (Name)
+                                            </th>
+                                            <th>Software Version</th>
+                                            <th>Software Type</th>
+                                        </tr>
+                                    </thead>
+                                    @if (!IsNew || !IsEdit)
+                                    {
+                                        var count = 1;
+                                        <tbody class="form-border tableSoftware" id="tbody">
+
+                                            @for (var i = 0; i < SRF.two.Count; i++)
+                                            {
+
+                                                if (SRF.two[i].IsOtherSoftware == "No")
+                                                {
+                                                    <tr>
+                                                        <td>@count</td>
+                                                        <td><input type="text" class="col sftDetClass inpValidate" name="txtSoftwareName_@(i + 1)" id="txtSoftwareName_@(i + 1)" value="@SRF.two[i].SoftwareName" /></td>
+                                                        <td><input type="text" class="txtDisable col inpValidate" name="txtSoftwareVersion_@(i + 1)" id="txtSoftwareVersion_@(i + 1)" value="@SRF.two[i].SoftwareVersion" onkeypress="allowNumbersAndDecimalsOnly(event)" /></td>
+                                                        <td><input type="text" class="txtDisable col inpValidate" name="txtSoftwareType_@(i + 1)" id="txtSoftwareType_@(i + 1)" value="@SRF.two[i].SoftwareType" /></td>
+                                                    </tr>
+                                                    count++;
+                                                }
+                                            }
+                                        </tbody>
+                                    }
+                                    else if (IsNew || !IsEdit)
+                                    {
+                                        <tbody class="form-border tableSoftware" id="tbody">
+                                            @for (var i = 1; i < 2; i++)
+                                            {
+                                                <tr id="row'@i'" class="tr_input">
+                                                    <td class="sNo">@i</td>
+                                                    <td><input type="text" class="col sftDetClass inpValidate" name="txtSoftwareName_@i" id="txtSoftwareName_@i" /></td>
+                                                    <td><input type="text" class="col inpValidate" name="txtSoftwareVersion_1" id="txtSoftwareVersion_1" onkeypress="allowNumbersAndDecimalsOnly(event)" /></td>
+                                                    <td><input type="text" class="col inpValidate" name="txtSoftwareType_1" id="txtSoftwareType_1" /></td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    }
+                                </table>
+                            </td>
+                        </tr>
+                        @if (IsNew || !IsEdit)
+                        {
+
+                            <tr align="right" id="addSoftwarebtn">
+                                <td class="">
+                                    <button type="button" class="btn btn-sm btn-success submit-btn d-flex float-right mb-2 bl-1 " onclick="AddSoftwareRows()">
+                                        + Add Software
+                                    </button>
+                                    <input type="hidden" name="totalrows" id="totalrows" />
+                                </td>
+                            </tr>
+
+                        }
+
+                    </table>
+
+                    <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="lblOtherSoftware">
+                        <tr>
+                            <td class="f-600 text-left pl-4">*If you are not able to search the software, please provide details as below.</td>
+                        </tr>
+                    </table>
+
+                    <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="otherSoftwareTable">
+                        <tr>
+                            <td class="bt-0 bb-0">
+                                <table class="w-100 mx-auto form-border text-center">
+                                    <thead class="form-head-1">
+                                        <tr>
+                                            <td></td>
+                                            <th>
+                                                Other Software
+                                            </th>
+                                            <th>Version</th>
+                                            <th> Software Type</th>
+                                        </tr>
+                                    </thead>
+                                    @if (IsNew)
+                                    {
+                                        if (!IsEdit)
+                                        {
+                                            if (SRF.five == 0)
+                                            {
+                                                <tbody class="form-border tableOtherSoftware" id="tbody">
+                                                    @for (var i = 1; i < 2; i++)
+                                                    {
+                                                        <tr id="row'@i'" class="">
+                                                            <td class="sNo">@i</td>
+                                                            <td><input type="text" class="col" name="txtOtherSoftwareName_@i" id="txtOtherSoftwareName_@i" /></td>
+                                                            <td><input type="text" class="col" name="txtOtherSoftwareVersion_1" id="txtOtherSoftwareVersion_1" onkeypress="allowNumbersAndDecimalsOnly(event)" /></td>
+                                                            <td>
+                                                                <select class="col" name="drpOtherSoftwareType_1" id="drpOtherSoftwareType_1">
+                                                                    <option value="null">Select</option>
+                                                                    <option value="Non-Standard Software">Non-Standard Software</option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            }
+                                            else
+                                            {
+                                                var count = 1;
+                                                <tbody class="form-border tableOtherSoftware" id="tbody">
+
+                                                    @for (var i = 0; i < SRF.two.Count; i++)
+                                                    {
+                                                        if (SRF.two[i].IsOtherSoftware == "Yes")
+                                                        {
+                                                            <tr id="row'@i'" class="">
+                                                                <td>@count</td>
+                                                                <td><input type="text" class="col" name="txtOtherSoftwareName_@(i + 1)" id="txtOtherSoftwareName_@(i + 1)" value="@SRF.two[i].SoftwareName" /></td>
+                                                                <td><input type="text" class="txtDisable col" name="txtOtherSoftwareVersion_@(i + 1)" id="txtOtherSoftwareVersion_@(i + 1)" value="@SRF.two[i].SoftwareVersion" onkeypress="allowNumbersAndDecimalsOnly(event)" /></td>
+                                                                <td>
+                                                                    <select class="txtDisable col" name="drpOtherSoftwareType_@(i + 1)" id="drpOtherSoftwareType_@(i + 1)" value="@SRF.two[i].SoftwareType">
+                                                                        <option value="Non-Standard Software" @(SRF.two[i].SoftwareType == "Non-Standard Software" ? "selected" : "")>Non-Standard Software</option>
+                                                                    </select>
+                                                                </td>
+                                                            </tr>
+                                                            count++;
+                                                        }
+                                                    }
+                                                </tbody>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <tbody class="form-border tableOtherSoftware" id="tbody">
+                                                @for (var i = 1; i < 2; i++)
+                                                {
+                                                    <tr id="row'@i'" class="">
+                                                        <td class="sNo">@i</td>
+                                                        <td><input type="text" class="col" name="txtOtherSoftwareName_@i" id="txtOtherSoftwareName_@i" /></td>
+                                                        <td><input type="text" class="col" name="txtOtherSoftwareVersion_1" id="txtOtherSoftwareVersion_1" onkeypress="allowNumbersAndDecimalsOnly(event)" /></td>
+                                                        <td>
+                                                            <select class="col" name="drpOtherSoftwareType_1" id="drpOtherSoftwareType_1">
+                                                                <option value="null">Select</option>
+                                                                <option value="Non-Standard Software">Non-Standard Software</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        }
+                                    }
+                                    @if (!IsNew)
+                                    {
+                                        var count = 1;
+                                        <tbody class="form-border tableOtherSoftware" id="tbody">
+
+                                            @for (var i = 0; i < SRF.two.Count; i++)
+                                            {
+                                                if (SRF.two[i].IsOtherSoftware == "Yes")
+                                                {
+                                                    <tr id="row'@i'" class="">
+                                                        <td>@count</td>
+                                                        <td><input type="text" class="col" name="txtOtherSoftwareName_@(i + 1)" id="txtOtherSoftwareName_@(i + 1)" value="@SRF.two[i].SoftwareName" /></td>
+                                                        <td><input type="text" class="txtDisable col" name="txtOtherSoftwareVersion_@(i + 1)" id="txtOtherSoftwareVersion_@(i + 1)" value="@SRF.two[i].SoftwareVersion" onkeypress="allowNumbersAndDecimalsOnly(event)" /></td>
+                                                        <td><input type="text" class="txtDisable col" name="txtOtherSoftwareType_@(i + 1)" id="txtOtherSoftwareType_@(i + 1)" value="@SRF.two[i].SoftwareType" onkeypress="allowNumbersAndDecimalsOnly(event)" /></td>
+                                                    </tr>
+                                                    count++;
+                                                }
+                                            }
+                                        </tbody>
+                                    }
+
+                                </table>
+                            </td>
+                        </tr>
+
+                        @if (IsNew || !IsEdit)
+                        {
+
+                            <tr align="right" id="addOtherSoftwarebtn">
+                                <td class="">
+                                    <button type="button" class="btn btn-sm btn-success submit-btn d-flex float-right mb-2 bl-1 " onclick="AddOtherSoftwareRows()">
+                                        + Add Other Software
+                                    </button>
+                                    <input type="hidden" name="totalotherrows" id="totalotherrows" />
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                    <table class="table mainTbl table-bordered form-table-container-2 bg-color">
+
+                        <tr>
+                            <td colspan="6" class="allFormLables borderLTB f-600">
+                                <span>Reason for Software Requisition (Business Need - Please provide detailed reason) (Max. 500)<span class="astColor">*</span></span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td colspan="6" class="allFormLables borderLTB f-600">
+                                <textarea class="textTrans txtDisable" cols="60" rows="7" name="txtBusinessNeed" id="txtBusinessNeed">@(!IsNew||!IsEdit ? (SRF.one[0].BusinessNeed ?? "") : "")</textarea>
+                            </td>
+                        </tr>
+                    </table>
+
+                    @if (!IsNew)
+                    {
+            <table class="table mainTbl table table-bordered table-sm dataTable no-footer border-none bg-color-2 table-middle">
+                <tr class="bg-color-2">
+                    <td colspan="6" class="authorize-container photogrph_header">HOD of Requester</td>
+                </tr>
+                <tr class="bg-color-2">
+                    <td colspan="1" class="authorize-td">
+                        <label class="f-600">Name:</label>
+                        <input type="text" name="" class="w-100 inpDisable inpIsNewDisable input-width-1" value="@(!IsNew ? (SRF.four[0].UserName ?? ""): "")">
+                    </td>
+                    <td class="authorize-td comment-box-2" colspan="2">
+                        <div class="form-group">
+                            <label class="f-600 align" for="comment">Approver Comment:</label>
+                            <textarea class="form-control textTrans" rows="12" id="comment" disabled>@(!IsNew ? (SRF.four[0].Comment ?? ""): "")</textarea>
+                        </div>
+                    </td>
+                    <td class="authorize-td" colspan="2">
+                        <label class="f-600 signature-box-1">Signature:</label>
+                        <input type="text" name="" class="w-100 inpDisable inpIsNewDisable input-width-1" value="@(!IsNew && SRF.four[0].ApproverStatus != "Pending" ? (SRF.four[0].ApproverStatus + " on " + Convert.ToDateTime(SRF.four[0].Modified).ToShortDateString()+" " +Convert.ToDateTime(SRF.four[0].Modified).ToShortTimeString()) : "" )">
+                    </td>
+                </tr>
+
+               
+            </table>
+                    }
+                    @if (!IsNew || !IsEdit)
+                    {
+                        <table class="table mainTbl table-bordered form-table-container-2 bg-color">
+                            <tbody>
+                                <tr>
+                                    <td class="allFormLables borderLTB">
+                                        <label class="f-600">for IT use only -</label>
+                                    </td>
+                                    <td class="borderLTB" colspan="2" style="text-align: right !important;">
+                                        <label class="f-600">Ticket No</label>
+                                        <input type="text" class="w-100" readonly="">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    }
+                    </td>
+                    </tr>
+                    </table>
+                </div>
+            </div>
+            <div>
+                <p class="text-left f-600">SF_FI_012</p>
+            </div>
+            @if (IsNew)
+            {
+                if (!IsEdit)
+                {
+                    <div class="card-footer align-content-center">
+                        <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                            Re-Submit
+                        </button>
+                        <button type="reset" class="btn btn-danger btn-sm cancl-btn">
+                            Cancel
+                        </button>
+                    </div>
+                }
+                else
+                {
+                    <div class="card-footer align-content-center">
+                        <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                            Submit
+                        </button>
+                        <button type="reset" class="btn btn-danger btn-sm cancl-btn">
+                            Cancel
+                        </button>
+                    </div>
+                }
+            }
+        </form>
+    </div>
+</div>
+<div class="modal fade" id="successModel" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header modelHeader">
+                <span class="modal-title modalMsgTitle" id="modalTitle"></span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label id="modalBody" class="lableMsg">  </label>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="submitBomBtn publishBtn" id="modalOkButton">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var spinner = $('#loader');
+    var isNew = @Html.Raw(Json.Encode(IsNew));
+    var srf = @Html.Raw(Json.Encode(SRF));
+    var appRowId = @Html.Raw(Json.Encode(AppRowId));
+    var approvalType =@Html.Raw(Json.Encode(ApprovalType));
+    var isEdit = @Html.Raw(Json.Encode(IsEdit));
+    var FlagRedirect = @Html.Raw(Json.Encode(FlagRedirect));
+    var formID = @Html.Raw(Json.Encode(FormId));
+    var RowId = @Html.Raw(Json.Encode(RowId));
+   console.log(srf);
+
+
+    pageLoad();
+    function pageLoad() {
+        spinner.hide();
+        getEmployeeType();
+        getOtherEmployeeType();
+        getRequestType();
+        empDetails();
+        showHideControls();
+
+
+        if (isNew) {
+            //var count = 0;
+            var EmailId = "";
+            getDesignations();
+            getServiceDeskLocations();
+            getExternalOrganization();
+            @*var result = EmailIDValidation(@user.Email);
+            if (result == true) {
+
+            }*@
+        }
+        if (!isNew) {
+            $(".inpDisable").attr("disabled", "disabled");
+            $(".txtDisable").prop("readonly", true);
+            if (srf[2].Value == 0) {
+                $("#otherSoftwareTable").hide();
+                $("#lblOtherSoftware").hide();
+            }
+        }
+        if (!isEdit) {
+            $(".isAutocomplete").attr("autocomplete", "on");
+            $("#otherSoftwareTable").show();
+            $("#lblOtherSoftware").show();
+        }
+    }
+
+
+
+    function empDetails() {
+        ////
+        //$("#txtOtherEmpname").autocomplete({
+        console.log("Hi Employee");
+        $("#txtOtherEmployeeName").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: "/List/GetEmployeeDetails",
+                    dataType: "json",
+                    cache: false,
+                    async: false,
+                    data: {
+                        searchText: $("#txtOtherEmployeeName").val()
+                    },
+                    success: function (data) {
+                        ////
+                        response($.map(data, function (item) {
+                            console.log(data, 'data');
+                            return { label: item.FirstName, value: item.FirstName, raw: item };
+                        }));
+                    }
+                });
+            },
+            search: function (event, ui) {
+                var value = $("#txtOtherEmployeeName").val();
+                // If less than three chars, cancel the search event
+                if (value.length < 4) {
+                    event.preventDefault();
+                }
+            },
+            min_length: 4,
+            delay: 0,
+            select: function (event, ui) {
+                ////
+                var empOtherDetails = ui.item['raw'];
+                //Get the other details like Cost Center Code, Employee Number from DB.
+                $.ajax({
+                    url: "/List/GetExistingEmployeeDetails",
+                    dataType: "json",
+                    cache: false,
+                    async: false,
+                    data: {
+                        otherEmpUserId: empOtherDetails.Email,
+                    },
+                    success: function (data) {
+                        console.log(data, 'data');
+                        //$('#txtOtherEmpCCCode').val(data.CostCenter);
+                        $('#txtOtherEmployeeCode').val(data.EmpNumber);
+                        $('#txtOtherDepartment').val(data.Department);
+                        $('#txtOtherEmployeeName').val(data.UserName);
+                        $('#txtOtherCostcenterCode').val(data.CostCenter);
+                        $('#txtOtherUserId').val(data.UserId);
+                        $('#txtOtherContactNo').val(data.PhoneNumber);
+                        $('#txtOtherEmailId').val(data.Email);
+                        // $('input[id="chkInternal"]').prop("checked", true);
+                        //$('input[id="chkInternal"]').prop("disabled", true);
+                        EmailId = data.Email;
+                        console.log(EmailId);
+                        var emailExt = EmailIDValidation(EmailId);
+                        if (emailExt == true) {
+                            $('input[id="chkExternal"]').prop("checked", true);
+                            $("#chkEmployeeType").val('External');
+                            $("#ddOtherEmpDesignation").empty();
+                            $("#ddOtherEmpDesignation").append('<option value="">Select</option><option value="Team Member">Team Member</option>');
+                            $("#ExternalOrganizationName").show();
+                            $("#lblExternalOrganizationName").show();
+                        }
+                        else {
+                            $('input[id="chkInternal"]').prop("checked", true);
+                            $("#chkEmployeeType").val('Internal');
+                        }
+                    }
+                });
+            }
+
+        });
+    }
+
+    function getExternalOrganization() {
+        if (isNew) {
+            if (!isEdit) {
+                var value = JSON.stringify(srf[0]);
+                console.log(value)
+                var value_1 = JSON.parse(value);
+                var selectedOrganization = value_1.Value[0].ExternalOrganizationName;
+                console.log(selectedOrganization);
+                var selectedOtherOrganization = value_1.Value[0].OtherExternalOrganizationName;
+                console.log(selectedOtherOrganization);
+
+                $.ajax({
+                    type: "GET",
+                    url: "/List/GetExternalOrganization",
+                    contentType: "application/json; charset=utf-8",
+                    datatype: 'json',
+                    cache: false,
+                    async: false,
+                    success: function (data) {
+                        console.log(data);
+
+                        var s = '<option value="">Select</option>';
+                        var s1 = '<option value="">Select</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            if (data[i].Organization == selectedOrganization) {
+                                console.log("hiiii" + data[i].Organization);
+                                s += '<option value="' + data[i].Organization + '" selected>' + data[i].Organization + '</option>';
+                            }
+                            else {
+                                s += '<option value="' + data[i].Organization + '">' + data[i].Organization + '</option>';
+                            }
+
+                            if (data[i].Organization == selectedOtherOrganization) {
+                                console.log("hiiii" + data[i].Organization);
+                                s1 += '<option value="' + data[i].Organization + '" selected>' + data[i].Organization + '</option>';
+                            }
+                            else {
+                                s1 += '<option value="' + data[i].Organization + '">' + data[i].Organization + '</option>';
+                            }
+                        }
+                        $("#ddExternalOrganizationName").html(s);
+                        $("#ddOtherExternalOrganizationName").html(s1);
+                    },
+                    error: function () {
+
+                    }
+                });
+            }
+            else {
+                $.ajax({
+                    type: "GET",
+                    url: "/List/GetExternalOrganization",
+                    contentType: "application/json; charset=utf-8",
+                    datatype: 'json',
+                    cache: false,
+                    async: false,
+                    success: function (data) {
+                        console.log(data);
+                        var s = '<option value="">Select</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            s += '<option value="' + data[i].Organization + '">' + data[i].Organization + '</option>';
+                        }
+
+                        $("#ddExternalOrganizationName").html(s);
+                        $("#ddOtherExternalOrganizationName").html(s);
+                    },
+                    error: function () {
+
+                    }
+                });
+            }
+        }
+    }
+
+     function RequestSubmissionFor() {
+
+         var drpRequestSubmissionFor = $("#drpRequestSubmissionFor").val();
+         if (drpRequestSubmissionFor == "OnBehalf") {
+            //$("#txtEmployeeCode").val("");
+            //$("#txtCostcenterCode").val("");
+            //$("#txtUserId").val("");
+            //$("#txtEmployeeName").val("");
+            //$("#txtDepartment").val("");
+            //$("#txtContactNo").val("");
+            //$('#txtEmailId').val("");
+            //$('input[id="chkInternal"]').prop("checked", false);
+            //$('input[id="chkExternal"]').prop("checked", false);
+             $('#OtherEmployeeOptions').show();
+            // $("#ddEmpDesignation").prop("selectedIndex", 0).val();
+            // $("#ddEmpLocation").prop("selectedIndex", 0).val();
+        }
+         else if (drpRequestSubmissionFor == "Self") {
+             @*$('#OtherEmployeeOptions').hide();
+            $("#txtEmployeeCode").val("@user.EmpNumber");
+            $("#txtCostcenterCode").val("@user.CostCenter");
+            $("#txtUserId").val("@user.UserId");
+            $("#txtEmployeeName").val("@user.UserName");
+             $("#txtDepartment").val("@user.Department");
+             $("#txtContactNo").val("@user.PhoneNumber");
+             EmailId = "@user.Email";
+             console.log(EmailId);
+             var emailExt = EmailIDValidation(EmailId);
+             if (emailExt == true) {
+                 $('input[id="chkExternal"]').prop("checked", true);
+                  $("#chkEmployeeType").val('External');
+                 $("#ddEmpDesignation").empty();
+                 $("#ddEmpDesignation").append('<option value="">Select</option><option value="Team Member">Team Member</option>');
+                 $("#ExternalOrganizationName").show();
+                 $("#lblExternalOrganizationName").show();
+             }
+             else {
+                 $('input[id="chkInternal"]').prop("checked", true);
+                  $("#chkEmployeeType").val('Internal');
+             }
+            $('#txtEmailId').val("@user.Email");
+             $('input[id="chkinternal"]').prop("checked", false);
+             $('input[id="chkExternal"]').prop("checked", false);
+             $("#ddEmpDesignation").prop("selectedIndex", 0).val();
+             $("#ddEmpLocation").prop("selectedIndex", 0).val();*@
+        }
+        else {
+            //$("#OtherEmpName").hide();
+            //$("#txtEmployeeCode").val("");
+            //$("#txtCostcenterCode").val("");
+            //$("#txtUserId").val("");
+            //$("#txtEmployeeName").val("");
+            //$("#txtDepartment").val("");
+            //$("#txtContactNo").val("");
+            //$('input[id="chkInternal"]').prop("checked", false);
+            //$('input[id="chkExternal"]').prop("checked", false);
+            //$('input[id="chkInternal"]').prop("disabled", false);
+            //$('input[id="chkExternal"]').prop("disabled", false);
+            //$("#ExternalOrganizationName").hide();
+            // $("#ExternalOtherOrganizationName").hide();
+            // $("#lblExternalOrganizationName").hide();
+            // $("#lblExternalOtherOrganizationName").hide();
+            //$("#ddEmpDesignation").prop("selectedIndex", 0).val();
+            //$("#ddEmpLocation").prop("selectedIndex", 0).val();
+             }
+     }
+
+    function EmailIDValidation(txt) {
+        console.log("email-validation");
+        var result = txt.includes("extern");
+        console.log(result);
+        return result;
+    }
+
+    function getEmployeeType() {
+        $('input:checkbox[id="chkInternal"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                console.log("Internal");
+                $('input[id="chkInternal"]').prop('disabled', true);
+                $('input[id="chkExternal"]').prop('checked', false);
+                $('input[id="chkExternal"]').prop("disabled", false);
+                $("#chkEmployeeType").val('Internal');
+
+                $("#ExternalOrganizationName").hide();
+                $("#lblExternalOrganizationName").hide();
+                $("#ExternalOtherOrganizationName").hide();
+                $("#lblExternalOtherOrganizationName").hide();
+                //    $("#txtOtherEmpname").val("");
+                //    $("#txtEmployeeCode").val("");
+                //    $("#txtCostcenterCode").val("");
+                //    $("#txtUserId").val("");
+                //    $("#txtEmployeeName").val("");
+                //    $("#txtContactNo").val("");
+                //$("#txtDepartment").val("");
+                getDesignations();
+                    //$("#ddEmpDesignation").prop("selectedIndex", 0).val();
+                    //$("#ddEmpLocation").prop("selectedIndex", 0).val();
+
+            }
+        });
+
+        $('input:checkbox[id="chkExternal"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                $("#chkEmployeeType").val('External');
+                $('input[id="chkExternal"]').prop('disabled', true);
+                $('input[id="chkInternal"]').prop("checked", false);
+                $('input[id="chkInternal"]').prop("disabled", false);
+
+                //hide / value empty
+                if (isEdit) {
+                    //$("#OtherEmpName").hide();
+                    //$("#txtEmployeeCode").val("");
+                    //$("#txtCostcenterCode").val("");
+                    //$("#txtUserId").val("");
+                    //$("#txtEmployeeName").val("");
+                    //$("#txtDepartment").val("");
+                    //$("#txtContactNo").val("");
+                }
+                    //show
+                $("#ExternalOrganizationName").show();
+                $("#lblExternalOrganizationName").show();
+                    //$("#drpRequestSubmissionFor").prop("selectedIndex", 2).val();
+                //    $("#ddExternalOrganizationName").prop("selectedIndex", 0).val();
+                //    //$("#ddEmpDesignation").prop("selectedIndex", 0).val();
+                //$("#txtOtherEmpname").val("");
+                //changes 16-Sept-21
+                $("#ddEmpDesignation").empty();
+                $("#ddEmpDesignation").append('<option value="">Select</option><option value="Team Member">Team Member</option>');
+
+
+            }
+        });
+     }
+     function getOtherEmployeeType() {
+         $('input:checkbox[id="chkOtherInternal"]').click(function () {
+             if ($(this).prop("checked") == true) {
+                 console.log("other Internal");
+                 $('input[id="chkOtherInternal"]').prop('disabled', true);
+                 $('input[id="chkOtherExternal"]').prop('checked', false);
+                 $('input[id="chkOtherExternal"]').prop("disabled", false);
+                 $('#chkOtherEmployeeType').val('Internal');
+
+                 $("#OtherExternalOrganizationName").hide();
+                 $("#OtherlblExternalOrganizationName").hide();
+                 $("#OtherExternalOtherOrganizationName").hide();
+                 $("#OtherlblExternalOtherOrganizationName").hide();
+                 //$("#txtOtherEmpname").val("");
+                 //$("#txtEmployeeCode").val("");
+                 //$("#txtCostcenterCode").val("");
+                 //$("#txtUserId").val("");
+                 //$("#txtEmployeeName").val("");
+                 //$("#txtContactNo").val("");
+                 //$("#txtDepartment").val("");
+                 //getDesignations();
+                 //$("#ddOtherEmpDesignation").prop("selectedIndex", 0).val();
+                 //$("#ddOtherEmpLocation").prop("selectedIndex", 0).val();
+
+             }
+         });
+
+         $('input:checkbox[id="chkOtherExternal"]').click(function () {
+             if ($(this).prop("checked") == true) {
+                 console.log("other External");
+                 $('#chkOtherEmployeeType').val('External');
+                 $('input[id="chkOtherExternal"]').prop('disabled', true);
+                 $('input[id="chkOtherInternal"]').prop("checked", false);
+                 $('input[id="chkOtherInternal"]').prop("disabled", false);
+
+                 //hide / value empty
+                 if (isEdit) {
+                     //$("#OtherEmpName").hide();
+                     //$("#txtEmployeeCode").val("");
+                     //$("#txtCostcenterCode").val("");
+                     //$("#txtUserId").val("");
+                     //$("#txtEmployeeName").val("");
+                     //$("#txtDepartment").val("");
+                     //$("#txtContactNo").val("");
+                 }
+                 //show
+                 $("#OtherExternalOrganizationName").show();
+                 $("#OtherlblExternalOrganizationName").show();
+                 //$("#drpRequestSubmissionFor").prop("selectedIndex", 2).val();
+                 //$("#ddExternalOrganizationName").prop("selectedIndex", 0).val();
+                 ////$("#ddEmpDesignation").prop("selectedIndex", 0).val();
+                 //$("#txtOtherEmpname").val("");
+                 //changes 16-Sept-21
+                 //$("#ddOtherEmpDesignation").empty();
+                 //$("#ddOtherEmpDesignation").append('<option value="">Select</option><option value="Team Member">Team Member</option>');
+
+
+             }
+         });
+     }
+
+    $("#ddExternalOrganizationName").change(function () {
+        if ($(this).val() == 'Other') {
+            console.log("other selected");
+            $("#ExternalOtherOrganizationName").show();
+            $("#lblExternalOtherOrganizationName").show();
+        }
+        else {
+            $("#ExternalOtherOrganizationName").hide();
+            $("#lblExternalOtherOrganizationName").hide();
+            $("#txtExternalOtherOrganizationName").val("");
+        }
+    });
+
+     $("#ddOtherExternalOrganizationName").change(function () {
+         if ($(this).val() == 'Other') {
+             console.log("other selected");
+             $("#OtherExternalOtherOrganizationName").show();
+             $("#OtherlblExternalOtherOrganizationName").show();
+         }
+         else {
+             $("#OtherExternalOtherOrganizationName").hide();
+             $("#OtherlblExternalOtherOrganizationName").hide();
+             $("#OthertxtExternalOtherOrganizationName").val("");
+         }
+     });
+
+            function showHideControls() {
+                console.log("Hi");
+                //$('input[type=radio][name=rdOnBehalfOption]').click(function () {
+                //    console.log("hello");
+                //    if (this.value == 'Existing') {
+                //        console.log("Existing");
+                //        $('#otherEmployeeDetailsSection').show();
+                //        $('#rdOnBehalfOption').val('Existing');
+                //        $('#txtOtherEmployeeName').autocomplete({ disabled: false });
+                //        empDetails();
+
+                //    }
+                //    if (this.value == 'New') {
+                //        console.log("New");
+                //        $('#otherEmployeeDetailsSection').show();
+                //        $('#rdOnBehalfOption').val('New');
+                //        $("#txtEmployeeCode").val("");
+                //        $("#txtCostcenterCode").val("");
+                //        $("#txtUserId").val("");
+                //        $("#txtEmployeeName").val("");
+                //        $("#txtDepartment").val("");
+                //        $("#txtContactNo").val("");
+                //        $('#txtEmailId').val("");
+                //        $('#txtOtherEmployeeName').autocomplete({ disabled: true });
+                //        $('input[id="chkInternal"]').prop("checked", false);
+                //        $('input[id="chkExternal"]').prop("checked", false);
+                //    }
+                //});
+
+                $('input[type=radio][name=rdOnBehalfOption]').click(function () {
+                    console.log("hello radio");
+
+                    var onBehalfOption = $(this).val();
+                    console.log(onBehalfOption);
+
+                    if (onBehalfOption == "Existing") {
+                        $('#otherEmployeeDetailsSection').show();
+                        $('#rdOnBehalfOption').val('Existing');
+                        $('#txtOtherEmployeeName').autocomplete({ disabled: false });
+                        empDetails();
+                    }
+                    else {
+                        $('#otherEmployeeDetailsSection').show();
+                        $("#txtOtherEmployeeCode").val("");
+                        $("#txtOtherCostcenterCode").val("");
+                        $("#txtOtherUserId").val("");
+                        $("#txtOtherEmployeeName").val("");
+                        $("#txtOtherDepartment").val("");
+                        $("#txtOtherContactNo").val("");
+                        $('#txtOtherEmailId').val("");
+                        $('#txtOtherEmployeeName').autocomplete({ disabled: true });
+                        $('input[id="chkOtherInternal"]').prop("checked", false);
+                        $('input[id="chkOtherExternal"]').prop("checked", false);
+                    }
+
+                });
+            }
+
+
+        function successModal(txt) {
+        ////
+        $('#modalTitle').html('Success');
+        if (txt == "approve") {
+            $('#modalBody').html('Form has been approved!');
+            FlagRedirect = txt;
+        }
+        else if (txt == "reject") {
+            $('#modalBody').html('Form has been rejected!');
+        }
+        else if (txt == "enquire") {
+            $('#modalBody').html('Form has been enquired!');
+        }
+        else if (txt == "cancelled") {
+            $('#modalBody').html('Form has been cancelled!');
+        }
+        else {
+            $('#modalBody').html('Your form with ID: SRF' + txt + ' has been submitted! Kindly use this for future reference');
+            FlagRedirect = txt;
+        }
+        //$("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+
+    function failureModal() {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html('Some error occurred!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+
+
+    function requiredModal(text) {
+        $('#modalTitle').html('Required!!');
+        $('#modalBody').html(text);
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function fillFormModal() {
+        $('#modalTitle').html('Required');
+        $('#modalBody').html('<font color="red">Kindly fill the complete Software Details!</font>');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+        }
+
+    $("#btnSubmit").on('click', function (e) {
+        e.preventDefault();
+        var model = "";
+
+        var employeeCodelen = $("#txtEmployeeCode").val().length;
+        if (employeeCodelen == 0) {
+            model += "* Employee Code is required" + "<br/>";
+        }
+
+
+        var costCenterNumlen = $("#txtCostcenterCode").val().length;
+        if (costCenterNumlen < 6) {
+            model += "* Employee Cost Center Code is required" + "<br/>";
+        }
+
+        var userIdlen = $("#txtUserId").val().length;
+        if (userIdlen == 0 || userIdlen < 0) {
+            model += "* Employee User Id is required" + "<br/>";
+        }
+
+        var name = document.getElementById("txtEmployeeName").value;
+        if (name == "") {
+            model += "* Employee Name is required" + "<br/>";
+        }
+
+        var department = document.getElementById("txtDepartment").value;
+        if (department == "") {
+            model += "* Employee Department is required" + "<br/>";
+        }
+
+        var designation = document.getElementById("ddEmpDesignation").selectedIndex;
+        console.log("designation=" + designation);
+        if (designation == 0) {
+            model += "* Employee Designation is required" + "<br/>";
+        }
+
+        var location = document.getElementById("ddEmpLocation").selectedIndex;
+        if (location == 0) {
+            model += "* Employee Location is required" + "<br/>";
+        }
+
+        var requestSubmissionFor = document.getElementById("drpRequestSubmissionFor").selectedIndex;
+        console.log(requestSubmissionFor);
+        if (requestSubmissionFor == 0) {
+            model = "* Request Submission Type is required" + "<br/>";
+        }
+
+        if (requestSubmissionFor == 2) {
+            var otherEmployeeCodelen = $("#txtOtherEmployeeCode").val().length;
+            if (otherEmployeeCodelen == 0) {
+                model += "* Other Employee Code is required" + "<br/>";
+            }
+
+
+            var otherCostCenterNumlen = $("#txtOtherCostcenterCode").val().length;
+            if (otherCostCenterNumlen < 6) {
+                model += "* Other Employee Cost Center Code is required" + "<br/>";
+            }
+
+            var otherUserIdlen = $("#txtUserId").val().length;
+            if (otherUserIdlen == 0 || otherUserIdlen < 0) {
+                model += "* Other Employee User Id is required" + "<br/>";
+            }
+
+            var otherName = document.getElementById("txtOtherEmployeeName").value;
+            if (otherName == "") {
+                model += "* Other Employee Name is required" + "<br/>";
+            }
+
+            var otherDepartment = document.getElementById("txtOtherDepartment").value;
+            if (otherDepartment == "") {
+                model += "* Other Employee Department is required" + "<br/>";
+            }
+
+            var otherDesignation = document.getElementById("ddOtherEmpDesignation").selectedIndex;
+            if (otherDesignation == 0) {
+                model += "* Other Employee Designation is required" + "<br/>";
+            }
+
+            var otherLocation = document.getElementById("ddOtherEmpLocation").selectedIndex;
+            if (otherLocation == 0) {
+                model += "* Other Employee Location is requiredn" + "<br/>";
+            }
+        }
+        var businessNeed = document.getElementById("txtBusinessNeed").value;
+        if (businessNeed == "") {
+            model += "* Business Need is required" + "<br/>";
+        }
+
+        if ($("#chkTemporary").prop("checked") == true) {
+            var dateTempFrom = document.forms["SRForm"]["txtTempFrom"].value;
+            var dateTempTo = document.forms["SRForm"]["txtTempTo"].value;
+
+            if (dateTempFrom == "") {
+                console.log("hello");
+                model += "* Please select the Temporary From Date" + "<br/>";
+            }
+            if (dateTempTo == "") {
+                console.log("hello");
+                model += "* Please select the Temporary To Date" + "<br/>";
+            }
+        }
+
+
+        var isEmpty = false;
+        $(".tableSoftware tr:first").find('.inpValidate').each(function () {
+            if (this.value == '') {
+                isEmpty = true;
+                $(this).addClass('errorMsg');
+            }
+        });
+
+        $(".tableSoftware").find('.inpValidate').each(function () {
+            if (this.value == '') {
+                isEmpty = true;
+                $(this).addClass('errorMsg');
+            }
+        });
+
+        if (isEmpty == true) {
+            model += "* Kindly fill the complete Software Details!" + "<br/>";
+        }
+
+
+
+        if (model != "") {
+
+            console.log("hi if");
+            requiredModal('<font color="red">' + model + '</font>');
+            return false;
+        }
+        else {
+            console.log("hi else");
+            $("#totalrows").val(count);
+            $("#totalotherrows").val(OtherSoftwareCount);
+
+            $("#pageLoader").removeClass('invisible');
+            var form = $("#SRForm").serialize();
+            $.ajax({
+                url: '/SoftwareRequisition/CreateSoftwareRequisitionRequest',
+                type: 'POST',
+                data: form,
+                cache: false,
+                dataType: 'JSON',
+                success: (function (data) {
+                    console.log(data);
+                    if (data[0].Value == 1) {
+                        console.log(data);
+                        $("#pageLoader").addClass('invisible');
+                        successModal(data[1].Value);
+                        $("#SRForm").trigger("reset");
+                    }
+                    else {
+                        failureModal();
+                        $("#pageLoader").addClass('invisible');
+                        $("#SRForm").trigger("reset");
+                    }
+                }),
+                error: (function (data) {
+                    failureModal();
+                    $("#pageLoader").addClass('invisible');
+                    $("#SRForm").trigger("reset");
+                })
+            })
+        }
+    });
+
+    function getDesignations() {
+        if (isNew) {
+            if (!isEdit) {
+                var value = JSON.stringify(srf[0]);
+                console.log(value)
+                var value_1 = JSON.parse(value);
+                var selectedDesignation = value_1.Value[0].EmployeeDesignation;
+                console.log(selectedDesignation);
+                var selectedOtherDesignation = value_1.Value[0].OtherEmployeeDesignation;
+                console.log(selectedOtherDesignation);
+
+                $.ajax({
+                    type: "POST",
+                    url: "/List/GetDesignations",
+                    contentType: "application/json; charset=utf-8",
+                    datatype: 'json',
+                    cache: false,
+                    async: false,
+                    success: function (data) {
+                        console.log(data);
+                        var s = '<option value="">Select</option>';
+                        var s1 = '<option value="">Select</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            if (data[i].JobTitle == selectedDesignation) {
+                                console.log("hiiii" + data[i].JobTitle);
+                                s += '<option value="' + data[i].JobTitle + '" selected>' + data[i].JobTitle + '</option>';
+                            }
+                            else {
+                                s += '<option value="' + data[i].JobTitle + '">' + data[i].JobTitle + '</option>';
+                            }
+
+                            if (data[i].JobTitle == selectedOtherDesignation) {
+                                console.log("hiiii" + data[i].JobTitle);
+                                s1 += '<option value="' + data[i].JobTitle + '" selected>' + data[i].JobTitle + '</option>';
+                            }
+                            else {
+                                s1 += '<option value="' + data[i].JobTitle + '">' + data[i].JobTitle + '</option>';
+                            }
+                        }
+                        $("#ddEmpDesignation").html(s);
+                        $("#ddOtherEmpDesignation").html(s1);
+                    },          ////success
+                    error: function () {
+                        //alert('Failed to retrieve modules.');
+                    }
+                });
+            }
+            else {
+
+                $.ajax({
+                    type: "POST",
+                    url: "/List/GetDesignations",
+                    contentType: "application/json; charset=utf-8",
+                    datatype: 'json',
+                    cache: false,
+                    async: false,
+                    success: function (data) {
+                        console.log(data);
+                        var s = '<option value="">Select</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            s += '<option value="' + data[i].JobTitle + '">' + data[i].JobTitle + '</option>';
+                        }
+                        $("#ddEmpDesignation").html(s);
+                        $("#ddOtherEmpDesignation").html(s);
+                    },
+                    error: function (data) {
+                        //code
+                    }
+                });
+
+            }
+        }
+    }
+
+
+
+    function getServiceDeskLocations() {
+        if (isNew) {
+            if (!isEdit) {
+                var value = JSON.stringify(srf[0]);
+                console.log(value)
+                var value_1 = JSON.parse(value);
+                var selectedLocation = value_1.Value[0].EmployeeLocation;
+                console.log(selectedLocation);
+                var selectedOtherLocation = value_1.Value[0].EmployeeLocation;
+                console.log(selectedOtherLocation);
+
+                $.ajax({
+                    type: "GET",
+                    url: "/List/GetServiceDeskLocations",
+                    contentType: "application/json; charset=utf-8",
+                    datatype: 'json',
+                    cache: false,
+                    async: false,
+                    success: function (data) {
+                        console.log(data);
+                        var s = '<option value="">Select</option>';
+                        var s1 = '<option value="">Select</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            if (data[i].LocationName == selectedLocation) {
+                                s += '<option value="' + data[i].LocationName + '">' + data[i].LocationName + '</option>';
+                            }
+                            else {
+                                s += '<option value="' + data[i].LocationName + '">' + data[i].LocationName + '</option>';
+                            }
+
+                            if (data[i].LocationName == selectedOtherLocation) {
+                                s1 += '<option value="' + data[i].LocationName + '">' + data[i].LocationName + '</option>';
+                            }
+                            else {
+                                s1 += '<option value="' + data[i].LocationName + '">' + data[i].LocationName + '</option>';
+                            }
+                        }
+                        $("#ddEmpLocation").html(s);
+                        $("#ddOtherEmpLocation").html(s1);
+                    },
+                    error: function () {
+
+                    }
+                });
+            }
+            else {
+                $.ajax({
+                    type: "GET",
+                    url: "/List/GetServiceDeskLocations",
+                    contentType: "application/json; charset=utf-8",
+                    datatype: 'json',
+                    cache: false,
+                    async: false,
+                    success: function (data) {
+                        console.log("Hi=" + data);
+                        var s = '<option value="">Select</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            if ((data[i].LocationName == "Pune File Server") || (data[i].LocationName == "Mumbai File Server") || (data[i].LocationName == "Aurangabad File Server") || (data[i].LocationName == "External")) { }else {
+                                s += '<option value="' + data[i].LocationName + '">' + data[i].LocationName + '</option>';
+                            }
+                        }
+                        $("#ddEmpLocation").html(s);
+                        $("#ddOtherEmpLocation").html(s);
+                    },
+                    error: function () {
+                    }
+                });
+            }
+        }
+    }
+
+
+    $(document).ready(function () {
+        count = 1;
+        $(document).on('keydown', '.sftDetClass', function () {
+
+            var id = this.id;
+            var splitid = id.split('_');
+            var index = splitid[1];
+            count = index;
+
+            // Initialize jQuery UI autocomplete
+            $('#' + id).autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        url: "/SoftwareRequisition/GetAvailableSoftwares",
+                        dataType: "json",
+                        cache: false,
+                        async: false,
+                        data: {
+                            searchText: request.term
+                        },
+                        success: function (data) {
+                            ////
+                            console.log(data, 'data');
+
+                            response($.map(data, function (item) {
+                                //console.log(data, 'data');
+                                return { label: item.Name, value: item.Name, raw: item };
+                            }));
+
+                        }
+                    });
+                },
+                minLength: 4,
+
+                select: function (event, ui) {
+                    $(this).val(ui.item.label); // display the selected text
+                    var softwareName = ui.item.value;
+                    console.log(softwareName);
+                    $.ajax({
+                        url: "/SoftwareRequisition/GetAvailableSoftwareDetails",
+                        dataType: "json",
+                        cache: false,
+                        async: false,
+                        data: {
+                            softwareName: softwareName,
+                        },
+                        success: function (response) {
+                            console.log(response);
+                            var len = response.length;
+                            console.log(len);
+                            if (len > 0) {
+                                var id = response[0]['Id'];
+                                var name = response[0]['Name'];
+                                var version = response[0]['Version'];
+                                var type = response[0]['Classification'];
+
+                                document.getElementById('txtSoftwareName_' + index).value = name;
+                                document.getElementById('txtSoftwareVersion_' + index).value = version;
+                                document.getElementById('txtSoftwareType_' + index).value = type;
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
+        rowIdx = 1;
+        srNo = 1;
+
+        rowOtherIdx = 1;
+        srOtherNo = 1;
+
+        OtherSoftwareCount = 1;
+
+        if (!isEdit || !isNew) {
+            selectedSoftwareCount = srf[1].Value.length;
+            //console.log(srf[1]);
+
+            console.log("selectedSoftwareCount=" + selectedSoftwareCount);
+            var other = 0;
+            for (var i = 0; i < selectedSoftwareCount; i++) {
+                if (srf[1].Value[i].IsOtherSoftware == "Yes") {
+                    other++;
+                }
+            }
+            console.log("other=" + other);
+            if (other == 0) {
+                console.log("hi");
+                if (!isNew) {
+                    $("#otherSoftwareTable").css("display", "none");
+                    $("#lblOtherSoftware").css("display", "none");
+                    $("#addOtherSoftwarebtn").css("display", "none");
+                } else if (!isEdit) {
+                    $("#otherSoftwareTable").css("display", "normal");
+                    $("#lblOtherSoftware").css("display", "normal");
+                    $("#addOtherSoftwarebtn").css("display", "normal");
+                }
+                rowOtherIdx = other+1;
+            }
+            else {
+                rowIdx = selectedSoftwareCount - other;
+                rowOtherIdx = other;
+            }
+
+            console.log("rowIdx=" + rowIdx);
+        }
+
+    });
+
+    function saveResponse(text) {
+        var status = '', comment = '';
+        comment = $("#comment-" + text).val();
+        switch (text) {
+            case 'approve': {
+                status = 'Approved';
+                break;
+            }
+            case 'reject': {
+                status = 'Rejected';
+                if (comment == '') {
+                    validityModal(text);
+                    return;
+                }
+                break;
+            }
+            case 'enquire': {
+                status = 'Enquired';
+                if (comment == '') {
+                    validityModal(text);
+                    return;
+                }
+                break;
+            }
+        }
+        $.ajax({
+            url: '/List/SaveResponse',
+            type: 'POST',
+            data: { response: status, appRowId: appRowId, comment: comment, approvalType: approvalType },
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data == 1) {
+                    successModal(text);
+                    $("#SRForm").trigger("reset");
+                    setTimeout(FilterMyTasks, 5000)
+                }
+                else {
+                    failureModal();
+                    $("#SRForm").trigger("reset");
+                }
+
+            }),
+            error: (function (data) {
+                failureModal();
+                $("#SRForm").trigger("reset");
+            })
+        })
+
+        return false;
+    }
+    function validityModal(txt) {
+        ////
+        if (txt == 'reject') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for rejecting the form');
+        }
+        else if (txt == 'enquire') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for enquiring the form');
+        }
+
+    }
+
+    function getRequestType() {
+
+        $('input:checkbox[id="chkPermanent"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                console.log("Permanent checked")
+                $("#chkRequestType").val('Permanent');
+                $("#TemporaryDateFrom").hide();
+                $("#TemporaryDateTo").hide();
+                $('input[id="chkTemporary"]').prop("checked", false);
+            }
+            else {
+                $('input[id="chkTemporary"]').attr('disabled', false);
+                $("#chkRequestType").val('');
+            }
+        });
+
+        $('input:checkbox[id="chkTemporary"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                console.log("Temporary checked")
+                $("#chkRequestType").val('Temporary');
+                $("#TemporaryDateFrom").show();
+                $("#TemporaryDateTo").show();
+                $('input[id="chkPermanent"]').prop("checked", false);
+            }
+            else {
+                $('input[id="chkPermanent"]').attr('disabled', false);
+                $("#TemporaryDateFrom").hide();
+                $("#TemporaryDateTo").hide();
+                $("#chkRequestType").val('');
+            }
+        });
+    }
+
+
+    function AddSoftwareRows() {
+
+            var newCount = rowIdx + 1;
+
+            var row = '<tr id="row' + newCount + '" class="tr_input">   <td class="sNo" >' + newCount + '</td> '
+                + '<td><input type="text" name="txtSoftwareName_' + newCount + '" id="txtSoftwareName_' + newCount + '" class="sftDetClass col inpValidate"/></td>'
+                + '<td><input type="text" name="txtSoftwareVersion_' + newCount + '"" id="txtSoftwareVersion_' + newCount + '"" class="col inpValidate" onkeypress="allowNumbersAndDecimalsOnly(event)"/></td>'
+                + '<td><input type="text" name="txtSoftwareType_' + newCount + '"" id="txtSoftwareType_' + newCount + '"" class="col inpValidate"/></td></tr>'
+
+            $(".tableSoftware tr:last").after(row);
+
+            rowIdx++;
+            srNo++;
+
+
+    };
+    function AddOtherSoftwareRows() {
+
+        var newCount = rowOtherIdx + 1;
+
+        var row = '<tr id="row' + newCount + '" class="">   <td class="sNo" >' + newCount + '</td> '
+            + '<td><input type="text" name="txtOtherSoftwareName_' + newCount + '" id="txtOtherSoftwareName_' + newCount + '" class="col"/></td>'
+            + '<td><input type="text" name="txtOtherSoftwareVersion_' + newCount + '"" id="txtOtherSoftwareVersion_' + newCount + '"" class="col" onkeypress="allowNumbersAndDecimalsOnly(event)"/></td>'
+            + ' <td> <select class="col" name = "drpOtherSoftwareType_' + newCount + '"" id = "drpOtherSoftwareType_' + newCount + '"" >'
+            + ' <option value="null">Select</option> <option value="Non-Standard Software">Non-Standard Software</option> </select ></td ></tr>'
+
+        $(".tableOtherSoftware tr:last").after(row);
+        OtherSoftwareCount = newCount;
+        console.log(OtherSoftwareCount);
+        rowOtherIdx++;
+        srOtherNo++;
+    }
+
+    function allowNumbersOnly(e) {
+        var code = (e.which) ? e.which : e.keyCode;
+        if (code > 31 && (code < 48 || code > 57)) {
+            e.preventDefault();
+        }
+    }
+    function alphaOnly(e) {
+        var key = e.keyCode;
+        if (key > 32 && (key < 65 || key > 122 || key == 91 || key == 92 || key == 93 || key == 94 || key == 95 || key == 96)) {
+            e.preventDefault();
+        }
+    }
+        function allowNumbersAndDecimalsOnly(e) {
+            var charCode = (e.which) ? e.which : e.keyCode
+            if (charCode != 46 && charCode > 31
+                && (charCode < 48 || charCode > 57)) {
+                e.preventDefault();
+            }
+        }
+
+    function redirectUser() {
+        window.location = '/Dashboard';
+    }
+
+
+
+    $("#modalOkButton").on('click', function () {
+        ////
+        if (FlagRedirect != null) {
+            spinner.show();
+            $.ajax({
+                url: '/EmailService/FormStatus',
+                type: 'POST',
+                data: { dataRowId: RowId, formID: formID },
+                dataType: 'JSON',
+                success: (function (data) {
+                    if (data.Result == 1) {
+                        spinner.hide();
+                        window.location = "../Dashboard";
+                    }
+                    else {
+                        spinner.hide();
+                        window.location = "../Dashboard";
+                    }
+
+                }),
+                error: (function (data) {
+                    spinner.hide();
+                    window.location = "../Dashboard";
+                })
+            })
+        }
+    });
+
+
+    function date_val() {
+        var today = new Date();
+
+        document.getElementsByName("txtTempFrom")[0].setAttribute("min", today);
+
+        document.getElementById('txtTempFrom').onchange = function () {
+            var res = this.value.toISOString();
+            document.getElementById('txtTempTo').setAttribute('min', today);
+        };
+    }
+
+    $(document).ready(function () {
+        rowIdx = 1;
+        srNo = 1;
+
+        $('#tbody').on('click', '.remove', function () {
+            ////
+            var delRow = $(this).closest('tr').attr('id');
+            console.log(delRow + " a");
+            var delRowNo = parseInt(delRow.substring(3));
+            console.log(delRowNo + " b");
+            if ((delRow == "row1") && (delRowNo == 1)) {
+                requiredModal();
+                return false;
+            }
+            else {
+                //var delDropVal = 'drpAccept' + delRowNo;
+                //var delTextVal = 'txtComment' + delRowNo;
+                //drpArray = drpArray.filter(item => item != delDropVal);
+                //txtArray = txtArray.filter(item => item != delTextVal);
+
+                //console.log(drpArray);
+                //console.log(txtArray);
+
+                var child = $(this).closest('tr').nextAll();
+                console.log(child);
+                child.each(function () {
+                    ////
+                    // Getting <tr> id.
+                    var id = $(this).attr('id');
+                    console.log(id);
+
+                    //  Getting the <p> inside the .row-index class.
+                    var idx = $(this).children('.row-index').children('p');
+                    console.log(idx);
+
+                    // Gets the row number from <tr> id.
+                    var dig = parseInt(id.substring(3));
+                    console.log(dig);
+
+                    // Modifying row index.
+                    idx.html(`row${dig - 1}`);
+
+                    // Modifying row id.
+                    $(this).attr('id', `row${dig - 1}`);
+
+                    //assigning updated serial number
+                    ////
+                    updatedDig = dig - 1;
+                    console.log(updatedDig);
+                    $('#row' + updatedDig + ' .sNo').html(updatedDig);
+
+                });
+
+                // Removing the current row.
+                $(this).closest('tr').remove();
+                // Decreasing total number of rows by 1.
+                rowIdx--;
+                //console.log(rowIdx);
+            }
+        });
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $('.temp-checkbox').on('click', function () {
+            $('.per').removeClass('per-checkbox');
+            $('.per').addClass('per-checkbox');
+        });
+    });
+</script>

@@ -1,0 +1,80 @@
+﻿
+@model Skoda_DCMS.Models.DashboardModel
+@{
+    ViewBag.Title = "Department Wise Form Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var user = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    var pvToBeRendered = "DepartmentWiseFormPartialView";
+}
+
+<div class="container body" id="scroll">
+    <div class="main_container">
+        <!-- top navigation -->
+        <!-- page content -->
+        <div class="right_col" role="main">
+            <div class="eform-container container">
+                <div class="breadcrumb-container">
+                    <div>
+                        <ol class="breadcrumb">
+                            @for (int i = 0; i < Model.Data.BreadCrumbs.Count; i++)
+                            {
+                                <li>
+                                    @if (i == Model.Data.BreadCrumbs.Count - 1)
+                                    {
+                                        @Model.Data.BreadCrumbs[i].Key
+                                    }
+                                    else
+                                    {
+                                        <a href="@Model.Data.BreadCrumbs[i].Value">
+                                            @Model.Data.BreadCrumbs[i].Key
+                                        </a>
+                                    }
+                                </li>
+                            }
+                        </ol>
+                    </div>
+                </div>
+                @*Department Wise Forms*@
+                <div class="form-main-container best_practise_card itbest-color table table-striped table-bordered table-sm dataTable no-footer">
+                    <div class="best_practise_card stand-color">
+                        <a href="">
+                            <h3 class="text-capitalize gridHeadings"><img src="~/img/dept.png" class="dept_img">Department wise form</h3>
+                        </a>
+
+                        <div class="form-status-table">
+                            @{
+                                Html.RenderPartial(pvToBeRendered, Model);
+                            }
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </div>
+        </div>
+        <!-- /Add new process -->
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        //Department table
+        $('#Dept_table').dataTable({
+            "bPaginate": true,
+            "bLengthChange": false,
+            "bFilter": true,
+            "bInfo": false,
+            "oLanguage": { "sSearch": "" },
+            "bAutoWidth": false,
+            language: {
+                searchPlaceholder: "Search",
+                paginate: {
+                    next: '&#8811;', // or '→'
+                    previous: '&#8810;' // or '←'
+                }
+            },
+
+        });
+    });
+</script>

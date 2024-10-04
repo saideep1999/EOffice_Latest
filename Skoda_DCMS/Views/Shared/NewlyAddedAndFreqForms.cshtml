@@ -1,0 +1,106 @@
+﻿@model Skoda_DCMS.Models.DashboardModel
+<table id="dtBasicExample" class="table table-striped table-bordered table-sm display nowrap" cellspacing="0" width="100%">
+    <thead>
+        <tr class="status-table-row">
+            @*<th class="th-sm">
+                    Id
+                    <span class="caret-icon">
+                        <a href="" class="caret-up">
+                            <i class="fa fa-caret-up"></i>
+                        </a>
+                        <a href="" class="caret-down">
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </span>
+                </th>*@
+            <th class="th-sm text-capitalize">
+                Form Name
+                <span class="caret-icon">
+                    <a href="" class="caret-up">
+                        <i class="fa fa-caret-up"></i>
+                    </a>
+                    <a href="" class="caret-down">
+                        <i class="fa fa-caret-down"></i>
+                    </a>
+                </span>
+            </th>
+            @*<th class="th-sm text-capitalize">
+                    Created on
+                    <span class="caret-icon">
+                        <a href="" class="caret-up">
+                            <i class="fa fa-caret-up"></i>
+                        </a>
+                        <a href="" class="caret-down">
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </span>
+                </th>*@
+            @*<th class="th-sm text-capitalize">
+                    transaction
+                    <span class="caret-icon">
+                        <a href="" class="caret-up">
+                            <i class="fa fa-caret-up"></i>
+                        </a>
+                        <a href="" class="caret-down">
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </span>
+                </th>*@
+            <th class="th-sm text-capitalize">
+                create new entry
+                <span class="caret-icon">
+                    <a href="" class="caret-up">
+                        <i class="fa fa-caret-up"></i>
+                    </a>
+                    <a href="" class="caret-down">
+                        <i class="fa fa-caret-down"></i>
+                    </a>
+                </span>
+            </th>
+            <th class="th-sm text-capitalize">
+                form dashboard
+                <span class="caret-icon">
+                    <a href="" class="caret-up">
+                        <i class="fa fa-caret-up"></i>
+                    </a>
+                    <a href="" class="caret-down">
+                        <i class="fa fa-caret-down"></i>
+                    </a>
+                </span>
+            </th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Data.Forms)
+        {
+            <tr>
+                @*<td>@($"{item.UniqueFormName}{item.UniqueFormId}")</td>*@
+                <td class="">@item.FormName</td>
+                @*<td>
+                        18/11/2020
+                    </td>*@
+                @*<td>@item.FormCount</td>*@
+                <td>
+                    <div class="plus_icon_margin">
+                        <a href="@Url.Action("CreateForm", "List", new { uniqueFormName = item.UniqueFormName, formParentId = item.FormParent.Id, formName = item.FormName, ControllerName = item.ControllerName})" target="_blank" style="color: #333333;">
+                            <i class="fa fa-plus" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </td>
+                <td>
+                    <!-- <a href="" class="txt-primary">
+                      view form
+
+                    </a> -->
+                    <div class="plus_icon_margin">
+                        <a href="@Url.Action("GetMyFormsByName", "Dashboard", new { formName = item.UniqueFormName, formParentId=item.Id, fullName =item.FormName,Department =item.Department ,FormOwner =item.FormOwner ,ControllerName =item.ControllerName  })" class="sfo_icons_info">
+                            <i class="fa fa-file-text-o" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+

@@ -1,0 +1,1661 @@
+﻿@model Skoda_DCMS.Models.DashboardModel
+@{
+    ViewBag.Title = "My Task Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var user = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    var pvToBeRendered = Model.Data.PartialViewName;
+}
+<style>
+    .clrBtn {
+        margin-top: 10px;
+        cursor: pointer;
+        color: #4ba82e;
+    }
+
+  /*  table.dataTable thead .sorting,
+    table.dataTable thead .sorting_asc,
+    table.dataTable thead .sorting_desc {
+        background: none;
+    }*/
+
+    .ui-autocomplete {
+        background: #fff;
+        z-index: 9999;
+        border: 1px solid #ccc;
+        padding: 10px;
+        max-height: 200px;
+        overflow: auto;
+        ui-autocomplete height: auto;
+        position: relative !important;
+        box-shadow: 2px 2px 4px 1px #696666;
+    }
+
+
+        .ui-autocomplete li {
+            padding: 5px 0;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+    .ui-widget-content {
+        border: none !important;
+        background: #fff;
+        color: #222222;
+        position: relative !important;
+        @*top: calc(100% - 85%) !important;*@
+        width: calc(100% - 82%);
+    }
+
+    .ui-menu .ui-menu-item {
+        /*position: absolute;*/
+        margin: 5px 0px 5px 0px;
+        padding: 3px 1em 3px .4em;
+        cursor: pointer;
+        min-height: 0;
+        list-style-image: none !important;
+        left: 0 !important;
+        width: 100% !important;
+        display: contents !important;
+    }
+
+    .ui-menu .ui-menu-item-wrapper {
+        position: relative;
+        padding: 3px 1em 3px .4em;
+        width: 100%;
+        display: block;
+        background: none;
+        color: #000 !important;
+        margin: 5px 0px 5px 0px;
+    }
+
+    .ui-menu-item:hover, .ui-state-focus, .ui-menu-item {
+        width: 100% !important;
+        background: #007fff !important;
+    }
+
+    .ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active, a.ui-button:active, .ui-button:active, .ui-button.ui-state-active:hover {
+        background: #e6e6e6 !important;
+        border: #e6e6e6 !important;
+    }
+
+    body {
+        overflow-x: hidden;
+    }
+
+    /*Custom radio buttons start here*/
+
+    .custRadio {
+        display: block;
+        position: relative;
+        padding-left: 23px;
+        margin-bottom: 0px;
+        cursor: pointer;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        /* Pri_text */
+        display: flex;
+        align-items: center;
+        color: #201F1F;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+        /* Hide the browser's default radio button */
+        .custRadio input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+    /* Create a custom radio button */
+    .checkmarkRadio {
+        position: absolute;
+        top: 8px;
+        left: 0;
+        height: 14px;
+        width: 14px;
+        background-color: #eee;
+        border-radius: 50%;
+    }
+
+    /* On mouse-over, add a grey background color */
+    .custRadio:hover input ~ .checkmarkRadio {
+        background-color: #ccc;
+    }
+
+    /* When the radio button is checked, add a blue background */
+    .custRadio input:checked ~ .checkmarkRadio {
+        background: #201F1F;
+    }
+
+    /* Create the indicator (the dot/circle - hidden when not checked) */
+    .checkmarkRadio:after {
+        content: "";
+        position: absolute;
+        display: none;
+    }
+
+    /* Show the indicator (dot/circle) when checked */
+    .custRadio input:checked ~ .checkmarkRadio:after {
+        display: block;
+    }
+
+    /* Style the indicator (dot/circle) */
+    .custRadio .checkmarkRadio:after {
+        top: 4px;
+        left: 4px;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: white;
+    }
+
+    .forApprove {
+        display: flex;
+        align-items: center;
+        padding: 0 25px;
+        height: 58px;
+        background-color: #98DB82;
+        border-radius: 5px;
+    }
+
+    .forReject {
+        display: flex;
+        align-items: center;
+        padding: 0 25px;
+        height: 58px;
+        background-color: transparent;
+        border: 1px solid #FDE933;
+        box-sizing: border-box;
+        border-radius: 5px;
+    }
+
+    .forEnqire {
+        display: flex;
+        align-items: center;
+        padding: 0 25px;
+        height: 58px;
+        background-color: transparent;
+        border: 1px solid #FE0E0E;
+        box-sizing: border-box;
+        border-radius: 5px;
+    }
+
+    textarea {
+        width: 100%;
+        max-width: inherit;
+        border: 1px solid #BFBFBF !important;
+        max-width: 98.7%;
+        height: 115px;
+        background: #F8F8F8;
+        box-sizing: border-box;
+        border-radius: 5px;
+        padding-left: 10px;
+    }
+
+    .submit-btn {
+        background: #3D3D3D !important;
+        border-radius: 5px !important;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px !important;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem !important;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #FFFFFF;
+        border-color: transparent !important;
+    }
+
+    .cancl-btn {
+        background: #FAE99B !important;
+        border-radius: 5px !important;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px !important;
+        border-color: transparent !important;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem !important;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #212221;
+        margin-left: 10px;
+    }
+
+
+
+
+
+    /* dashboard css */
+
+    .searchButton {
+        background: #4ba82e;
+        border-top-left-radius: 0px;
+        border-bottom-left-radius: 0px;
+        border-top-right-radius: 5x;
+        border-bottom-right-radius: 5px;
+        border: 1px solid #4ba82e;
+        font-size: 1rem;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0 1rem;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #FFFFFF;
+    }
+
+    .searchAdvButton {
+        background: #4ba82e;
+        border-radius: 5px;
+        border: 1px solid #4ba82e;
+        font-size: 1rem;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        position: relative;
+        padding: 0 1rem;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        justify-content: center;
+        text-transform: uppercase;
+        color: #fff;
+    }
+
+    .applyNowBtn {
+        padding: 0 3rem 0 3rem !important;
+    }
+
+    .searchAdvButton:focus {
+        border-color: #FAE99B;
+        outline: none;
+    }
+
+    .searchAdvButton img {
+        position: absolute;
+        right: 38px;
+        top: 22px;
+    }
+
+    .inpSearch {
+        background: #FFFFFF;
+        border: 1px solid #BFBFBF;
+        box-sizing: border-box;
+        border-radius: 5px !important;
+        height: 44px;
+        padding-left: 38px;
+        flex: auto;
+    }
+
+    .searchIcon {
+        position: absolute;
+        z-index: 4;
+        display: block;
+        width: 2.375rem;
+        height: 2.375rem;
+        line-height: 2.375rem;
+        text-align: center;
+        pointer-events: none;
+        color: #fff;
+        top: 8px;
+        right: 0px;
+    }
+
+    .form-control:focus {
+        color: #BFBFBF;
+        background-color: #fff;
+        border-color: #BFBFBF;
+        outline: 0;
+        box-shadow: none;
+    }
+
+    .lblTextSearch {
+        font-size: 20px;
+        line-height: 173.7%;
+        display: flex;
+        align-items: center;
+        color: #201F1F;
+    }
+
+    .drpdwnBtn {
+        position: absolute !important;
+        right: 0;
+        z-index: 4;
+        height: 44px;
+    }
+
+    .advSearchDrop {
+        background: #FFFFFF;
+        border: 1px solid #BFBFBF;
+        box-sizing: border-box;
+        border-radius: 5px !important;
+        height: 44px;
+        flex: auto;
+    }
+
+    .custom-select {
+        height: 44px;
+    }
+
+    .dropDownLeftAttachedBtn {
+        background: #929292;
+        color: #fff;
+    }
+
+        .dropDownLeftAttachedBtn:hover {
+            background: #929292;
+            color: #fff;
+        }
+
+    button:focus {
+        outline: none !important;
+        box-shadow: none !important;
+    }
+
+    input:focus {
+        outline: none !important;
+        box-shadow: none !important;
+    }
+
+    select:focus {
+        outline: none !important;
+        box-shadow: none !important;
+    }
+
+
+
+    #tabs h6.section-title {
+        color: #eee;
+    }
+
+    #tabs .nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {
+        background-color: #043b64;
+        font-size: 18px;
+        line-height: 22px;
+        color: #fff !important;
+        font-weight: 500;
+        border: 1px solid #043b64;
+    }
+
+    #tabs .nav-tabs .nav-link {
+        font-size: 18px;
+        line-height: 41px;
+        color: #fff;
+        font-weight: 500;
+        padding-top: 14px;
+        margin-left: 28px;
+        border-radius: 0px !important;
+    }
+    .nav-tabs .nav-link {
+         border: 0 !important;
+         border-top-left-radius: 0 !important;
+         border-top-right-radius: 0 !important;
+    }
+
+       @* #tabs .nav-tabs .nav-link:after {
+            background: url('../../assets/img/active-ght.png');
+            content: "";
+            position: absolute;
+            top: 0;
+            height: 60px;
+        }*@
+
+        #tabs .nav-tabs .nav-link:hover {
+            color: #fff;
+            background-color: #043b64;
+            border: 1px solid #043b64;
+            font-weight: 500;
+        }
+
+    .forCurve{
+        position: relative;
+        border-bottom-color: #72b6e7;
+        background-color: #72b6e7;
+    }
+
+    .forCurveActive {
+        position: relative;
+
+        background-color: #043b64;
+        font-size: 18px;
+        line-height: 22px;
+        color: #fff !important;
+        font-weight: 500;
+        border: 1px solid #043b64;
+    }
+
+    .noMarginLeft {
+        margin-left: 0 !important;
+    }
+
+    .mr40 {
+        margin-right: 32px !important;
+    }
+
+    .forCurveActive:after {
+        background: url('../../assets/img/active-ght.png') !important;
+        content: "";
+        position: absolute;
+        right: -38px;
+        top: 0px;
+        width: 40px;
+        height: 64px;
+        transform: rotateX(180deg) rotateY(180deg);
+        z-index: 2;
+    }
+
+    .forCurveActive:before {
+        background: url('../../assets/img/active-left.png') !important;
+        content: "";
+        position: absolute;
+        left: -38px;
+        top: 0px;
+        width: 40px;
+        height: 64px;
+        transform: rotateX(180deg) rotateY(180deg);
+        z-index: 1;
+    }
+
+    .forCurve:hover:after {
+        background: url('../../assets/img/active-ght.png');
+        content: "";
+        position: absolute;
+        right: -38px;
+        top: 0px;
+        width: 40px;
+        height: 64px;
+        transform: rotateX(180deg) rotateY(180deg);
+        z-index: 1;
+    }
+
+    .forCurve:hover:before {
+        background: url('../../assets/img/active-left.png');
+        content: "";
+        position: absolute;
+        left: -38px;
+        top: 0px;
+        width: 40px;
+        height: 64px;
+        transform: rotateX(180deg) rotateY(180deg);
+        z-index: 1;
+    }
+    .nav-tabs {
+        @*margin-right: 40px;
+        margin-left: 40px;*@
+        border-radius: 6px;
+        box-shadow: none;
+    }
+
+
+
+    .navTabsInactiveFirst:before {
+        background: url('../../assets/img/active-gh2.png');
+        content: "";
+        position: absolute;
+        left: -37px;
+        top: 0px;
+        width: 40px;
+        height: 64px;
+        transform: rotateX(180deg) rotateY(180deg);
+    }
+
+
+
+    .navTabsInactiveLast:after {
+        background: url('../../assets/img/active-left2.png');
+        content: "";
+        position: absolute;
+        right: -37px;
+        top: 0px;
+        width: 40px;
+        height: 64px;
+        transform: rotateX(180deg) rotateY(180deg);
+    }
+
+    .tbl th {
+        font-size: 14px;
+        line-height: 17px;
+        /* identical to box height */
+
+        display: flex;
+        align-items: center;
+        text-transform: uppercase;
+        /* Text_white */
+
+        color: #FFFFFF;
+    }
+
+    .tab-content table th {
+        background: transparent;
+        border: o !important;
+        font-size: 14px;
+        line-height: 17px;
+        /* identical to box height */
+        text-transform: uppercase;
+        /* Text_white */
+        color: #043b64;
+    }
+
+    .tab-content table tr td {
+        font-size: 15px;
+        line-height: 25px;
+        /* identical to box height */
+        font-weight: 600;
+        color: #3E3E3E;
+    }
+
+    .tab-content .fa {
+        cursor: pointer;
+    }
+
+    .form-check-input {
+        margin-left: 0px;
+    }
+
+    .page-item.active .page-link {
+        color: #fff;
+        background-color: #3D3D3D;
+        border-color: #3D3D3D;
+    }
+
+    element.style {
+    }
+
+    .page-item:last-child .page-link {
+        border-top-right-radius: .25rem;
+        border-bottom-right-radius: .25rem;
+    }
+
+    .page-link {
+        position: relative;
+        display: block;
+        padding: .5rem .75rem;
+        margin-left: -1px;
+        line-height: 1.25;
+        color: #979797;
+        background-color: #fff;
+        border: 1px solid #979797;
+    }
+
+    /* MATERIAL */
+
+    div.input-block {
+        position: relative;
+    }
+
+        div.input-block input {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #495055;
+            width: 165px;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block span.placeholder {
+            position: absolute;
+            margin: 12px 0;
+            padding: 0 4px;
+            font-family: Roboto, sans-serif;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            top: 0;
+            left: 15px;
+            transition: all 0.2s;
+            transform-origin: 0% 0%;
+            background: none;
+            pointer-events: none;
+        }
+        div.input-block textarea {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #495055;
+            width: 100%;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            background-color: #fff !important;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+        div.input-block input:valid + span.placeholder,
+        div.input-block input:focus + span.placeholder {
+            transform: scale(0.8) translateY(-30px);
+            background: #fff;
+        }
+    textarea.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+    div.input-block textarea:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: #fff !important;
+    }
+
+    div.input-block textarea:valid + span.placeholder,
+    div.input-block textarea:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background: #fff !important;
+    }
+    div.inputSelect span.placeholder {
+        position: absolute;
+        margin: 12px 0;
+        padding: 0 4px;
+        font-family: Roboto, sans-serif;
+        color: #000;
+        display: flex;
+        align-items: center;
+        font-size: 1rem;
+        top: 0;
+        left: 15px;
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+        background: none;
+        pointer-events: none;
+    }
+
+    div.inputSelect select:focus + span.placeholder {
+        transform: scale(0.8) translateY(-30px);
+        background: #fff;
+        z-index: 9;
+    }
+
+    div.inputSelect select:not([value=""]):valid + span.placeholder {
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+    }
+
+    div.input-block input:focus {
+        border-color: #4cd137;
+    }
+
+        div.input-block input:focus + span.placeholder {
+            color: #284B63;
+        }
+
+    .nav_menu {
+        position: fixed;
+        float: left;
+        left: 0;
+        background: #fff;
+        border-bottom: 1px solid #D9DEE4;
+        margin-bottom: 0px;
+        width: 100%;
+        z-index: 9;
+    }
+
+    body.nav-sm .container.body .right_col {
+        margin-top: 93px;
+        padding: 10px 20px;
+        z-index: 2;
+    }
+
+    .breadcrumb {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+        padding: .75rem 1rem;
+        margin-bottom: 0;
+        list-style: none;
+        background-color: #FFFFFF;
+        border-radius: .25rem;
+    }
+
+    body.nav-sm .container.body .left_col {
+        width: 70px;
+        padding: 0;
+        position: fixed;
+        height: 45%;
+        z-index: 8;
+    }
+
+    .dropdown-toggle::after {
+        display: none;
+        width: 0;
+        height: 0;
+        margin-left: .255em;
+        vertical-align: .255em;
+        content: "";
+        border-top: .3em solid;
+        border-right: .3em solid transparent;
+        border-bottom: 0;
+        border-left: .3em solid transparent;
+    }
+
+    body.nav-sm span.fa, body.nav-sm .menu_section h3 {
+        display: block !important;
+    }
+
+    .indications {
+        display: flex;
+        justify-content: end;
+        text-transform: uppercase;
+        font-size: 14px;
+        font-weight: 400;
+        align-items: baseline;
+        margin-right: 30px;
+        margin-bottom: 4px;
+        vertical-align: sub;
+    }
+
+        .indications span:not(:last-child) {
+            display: inline-block;
+            margin-right: 20px;
+            vertical-align: sub;
+        }
+
+        @*.indications span:nth-child(1):before {
+            content: '\2022';
+            color: #A9D08E;
+            font-size: 26px;
+            vertical-align: sub;
+        }
+
+        .indications span:nth-child(2):before {
+            content: '\2022';
+            color: #ffff007a;
+            font-size: 26px;
+            vertical-align: sub;
+        }
+
+        .indications span:nth-child(3):before {
+            content: '\2022';
+            color: #f4b084;
+            font-size: 26px;
+            vertical-align: sub;
+        }*@
+
+   @* .tab-pane .table > thead > tr > th:nth-child(1) {
+        padding-left: 15px !important;
+    }*@
+
+    .tab-pane table tr td:nth-child(1) {
+        padding-left: 20px !important;
+    }
+
+ /*   .tab-pane table tr:nth-child(1) td:nth-child(1) {
+        border-left: 4px solid #f00;
+    }
+
+    .tab-pane table tr:nth-child(2) td:nth-child(1) {
+        border-left: 4px solid #FAE99B;
+    }
+
+    .tab-pane table tr:nth-child(3) td:nth-child(1) {
+        border-left: 4px solid #0f0;
+    }*/
+
+    table.dataTable tbody tr.even {
+        background-color:transparent !important;
+    }
+    table.dataTable tbody tr.odd {
+        background-color: rgba(242,242,242,0.6) !important;
+    }
+    table.dataTable thead th, table.dataTable thead td {
+        padding: 12px 0 !important;
+    }
+
+    select.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    .rowGreen:nth-child(1) {
+        border-left: 4px solid #81c26d;
+    }
+
+    .rowYellow:nth-child(1) {
+        border-left: 4px solid #ffd200;
+    }
+
+    .rowOrange:nth-child(1) {
+        border-left: 4px solid #d22630;
+    }
+    .twoDays {
+        color: #81c26d;
+    }
+    .twoFourDays {
+        color: #ffd200;
+    }
+    .moreThan {
+        color: #d22630;
+    }
+    .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 120px;
+        background-color: black;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px 0;
+        /* Position the tooltip */
+        position: absolute;
+        z-index: 1;
+    }
+</style>
+<div class="container body" id="scroll">
+    <div class="main_container">
+        <div class="container" style="" id="scroll">
+            <!-- Trigger the modal with a button -->
+            <button type="button" class="btn" data-toggle="modal" style="display: none;">view form</button>
+
+            <!-- Modal -->
+            <!--<div class="modal fade" id="myModal5" role="dialog">
+                <div class="modal-dialog modal-dialog-width">-->
+
+                    <!-- Modal content-->
+                    <!--<div class="modal-content">
+                        <div class="modal-header modal_header_block">
+                            <button type="button" id="crossClose" class="close" data-dismiss="modal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div id="formView"></div>
+                        </div>
+                        <div class="col-12 approvalWindow">
+                            <form action="" id="approveFooter" class="comment-approved" style="display: none; text-align:center;">
+                                <div class="radio-box">
+                                    <label class="radio-inline" style="display:none">
+                                        <input type="radio" name="optradio" data-toggle="modal" data-target="#Signature" class="mr-1" disabled>Signature Canvas
+                                    </label>
+                                    <div class="modal fade" id="Signature" role="dialog">
+                                        <div class="modal-dialog signature-modal-dialog">-->
+                                            <!-- Modal content-->
+                                            <!--<div class="modal-content">
+                                                <div class="modal-header">
+                                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                    <h4 class="modal-title">Signature Canvas</h4>
+                                                </div>
+                                                <div class="modal-body">-->
+                                                    <!-- Content -->
+                                                    <!--<div class="container">
+                                                        <div class="row">
+                                                            <div class="col-md-12">
+                                                                <h1>E-Signature</h1>
+                                                                <p>Sign in the canvas below and save your signature as an image!</p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-12">
+                                                                <canvas id="sig-canvas" width="435" height="160">
+                                                                    Get a better browser, bro.
+                                                                </canvas>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-12 signature-row">
+                                                                <button class="btn btn-primary" id="sig-submitBtn">Submit Signature</button>
+                                                                <button class="btn btn-default" id="sig-clearBtn">Clear Signature</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <label class="radio-inline pl-2" style="display:none">
+                                        <input type="radio" name="optradio" class="mr-1" disabled>Sign using PKI Certificate
+                                    </label>
+                                </div>
+                                <div class="input-block">
+                                    <textarea id="comment-approve" rows="4" cols="50" style="background-color:#fff;" name="comment" placeholder="Comments..." form="usrform"></textarea>-->
+                                    <!-- <span class="placeholder">Comments</span>-->
+                                <!--</div>
+                                <div class="comment-submit col-12 d-flex">
+                                    <input type="button" id="approveSubmit" class="submit-btn" onclick="saveResponse('approve')" value="Submit">
+                                    <button type="button" id="cancelBtnApprove" class="btn btn-default close-btn-border cancl-btn">Close</button>
+                                </div>
+                            </form>
+                            <form action="" id="rejectFooter" class="comment-reject" style="display: none; text-align: center;">
+                                <textarea id="                       comment-reject" rows="4" cols="50" name="comment" form="usrform" placeholder="Comments..."></textarea>
+                                <div class="comment-submit col-12 d-flex">
+                                    <input type="button" id="rejectSubmit" class="submit-btn" onclick="saveResponse('reject')" value="Submit">
+                                    <button type="button" id="cancelBtnReject" class="btn btn-default close-btn-border cancl-btn">Close</button>
+                                </div>
+                            </form>
+                            <form action="" id="enquireFooter" class="comment-enquire" style="display: none; text-align: center;">
+                                <textarea id="comment-enquire" rows="4" cols="50" name="comment" form="usrform" placeholder="Comments..."></textarea>
+                                <div class="comment-submit col-12 d-flex">
+                                    <input type="button" id="enquireSubmit" class="submit-btn" onclick="saveResponse('enquire')" value="Submit">
+                                    <button type="button" id="cancelBtnEnquire" class="btn btn-default close-btn-border cancl-btn">Close</button>
+                                </div>
+                            </form>
+                            <div class="modal-footer">
+                                <div data-role="fieldcontain" class="margin_center">
+                                    <fieldset data-role="controlgroup" class="d-md-flex">
+                                        <input type="hidden" id="hiddenFormName" name="hiddenFormName" value="" />
+                                        <div class="mr-3 forApprove">
+                                            <label class="custRadio">
+                                                Approve
+                                                <input type="radio" name="rad_btn" id="btnApprove" class="comment-toggle-2" value="Approve" />
+                                                <span class="checkmarkRadio"></span>
+                                            </label>
+                                        </div>
+
+                                        <div class="mr-3 forEnqire">
+                                            <label class="custRadio">
+                                                Enquire
+                                                <input type="radio" name="rad_btn" id="btnEnquire" class="comment-toggle-1" value="Enquire" />
+                                                <span class="checkmarkRadio"></span>
+                                            </label>
+                                        </div>
+                                        <div class="mr-3 forReject">
+                                            <label class="custRadio">
+                                                <span id="labelReject">Reject</span>
+                                                <input type="radio" name="rad_btn" id="btnReject" class="comment-toggle btn" value="Reject" />
+                                                <span class="checkmarkRadio"></span>
+                                            </label>
+                                        </div>
+
+
+                                    </fieldset>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>-->
+
+            <div class="modal fade" id="myModalEdit" role="dialog">
+                <div class="modal-dialog modal-dialog-width">
+
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-header modal_header_block">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div id="viewForm"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- top navigation -->
+        <!-- page content -->
+        <div class="right_col" role="main">
+            <div class="eform-container container">
+                <div class="breadcrumb-container">
+                    <div>
+                        <ol class="breadcrumb">
+                            @for (int i = 0; i < Model.Data.BreadCrumbs.Count; i++)
+                            {
+                                <li>
+                                    @if (i == Model.Data.BreadCrumbs.Count - 1)
+                                    {
+                                        @Model.Data.BreadCrumbs[i].Key
+                                    }
+                                    else
+                                    {
+                                        <a href="@Model.Data.BreadCrumbs[i].Value">
+                                            @Model.Data.BreadCrumbs[i].Key
+                                        </a>
+                                    }
+                                </li>
+                            }
+
+                        </ol>
+                    </div>
+                </div>
+
+
+                <div class="form-main-container best_practise_card itbest-color table table-striped table-bordered table-sm dataTable no-footer">
+
+                    <div class="form-group" id="best_practise_card">
+                        <div class='my-legend'>
+                            <div class='legend-scale'>
+                                <span class="text-capitalize gridHeadings text-left"><i class="fa fa-th-list forTaskIcon"></i>My Task</span>
+
+                            </div>
+
+                        </div>
+                    </div>
+                    <br />
+                    <div id="indications" name="indications" class="indications pt-1">
+                        <span id="GreenColor" style="cursor:pointer">
+                            <i class="fa fa-circle twoDays" aria-hidden="true"></i>
+                            < 2 Days
+                        </span>
+
+                        <span id="OrangeColor" style="cursor:pointer">
+                            <i class="fa fa-circle twoFourDays" aria-hidden="true"></i>
+                            2 – 5 Days
+                        </span>
+
+                        <span id="YellowColor" style="cursor:pointer">
+                            <i class="fa fa-circle moreThan" aria-hidden="true"></i>
+                            > 5 Days
+                        </span>
+
+                        <span id="ClearBtn" class="clrBtn">
+                            <i class="fa fa-circle" aria-hidden="true"></i>
+                            Clear Filter
+
+                        </span>
+                    </div>
+                    <div>
+                        <table class="table table-reponsive" id="taskTable">
+                            @*<table class="table" id="myTable">*@
+                            <thead>
+                                <tr class="my_task_table">
+                                    @*<th style="text-align:center"><input type="checkbox" name="select_all" value="1" id="example-select-all"></th>*@
+                                    <th class="sortingFormId">Form Id</th>
+                                    <th class="sortingFormName">Form Name</th>
+                                    <th class="sortingRequestForm">Request from</th>
+                                    <th class="sortingBusinessNeed">Details / Business Needs</th>
+                                    <th class="sortingStatus">Status </th>
+                                    <th class="sortingRecievedDate">Received Date</th>
+                                    <th class="text-center">Action</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="myTaskFormView">
+                                @{ var count = 1;}
+                                @if (Model.Data.Forms.Count <= 0)
+                                {
+                                    <tr>
+                                        @*<td class="text-center" colspan="5">
+                                                <i> No Tasks </i>
+                                            </td>*@
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>
+                                            <i> No Tasks </i>
+                                        </td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    foreach (var item in Model.Data.Forms)
+                                    {
+                                        <tr class="my_task_table">
+                                            @*<td></td>*@
+                                            @*<td>@count</td>*@
+                                            <td>@(item.FormRelation.UniqueFormName + item.FormRelation.Id)</td>
+                                            <td>@(item.FormRelation.FormName)</td>
+                                            <td>@item.Author.Submitter</td>
+                                            @*<td>
+                                                    @(item.BusinessNeed)
+                                                </td>*@
+                                            <td title="@item.BusinessNeed">
+                                                <input value="@item.BusinessNeed" class="inputTooltipFontNormal" maxlength="10" readonly />
+                                            </td>
+                                            <td>@item.ApproverStatus</td>
+                                            <td data-order="@item.RecievedDate.ToString("MM/dd/yyyy HH:mm")">@item.RecievedDate.ToString("MM/dd/yyyy")</td>
+
+
+
+                                            <!--<td class="action-btn">
+                                            <div class="container" style="text-align: center;">-->
+                                            <!-- Trigger the modal with a button -->
+                                            <!--<button type="button" onclick="GoToViewForm('@item.FormRelation.UniqueFormName', @item.RowId, @item.FormRelation.Id, @item.Id)">
+                                                        <i class="fa fa-eye" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
+                                            </td>-->
+                                            <td class="action-btn">
+                                                <div class="container" style="text-align: center;">
+                                                    <!-- Trigger the modal with a button -->
+                                                    @if (item.FormRelation.UniqueFormName == "CRF")
+                                                    {
+                                                        <button type="button" onclick="window.location.href = 'http://win-6cgsdmg51od:8080/sites/DCMS/Lists/@(item.FormRelation.ListName)/EditForm.aspx?ID=@(item.RowId)&Source=http%3A%2F%2Fwin%2D6cgsdmg51od%3A8080%2Fsites%2FDCMS%2FLists%2F@(item.FormRelation.ListName)%2FAllItems%2Easpx&ContentTypeId=0x01008964B342765A924B8A6F018C4C784B11';">
+                                                            <i class="fa fa-eye" aria-hidden="true"></i>
+                                                        </button>
+                                                    }
+                                                    else
+                                                    {
+                                                        if (item.ApproverStatus == "Enquired")
+                                                        {
+                                                            <button type="button" class="btn btn-xs btn-default photography-action-btn" onclick="GoToEditForm('@item.FormRelation.UniqueFormName', @item.RowId, @item.FormRelation.Id, @item.Id,'@item.FormRelation.ControllerName')">
+                                                                <i class="fa fa-edit" aria-hidden="true"></i>
+                                                            </button>
+                                                        }
+                                                        else
+                                                        {
+                                                            <button type="button" class="btn btn-xs btn-default photography-action-btn" onclick="GoToViewForm('@item.FormRelation.UniqueFormName', @item.RowId, @item.FormRelation.Id, @item.Id, @item.ApprovalType, @item.AuthorityToEdit, '@item.FormRelation.FormStatus','@item.FormRelation.ControllerName')">
+                                                                <i class="fa fa-eye" aria-hidden="true"></i>
+                                                            </button>
+                                                        }
+                                                    }
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        //count++;
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+        <!-- /Add new process -->
+    </div>
+</div>
+
+<script>
+
+
+    $(document).ready(function () {
+        $(".comment-toggle-1").click(function () {
+            $(".comment-enquire").toggle();
+        });
+
+        $(".comment-toggle").click(function () {
+            $(".comment-reject").toggle();
+        });
+
+        $(".comment-toggle-2").click(function () {
+            $(".comment-approved").toggle();
+        });
+
+        $("#btnClose").click(function () {
+            $("#approveFooter").hide();
+            $("#rejectFooter").hide();
+            $("#enquireFooter").hide();
+            window.location.reload();
+        });
+
+        $("#crossClose").click(function () {
+            $("#approveFooter").hide();
+            $("#rejectFooter").hide();
+            $("#enquireFooter").hide();
+            window.location.reload();
+        });
+
+        $("#approveSubmit").click(function () {
+            $("#approveFooter").hide();
+            $("#rejectFooter").hide();
+            $("#enquireFooter").hide();
+            $("#comment-approve").val('');
+            $("#btnApprove").prop('checked', false);
+            //window.location.reload();
+        });
+
+        $("#rejectSubmit").click(function () {
+            $("#approveFooter").hide();
+            $("#rejectFooter").hide();
+            $("#enquireFooter").hide();
+            $("#comment-reject").val('');
+            $("#btnReject").prop('checked', false);
+            //window.location.reload();
+        });
+
+        $("#enquireSubmit").click(function () {
+            $("#approveFooter").hide();
+            $("#rejectFooter").hide();
+            $("#enquireFooter").hide();
+            $("#comment-enquire").val('');
+            $("#btnEnquire").prop('checked', false);
+            //window.location.reload();
+        });
+
+        $("#btnApprove").click(function () {
+            //$("#approveFooter").hide();
+
+            var objDiv = $("#myModal5");
+            var h = objDiv.get(0).scrollHeight;
+            objDiv.animate({ scrollTop: h });
+            $("#rejectFooter").hide();
+            $("#enquireFooter").hide();
+
+            //window.location.reload();
+        });
+
+        $("#btnReject").click(function () {
+            var objDiv = $("#myModal5");
+            var h = objDiv.get(0).scrollHeight;
+            objDiv.animate({ scrollTop: h });
+            $("#approveFooter").hide();
+            //$("#rejectFooter").hide();
+            $("#enquireFooter").hide();
+            //window.location.reload();
+        });
+
+        $("#btnEnquire").click(function () {
+            var objDiv = $("#myModal5");
+            var h = objDiv.get(0).scrollHeight;
+            objDiv.animate({ scrollTop: h });
+            $("#approveFooter").hide();
+            $("#rejectFooter").hide();
+            //$("#enquireFooter").hide();
+            //window.location.reload();
+        });
+
+    });
+
+
+
+    $(document).ready(function () {
+
+        $('#taskTable').DataTable({
+            "bLengthChange": false,
+            "iDisplayLength": 10,
+            "bInfo": false,
+            "bFilter": false,
+            "responsive": true,
+            language: {
+                searchPlaceholder: "Search",
+                paginate: {
+                    next: '&#8811;', // or '→'
+                    previous: '&#8810;' // or '←'
+                }
+            },
+            "oLanguage": { "sSearch": "" },
+            "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                var today = new Date();
+                var dd = today.getDate();
+                var mm = today.getMonth() + 1;
+                var yyyy = today.getFullYear();
+                if (dd < 10) {
+                    dd = '0' + dd;
+                }
+                if (mm < 10) {
+                    mm = '0' + mm;
+                }
+                today = mm + '/' + dd + '/' + yyyy;
+                // console.log(today);
+
+                var date2 = new Date(today);
+
+                var date = new Date(aData[5].display);
+                /* console.log(((date.getMonth() > 8) ? (date.getMonth() + 1) : ('0' + (date.getMonth() + 1))) + '/' + ((date.getDate() > 9) ? date.getDate() : ('0' + date.getDate())) + '/' + date.getFullYear());*/
+                ((date.getMonth() > 8) ? (date.getMonth() + 1) : ('0' + (date.getMonth() + 1))) + '/' + ((date.getDate() > 9) ? date.getDate() : ('0' + date.getDate())) + '/' + date.getFullYear();
+
+                // To calculate the time difference of two dates
+                var Difference_In_Time = date2.getTime() - date.getTime();
+
+                // To calculate the no. of days between two dates
+                var diffDays = Difference_In_Time / (1000 * 3600 * 24);
+
+                if (diffDays <= 2) {
+                    $('td', nRow).addClass('rowGreen');
+                    $(nRow).attr('Filter', 'Green');
+                    $(nRow).attr('Id', aData[0]);
+                } else if (diffDays > 2 && diffDays <= 5) {
+                    $('td', nRow).addClass('rowYellow');
+                    $(nRow).attr('Filter', 'Yellow');
+                    $(nRow).attr('Id', aData[0]);
+                }
+                else if (diffDays > 5) {
+                    $('td', nRow).addClass('rowOrange');
+                    $(nRow).attr('Filter', 'Orange');
+                    $(nRow).attr('Id', aData[0]);
+                }
+                else {
+                    $(nRow).attr('Filter', 'NoColor');
+                    $(nRow).attr('Id', aData[0]);
+                }
+            },
+            //'columnDefs': [{
+            //    'targets': 0,
+            //    'searchable': false,
+            //    'orderable': false,
+            //    'className': 'dt-body-center',
+            //    'render': function (data, type, full, meta) {
+            //        return '<input type="checkbox" name="id[]" value="' + $('<div/>').text(data).html() + '">';
+            //    }
+            //}],
+            columnDefs: [{ type: 'date', 'targets': [5] }],
+            order: [[5, 'desc']],
+        });
+
+        //var dt = $('#taskTable').DataTable();
+        ////hide the first column
+        //dt.column(0).visible(false);
+
+        $("#best_practise_card").on("change", "input[type='checkbox']", function () {
+
+            //
+
+            $(this).closest("li").toggleClass("active", this.checked);
+            var check_class = $(this).closest("li").children().children().children().addClass("checked");
+
+            var text_data = $(this).closest("li").children().children().children();
+            var text_label = $(this).closest("li").children().children().text().trim();
+            var a = $(this).closest("li").hasClass("active");
+
+            if (text_label == "less than 2 days" && $(text_data).hasClass("checked") && a) {
+                $('#taskTable').dataTable().fnDestroy();
+                FilterMyTasks(2, 1);
+
+            }
+            else if (text_label == "2 days to 4 days" && $(text_data).hasClass("checked") && a) {
+                $('#taskTable').dataTable().fnDestroy();
+                FilterMyTasks(4, 1);
+            }
+            else if (text_label == "more than 4 to 5 days" && $(text_data).hasClass("checked") && a) {
+                $('#taskTable').dataTable().fnDestroy();
+                FilterMyTasks(5, 1);
+            }
+            else {
+                $(this).closest("li").children().children().children().removeClass("checked");
+                $('#taskTable').dataTable().fnDestroy();
+                FilterMyTasks(0, 1);
+                $('#taskTable').dataTable().fnDestroy();
+                MyTaskTable();
+            }
+
+        });
+
+        //Green Color Filter
+        $("#GreenColor").click(function () {
+            //
+            $('#taskTable').dataTable().fnDestroy();
+            FilterMyTasks(2, 1);
+        });
+        //Orange Color Filter
+        $("#OrangeColor").click(function () {
+            $('#taskTable').dataTable().fnDestroy();
+            FilterMyTasks(4, 1);
+        });
+        //Yellow Color Filter
+        $("#YellowColor").click(function () {
+            $('#taskTable').dataTable().fnDestroy();
+            FilterMyTasks(5, 1);
+        });
+        //Clear Color Filter
+        $("#ClearBtn").click(function () {
+            $('#taskTable').dataTable().fnDestroy();
+            FilterMyTasks(0, 1);
+            $('#taskTable').dataTable().fnDestroy();
+            MyTaskTable();
+        });
+
+
+        function FilterMyTasks(Filter1, Checked1) {
+            var Filter = Filter1;
+            var Checked = Checked1;
+            $("#myTaskFormView").html("");
+            $('#taskTable').dataTable().fnDestroy();
+            $.ajax({
+                url: '/Dashboard/GetMyTasks',
+                type: 'GET',
+                dataType: 'html',
+                data: { Checked: Checked, Filter: Filter },
+                success: (function (data) {
+                    $('#taskTable').dataTable().fnDestroy();
+                    $("#myTaskFormView").html(data);
+                    MyTaskTable();
+                }),
+                error: (function (data) {
+                    console.log("There was an issue while refreshing tasks. Please reload the page");
+                })
+            })
+        }
+
+        $('#MyTaskSearch').on('keyup', function () {
+            // //
+            $('#taskTable').dataTable().fnDestroy();
+            var table = $('#taskTable').DataTable({
+                "bLengthChange": false,
+                "iDisplayLength": 10,
+                "dom": "lrtip",
+                //"bFilter": false,
+                "bInfo": false,
+                /*      "order": [[0, 'desc']],*/
+                "rowReorder": {
+                    selector: 'td:nth-child(2)'
+                },
+                "responsive": true,
+                language: {
+                    searchPlaceholder: "Search",
+                    paginate: {
+                        next: '&#8811;', // or '→'
+                        previous: '&#8810;' // or '←'
+                    }
+                },
+                "oLanguage": { "sSearch": "" },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    var today = new Date();
+                    var dd = today.getDate();
+                    var mm = today.getMonth() + 1;
+                    var yyyy = today.getFullYear();
+                    if (dd < 10) {
+                        dd = '0' + dd;
+                    }
+                    if (mm < 10) {
+                        mm = '0' + mm;
+                    }
+                    today = mm + '/' + dd + '/' + yyyy;
+                    // console.log(today);
+
+                    var date2 = new Date(today);
+
+                    /*      var date = new Date(aData[5]);*/
+                    /*   var date = new Date(aData[6]);*/
+                    var date = new Date(aData[6].display);
+                    /* console.log(((date.getMonth() > 8) ? (date.getMonth() + 1) : ('0' + (date.getMonth() + 1))) + '/' + ((date.getDate() > 9) ? date.getDate() : ('0' + date.getDate())) + '/' + date.getFullYear());*/
+                    ((date.getMonth() > 8) ? (date.getMonth() + 1) : ('0' + (date.getMonth() + 1))) + '/' + ((date.getDate() > 9) ? date.getDate() : ('0' + date.getDate())) + '/' + date.getFullYear();
+
+                    // To calculate the time difference of two dates
+                    var Difference_In_Time = date2.getTime() - date.getTime();
+
+                    // To calculate the no. of days between two dates
+                    var diffDays = Difference_In_Time / (1000 * 3600 * 24);
+
+                    if (diffDays <= 2) {
+                        $('td', nRow).addClass('rowGreen');
+                        $(nRow).attr('Filter', 'Green');
+                        $(nRow).attr('Id', aData[0]);
+                    } else if (diffDays > 2 && diffDays <= 4) {
+                        $('td', nRow).addClass('rowYellow');
+                        $(nRow).attr('Filter', 'Yellow');
+                        $(nRow).attr('Id', aData[0]);
+                    }
+                    else if (diffDays >= 5) {
+                        $('td', nRow).addClass('rowOrange');
+                        $(nRow).attr('Filter', 'Orange');
+                        $(nRow).attr('Id', aData[0]);
+                    }
+                    else {
+                        $(nRow).attr('Filter', 'NoColor');
+                        $(nRow).attr('Id', aData[0]);
+                    }
+                },
+                'columnDefs': [{
+                    'targets': 0,
+                    'searchable': false,
+                    'orderable': false,
+                    'className': 'dt-body-center',
+                    'render': function (data, type, full, meta) {
+                        return '<input type="checkbox" name="id[]" value="' + $('<div/>').text(data).html() + '">';
+                    }
+                }],
+                "order": [[6, 'desc']],
+            });
+            //hide the first column
+            table.search(this.value).draw();
+            table.column(0).visible(false);
+            table.attr('aria-hidden', 'taskTable').hide();
+        });
+    });
+
+
+
+    function MyTaskTable() {
+        //
+        $('#taskTable').DataTable({
+            "bLengthChange": false,
+            "iDisplayLength": 10,
+            "bInfo": false,
+            "bFilter": false,
+            "responsive": true,
+            language: {
+                searchPlaceholder: "Search",
+                paginate: {
+                    next: '&#8811;', // or '→'
+                    previous: '&#8810;' // or '←'
+                }
+            },
+            "oLanguage": { "sSearch": "" },
+            "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                var today = new Date();
+                var dd = today.getDate();
+                var mm = today.getMonth() + 1;
+                var yyyy = today.getFullYear();
+                if (dd < 10) {
+                    dd = '0' + dd;
+                }
+                if (mm < 10) {
+                    mm = '0' + mm;
+                }
+                today = mm + '/' + dd + '/' + yyyy;
+                // console.log(today);
+
+                var date2 = new Date(today);
+
+
+                var date = new Date(aData[5].display);
+
+                ((date.getMonth() > 8) ? (date.getMonth() + 1) : ('0' + (date.getMonth() + 1))) + '/' + ((date.getDate() > 9) ? date.getDate() : ('0' + date.getDate())) + '/' + date.getFullYear();
+
+                // To calculate the time difference of two dates
+                var Difference_In_Time = date2.getTime() - date.getTime();
+
+                // To calculate the no. of days between two dates
+                var diffDays = Difference_In_Time / (1000 * 3600 * 24);
+
+                if (diffDays <= 2) {
+                    $('td', nRow).addClass('rowGreen');
+                    $(nRow).attr('Filter', 'Green');
+                    $(nRow).attr('Id', aData[0]);
+                } else if (diffDays > 2 && diffDays <= 5) {
+                    $('td', nRow).addClass('rowYellow');
+                    $(nRow).attr('Filter', 'Yellow');
+                    $(nRow).attr('Id', aData[0]);
+                }
+                else if (diffDays > 5) {
+                    $('td', nRow).addClass('rowOrange');
+                    $(nRow).attr('Filter', 'Orange');
+                    $(nRow).attr('Id', aData[0]);
+                }
+                else {
+                    $(nRow).attr('Filter', 'NoColor');
+                    $(nRow).attr('Id', aData[0]);
+                }
+
+            },
+            //'columnDefs': [{
+            //    'targets': 0,
+            //    'searchable': false,
+            //    'orderable': false,
+            //    'className': 'dt-body-center',
+            //    'render': function (data, type, full, meta) {
+            //        return '<input type="checkbox" name="id[]" value="' + $('<div/>').text(data).html() + '">';
+            //    }
+            //}],
+            columnDefs: [{ type: 'date', 'targets': [5] }],
+            order: [[5, 'desc']],
+        });
+
+        //var dt = $('#taskTable').DataTable();
+        ////hide the first column
+        //dt.column(0).visible(false);
+    }
+
+    function GoToViewForm(formName, rowId, formId, appRowId, ApprovalType, ApproverType, FormStatus, ControllerName) {
+        $(".full-screen-container").removeClass('invisible');
+        $(".full-screen-container").show();
+        var MyTask = 0;
+        if (ApproverType == 1) {
+            MyTask = 1;
+        }
+        else {
+            MyTask = 0;
+        }
+        $("#pageLoader").removeClass('invisible');
+        $.ajax({
+            url: '/List/ViewFilledFormNew',
+            type: 'GET',
+            data: { formName: formName, rowId: rowId, formId: formId, appRowId: appRowId, MyTask: MyTask, ApprovalType: ApprovalType, MyTask: MyTask, ControllerName: ControllerName },
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data.isValid) {
+                    $("#formView").html(data.view);
+                    $("#myModal5").modal('show');
+                    $("#pageLoader").addClass('invisible');
+                }
+                else {
+                    $("#pageLoader").addClass('invisible');
+                    alert("There was an issue while opening the form. Please contact your administrator");
+                }
+                $(".full-screen-container").hide();
+            }),
+            error: (function (data) {
+                $("#loader").addClass('invisible');
+                $(".full-screen-container").hide();
+            })
+        })
+    }
+    function scrollDown() {
+        document.getElementById('scroll').scrollTop = document.getElementById('scroll').scrollHeight
+    }
+
+    function GoToEditForm(formName, rowId, formId, appRowId, ControllerName) {
+        $(".full-screen-container").removeClass('invisible');
+        $(".full-screen-container").show();
+        $("#pageLoader").removeClass('invisible');
+        $.ajax({
+            url: '/List/EditForm',
+            type: 'GET',
+            data: { formName: formName, rowId: rowId, formId: formId, appRowId: appRowId, ControllerName: ControllerName },
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data.isValid) {
+                    //console.log(data);
+                    $("#viewForm").html(data.view);
+                    $("#myModalEdit").modal('show');
+                    $("#pageLoader").addClass('invisible');
+                }
+                else {
+                    $("#pageLoader").addClass('invisible');
+                    alert("There was an issue while opening the form. Please contact your administrator");
+                }
+                $(".full-screen-container").hide();
+            }),
+            error: (function (data) {
+                $("#loader").addClass('invisible');
+                $(".full-screen-container").hide();
+            })
+        })
+    }
+
+    $("#modalOkButton").on('click', function () {
+        window.location = "../Dashboard";
+
+    });
+
+</script>

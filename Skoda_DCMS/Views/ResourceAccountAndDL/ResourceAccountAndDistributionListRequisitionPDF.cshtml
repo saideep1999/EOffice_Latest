@@ -1,0 +1,849 @@
+﻿
+@{
+    Layout = null;
+    dynamic RADLF = null;
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        RADLF = ViewBag.Model;
+    }
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <style type="text/css">
+        *:visited, *:focus {
+            box-shadow: none;
+        }
+        table tr td {
+            vertical-align: top;
+            color: rgb(110,110,110);
+        }
+
+    input, select, input:focus, select:focus, textarea, textarea:focus {
+        border: 1px solid #000;
+        box-shadow: none;
+    }
+
+        input, textarea {
+            padding: 5px;
+        }
+
+            input[type='text'] {
+                width: 85%;
+            }
+
+        select {
+            width: 89%;
+        }
+
+        .signature-table thead td {
+            border-bottom: 1px solid black;
+            border-left: 1px solid black;
+            border-collapse: collapse;
+        }
+
+        .signature-table tbody, .signature-table td {
+            border: none;
+            border-left: 1px solid black;
+            border-collapse: collapse;
+            padding: 5px;
+        }
+
+        .signature-table td:first-child {
+            border-left: none;
+        }
+
+        .signature-table {
+            border: 1px solid black;
+        }
+
+        @@font-face {
+            font-family: 'SKODANext-Black';
+            src: url('../../fonts/SKODANextfont/SKODANext-Black.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Bold.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Light.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Regular.ttf') format('truetype');
+        }
+
+        body {
+            font-family: 'SKODANext-Black';
+        }
+
+        .form_lbl {
+            color: #000;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <center>
+        <table style="width: 100%; font-size: 14px; color: rgb(110,110,110); font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+            <tr>
+                <td>
+                    <table style="width: 100%;" cellspadding="0" cellspacing="0">
+                        <tr>
+                            <td width="20%" style="text-align: center; border-right: 1px solid #000; border-bottom: 1px solid #000;">
+                                <label class="form_lbl">Classification</label>
+                            </td>
+                            <td width="20%" style="text-align: center; border-right: 1px solid #000; border-bottom: 1px solid #000;">
+                                <label class="form_lbl">Internal</label></td>
+                            <td rowspan="2" width="60%" style="text-align: right;">
+                                <img style="width: 50%;" src='@Server.MapPath("~/assets/img/SAVWIPL_Merger_Logo.JPG")'>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="height: 50px; line-height: 50px; text-align: center; border-right: 1px solid #000;">
+                                Version
+                            </td>
+                            <td style="height: 50px; line-height: 50px; text-align: center; border-right: 1px solid #000; ">
+                                08
+                            </td>
+
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td style="height: 45px; line-height: 44px; text-align: center; border-left: 1px solid #000; border-right: 1px solid #000; border-bottom: 1px solid #000;">
+                Resource Account & Distribustion List Requisition Form
+            </td>
+        </tr>
+        @*<tr>
+                <td style="height: 45px; padding-left: 15px; color: #000;">
+                    This is digital form, that can be filled and digitally signed by your PKI card. Please do not take print out.
+                </td>
+            </tr>*@
+
+            <tr>
+                <td style="padding: 15px;">
+                    <table cellspacing="0" cellpadding="0" width="100%">
+                        @if (RADLF.one[0].RequestSubmissionFor != "OnBehalf")
+                        {
+                            <tr>
+                                <td>
+                                    <label class="form_lbl"> Type of Employee</label></td>
+                                <td>
+
+                                    @if (RADLF.one[0].EmployeeType == "Internal")
+                                    {
+                                        <input type="checkbox" id="internal" name="chkTyprEmp" value="Internal" checked>
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" id="internal" name="chkTyprEmp" value="Internal">
+                                    }
+                                    <label for="vehicle1"> Internal</label>
+
+                                </td>
+                                <td>
+                                    @if (RADLF.one[0].EmployeeType == "External")
+                                    {
+                                        <input type="checkbox" id="external" name="chkTyprEmp" value="External" checked>
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" id="external" name="chkTyprEmp" value="External">
+                                    }
+                                    <label for="vehicle1"> External</label>
+                                </td>
+                                <td colspan="3">
+                                    @if (RADLF.one[0].EmployeeType == "External")
+                                    {
+                                        @(RADLF.one[0].ExternalOtherOrganizationName ?? "")
+                                        <!--<input type="text" placeholder="External Company Name"
+               style="height: 25px; border-radius: 0;"
+               value="" />-->
+                                    }
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="height: 15px;">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label class="form_lbl"> Employee Code </label>
+</td>
+                                <td>
+                                    @(RADLF.one[0].EmployeeCode ?? "")
+                                    @*<input type="text" style="height: 25px; border-radius: 0; " value="" />*@
+                                </td>
+                                <td>
+                                    <label class="form_lbl"> Cost Center No.</label>
+</td>
+                                <td>
+                                    @(RADLF.one[0].EmployeeCCCode ?? "")
+                                    @*<input type="text" style="height: 25px; border-radius: 0; " value="" />*@
+                                </td>
+                                <td>
+                                    <label class="form_lbl"> UserId </label>
+</td>
+                                <td>
+                                    @(RADLF.one[0].EmployeeUserId ?? "")
+                                    @*<input type="text" style="height: 25px; border-radius: 0; width: 100%; " value="" />*@
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td colspan="6" style="height: 15px;">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label class="form_lbl"> Employee Name </label>
+</td>
+                                <td>
+                                    @(RADLF.one[0].EmployeeName ?? "")
+                                    @*<input type="text" style="height: 25px; border-radius: 0; " value="" />*@
+                                </td>
+                                <td>
+                                    <label class="form_lbl">  Department </label>
+</td>
+                                <td>
+                                    @(RADLF.one[0].EmployeeDepartment ?? "")
+                                    @*<input type="text" style="height: 25px; border-radius: 0; " value="" />*@
+                                </td>
+                                <td>
+                                    <label class="form_lbl">  Contact Number </label>
+</td>
+                                <td>
+                                    @(RADLF.one[0].EmployeeContactNo ?? "")
+                                    @*<input type="text" style="height: 25px; border-radius: 0; width: 100%; " value="" />*@
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="6" style="height: 15px;">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="height: 15px;">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label class="form_lbl"> Designation </label>
+</td>
+                                <td>
+                                    @(RADLF.one[0].EmployeeDesignation ?? " ")
+                                    @*<input type="text" name="txtdesignation" id="txtdesignation" value="" />*@
+                                </td>
+
+                                <td>
+                                    <label class="form_lbl"> Location </label>
+</td>
+
+                                <td>
+                                    @(RADLF.one[0].EmployeeLocation ?? " ")
+                                    @*<input type="text" name="txtLocation" id="txtLocation" value="" />*@
+                                </td>
+                                <td colspan="2">
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr>
+                                <td>
+                                    <label class="form_lbl"> Type of Employee </label>
+</td>
+                                <td>
+
+                                    @if (RADLF.one[0].OtherEmployeeType == "Internal")
+                                    {
+                                        <input type="checkbox" id="internal" name="chkTyprEmp" value="Internal" checked>
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" id="internal" name="chkTyprEmp" value="Internal">
+                                    }
+                                    <label for="vehicle1"> Internal</label>
+
+                                </td>
+                                <td>
+                                    @if (RADLF.one[0].OtherEmployeeType == "External")
+                                    {
+                                        <input type="checkbox" id="external" name="chkTyprEmp" value="External" checked>
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" id="external" name="chkTyprEmp" value="External">
+                                    }
+                                    <label for="vehicle1"> External</label>
+                                </td>
+                                <td colspan="3">
+                                    @if (RADLF.one[0].OtherEmployeeType == "External")
+                                    {
+                                        @(RADLF.one[0].OtherExternalOtherOrganizationName ?? "")
+                                        @*<input type="text" placeholder="External Company Name"
+                                               style="height: 25px; border-radius: 0;"
+                                               value="" />*@
+                                    }
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="height: 15px;">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label class="form_lbl"> Employee Code </label>
+</td>
+                                <td>
+                                    @(RADLF.one[0].OtherEmployeeCode ?? "")
+                                    @*<input type="text" style="height: 25px; border-radius: 0; " value="" />*@
+                                </td>
+                                <td>
+                                    <label class="form_lbl"> Cose Center No. </label>
+</td>
+                                <td>
+                                    @(RADLF.one[0].OtherEmployeeCCCode ?? "")
+                                    @*<input type="text" style="height: 25px; border-radius: 0; " value="" />*@
+                                </td>
+                                <td>
+                                    <label class="form_lbl"> UserId </label>
+</td>
+                                <td>
+                                    @(RADLF.one[0].OtherEmployeeUserId ?? "")
+                                    @*<input type="text" style="height: 25px; border-radius: 0; width: 100%; " value="" />*@
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td colspan="6" style="height: 15px;">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Employee Name
+                                </td>
+                                <td>
+                                    @(RADLF.one[0].OtherEmployeeName ?? "")
+                                    @*<input type="text" style="height: 25px; border-radius: 0; " value="" />*@
+                                </td>
+                                <td>
+                                    <label class="form_lbl"> Department </label>
+</td>
+                                <td>
+                                    @(RADLF.one[0].OtherEmployeeDepartment ?? "")
+                                    @*<input type="text" style="height: 25px; border-radius: 0; " value="" />*@
+                                </td>
+                                <td>
+                                    <label class="form_lbl"> Contact Number </label>
+</td>
+                                <td>
+                                    @(RADLF.one[0].OtherEmployeeContactNo ?? "")
+                                    @*<input type="text" style="height: 25px; border-radius: 0; width: 100%; " value="" />*@
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="height: 15px;">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label class="form_lbl"> Designation </label>
+</td>
+                                <td>
+                                    @(RADLF.one[0].OtherEmployeeDesignation ?? " ")
+                                    @*<input type="text" style="height: 25px; border-radius: 0; width: 100%; " value="" />*@
+
+                                </td>
+
+                                <td>
+                                    <label class="form_lbl"> Location </label>
+</td>
+
+                                <td>
+                                    @(RADLF.one[0].OtherEmployeeLocation ?? " ")
+                                    @*<input type="text" style="height: 25px; border-radius: 0; width: 100%; " value="" />*@
+
+                                </td>
+                                <td colspan="2">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="6" style="height: 15px;">
+                                </td>
+                            </tr>
+                        }
+
+                        <tr>
+                            <td>
+                                <label class="form_lbl"> Request For </label>
+</td>
+                            <td>
+                                @*<select style=" height: 30px;">
+            <option>One</option>
+            <option>One</option>
+            <option>One</option>
+        </select>*@
+                                @(RADLF.one[0].RequestFor == "ResourceAccount"
+                                    ? "Resource Account"
+                                    : RADLF.one[0].RequestFor == "DistributionList"
+                                    ? "Distribution List"
+                                    : "")
+                                <!-- <input type="text" style="height: 25px; border-radius: 0; " value="" /> -->
+                            </td>
+                            <td>
+                                <label class="form_lbl"> Action Type </label>
+</td>
+                            <td colspan="3">
+                                @if (RADLF.one[0].ActionType == "Creation")
+                                {
+                                    <input type="checkbox" id="internal" name="chkTyprEmp" value="Creation" checked>
+                                }
+                                else
+                                {
+                                    <input type="checkbox" id="internal" name="chkTyprEmp" value="Creation">
+                                }
+                                <label for="vehicle1"> Creation</label>
+                                @if (RADLF.one[0].ActionType == "Deletion")
+                                {
+                                    <input style="margin-left: 20px;" type="checkbox" id="internal" name="chkTyprEmp" value="Deletion" checked>
+                                }
+                                else
+                                {
+                                    <input style="margin-left: 20px;" type="checkbox" id="internal" name="chkTyprEmp" value="Deletion">
+                                }
+                                <label for="vehicle1"> Deletion</label>
+                                @if (RADLF.one[0].ActionType == "Modification")
+                                {
+                                    <input style="margin-left: 20px;" type="checkbox" id="internal" name="chkTyprEmp" value="Modification" checked>
+                                }
+                                else
+                                {
+                                    <input style="margin-left: 20px;" type="checkbox" id="internal" name="chkTyprEmp" value="Modification">
+                                }
+                                <label for="vehicle1"> Modification</label>
+                            </td>
+
+                        </tr>
+
+
+                        <tr>
+                            <td style="height: 15px;">
+                            </td>
+                        </tr>
+
+
+                        <tr>
+                            <td>
+                                <label class="form_lbl"> Request Type </label>
+</td>
+                            <td  colspan="2">
+                                @if (RADLF.one[0].RequestType == "Permanent")
+                                {
+                                    <input type="checkbox" id="internal" name="chkTyprEmp" value="Permanent" checked />
+                                }
+                                else
+                                {
+                                    <input type="checkbox" id="internal" name="chkTyprEmp" value="Permanent">
+                                }
+                                <label for="vehicle1"> Permanent</label>
+                                @if (RADLF.one[0].RequestType == "Temporary")
+                                {
+                                    <input type="checkbox" id="internal" name="chkTyprEmp" value="Temporary" checked>
+                                }
+                                else
+                                {
+                                    <input type="checkbox" id="internal" name="chkTyprEmp" value="Temporary">
+                                }
+                                <label for="vehicle1"> Temporary</label>
+
+                            </td>
+
+                            @if (RADLF.one[0].RequestType == "Temporary")
+                            {
+                                <td colspan="3">
+                                    <div style="display: flex; align-items: baseline;">
+
+                                        <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                                            <tr>
+                                                <td style="width:30px;">
+                                                   <label class="form_lbl"> From </label>
+</td>
+                                                <td>
+                                                    @(RADLF.one[0].TempFrom.ToString("yyyy-MM-dd"))
+                                                    @*<input style=" margin-left: 5px;" type="text" name="" value="">*@
+                                                </td>
+                                                <td style="width: 15px;">
+                                                    <label class="form_lbl"> To </label>
+</td>
+                                                <td>
+                                                    @(RADLF.one[0].TempTo.ToString("yyyy-MM-dd"))
+                                                    @*<input style="margin-left: 5px; width:97%;" type="text" name="" value="">*@
+                                                </td>
+                                            </tr>
+                                        </table>
+
+                                    </div>
+                                </td>
+                            }
+                        </tr>
+
+
+                        <tr>
+                            <td style="height: 15px;">
+                            </td>
+                        </tr>
+
+
+                        <tr>
+                            <td>
+                                <label class="form_lbl">
+                                    Distribution List / Resource Account Name </label>
+                                    @*Request For*@
+</td>
+                            <td>
+                                @(RADLF.one[0].RequestFor == "ResourceAccount"
+                                    ? (RADLF.one[0].ResourceAccountLocation ?? "") + ", " + (RADLF.one[0].DLResourceAccountName ?? "")
+                                    : RADLF.one[0].AccountOwner ?? "")
+                                @*<input style="margin-left: 5px; width:97%;" type="text" name="" value="">*@
+                                @*@if (RADLF.one[0].RequestFor == "ResourceAccount")
+        {
+            <input type="checkbox" class="inpDisable" name="chkResourceAccount" id="chkResourceAccount" value="Resource Account" checked />
+        }
+        else
+        {
+            <input type="checkbox" class="inpDisable" name="chkResourceAccount" id="chkResourceAccount" value="Resource Account" />
+        }
+        <label for="vehicle1"> Resource Account</label>
+        @if (RADLF.one[0].RequestFor == "DistributionList")
+        {
+            <input type="checkbox" class="inpDisable" name="chkDistributionList" id="chkDistributionList" value="Distribution List" checked />
+        }
+        else
+        {
+            <input type="checkbox" class="inpDisable" name="chkDistributionList" id="chkDistributionList" value="Distribution List" />
+        }
+        <label for="vehicle1"> Distribution List</label>*@
+                            </td>
+                                            @*@if ((RADLF.one[0].RequestFor == "ResourceAccount"))
+                            {
+                                <td>
+                                    Resource Account Location
+                                </td>
+                                <td colspan="2">
+                                    <input type="text" style="width: 97%;" name="" value="@(RADLF.one[0].ResourceAccountLocation ?? "")">
+                                </td>
+                            }*@
+                        </tr>
+
+
+                        @*<tr>
+                            <td style="height: 15px;">
+                            </td>
+                        </tr>*@
+
+                        @*<tr>
+                            <td>
+                                Owner Of Account
+                            </td>
+                            <td colspan="2">
+                                <input type="text" name="" value="@(RADLF.one[0].AccountOwner ?? "")">
+                            </td>
+
+                            <td>
+                                @if (RADLF.one[0].RequestFor == "ResourceAccount")
+                                {
+                                    <span>Display Name </span>
+                                }
+                                else
+                                {
+                                    <span>Display Name (VWVI DLPL)</span>
+                                }
+                            </td>
+                            <td colspan="2">
+                                <input type="text" name="" value="@((RADLF.one[0].DLResourceAccountName ?? ""))">
+                            </td>
+                        </tr>*@
+
+
+                        <tr>
+                            <td style="height: 15px;">
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <label class="form_lbl">
+                                    Email Address \ Domain Id </label>
+                                    @*@if (RADLF.one[0].RequestFor == "ResourceAccount")
+        {
+            <span>E-mail Address</span>
+        }
+        else
+        {
+            <span>Domain Id</span>
+        }*@
+
+</td>
+                            <td colspan="2">
+                                @if (RADLF.one[0].RequestFor == "ResourceAccount")
+                                {
+                                    @(RADLF.one[0].EmailAddress ?? "")
+                                    @*<input type="text" name="" value="">*@
+                                }
+                                else
+                                {
+                                    @(RADLF.one[0].DomainId ?? "")
+                                    @*<input type="text" name="" value="">*@
+                                }
+
+                            </td>
+                        </tr>
+
+                        @*<tr>
+
+
+            <td>
+                Level
+            </td>
+
+            <td>
+                <input type="text" style="height: 25px; border-radius: 0; " />
+            </td>
+            <td colspan="4">
+            </td>
+
+        </tr>*@
+
+                        <tr>
+                            <td style="height: 25px;">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="6">
+                                <lable style='display: block;' class="form_lbl">Add/Remove Form List</lable>
+
+                                <table cellspacing="0" cellpadding="0" border="1" width="100%">
+                                    <thead>
+                                        <tr>
+                                            <td width="10%" style="padding: 5px; text-align: center;">
+                                                Sr.No
+                                            </td>
+                                            <td width="70%" style="padding: 5px; text-align: center;">
+                                                User ID
+                                            </td>
+                                            <td width="20%" style="padding: 5px; text-align: center;">
+                                                Add/Remove
+                                            </td>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="form-border tableUserId" id="userIdBody">
+                                        @if (RADLF.two != null)
+                                        {
+                                            var count = 1;
+                                            foreach (var item in RADLF.two)
+                                            {
+                                                <tr>
+                                                    <td class="sNo" style="padding: 5px; text-align:center;">@count</td>
+                                                    <td style="padding: 5px; text-align: center;">
+                                                        @*<input type="text" name="txtEmployeeUserId" id="txtEmployeeUserId" value="@item.EmployeeUserId" />*@
+                                                        @item.EmployeeUserId
+                                                    </td>
+                                                    <td style="padding: 5px; text-align: center;">
+                                                        @*<input type="text" name="txtActionType" id="txtActionType" value="@item.ActionType" />*@
+                                                        @item.ActionType
+                                                    </td>
+                                                </tr>
+                                                count++;
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+
+                                <lable style='display: block;'>Note: For distribution list further members can be added or deleted by respective owners</lable>
+
+
+                        </tr>
+
+
+                        <tr>
+                            <td style="height: 25px;">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="6">
+                                <lable class="form_lbl">Reason for Requisition (Business Justification)</lable>
+                                <div style="margin-bottom: 10px; margin-top: 10px;">
+                                    @((RADLF.one[0].BusinessNeed ?? ""))
+                                    @*<textarea type="text" rows="5" value="" style="width: 100%;"></textarea>*@
+                                </div>
+
+                            </td>
+
+
+
+                        </tr>
+                        <tr>
+                            <td style="height: 25px;">
+                            </td>
+                        </tr>
+                        <tr>
+                            @*<td colspan="6">
+                <p>Compliance with the privacy terms:</p>
+                <p>
+                    While using company issued smartphone and using the respective services, attention is to be paid to the privacy and security
+                    terms of the Volkswagen AG.
+                </p>
+            </td>*@
+
+                        </tr>
+
+                        <tr>
+                            <td colspan="6">
+
+
+                                <table cellpadding="0" cellspacing="0" border="1" width="100%" class="signature-table">
+                                    <thead>
+                                        <tr>
+                                            @{var row = (RADLF.one[0].ActionType == "Creation" ? 2 : 1);}
+                                            <td rowspan="@row" width="15%" style="padding: 10px; text-align: center;">
+                                                Requester
+                                            </td>
+                                            <td width="15%" rowspan="@row" style="padding: 10px; text-align: center;">
+                                                Owner Account
+                                            </td>
+
+                                            @if (RADLF.one[0].ActionType == "Creation")
+                                            {
+                                                <td colspan="2" width="15%" style="padding: 10px; text-align: center;">
+                                                    In case of New Creation Only
+                                                </td>
+                                            }
+
+                                        </tr>
+                                        @if (RADLF.one[0].ActionType == "Creation")
+                                        {
+                                            <tr>
+                                                <td width="25%" style="padding: 10px; text-align: center; border-left: 1px solid;">
+                                                    HOD of Requester
+                                                </td>
+                                                <td width="25%" style="padding: 10px; text-align: center;">
+                                                    Head IT - Infrastucture
+                                                </td>
+                                            </tr>
+                                        }
+                                    </thead>
+                                    @if ((RADLF.three.Count > 0) || (RADLF.four.Count > 0))
+                                    {
+                                        <tbody>
+                                            @{ Html.RenderPartial("_ApprovalTrackingPDF", new Skoda_DCMS.Models.PdfParameterModel { RequesterData = RADLF.three, ApproverData = RADLF.four});}
+                                            @*<tr>
+                                                <td>@(RADLF.three[0].Author.Title ?? " ")</td>
+                                                <td>@(RADLF.four[0].UserName ?? "")</td>
+                                                @if (RADLF.one[0].ActionType == "Creation")
+                                                {
+                                                    <td>@(RADLF.four[1].UserName ?? "")</td>
+                                                    <td>@(RADLF.four[2].UserName ?? "")</td>
+                                                }
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    @("Submitted on " + Convert.ToDateTime(RADLF.three[0].FormId.Created).ToShortDateString() + " "
+                                                    + Convert.ToDateTime(RADLF.three[0].FormId.Created).ToShortTimeString() ?? "")
+                                                </td>
+                                                <td>
+                                                    @(RADLF.three[0].ApproverStatus != "Pending"
+                                                    ? (RADLF.four[0].ApproverStatus + " on " + " " + Convert.ToDateTime(RADLF.four[0].Modified).ToShortDateString()
+                                                    + " " + Convert.ToDateTime(RADLF.four[0].Modified).AddHours(5.5).ToShortTimeString())
+                                                    : "" )
+                                                </td>
+                                                @if (RADLF.one[0].ActionType == "Creation")
+                                                {
+                                                    <td>
+                                                        @(RADLF.three[1].ApproverStatus != "Pending"
+                                                        ? (RADLF.four[1].ApproverStatus + " on " + " " + Convert.ToDateTime(RADLF.four[1].Modified).ToShortDateString()
+                                                        + " " + Convert.ToDateTime(RADLF.four[1].Modified).AddHours(5.5).ToShortTimeString()) : "" )
+                                                    </td>
+                                                    <td>
+                                                        @(RADLF.three[2].ApproverStatus != "Pending"
+                                                        ? (RADLF.four[2].ApproverStatus + " on " + " " + Convert.ToDateTime(RADLF.four[2].Modified).ToShortDateString()
+                                                        + " " + Convert.ToDateTime(RADLF.four[2].Modified).AddHours(5.5).ToShortTimeString()) : "" )
+                                                    </td>
+                                                }
+                                            </tr>*@
+
+
+
+                                            @*@if (RADLF.three[0].ApproverStatus != "Pending")
+                            {
+                                <tr>
+                                    <td></td>
+                                    <td>
+                                        <span>
+                                            <label>
+                                                <textarea cols="30" rows="15" readonly></textarea>
+                                                @(RADLF.four[0].Comment ?? "")
+                                            </label>
+                                        </span>
+                                    </td>
+                                    @if (RADLF.one[0].ActionType == "Creation")
+                                    {
+                                        <td>
+                                            <span>
+                                                @if (RADLF.four[1].ApproverStatus != "Pending")
+                                                {
+
+                                                    <label name="txtKeyuser">
+                                                        <textarea cols="30" rows="15" readonly> </textarea>
+                                                        @(RADLF.four[1].Comment ?? "")
+                                                    </label>
+                                                }
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span>
+                                                @if (RADLF.four[2].ApproverStatus != "Pending")
+                                                {
+
+                                                    <label name="txtKeyuser">
+                                                        <textarea cols="30" rows="15" readonly> </textarea>
+                                                        @(RADLF.four[2].Comment ?? "")
+                                                    </label>
+                                                }
+                                            </span>
+                                        </td>
+                                    }
+                                </tr>
+                            }*@
+                                        </tbody>
+                                                }
+                                </table>
+
+                            </td>
+
+
+
+                        </tr>
+                        <tr>
+                            <td style="height: 25px;">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="6">
+                                <lable>For IT use only - ServiceDeskIndia@volkswagen.co.in</lable>
+                                <div style="display: inline-block; margin-bottom: 10px; margin-top: 10px; margin-left: 40px;">
+                                    @*<input type="text" value="" style="width: 20%;">*@
+                                    <label class="form_lbl"><span>Ticket No. </span></label>  <span> </span>
+                                </div>
+
+                            </td>
+
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 15px;">
+                    <p style="font-weight: 600; color: black;">SF_II_024</p>
+                </td>
+            </tr>
+        </table>
+    </center>
+</body>
+</html>

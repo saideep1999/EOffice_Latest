@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+@{
+    ViewBag.Title = "New Global GL code form";
+    int FormId = 0, AppRowId = 0, ApprovalType = 0;
+    bool IsNewMode = true, IsEditMode = false, IsViewMode = false;
+    bool IsNew = true;
+    bool IsEdit = true;
+    var currentUser = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    List<Skoda_DCMS.Models.ApprovalDataModel> appList = new List<Skoda_DCMS.Models.ApprovalDataModel>();
+    string disabled = "";
+    Skoda_DCMS.Models.NewGlobalCodeData NGCF = null;
+    var CurrentUserDesgn = "";
+    long? CurrentUserLevel = 0;
+    var glTeam = "GL Team";
+    var controllingTeam = "Controlling Team";
+    Layout = ViewBag.Layout;
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IsNew = ViewBag.IsNew;
+        IsEdit = ViewBag.IsEdit;
+        disabled = IsViewMode ? "disabled" : "";
+        NGCF = ViewBag.Model.one[0] as Skoda_DCMS.Models.NewGlobalCodeData;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        appList = ViewBag.Model?.three as List<Skoda_DCMS.Models.ApprovalDataModel>;
+        CurrentUserDesgn = appList?.Where(x => x.ApproverUserName == currentUser.UserName).Select(x => x.Designation).FirstOrDefault();
+        CurrentUserLevel = appList?.Where(x => x.ApproverUserName == currentUser.UserName && x.ApproverStatus == "Pending").Select(x => x.Level).FirstOrDefault();
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+        if (IsViewMode)
+        {
+            var Ap = appList?.Where(x =>
+                x.ApproverUserName.ToLower() == currentUser.UserName.ToLower()
+                && x.ApproverStatus.ToLower() == "pending"
+            ).FirstOrDefault();
+        }
+    }
+
+}
+<html>
+<head>
+    <title>SAVWIPL - Gifts, Invitation and Compliance Consultation Form</title>
+    <style type="text/css">
+        *:visited, *:focus {
+            box-shadow: none;
+        }
+
+        input, select, input:focus, select:focus, textarea, textarea:focus {
+            border: 1px solid #000;
+        }
+
+        input, textarea {
+            padding: 5px;
+        }
+
+        table td {
+            padding: 5px;
+        }
+
+        .mr-2 {
+            margin-right: 10px;
+        }
+
+        .hide {
+            display: none;
+        }
+
+        .row {
+            display: flex;
+        }
+    </style>
+</head>
+<body>
+
+    <table style="width: 100%; font-size: 14px; color: #000; font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+        <tr>
+            <td>
+                <table style="width: 100%;" cellspadding="0" cellspacing="0">
+                    <tr>
+                        <td colspan="6" width="60%" style="text-align: right;">
+                            <img style="width: 50%;" src='@Server.MapPath("~/assets/img/SAVWIPL_Merger_Logo.JPG")'>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td align="center">
+                <h2>New Global GL code form</h2>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 15px;">
+                <table border="1" cellspacing="0" cellpadding="0" width="100%">
+                    @if (NGCF.RequestSubmissionFor == "Self")
+                    {
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Employee Name
+                            </td>
+                            <td style="width: 30%" colspan="2" align='left'>
+                                @(NGCF.EmployeeName)
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Employee Code
+                            </td>
+                            <td style="width: 30%" colspan="2" align='left'>
+                                @(NGCF.EmployeeCode)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Designation
+                            </td>
+                            <td colspan="2" align='left'>
+                                @(NGCF.EmployeeDesignation)
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Location
+                            </td>
+                            <td colspan="2" align='left'>
+                                @(NGCF.EmployeeLocation)
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Department
+                            </td>
+                            <td colspan="2" align='left'>
+                                @(NGCF.EmployeeDepartment)
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Contact Number
+                            </td>
+                            <td colspan="2" align='left'>
+                                @(NGCF.EmployeeContactNo)
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Cost Center Number
+                            </td>
+                            <td colspan="2" align='left'>
+                                @(NGCF.EmployeeCCCode)
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                User ID
+                            </td>
+                            <td colspan="2" align='left'>
+                                @(NGCF.EmployeeUserId)
+                            </td>
+
+                        </tr>
+
+                    }
+                    else
+                    {
+                        if (NGCF.OtherEmployeeType == "SAVWIPLEmployee")
+                        {
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Employee Name
+                                </td>
+                                <td style="width: 30%" colspan="2" align='left'>
+                                    @(NGCF.OtherEmployeeName)
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Employee Code
+                                </td>
+                                <td style="width: 30%" colspan="2" align='left'>
+                                    @(NGCF.OtherEmployeeCode)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Designation
+                                </td>
+                                <td colspan="2" align='left'>
+                                    @(NGCF.OtherEmployeeDesignation)
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Location
+                                </td>
+                                <td colspan="2" align='left'>
+                                    @(NGCF.OtherEmployeeLocation)
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Department
+                                </td>
+                                <td colspan="2" align='left'>
+                                    @(NGCF.OtherEmployeeDepartment)
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Contact Number
+                                </td>
+                                <td colspan="2" align='left'>
+                                    @(NGCF.OtherEmployeeContactNo)
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Cost Center Number
+                                </td>
+                                <td colspan="2" align='left'>
+                                    @(NGCF.OtherEmployeeCCCode)
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    UserID
+                                </td>
+                                <td colspan="2" align='left'>
+                                    @(NGCF.OtherEmployeeUserId)
+                                </td>
+
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Employee Name
+                                </td>
+                                <td style="width: 30%" colspan="2" align='left'>
+                                    @(NGCF.OtherNewEmployeeName)
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Employee Code
+                                </td>
+                                <td style="width: 30%" colspan="2" align='left'>
+                                    @(NGCF.OtherNewEmployeeCode)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Designation
+                                </td>
+                                <td colspan="2" align='left'>
+                                    @(NGCF.OtherNewEmpDesignation)
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Location
+                                </td>
+                                <td colspan="2" align='left'>
+                                    @(NGCF.OtherNewEmpLocation)
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Department
+                                </td>
+                                <td colspan="2" align='left'>
+                                    @(NGCF.OtherNewDepartment)
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Contact Number
+                                </td>
+                                <td colspan="2" align='left'>
+                                    @(NGCF.OtherNewContactNo)
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Cost Center Number
+                                </td>
+                                <td colspan="2" align='left'>
+                                    @(NGCF.OtherNewCostcenterCode)
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    UserID
+                                </td>
+                                <td colspan="2" align='left'>
+                                    @(NGCF.OtherNewUserId)
+                                </td>
+
+                            </tr>
+                        }
+                    }
+                    <tr>
+                        <td colspan="3" style="width:20%; font-weight: bold;">
+                            Request Type
+                        </td>
+                        @if (NGCF.RequestType == "Profit & Loss")
+                        {
+                            <td colspan="3" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> Profit & Loss </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="profitLoss" name="reqType" checked>
+
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> Balance Sheet </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="balanceSheet" name="reqType">
+                            </td>
+                        }
+                        else
+                        {
+                            <td colspan="3" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> Profit & Loss </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="profitLoss" name="reqType">
+
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> Balance Sheet </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="balanceSheet" name="reqType" checked>
+                            </td>
+                        }
+
+                    </tr>
+                    <tr id="tr_name">
+
+                        <td colspan="6" align='left'>
+                            <span style=" width: 85%; font-weight: bold; border-radius: 0; ">Name of GL to open</span>
+                        </td>
+
+                    </tr>
+                    <tr id="tr_nameinput">
+                        <td colspan="6" align='left' style="height: 25px;">
+                            <span style="height: 25px; width: 85%; font-weight: normal; border-radius: 0; ">  @(NGCF.NameOfGLToOpen)</span>
+                        </td>
+                    </tr>
+                    <tr id="tr_freq">
+                        <td colspan="6" align='left'>
+                            <span style=" width: 85%; font-weight: bold; border-radius: 0; ">Name of transaction to be captured in GL</span>
+                        </td>
+                    </tr>
+                    <tr id="tr_freqinput">
+                        <td colspan="6" align='left' style="height: 25px;">
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">  @(NGCF.NatureOfTranInGL)</span>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Purpose
+                        </td>
+                        <td style="width: 30%" colspan="2" align='left'>
+                            @(NGCF.Purpose)
+                        </td>
+                        <td style="width:20%; font-weight: bold;">
+                            Date to Open New Gl
+                        </td>
+                        <td style="width: 30%" colspan="2" align='left'>
+                            @(NGCF.DateToOpenNewGL.ToShortDateString())
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            GL Code
+                        </td>
+                        <td style="width: 30%" colspan="2" align='left'>
+                            @(NGCF.GLCode)
+                        </td>
+                        <td style="width:20%; font-weight: bold;">
+                            GL Name
+                        </td>
+                        <td style="width: 30%" colspan="2" align='left'>
+                            @(NGCF.GLName)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            GL Series
+                        </td>
+                        <td style="width: 30%" colspan="2" align='left'>
+                            @(NGCF.GLSeries)
+                        </td>
+                        <td style="width:20%; font-weight: bold;">
+                        </td>
+                        <td style="width: 30%" colspan="2" align='left'>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="6" align='left'>
+                            <span style=" width: 85%; font-weight: bold; border-radius: 0; ">Business Function & Responsibility</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="6" align='left' style="height: 25px;">
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">  @(NGCF.BusinessNeed)</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            New GL Number
+                        </td>
+                        <td style="width: 30%" colspan="2" align='left'>
+                            @(NGCF.NewGLNo)
+                        </td>
+                        @if (NGCF.RequestType == "Profit & Loss")
+                        {
+                            <td style="width:20%; font-weight: bold;">
+                                Commitment Item
+                            </td>
+                            <td style="width: 30%" colspan="2" align='left'>
+                                @(NGCF.CommitmentItem)
+                            </td>
+                        }
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+    <table style="width: 100%; font-size: 14px; color: #000;" cellspacing="0" cellpadding="0">
+        @if (appList.Count > 0)
+        {
+            foreach (var item in appList)
+            {
+                if (item.ApproverStatus != "Pending")
+                {
+                    <tr>
+                        <td width="5%"></td>
+                        <td width="40%">
+                            <table style="width: 100%; font-size: 14px; color: #000;" border="1" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td height="50px" colspan="2" align="center">
+                                        @item.ApproverStatus
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td width="50%" align="center">
+                                        @item.UserName
+                                    </td>
+                                    <td width="50%" align="center">
+                                        @(item.TimeStamp.ToShortDateString() + " " + Convert.ToDateTime(item.TimeStamp).AddHours(5.5).ToShortTimeString())
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td height="50px" colspan="2" align="center">
+                                        @item.Designation
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td width="10%"></td>
+                    </tr>
+                }
+            }
+        }
+
+    </table>
+</body>
+</html>

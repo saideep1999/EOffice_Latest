@@ -1,0 +1,568 @@
+﻿
+@{
+    Layout = null;
+    dynamic SRF = null;
+    if (ViewBag != null)
+    {
+        SRF = ViewBag.Model;
+    }
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+
+    <style type="text/css">
+        *:visited, *:focus {
+            box-shadow: none;
+        }
+
+        input, select, input:focus, select:focus, textarea, textarea:focus {
+            border: 1px solid #000;
+        }
+
+        input, textarea {
+            padding: 5px;
+        }
+
+        .asset {
+            border: 1px solid black;
+            height: 20px;
+        }
+
+        .signature-table thead td {
+            border-bottom: 1px solid black;
+            border-left: 1px solid black;
+            border-collapse: collapse;
+        }
+
+        .signature-table tbody, .signature-table td {
+            border: none;
+            border-left: 1px solid black;
+            border-collapse: collapse;
+            padding: 5px;
+        }
+
+            .signature-table td:first-child {
+                border-left: none;
+            }
+
+        .signature-table {
+            border: 1px solid black;
+        }
+
+        @@font-face {
+            font-family: 'SKODANext-Black';
+            src: url('../../fonts/SKODANextfont/SKODANext-Black.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Bold.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Light.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Regular.ttf') format('truetype');
+        }
+
+        body {
+            font-family: 'SKODANext-Black';
+        }
+
+        .form_lbl {
+            color: #000;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <table style="width: 100%; font-size: 14px; color: rgb(110,110,110); font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+
+        <tr>
+            <td>
+                <table style="width: 100%;" cellspadding="0" cellspacing="0">
+                    <tr>
+                        <td width="20%" style="text-align: center; border-right: 1px solid #000; border-bottom: 1px solid #000;">
+                            Classification
+                        </td>
+                        <td width="20%" style="text-align: center; border-right: 1px solid #000; border-bottom: 1px solid #000;">
+                            Internal
+                        </td>
+                        <td rowspan="2" width="60%" style="text-align: right;">
+                            <img style="width: 50%;" src='@Server.MapPath("~/assets/img/SAVWIPL_Merger_Logo.JPG")'>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: center; border-right: 1px solid #000;">
+                            Version
+                        </td>
+                        <td style="text-align: center; border-right: 1px solid #000;">
+                            01
+                        </td>
+
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td style="height: 45px; text-align: center; border-left: 1px solid #000; border-right: 1px solid #000; border-bottom: 1px solid #000;">
+                Software Requisition Form
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 15px;">
+                <table cellspacing="0" cellpadding="0" width="100%">
+                    @if (SRF.one[0].RequestSubmissionFor != "OnBehalf")
+                    {
+                        <tr>
+                            <td class="form_lbl">
+                                Type of Employee
+                            </td>
+                            <td>
+                                @if (SRF.one[0].EmployeeType == "Internal")
+                                {
+                                    <input type="checkbox" id="internal" name="chkTyprEmp" value="Internal" checked>
+                                }
+                                else
+                                {
+                                    <input type="checkbox" id="internal" name="chkTyprEmp" value="Internal">
+                                }
+                                <label for="vehicle1"> Internal</label>
+                            </td>
+                            <td>
+                                @if (SRF.one[0].EmployeeType == "External")
+                                {
+                                    <input type="checkbox" id="external" name="chkTyprEmp" value="Internal" checked>
+                                }
+                                else
+                                {
+                                    <input type="checkbox" id="external" name="chkTyprEmp" value="Internal">
+                                }
+                                <label for="vehicle1"> External</label>
+                            </td>
+                            <td colspan="3">
+                                @if (SRF.one[0].EmployeeType == "External")
+                                {
+                                    <input type="text" placeholder="External Company Name" style="height: 25px; border-radius: 0; " value="@(SRF.one[0].ExternalOtherOrganizationName ?? " ")" />
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="height: 15px;">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="form_lbl">
+                                Employee Code
+                            </td>
+                            <td>
+                                @(SRF.one[0].EmployeeCode ?? " ")
+                                @*<input type="text" style="height: 25px; border-radius: 0; " value="" />*@
+                            </td>
+                            <td class="form_lbl">
+                                Cost Center No.
+                            </td>
+                            <td>
+                                @(SRF.one[0].EmployeeCCCode ?? " ")
+                                @*<input type="text" style="height: 25px; border-radius: 0; " value="" />*@
+                            </td>
+                            <td class="form_lbl">
+                                UserId
+                            </td>
+                            <td>
+                                @(SRF.one[0].EmployeeUserId ?? " ")
+                                @*<input type="text" style="height: 25px; border-radius: 0; width: 100%; " value="" />*@
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style="height: 15px;">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="form_lbl">
+                                Employee Name
+                            </td>
+                            <td>
+                                @(SRF.one[0].EmployeeName ?? " ")
+                                @*<input type="text" style="height: 25px; border-radius: 0; " value="" />*@
+                            </td>
+                            <td class="form_lbl">
+                                Department
+                            </td>
+                            <td>
+                                @(SRF.one[0].EmployeeDepartment ?? " ")
+                                @*<input type="text" style="height: 25px; border-radius: 0; " value="" />*@
+                            </td>
+                            <td class="form_lbl">
+                                Contact Number
+                            </td>
+                            <td>
+                                @(SRF.one[0].EmployeeContactNo ?? " ")
+                                @*<input type="text" style="height: 25px; border-radius: 0; width: 100%; " value="" />*@
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="height: 15px;">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="form_lbl">
+                                Designation
+                            </td>
+                            <td>
+                                @(SRF.one[0].EmployeeDesignation ?? " ")
+                                @*<input type="text" style="height: 25px; border-radius: 0;  " value="" />*@
+                            </td>
+
+                            <td class="form_lbl">
+                                Location
+                            </td>
+
+                            <td>
+                                @(SRF.one[0].EmployeeLocation ?? " ")
+                                @*<input type="text" style="height: 25px; border-radius: 0;  " value="" />*@
+                            </td>
+                            <td colspan="2">
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td class="form_lbl">
+                                Type of Employee
+                            </td>
+                            <td>
+                                @if (SRF.one[0].EmployeeType == "Internal")
+                                {
+                                    <input type="checkbox" id="internal" name="chkTyprEmp" value="Internal" checked>
+                                }
+                                else
+                                {
+                                    <input type="checkbox" id="internal" name="chkTyprEmp" value="Internal">
+                                }
+                                <label for="vehicle1"> Internal</label>
+                            </td>
+                            <td>
+                                @if (SRF.one[0].EmployeeType == "External")
+                                {
+                                    <input type="checkbox" id="internal" name="chkTyprEmp" value="Internal" checked>
+                                }
+                                else
+                                {
+                                    <input type="checkbox" id="internal" name="chkTyprEmp" value="Internal">
+                                }
+                                <label for="vehicle1"> External</label>
+                            </td>
+                            @if (SRF.one[0].OtherEmployeeType == "External")
+                            {
+                                <td colspan="3">
+                                    <input type="text" placeholder="External Company Name" style="height: 25px; border-radius: 0; " value="@(SRF.one[0].OtherExternalOtherOrganizationName ?? " ")" />
+                                </td>
+                            }
+                        </tr>
+                        <tr>
+                            <td style="height: 15px;">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="form_lbl">
+                                Employee Code
+                            </td>
+                            <td>
+                                @(SRF.one[0].OtherEmployeeCode ?? " ")
+                                @*<input type="text" style="height: 25px; border-radius: 0; " value="" />*@
+                            </td>
+                            <td class="form_lbl">
+                                Cost Center No.
+                            </td>
+                            <td>
+                                @(SRF.one[0].OtherEmployeeCCCode ?? " ")
+                                @*<input type="text" style="height: 25px; border-radius: 0; " value="" />*@
+                            </td>
+                            <td class="form_lbl">
+                                UserId
+                            </td>
+                            <td>
+                                @(SRF.one[0].OtherEmployeeUserId ?? " ")
+                                @*<input type="text" style="height: 25px; border-radius: 0; width: 100%; " value="" />*@
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style="height: 15px;">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="form_lbl">
+                                Employee Name
+                            </td>
+                            <td>
+                                @(SRF.one[0].OtherEmployeeName ?? " ")
+                                @*<input type="text" style="height: 25px; border-radius: 0; " value="" />*@
+                            </td>
+                            <td class="form_lbl">
+                                Department
+                            </td>
+                            <td>
+                                @(SRF.one[0].OtherEmployeeDepartment ?? " ")
+                                @*<input type="text" style="height: 25px; border-radius: 0; " value="" />*@
+                            </td>
+                            <td class="form_lbl">
+                                Contact Number
+                            </td>
+                            <td>
+                                @(SRF.one[0].OtherEmployeeContactNo ?? " ")
+                                @*<input type="text" style="height: 25px; border-radius: 0; width: 100%; " value="" />*@
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="height: 15px;">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="form_lbl">
+                                Designation
+                            </td>
+                            <td>
+                                @(SRF.one[0].OtherEmployeeDesignation ?? " ")
+                                @*<input type="text" style="height: 25px; border-radius: 0; width: 100%; " value="" />*@
+
+                            </td>
+
+                            <td class="form_lbl">
+                                Location
+                            </td>
+
+                            <td>
+                                @(SRF.one[0].OtherEmployeeLocation ?? " ")
+                                @*<input type="text" style="height: 25px; border-radius: 0; width: 100%; " value="" />*@
+
+                            </td>
+                            <td colspan="2">
+                            </td>
+                        </tr>
+
+                    }
+                    <tr>
+                        <td style="height: 25px;">
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td class="form_lbl">
+                            Request Type:
+                        </td>
+                        <td>
+                            @if (SRF.one[0].EmployeeRequestType == "Permanent")
+                            {
+                                <input type="checkbox" id="permanent" name="chkTyprEmp" value="Permanent" checked>
+                            }
+                            else
+                            {
+                                <input type="checkbox" id="permanent" name="chkTyprEmp" value="Permanent">
+                            }
+                            <label for=""> Permanent</label>
+                        </td>
+                        <td>
+                            @if (SRF.one[0].EmployeeRequestType == "Temporary")
+                            {
+                                <input type="checkbox" id="temprory" name="chkTyprEmp" value="Temprory" checked>
+                            }
+                            else
+                            {
+                                <input type="checkbox" id="temprory" name="chkTyprEmp" value="Temprory">
+                            }
+                            <label for=""> Temporary</label>
+                        </td>
+                        <td>
+                            @if (SRF.one[0].EmployeeRequestType == "Temporary")
+                            {
+                                <label for="">if temporary form</label>
+                                @(SRF.one[0].TempFrom.ToShortDateString() ?? "")
+                                @*<input type="date" id="date" name="" value="">*@
+                            }
+                        </td>
+
+                        <td>
+                            @if (SRF.one[0].EmployeeRequestType == "Temporary")
+                            {
+                                <label for="">to</label>
+
+                                @*<input type="date" id="date" name="" value="">*@
+                            }
+                        </td>
+
+                    </tr>
+
+                    <tr>
+                        <td style="height: 15px;">
+                        </td>
+                    </tr>
+
+                </table>
+
+                <table style="width: 100%; font-size: 14px; color: rgb(110,110,110); font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td>
+                            <table style="width: 100%; font-size: 14px; color: rgb(110,110,110); font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+                                <tr class="form_lbl">
+                                    <th>Sr.No</th>
+                                    <th>Software Details(Name)</th>
+                                    <th>Software Version</th>
+                                    <th>Marked by IT License Manager</th>
+                                </tr>
+                                @{var count = 1; }
+                                @foreach (var item in SRF.two)
+                                {
+                                    <tr>
+                                        <td class="sNo">@count</td>
+                                        <td class="asset">@item.SoftwareName</td>
+                                        <td class="asset">@item.SoftwareVersion</td>
+                                        <td class="asset">@item.SoftwareType</td>
+                                    </tr>
+                                    count++;
+                                }
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+
+                <table>
+                    <tr>
+                        <td colspan="">
+                            <lable>Reason Software Requisition (Business Justification)</lable>
+                            <div style="margin-bottom: 10px; margin-top: 10px;">
+                                <textarea type="text" rows="5" value="" style="width: 200%;">@(SRF.one[0].BusinessNeed ?? "")</textarea>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+
+                <table style="width: 100%; font-size: 14px; color: rgb(110,110,110); font-weight: 600;padding: 0; margin:0;" border="1" cellspacing="0" cellpadding="0" class="signature-table">
+
+                    <tr style=" width: 100%;">
+                        <td style=" width: 100%;">
+                            <table style="width: 100%;  " border="1" cellspacing="0" cellpadding="0">
+                                <thead style="width: 100%;">
+                                    <tr style="text-align: center;" class="form_lbl">
+                                        @*<td style="padding-left: 250px; text-align: center;"></td>*@
+                                        <td style="width: 25%;"><lable>Requester Signature</lable></td>
+                                        <td style="width: 25%;"><lable> @SRF.four[0].Designation </lable> </td>
+                                        @if (SRF.one[0].IsNonStandard == true)
+                                        {
+                                            <td style="width: 25%;"> <lable> CISO / LISO</lable> </td>
+                                        }
+                                        @if (SRF.one[0].IsStandard == true)
+                                        {
+                                            <td style="width: 25%;"><lable>IT - Service Desk Manager</lable></td>
+                                        }
+
+                                        </tr>
+                                </thead>
+                                <tbody>
+                                    @if ((SRF.three.Count > 0) || (SRF.four.Count > 0))
+                                    {
+                                        var appList = SRF.four as List<Skoda_DCMS.Models.ApprovalDataModel>;
+                                        var maxLevel = appList.Max(x => x.Level);
+                                        <tr>
+                                            <td>@(SRF.three[0].Author.Title ?? " ")</td>
+
+                                            @for (var i = 0; i < maxLevel; i++)
+                                            {
+                                                <td>
+                                                    @foreach (var item in appList)
+                                                    {
+                                                        if (item.Level == i + 1 && item.ApproverStatus != "Pending")
+                                                        {
+                                                            @(item.UserName ?? "");
+                                                        }
+                                                      
+                                                    }
+
+
+                                                </td>
+                                            }
+                                           
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                @("Submitted on " + Convert.ToDateTime(SRF.three[0].FormId.Created).ToShortDateString() + " "
+                                            + Convert.ToDateTime(SRF.three[0].FormId.Created).ToShortTimeString() ?? "")
+                                            </td>
+                                            @for (var i = 0; i < maxLevel; i++)
+                                            {
+                                                <td>
+                                                    @foreach (var item in appList)
+                                                    {
+                                                        if (item.Level == i + 1 && item.ApproverStatus != "Pending")
+                                                        {
+                                                            @(item.ApproverStatus + " on " + " " + Convert.ToDateTime(item.Modified).ToShortDateString()
+                                                            + " " + Convert.ToDateTime(item.Modified).AddHours(5.5).ToShortTimeString())
+                                                        }
+                                                    }
+                                                </td>
+                                            }
+                                           
+                                        </tr>
+                                    }
+                                </tbody>
+                                </table>
+
+                        </td>
+                    </tr>
+                </table>
+                <table style="width: 100%; font-size: 14px; color: rgb(110,110,110); font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td>
+                            <table>
+                                <tr>
+                                    <td style="height: 45px; padding-left: 15px; color: rgb(128, 128, 128);">
+                                        for IT use only
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <label for="vehicle1" style="padding-left: 15px;"> Ticket No.</label>
+                                        <input type="text" placeholder="" style="height: 25px; border-radius: 0;   " />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="height: 15px;">
+                                    </td>
+                                </tr>
+                                @*<tr>
+                                    <td style="height: 15px; color: black;">
+                                        This is digital form, that can be filled and digitally sign by your PKI card. Please do not take print out.
+                                    </td>
+                                </tr>*@
+                            </table>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+            
+        <tr>
+            <td style="padding: 15px;">
+                <p style="font-weight: 600; color: black;">SF_FI_012</p>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

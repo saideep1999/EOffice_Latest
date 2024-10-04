@@ -1,0 +1,629 @@
+﻿@model dynamic
+@{
+    bool IsNew = true;
+    dynamic DNF = null;
+    dynamic FlagRedirect = null;
+    bool IsEdit = true;
+    int FormId = 0, AppRowId = 0, ApprovalType = 0;
+    Layout = ViewBag.Layout;
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IsNew = ViewBag.IsNew;
+        DNF = ViewBag.Model;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+        IsEdit = ViewBag.IsEdit;
+
+    }
+    var currentUser = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    ViewBag.Title = "Deviation Note Form";
+    int count = 0;
+}
+
+<style>
+    .textTrans {
+        width: 100%;
+        max-width: 100%;
+        margin-right: 0px;
+        border: 1px solid !important;
+    }
+
+    .form-table-container-2 tr td input {
+        width: 100%;
+        border: 1px solid !important;
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+
+    .autoresizing {
+        display: block;
+        overflow: hidden;
+        resize: none;
+    }
+</style>
+</style>
+
+<body>
+    <div class="right_col bg-transparent" role="main">
+        <form action="/DeviationNote/SaveDeviationNoteForm" method="post" id="DNForm">
+            <div class="container">
+
+                <div class="container form-container">
+                    <table class="w-100 m-auto">
+                        <tr>
+                            <td>
+                                <table class="table mainTbl table-bordered form-table-container-2 bg-color">
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="6" class="heading form-heading-1" style="text-align:center;">
+                                                <span>Deviation Note Form</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="w-25 allFormLables borderLTB">
+                                                <label class="f-600">Form ID:</label>
+                                            </td>
+                                            <td colspan="2" class="borderLTB text-left">
+                                                <input type="text" name="txtFormId" class="inpDisable" value="@(!IsNew ||!IsEdit ? ("DNF"+DNF.three[0].FormId.Id ?? "" ) : "" )" readonly>
+                                            </td>
+                                            <td class="allFormLables borderLTB f-600 align">
+                                            </td>
+                                            <td colspan="3" class="borderLTB">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="allFormLables borderLTB">
+                                                <label class="f-600">Supplier:</label>
+                                            </td>
+                                            <td colspan="2" class="borderLTB text-left">
+                                                <input class="w-100 inputTrans inpDisable" type="text" id="txtSupplier" name="txtSupplier" value="@(!IsNew ? (DNF.one[0].Supplier ?? " ") : " ")">
+                                            </td>
+                                            <td class="allFormLables borderLTB">
+                                            </td>
+                                            <td colspan="3" class="borderLTB">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="allFormLables borderLTB">
+                                                <label class="f-600">Description:</label>
+                                            </td>
+                                            <td colspan="2" class="borderLTB text-left">
+                                                <textarea class="inpDisable" rows="15" cols="60" id="txtDescription" name="txtDescription">@(!IsNew ? (DNF.one[0].Description ?? "") : "")</textarea>
+                                            </td>
+                                            <td class="allFormLables borderLTB">
+                                            </td>
+                                            <td colspan="3" class="borderLTB">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="allFormLables borderLTB suggestion_td">
+                                                <label class="f-600">Currency:</label>
+                                            </td>
+                                            <td colspan="2" class="borderLTB text-left">
+                                                <input class='w-100 validate drpDisable inpDisable' name="drpCurrency" id="drpCurrency" onchange="" value="@(!IsNew ? (DNF.one[0].Currency ?? " ") : " ")">
+                                            </td>
+                                            <td class="allFormLables borderLTB">
+                                            </td>
+                                            <td colspan="3" class="borderLTB">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="allFormLables borderLTB suggestion_td">
+                                                <label class="f-600">Budget/Contract/PO Value:</label>
+                                            </td>
+                                            <td colspan="2" class="borderLTB text-left">
+                                                <input class="w-100 inputTrans inpDisable" type="text" id="txtBudget" name="txtBudget" value="@(!IsNew ? (DNF.one[0].Budget ?? " ") : " ")" onkeypress="allowNumbersOnly(event)">
+                                            </td>
+                                            <td class="allFormLables borderLTB">
+                                            </td>
+                                            <td colspan="3" class="borderLTB">
+                                            </td>
+                                        </tr>
+                                        @if (!(DNF.one[0].Currency == "Rupee"))
+                                        {
+                                            <tr>
+                                                <td class="allFormLables borderLTB suggestion_td">
+                                                    <label class="f-600">Conversion Value:</label>
+                                                </td>
+                                                <td colspan="2" class="borderLTB text-left">
+                                                    <input type="text" class="inpDisable" id="txtConvert" name="txtConvert" placeholder="" value="@(!(DNF.one[0].Currency==" Rupee") ? (DNF.one[0].ConversionValue ?? "" ) : "" )" onkeypress="allowNumbersOnly(event)">
+                                                </td>
+                                                <td class="allFormLables borderLTB">
+                                                </td>
+                                                <td colspan="3" class="borderLTB">
+                                                </td>
+                                            </tr>
+                                        }
+                                        <tr>
+                                            <td class="allFormLables borderLTB suggestion_td">
+                                                <label class="f-600">Department:</label>
+                                            </td>
+                                            <td colspan="2" class="borderLTB text-left">
+                                                <input class="w-100 drpDisable inpDisable" name="drpDepartment" id="drpDepartment" value="@(!IsNew ? (DNF.one[0].Department ?? " ") : " ")">
+                                            </td>
+                                            <td class="allFormLables borderLTB">
+                                                <label class="f-600">Brand:</label>
+                                            </td>
+                                            <td colspan="3" class="borderLTB">
+                                                <input class="w-100 inputTrans inpDisable" type="text" id="txtBrand" name="txtBrand" value="@(!IsNew ? (DNF.one[0].Brand ?? " ") : " ")">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="6">Reason for Deviation (select from below) :</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="6">1.<input type="checkbox" id="checkBoxReason1" name="checkBoxReason1" value="Reason1" @(DNF.one[0].Reason1 == "Reason1" ? "checked" : "" ) disabled>Single Sourcing (except the cases referred in “Exception list : Deviation from General purchasing process” dated _______)</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="6">2.<input type="checkbox" id="checkBoxReason2" name="checkBoxReason2" value="Reason2" @(DNF.one[0].Reason2 == "Reason2" ? "checked" : "" ) disabled>Regularization of Invoices where ever the Procurement was not involved and no negotiation done.</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="6">3.<input type="checkbox" id="checkBoxReason3" name="checkBoxReason3" value="Reason3" @(DNF.one[0].Reason3 == "Reason3" ? "checked" : "" ) disabled>Rendering the services or delivery of Goods without PO (rates are pre-negotiated/approved by Procurement)</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="6">4.<input type="checkbox" id="checkBoxReason4" name="checkBoxReason4" value="Reason4" @(DNF.one[0].Reason4 == "Reason4" ? "checked" : "" ) disabled>Late financial /Shopping Cart approval,, An emergency, product change, critical shortage,a safety issue or no time for specifications.</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="6">
+                                                Reason in detail for the deviation:
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="6"><textarea class="w-100 textTrans inpDisable" rows="15" cols="50" id="txtReason" name="txtReason">@(!IsNew ? (DNF.one[0].Reason ?? "") : "")</textarea></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="6">Note: </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="6">1. For topic values ≤0.5 Mio INR, above signatures are sufficient</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="6">2. For topic values >0.5 Mio INR, below signatures are needed</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table mainTbl table-bordered form-table-container-2 bg-color f-600">
+                                    <tbody>
+                                        <tr>
+                                            <td>Head of department</td>
+                                            <td>Signature</td>
+                                            <td>Comments</td>
+                                        </tr>
+                                        <tr>
+                                            <td><input type="text" class="w-100 signature inpDisable" value="@(DNF.three[0].UserName)"></td>
+                                            <td><input type="text" class="w-100 signature inpDisable" value="@(DNF.three[0].ApproverStatus != "Pending" ? (DNF.three[0].ApproverStatus + " on " + Convert.ToDateTime(DNF.two[0].Modified).ToShortDateString() + " " + Convert.ToDateTime(DNF.two[0].Modified).ToShortTimeString()) : "" )"></td>
+                                            <td> <textarea class="signature inpDisable autoresizing" rows="15"> @(DNF.three[0].Comment)"</textarea></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Director</td>
+                                            <td>Signature</td>
+                                            <td>Comments</td>
+                                        </tr>
+                                        <tr>
+                                            <td><input type="text" class="w-100 inpDisable" value="@(DNF.three[1].UserName)"></td>
+                                            <td><input type="text" class="w-100 inpDisable" value="@(DNF.three[1].ApproverStatus != "Pending" ? (DNF.three[1].ApproverStatus + " on " + Convert.ToDateTime(DNF.two[1].Modified).ToShortDateString() + " " + Convert.ToDateTime(DNF.two[1].Modified).ToShortTimeString()) : "" )"></td>
+                                            <td> <textarea class="inpDisable autoresizing" rows="15"> @(DNF.three[1].Comment)"</textarea></td>
+                                        </tr>
+
+                                        @if (DNF.one[0].Budget > 500000)
+                                        {
+                                            <tr>
+                                                <td>Managing Director</td>
+                                                <td>Signature</td>
+                                                <td>Comments</td>
+                                            </tr>
+                                            <tr>
+                                                <td><input type="text" class="w-100 signature inpDisable" value="@(DNF.three[2].UserName)"></td>
+                                                <td><input type="text" class="w-100 signature inpDisable" value="@(DNF.three[2].ApproverStatus != "Pending" ? (DNF.three[2].ApproverStatus + " on " + Convert.ToDateTime(DNF.two[2].Modified).ToShortDateString() + " " + Convert.ToDateTime(DNF.two[2].Modified).ToShortTimeString()) : "" )"></td>
+                                                <td> <textarea class="inpDisable autoresizing" rows="15"> @(DNF.three[2].Comment)"</textarea></td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+            </div>         
+        </form>
+    </div>
+</body>
+
+<div class="modal fade" id="successModel" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content sfo_modal_popup">
+            <div class="modal-header modelHeader">
+                <span class="modal-title modalMsgTitle" id="modalTitle"></span>
+                <button type="button" class="close closs-icon-info font-weight-bold" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label id="modalBody" class="lableMsg"></label>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="submitBomBtn publishBtn btn-error-2" id="modalOkButton">Ok</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var FlagRedirect = @Html.Raw(Json.Encode(FlagRedirect));
+    var IsNew = @Html.Raw(Json.Encode(IsNew));
+    var DNF = @Html.Raw(Json.Encode(DNF));
+    var appRowId = @Html.Raw(Json.Encode(AppRowId));
+    var approvalType =@Html.Raw(Json.Encode(ApprovalType));
+    var IsEdit = @Html.Raw(Json.Encode(IsEdit));
+    pageLoad();
+
+    function pageLoad() {
+        var data = "";
+        if (!IsNew) {
+            $(".inpDisable").attr("disabled", "disabled");
+            $(".drpDisable").attr("disabled", "disabled");
+        }
+
+        if (!IsEdit) {
+
+        }
+        if (IsNew) {
+            if (!IsEdit) {
+                getDepartment();
+                $("#txtConvert").hide();
+            }
+            else {
+                getDepartment();
+                $("#txtConvert").hide();
+            }
+        }
+    }
+
+    function allowNumbersOnly(e) {
+        var code = (e.which) ? e.which : e.keyCode;
+        if (code > 31 && (code < 48 || code > 57)) {
+            e.preventDefault();
+        }
+    }
+
+    function hideConvert() {
+        dropValue = document.getElementById("drpCurrency").selectedIndex;
+        console.log(dropValue);
+        if (dropValue == 0) {
+            $("#txtConvert").hide();
+            $("#euroLabel").hide();
+            $("#dollarLabel").hide();
+            $("#rupeeLabel").hide();
+        }
+        else if (dropValue == 1) {
+            $("#txtConvert").hide();
+            $("#rupeeLabel").show();
+            $("#euroLabel").hide();
+            $("#dollarLabel").hide();
+        }
+        else if (dropValue == 2) {
+            $("#dollarLabel").show();
+            $("#txtConvert").show();
+            $("#euroLabel").hide();
+            $("#rupeeLabel").hide();
+        }
+        else if (dropValue == 3) {
+            $("#euroLabel").show();
+            $("#txtConvert").show();
+            $("#dollarLabel").hide();
+            $("#rupeeLabel").hide();
+        }
+
+        else if (dropValue == 4) {
+            $("#euroLabel").hide();
+            $("#txtConvert").show();
+            $("#dollarLabel").hide();
+            $("#rupeeLabel").hide();
+        }
+
+        else if (dropValue == 5) {
+            $("#euroLabel").hide();
+            $("#txtConvert").show();
+            $("#dollarLabel").hide();
+            $("#rupeeLabel").hide();
+        }
+
+        else if (dropValue == 6) {
+            $("#euroLabel").hide();
+            $("#txtConvert").show();
+            $("#dollarLabel").hide();
+            $("#rupeeLabel").hide();
+        }
+
+        else if (dropValue == 7) {
+            $("#euroLabel").hide();
+            $("#txtConvert").show();
+            $("#dollarLabel").hide();
+            $("#rupeeLabel").hide();
+        }
+
+        else if (dropValue == 8) {
+            $("#euroLabel").hide();
+            $("#txtConvert").show();
+            $("#dollarLabel").hide();
+            $("#rupeeLabel").hide();
+        }
+    }
+
+    $('#txtBudget').keyup(function (event) {
+        // skip for arrow keys
+        if (event.which >= 37 && event.which <= 40) return;
+
+        // format number
+        $(this).val(function (index, value) {
+            return value.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        });
+    });
+
+    function getDepartment() {
+        if (IsNew) {
+            if (!IsEdit) {
+                //
+                var value = JSON.stringify(DNF[0]);
+                var value_1 = JSON.parse(value);
+                var selectedLocation = value_1.Value[0].Department;
+                console.log(selectedLocation);
+
+                $.ajax({
+                    url: '/DeviationNote/Department',
+                    type: 'GET',
+                    data: {},
+                    dataType: 'JSON',
+                    success: (function (data) {
+                        //locdata = data;
+
+                        //console.log(data);
+                        var s = '<option value="-1" selected disabled>Please Select Department</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            if (data[i].Department == selectedLocation) {
+                                s += '<option value="' + data[i].Department + '" id="' + data[i].Id + '" selected>' + data[i].Department + '</option>';
+                            }
+                            else {
+                                s += '<option value="' + data[i].Department + '" id="' + data[i].Id + '">' + data[i].Department + '</option>';
+                            }
+                        }
+                        $("#drpDepartment").html(s);
+
+
+                    }),
+                    error: (function (data) {
+                        //code
+                    })
+                })
+            }
+            else {
+                $.ajax({
+                    url: '/DeviationNote/Department',
+                    type: 'GET',
+                    data: {},
+                    dataType: 'JSON',
+                    success: (function (data) {
+                        locdata = data;
+
+                        //console.log(data);
+                        var s = '<option value="-1" selected disabled>Please Select Department</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            s += '<option value="' + data[i].Department + '" id="' + data[i].Id + '">' + data[i].Department + '</option>';
+                        }
+                        $("#drpDepartment").html(s);
+
+
+                    }),
+                    error: (function (data) {
+                        //code
+                    })
+                })
+            }
+        }
+    }
+
+    function successModal(txt) {
+        ////
+        $('#modalTitle').html('Success');
+        if (txt == "approve") {
+            $('#modalBody').html('Form has been approved!');
+        }
+        else if (txt == "reject") {
+            $('#modalBody').html('Form has been rejected!');
+        }
+        else if (txt == "enquire") {
+            $('#modalBody').html('Form has been enquired!');
+        }
+        else if (txt == "cancelled") {
+            $('#modalBody').html('Form has been cancelled!');
+        }
+        else {
+            $('#modalBody').html('Your form with ID: DNF' + txt + ' has been submitted! Kindly use this for future reference');
+            FlagRedirect = txt;
+        }
+        //$('#modalBody').html('Your form has been submitted!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function failureModal() {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html('Some error occurred!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function requiredModal(text) {
+        $('#modalTitle').html('Required!');
+        $('#modalBody').html(text);
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    $("#modalOkButton").on('click', function () {
+        ////
+        if (FlagRedirect != null) {
+            window.location = "../Dashboard";
+        }
+    });
+
+    $("#btnSubmit").on('click', function (e) {
+        //
+        var supplier = document.getElementById("txtSupplier").value;
+        var description = document.getElementById("txtDescription").value;
+        var currency = document.getElementById("drpCurrency").value;
+        var conversionValue = document.getElementById("txtConvert").value;
+        var budget = document.getElementById("txtBudget").value;
+        var department = document.getElementById("drpDepartment").value;
+        var brand = document.getElementById("txtBrand").value;
+        //var r1 = document.getElementById("checkBoxReason1").value;
+        //var r2 = document.getElementById("checkBoxReason2").value;
+        //var r3 = document.getElementById("checkBoxReason3").value;
+        //var r4 = document.getElementById("checkBoxReason4").value;
+        var reason = document.getElementById("txtReason").value;
+
+        if (supplier == "") {
+            requiredModal("Please Enter Supplier Name.");
+            return false;
+        }
+
+        if (description == "") {
+            requiredModal("Please Enter Description.");
+            return false;
+        }
+
+        if (currency == -1) {
+            requiredModal("Please Enter Currency.");
+            return false;
+        }
+
+        if (conversionValue == "" && currency!="Rupee") {
+            requiredModal("Please Enter Conversion Value.");
+            return false;
+        }
+
+        if (budget == "") {
+            requiredModal("Please Enter Budget.");
+            return false;
+        }
+
+        if (department == -1) {
+            requiredModal("Please Enter Department.");
+            return false;
+        }
+
+        if (brand == "") {
+            requiredModal("Please Enter Brand.");
+            return false;
+        }
+
+        if (reason == "") {
+            requiredModal("Please Enter Reason.");
+            return false;
+        }
+
+        if (($("#checkBoxReason1").prop("checked") == false) && ($("#checkBoxReason2").prop("checked") == false) && ($("#checkBoxReason3").prop("checked") == false) && ($("#checkBoxReason4").prop("checked") == false)) {
+            requiredModal("Please Choose Atleast 1 Reason.");
+            return false;
+        }
+
+
+        var form = $("#DNForm").serialize();
+        $.ajax({
+            url: '/DeviationNote/SaveDeviationNoteForm',
+            type: 'POST',
+            data: form,
+            dataType: 'JSON',
+            success: (function (data) {
+                ////
+                if (data[0].Value == 1) {
+                    successModal(data[1].Value);
+                    $("#DNForm").trigger("reset");
+                    if (IsNew) {
+                        if (!IsEdit) {
+                            setTimeout(function () {// wait for 4 secs(2)
+                                location.reload(); // then reload the page.(3)
+                            }, 4000);
+                        }
+                    }
+                    //$("#pageLoader").addClass('invisible');
+                }
+                else {
+                    ///$("#pageLoader").addClass('invisible');
+                    failureModal();
+                    $("#DNForm").trigger("reset");
+                }
+            }),
+            error: (function (data) {
+                /// $("#pageLoader").addClass('invisible');
+                failureModal();
+                $("#DNForm").trigger("reset");
+            })
+        })
+    });
+
+    function saveResponse(text) {
+        //
+        var status = '', comment = '';
+        comment = $("#comment-" + text).val();
+        switch (text) {
+            case 'approve': {
+                status = 'Approved';
+                break;
+            }
+            case 'reject': {
+                status = 'Rejected';
+                if (comment == '') {
+                    validityModal(text);
+                    return;
+                }
+                break;
+            }
+            case 'enquire': {
+                status = 'Enquired';
+                if (comment == '') {
+                    validityModal(text);
+                    return;
+                }
+                break;
+            }
+        }
+        //spinner.show();
+        $.ajax({
+            url: '/List/SaveResponse',
+            type: 'POST',
+            data: { response: status, appRowId: appRowId, comment: comment, approvalType: approvalType },
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data == 1) {
+                    successModal(text);
+                    $("#DNForm").trigger("reset");
+                    setTimeout(FilterMyTasks, 8000)
+                    //spinner.hide();
+                }
+                else {
+                    failureModal();
+                    $("#DNForm").trigger("reset");
+                    //spinner.hide();
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+                $("#DNForm").trigger("reset");
+                //spinner.hide();
+            })
+        })
+    }
+
+    $(document).ready(function () {
+        $('.autoresizing').css('height','auto');
+
+        $('.autoresizing').style.height =
+                (this.scrollHeight) + 'px';
+       
+    })
+</script>

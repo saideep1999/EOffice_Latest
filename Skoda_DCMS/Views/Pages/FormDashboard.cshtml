@@ -1,0 +1,103 @@
+﻿@model Skoda_DCMS.Models.DashboardModel
+@{
+    ViewBag.Title = "Form Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var user = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    var pvToBeRendered = Model.Data.PartialViewName;
+}
+
+<div class="container body">
+    <div class="main_container">
+        <div class="modal fade" id="myModal" role="dialog">
+            <div class="modal-dialog modal-dialog-width">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header modal_header_block">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="viewForm"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- top navigation -->
+        <!-- page content -->
+        <div class="right_col" role="main">
+            <div class="eform-container container">
+
+                <div class="breadcrumb-container">
+                    <div>
+                        <ol class="breadcrumb">
+                            @for (int i = 0; i < Model.Data.BreadCrumbs.Count; i++)
+                            {
+                                <li>
+                                    @if (i == Model.Data.BreadCrumbs.Count - 1)
+                                    {
+                                        @Model.Data.BreadCrumbs[i].Key
+                                    }
+                                    else
+                                    {
+                                        <a href="@Model.Data.BreadCrumbs[i].Value">
+                                            @Model.Data.BreadCrumbs[i].Key
+                                        </a>
+                                    }
+                                </li>
+                            }
+                            @*<li class="active">@Model.Data.BreadCrumbTitleFirst</li>*@
+                        </ol>
+                    </div>
+                </div>
+
+
+                <div class="form-main-container">
+                    <div class="row">
+                        <div class="col-lg-4 col-md-4">
+                            <h4 class="text-capitalize heading-text form-m p-left">
+                                @for (int i = 0; i < Model.Data.BreadCrumbs.Count; i++)
+                                {
+
+                                    if (i == Model.Data.BreadCrumbs.Count - 1)
+                                    {
+                                        @Model.Data.BreadCrumbs[i].Key
+                                    }
+                                }
+                            </h4>
+                        </div>
+                        @*<div class="col-lg-5 col-md-5">
+                                <div class="input-group input-inline-group md-form form-sm form-2 pl-0 form-input-m">
+                                    <input class="form-control my-0 py-1 red-border" type="text" placeholder="Search" aria-label="Search">
+
+                                    <span class="input-group-text red lighten-3 input-search-icon" id="basic-text1"><i class="fa fa-search text-grey" aria-hidden="true"></i></span>
+
+                                </div>
+                            </div>*@
+                    </div>
+
+                    <div class="form-status-table">
+                        @{
+                            Html.RenderPartial(pvToBeRendered, Model);
+                        }
+                    </div>
+
+                </div>
+                <br />
+                @*<div class="row animated topMargin">
+                    <div class="animated  col-sm-6 col-md-6 col-xs-12">
+                        <div class="best_practise_card newly_added_form itbest-color">
+                            <h3 class="text-capitalize gridHeadings"><i class="fa fa-chevron-right"></i> Administration | Report</h3>
+                        </div>
+                    </div>
+                    <div class="animated  col-sm-6 col-md-6 col-xs-12">
+                        <div class="best_practise_card buss-color ">
+                            <h3 class="gridHeadings"><i class="fa fa-chevron-right"></i> Analytics reports</h3>
+                        </div>
+                    </div>
+                </div>*@
+            </div>
+        </div>
+        <!-- /Add new process -->
+    </div>
+</div>
+

@@ -1,0 +1,1676 @@
+﻿@model Skoda_DCMS.Models.LoginModel
+@{
+    Layout = null;
+    ViewBag.Title = "Login";
+}
+
+<!doctype html>
+<html class="no-js" lang="">
+<head>
+
+    <style>
+        .z100 {
+            z-index: 100;
+            position: relative;
+        }
+
+        #cycler {
+            position: relative;
+        }
+
+        #cycler img.bgCarImg {
+            position: fixed;
+            z-index: -1;
+            object-fit: fill;
+            width: 100%;
+            height: 100%;
+        }
+
+        #cycler img.active {
+            z-index: -1
+        }
+
+        button:focus {
+            outline: none !important;
+        }
+
+        div.input-block {
+            position: relative;
+        }
+
+        div.input-block input {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 188px;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            border: 1px solid #D9D9D9;
+            outline: none;
+            height: 45px !important;
+        }
+
+        div.input-block span.placeholder {
+            position: absolute;
+            margin: 17px 0;
+            /*padding: 0 4px;*/
+            font-family: Roboto, sans-serif;
+            color: #3f464c;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            top: -15px;
+            left: 15px;
+            transition: all 0.2s;
+            transform-origin: 0% 0%;
+            background: none;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .empDetailsBg div.input-block input:valid + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: rgba(213,238,2238,0) !important;
+        }
+
+        .empDetailsBg div.input-block input:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: rgba(213,238,2238,0) !important;
+        }
+
+        div.input-block input:valid + span.placeholder, div.input-block input:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: rgb(255,255,255);
+        }
+
+        div.input-block input.spanUpperSide + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: rgba(213,238,2238,0) !important;
+        }
+
+        div.input-block textarea.spanUpperSide + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: rgba(213,238,2238,0) !important;
+        }
+
+        div.input-block input:read-only + span.placeholder,
+        div.input-block input:read-only + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background: rgba(213,238,2238,0) !important;
+        }
+
+        div.inputSelect span.placeholder {
+            position: absolute;
+            margin: 17px 0;
+            padding: 0 4px;
+            font-family: Roboto, sans-serif;
+            color: #000;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            top: -6px;
+            left: 15px;
+            transition: all 0.2s;
+            transform-origin: 0% 0%;
+            background: none;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        div.inputSelect select:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background: rgba(213,238,2238,0) !important;
+            z-index: 9;
+        }
+
+        div.inputSelect select:not([value=""]):valid + span.placeholder {
+            transition: all 0.2s;
+            transform-origin: 0% 0%;
+        }
+
+        div.input-block input:focus + span.placeholder {
+            color: #284B63;
+        }
+
+        .modal-dialog-width {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0.75rem 0rem 0rem 0.55rem !important;
+        }
+
+        .astColor {
+            color: red;
+        }
+
+        .heading {
+            margin-bottom: 20px;
+        }
+
+        .forClose {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 45px;
+            background-color: rgb(115, 177, 221) !important;
+            box-sizing: border-box;
+            border-radius: 5px;
+        }
+
+        .bgYellowBtn {
+            background-color: rgb(255, 209, 0) !important;
+        }
+
+        .position-relative {
+            position: relative !important;
+        }
+
+        .errorIcon {
+            background-image: url(../../assets/img/fieldError.svg) !important;
+            background-position: 97% center;
+            background-repeat: no-repeat;
+            background-size: 14px 14px !important;
+            padding-right: 25px !important;
+        }
+        .errorIconDropDown {
+            background-image: url(../../assets/img/fieldError.svg) !important;
+            background-position: 92% center;
+            background-repeat: no-repeat;
+            background-size: 14px 14px !important;
+            padding-right: 25px !important;
+        }
+
+        .search-button {
+            border-top-left-radius: 0 !important;
+            border-bottom-left-radius: 0 !important;
+        }
+
+        @@font-face {
+            font-family: 'SKODANext-Black','SKODANext-Bold','SKODANext-Light','SKODANext-Regular';
+            src: url('../../fonts/SKODANextfont/SKODANext-Black.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Bold.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Light.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Regular.ttf') format('truetype');
+        }
+
+        *:not(i) {
+            font-family: "SKODANext-Regular", sans-serif !important;
+        }
+
+        .toast {
+            right: 3%;
+            position: fixed;
+            bottom: 5%;
+            max-width: 250px;
+            /*transform: translate(-50%, 0px);*/
+            /*     z-index: 9999;*/
+        }
+
+        .toast-header {
+            font-size: 15px;
+        }
+
+        #toastTitle {
+            color: white;
+        }
+
+        .toast-header-warning {
+            background-color: yellow !important;
+        }
+
+        .toast-header-error {
+            background-color: darkred !important;
+        }
+
+        .toast-header-info {
+            background-color: dodgerblue !important;
+        }
+
+        .toast-header-success {
+            background-color: green !important;
+        }
+
+        .toast-header-failure {
+            background-color: red !important;
+        }
+
+        .toast-body {
+        }
+
+        .ui-autocomplete {
+            overflow-y: auto;
+            max-height: 300px;
+        }
+        .login_form_details input[type=text]:read-only,
+        .login_form_details input[type=text]:disabled {
+            background-color: rgba(242, 242, 242,0.7);
+            color: #4E4E4E;
+        }
+
+        @*@media only screen and (max-width: 413px) {
+            #logoIcon {
+                width: auto;
+            }
+        }
+*@
+        .login-btn-submit {
+            max-width: 225px;
+            width: 100%;
+            height: 45px;
+            border-radius: 10px;
+            background-color: #408db0 !important;
+            border: 1px solid #004666;
+            text-align: center;
+            font-size: 14px;
+            text-transform: uppercase;
+            color: #fff;
+            /* display: inline-block; */
+            margin-bottom: 0;
+            transition: all 50ms linear;
+        }
+        .login-btn-reset {
+            max-width: 225px;
+            width: 100%;
+            height: 45px;
+            border-radius: 10px;
+            background-color: rgb(210,38,48);
+            border: 1px solid rgb(210,38,48);
+            text-align: center;
+            font-size: 14px;
+            text-transform: uppercase;
+            color: #fff;
+            /*display: inline-block;*/
+            margin-bottom: 0;
+            transition: all 50ms linear;
+        }
+        .empDetailsBg div.input-block input:valid + span.placeholder, .empDetailsBg div.input-block input:focus + span.placeholder {
+            background-color: rgb(219,238,213) !important;
+        }
+
+        select.spanUpperSide + span.placeholder {
+            transform: scale(0.8) translateY(-25px) !important;
+            background-color: #fff !important;
+            z-index: 9;
+        }
+        .password-input-container {
+            position: relative;
+        }
+
+        .password-input {
+            padding-right: 32px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            top: 15px;
+            right: 43px;
+            cursor: pointer;
+            z-index: 9999;
+        }
+
+        .password_icon {
+            position: absolute;
+            width: 40px;
+            right: 20px;
+            height: 93%;
+            top: 1px;
+            background-color: #fff;
+            border-left: 1px solid #D9D9D9;
+        }
+
+        .password_icon .fa {
+            margin-top: 15px;
+        }
+
+        .password-input.errorIcon {
+            background-position: 81% center !important;
+        }
+    </style>
+   
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>@ViewBag.Title</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    @*<link rel="manifest" href="site.webmanifest">*@
+    <link rel="apple-touch-icon" href="icon.png">
+    <!-- Place favicon.ico in the root directory -->
+
+    <link rel="stylesheet" href="~/assets/css/normalize.css">
+
+    <!-- Bootstrap core CSS -->
+    <link href="~/assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="~/assets/fonts/css/font-awesome.min.css" rel="stylesheet">
+    <link href="~/assets/css/animate.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/assets/css/main.css">
+    <link href="~/assets/font/css/animate.min.css" rel="stylesheet">
+
+    <script src="~/assets/js/vendor/modernizr-3.6.0.min.js"></script>
+    <script src="~/assets/js/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
+    <script>window.jQuery || document.write('<script src="~/assets/js/vendor/jquery-3.3.1.min.js"><\/script>')</script>
+    <script src="~/assets/js/plugins.js"></script>
+    <script src="~/assets/js/main.js"></script>
+    <script src="~/assets/js/jquery-ui.js" crossorigin="anonymous"></script>
+    <script src="~/assets/js/bootstrap.min.js"></script>
+    <link href="~/assets/css/bootstrap.min.css" rel="stylesheet">
+    <script src="~/Scripts/Validation.js"></script>
+    <link rel="stylesheet" href="~/assets/css/jquery-ui.css">
+    <link href="~/assets/js/vendor/mdi/css/materialdesignicons.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/7.2.0/sweetalert2.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/7.2.0/sweetalert2.all.min.js"></script>
+</head>
+
+<body>
+    <!-- Add your site or application content here -->
+    @(Model.Password)
+    <div class="alert alert-warning animated slideInDown" id="browser-compatible-warning" style="display: none;">
+        <strong>Note!</strong> Login to eForms through Internet Explorer is restricted as it will be retired soon! As per Group recommendation, you are advised to use Microsoft Edge browser.
+        @*<strong>Warning!</strong> To get the best experience we recommend using one of our supported web browsers, i.e. the latest versions of Firefox and Edge.*@
+    </div>
+
+
+    <div id="cycler">
+
+        @*<img src="~/assets/img/loginBg1.jpg" class="bgCarImg active" style="z-index: 3;" />
+            <img src="~/assets/img/loginBg2.jpg" class="bgCarImg" />
+            <img src="~/assets/img/loginBg3.jpg" class="bgCarImg" />
+            <img src="~/assets/img/loginBg4.jpeg" class="bgCarImg" />
+            <img src="~/assets/img/loginBg5.jpg" class="bgCarImg" />
+            <img src="~/assets/img/loginBg6.jpg" class="bgCarImg" />*@
+
+
+        <img src="~/assets/img/logo/8722681.jpg" class="bgCarImg" />
+
+
+    </div>
+
+    <div class="container-fluid p-0 login_bg d-flex align-items-center flex-column justify-content-center">
+        @*<img src="~/assets/img/mobinext-logo.png" class="m-3 z100 brandLogo" />*@
+        <div class="container body z100">
+            <div class="login">
+                <div class="circle_login"><img src="~/assets/img/logo/unlock.png" /></div>
+
+                <div class="login_form animated flipInY" id="LoginForm">
+                    <div class="login_logo_wrp">
+                        <span class="logo_inline logo_login"><img src="~/assets/img/mobinext-logo.png" alt="logo" class="img-responsive" id="logoIcon"></span>
+                        @*<span class="logo_inline logo_name">E-Forms</span>*@
+
+                    </div>
+                    <hr style="border-top: 1.5px solid #004666" />
+                    @using (Html.BeginForm("Login", "Login", FormMethod.Post, new { @id = "LoginForm" }))
+                    {
+                        <div class="login_input_tbl">
+                            <div class="login_input_cell"> <img src="~/assets/img/user.png" alt=""> </div>
+                            <div class="login_input_cell">
+                                @Html.TextBoxFor(x => x.UserName, new { @class = "input_login", id = "email", @required = "required", @autocomplete = "off", @placeholder = "UserID" })
+                            </div>
+                        </div>
+                        <div class="login_input_tbl mb-0">
+                            <div class="login_input_cell"> <img src="~/assets/img/lock.png" alt=""> </div>
+                            <div class="login_input_cell">
+                                @Html.TextBoxFor(x => x.Password, new { @class = "input_login pass_place", id = "password", @type = "password", @required = "required", @autocomplete = "off", @placeholder = "*********" })
+                                @Html.HiddenFor(x => x.FormName, new { @id = "formNameField" })
+                            </div>
+                        </div>
+                        <div>
+                            <label id="error" class="msgError" style="display:none;"></label>
+                            <label id="warning" class="msgWarning" style="display:none;"></label>
+                        </div>
+                        <div class="d-flex">
+                            <button class="login-btn login-btn_spacing" type="button" id="btnLogin" style="cursor: pointer;">
+                                <span id="loginSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                                LOGIN
+                            </button>
+                            <!--<div class="col-lg-6">
+                        <a class="login-btn login-btn_spacing" type="button" id="SignUp" onclick="Onclick();">-->
+                            @*<span class="psw"><a id="SignUp" href="#" style="color:white"> SignUp</a></span>*@
+                            <!--<span id="loginSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                                SignUp
+                            </a>
+                        </div>-->
+
+                        </div>
+                        <div class="mt-2" style="text-align:center">
+                            <a class="" data-toggle="modal" data-target="#exampleModalCenter" style="font-size: 12px; cursor: pointer;"><u>Forgot Password?</u></a>
+                        </div>
+                        <div class="my-0 mt-2 align-content-center form-button">
+                            <span style="font-size: 15px;">
+                                Don't have an account? <a class="" id="SignUp" onclick="Onclick();" style="cursor: pointer;">
+                                    Register here
+                                </a>
+                            </span>
+                        </div>
+                    }
+                </div>
+
+                <div class="login_form login_form_details animated flipInX d-none" id="UserDetail">
+                    <div style="text-align: right;"><a href="/">Login <i class="fa fa-sign-in mt-1 mr-1"></i></a></div>
+                    <div id="viewFormRequest">
+                        <div class="container right_col bg-transparent" role="main">
+                            <div class="heading" id="headingErr">
+                                <h6 id="info" class="info-header">Looks like some of your details are missing! Kindly enter your employee number below to continue.<br></h6>
+                            </div>
+
+                            <div id="Search">
+                                <div class="row justify-content-center">
+                                    <div class="col-lg-4 mb-2">
+                                        <span class="placeholder float-left">Employee Number<span class="astColor">*</span></span>
+                                        <div class="input-block d-flex w-100">
+                                            <input type="text" class="w-100" id="txtEmployeeCode" name="EmpNumber" value="" onkeypress="allowNumbersOnly(event)" required>
+                                            <button type="button" class="btn btn-secondary submit-btn px-3 search-button" id="btnSearch">
+                                                <i class="fa fa-search"></i>
+                                            </button>
+                                        </div>
+                                        <span class="astColor d-none" id="emp-code-req-error">
+                                            Employee Code is required.
+                                        </span>
+                                        <span class="astColor inline_block" style="height: 24px;">
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="Form" class="mt-2">
+                                <form id="UserForm" method="post">
+                                    <div class="row">
+                                        <div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                            <input type="text" class="w-100" id="txtEmployeeFirstName" name="FirstName" value="" required autocomplete="off">
+                                            <span class="placeholder">Employee First Name<span class="astColor">*</span></span>
+                                        </div>
+                                        <div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                            <input type="text" class="w-100" id="txtEmployeeMiddleName" name="MiddleName" value="" required autocomplete="off">
+                                            <span class="placeholder">Employee Middle Name</span>
+                                        </div>
+                                        <div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                            <input type="text" class="w-100" id="txtEmployeeLastName" name="LastName" value="" required autocomplete="off">
+                                            <span class="placeholder">Employee Last Name<span class="astColor">*</span></span>
+                                        </div>
+                                        @*<div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                          <input type="text" class="w-100" id="txtEmployeeCode" name="EmployeeCode" value=""
+                                            onkeypress="allowNumbersOnly(event)" required>
+                                          <span class="placeholder">Employee Code<span class="astColor">*</span></span>
+                                        </div>*@
+                                        <div class="form-group col-md-4 col-lg-4 col-12 input-block autocompleteCC-div">
+                                            <input type="text" class="w-100" id="txtCostCenter" name="CostCenter" value="" required autocomplete="off">
+                                            <span class="placeholder">Cost Center<span class="astColor">*</span></span>
+                                        </div>
+                                        <div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                            <input type="text" class="w-100" id="txtEmailId" name="Email" value="" required autocomplete="off">
+                                            <span class="placeholder">Email ID<span class="astColor">*</span></span>
+                                        </div>
+                                        <div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                            <input type="text" class="w-100" name="PhoneNumber" id="txtContactNo" maxlength="10" value=""
+                                                   onkeypress="allowNumbersOnly(event)" required autocomplete="off" />
+                                            <span class="placeholder">Contact No</span>
+                                        </div>
+                                        <div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                            <input type="text" class="w-100" name="Department" id="txtDepartment" value="" onkeypress="alphaOnly(event)"
+                                                   required autocomplete="off" />
+                                            <span class="placeholder">Department<span class="astColor">*</span></span>
+                                        </div>
+                                        <div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                            <input type="text" class="w-100" name="SubDepartment" id="txtSubDepartment" value="" onkeypress="alphaOnly(event)"
+                                                   required autocomplete="off" />
+                                            <span class="placeholder">Sub Department<span class="astColor">*</span></span>
+                                        </div>
+                                        <div class="form-group col-md-4 col-lg-4 col-12 input-block autocompleteManagerEmpCode-div">
+                                            <input type="text" class="w-100" id="txtManagerEmployeeCode" name="ManagerEmployeeNumber" value=""
+                                                   onkeypress="allowNumbersOnly(event)" required autocomplete="off">
+                                            <span class="placeholder">Manager Employee Number<span class="astColor">*</span></span>
+                                        </div>
+                                    </div>
+                                    <div class="row justify-content-center">
+                                        <div id="add_to_me" class="header-list d-none" style="color:red;"></div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-12">
+                                            <h6 id="info" class="info-header"><b>Note: </b>If the above mentioned data is incorrect and you are not able to change it, kindly get in touch with the HR team to get the details updated.<br></h6>
+                                            <button id="btnUserUpdateSubmit" class="login-btn-submit mr-3">
+                                                <span id="UserUpdateSpinner" class="spinner-border spinner-border-sm d-none" role="status"
+                                                      aria-hidden="true"></span>
+                                                Submit
+                                            </button>
+                                            <button id="clearDetails" class="login-btn-reset">
+                                                Reset
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+
+
+                            <div id="SignUpForm" class="mt-2">
+                                <form id="SignUpUserForm" method="post">
+                                    <div class="row">
+                                        @*<div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                            <input type="text" class="w-100" id="txtEmployeeCodeSU" name="EmployeeCode" value=""
+                                                   onkeypress="allowNumbersOnly(event)" required>
+                                            <span class="placeholder">Employee Code<span class="astColor">*</span></span>
+                                        </div>*@
+                                        <div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                            <input type="text" class="w-100" id="txtEmployeeFirstNameSU" name="FirstName" value="" required autocomplete="off">
+                                            <span class="placeholder">Employee First Name<span class="astColor">*</span></span>
+                                        </div>
+                                        <div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                            <input type="text" class="w-100" id="txtEmployeeMiddleNameSU" name="MiddleName" value="" required autocomplete="off">
+                                            <span class="placeholder">Employee Middle Name</span>
+                                        </div>
+                                        <div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                            <input type="text" class="w-100" id="txtEmployeeLastNameSU" name="LastName" value="" required autocomplete="off">
+                                            <span class="placeholder">Employee Last Name<span class="astColor">*</span></span>
+                                        </div>
+
+                                        @*<div class="form-group col-md-4 col-lg-4 col-12 input-block autocompleteCC-div">
+                                            <input type="text" class="w-100" id="txtCostCenterSU" name="CostCenter" value="" required autocomplete="off">
+                                            <span class="placeholder">Cost Center<span class="astColor">*</span></span>
+                                        </div>*@
+                                        <div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                            <input type="text" class="w-100" id="txtEmailIdSU" name="Email" value="" required autocomplete="off">
+                                            <span class="placeholder">Email ID<span class="astColor">*</span></span>
+                                        </div>
+                                        <div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                            <input type="text" class="w-100" name="PhoneNumber" id="txtContactNoSU" maxlength="10" value=""
+                                                   onkeypress="allowNumbersOnly(event)" required autocomplete="off" />
+                                            <span class="placeholder">Contact No</span>
+                                        </div>
+                                        <div class="form-group col-md-4 col-lg-4 col-12 inputSelect">
+                                            <select class="form-control w-100" name="Department" id="txtDepartmentSU" onchange="checkSelect('txtDepartmentSU')" style="height: 45px;">
+                                                <option id="0" value="">Select Department</option>
+                                            </select>
+                                            <span class="placeholder">Department<span class="astColor">*</span></span>
+                                        </div>
+                                        <div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                            <select class="form-control cls_subcategory w-100" name="SubDepartment" id="txtSubDepartmentSU" onchange="checkSelect('txtSubDepartmentSU')" style="height: 45px;">
+                                                <option value="0">Sub Department</option>
+                                            </select>
+                                            <span class="placeholder">Sub Department<span class="astColor">*</span></span>
+                                        </div>
+                                        @*<div class="form-group col-md-4 col-lg-4 col-12 input-block autocompleteManagerEmpCode-div">
+                                            <input type="text" class="w-100" id="txtManagerEmployeeCodeSU" name="ManagerEmployeeNumber" value=""
+                                                   onkeypress="allowNumbersOnly(event)" required autocomplete="off">
+                                            <span class="placeholder">Manager Employee Number<span class="astColor">*</span></span>
+                                        </div>*@
+                                        <div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                            <input type="text" class="w-100" id="txtUserNameSU" name="UserName" value="" autocomplete="false"
+                                                   required>
+                                            <span class="placeholder">UserName<span class="astColor">*</span></span>
+                                        </div>
+                                        <div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                            <input type="text" class="w-100 password-input" id="txtPasswordSU" name="Password" value="" autocomplete="false"
+                                                   required>
+                                            <span class="placeholder">Password<span class="astColor">*</span></span>
+                                            <span class="password_icon toggle-password"><i class="fa fa-eye"></i></span>
+                                            @*<i class="password_icon toggle-password fa fa-eye"></i>*@
+                                        </div>
+                                    </div>
+                                    <div class="row justify-content-center">
+                                        <div id="add_to_me" class="header-list d-none" style="color:red;"></div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-12">
+                                            <h6 id="infoSU" class="info-header"><b>Note: </b>If the above mentioned data is incorrect and you are not able to change it, kindly get in touch with the HR team to get the details updated.<br></h6>
+                                            <button id="btnUserUpdateSubmitSU" class=" form-group login-btn-submit mr-3">
+                                                <span id="UserUpdateSpinnerSU" class="spinner-border spinner-border-sm d-none" role="status"
+                                                      aria-hidden="true"></span>
+                                                Submit
+                                            </button>
+                                            <button id="clearDetailsSU" class="form-group login-btn-reset" onclick="SignupClearData()">
+                                                Reset
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+
+
+                            <h6 id="SuccessSU" class="info-header d-none txt-success">Your data saved successfully, kindly get in touch with the HR team to get the details.<br></h6>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div><br><br>
+
+        <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" id="toast" style="z-index: 1;">
+            <div class="toast-header" id="toastHeaderDiv">
+                <strong class="mr-auto" id="toastTitle">Title</strong>
+                <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="toast-body">
+                <span id="toastMsg">
+                    Message here
+                </span>
+            </div>
+        </div>
+
+        <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" id="toast" style="z-index: 1;">
+            <div class="toast-header" id="toastHeaderDiv">
+                <strong class="mr-auto" id="toastTitle">Title</strong>
+                <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="toast-body">
+                <span id="toastMsg">
+                    Message here
+                </span>
+            </div>
+        </div>
+
+        <footer class="login_footer z100">
+            Copyright ©2023 Mobi | Version 1.0.0. All rights reserved.
+        </footer>
+
+    </div>
+    @* End *@
+
+</body>
+</html>
+
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalCenterTitle">Account Recovery</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group" autocomplete="off">
+                    <label for="exampleInputEmail">Email Id</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend bg-transparent login-icon-bg">
+                            <span class="input-group-text bg-transparent radius-5">
+                                <i class="mdi mdi-account-outline text-primary"></i>
+                            </span>
+                        </div>
+                        <input type="text" class="form-control border-left-0 bg-white" id="emailId" placeholder="Please enter valid email">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="validateEmail()" id="emailBtn">
+                    Reset Password
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    var routeUrl = "";
+
+    $("#email").on('keyup', function () {
+        $("#error").html('');
+        $("#error").attr('style', 'display:none');
+        //if (event.keyCode === 13) {
+        //    event.preventDefault();
+        //    document.getElementById("btnLogin").click();
+        //}
+    });
+
+    $("#password").on('keyup', function () {
+        $("#error").html('');
+        $("#error").attr('style', 'display:none');
+        if (event.keyCode === 13) {
+            event.preventDefault();
+            document.getElementById("btnLogin").click();
+        }
+    });
+
+    $("#btnLogin").on('click', function (e) {
+        //
+        $("#loginSpinner").removeClass('d-none');
+        var uName = $("#email").val();
+        var uPass = $("#password").val();
+        if (!uPass || !uName) {
+            $("#error").html('<b>Kindly fill both fields</b>');
+            $("#error").removeAttr('style');
+            return false;
+        }
+
+        $("#btnLogin").prop("disabled", true);
+        var model = { UserName: uName.toLowerCase(), Password: uPass, FormName: $("#formNameField").val() };
+        $.ajax({
+            url: '/Login/Login',
+            data: { loginDetails: model },
+            type: 'POST',
+            dataType: 'json',
+            success: (function (result) {
+
+                console.log(result);
+                if (result.Status == 200) {
+                    debugger;
+                    //$("#error").html('<b>' + result.Message + '</b>');
+                    $("#error").removeAttr("style");
+                    /*var url = "/Dashboard";*/
+                    $("#loginSpinner").addClass('d-none');
+                    $("#btnLogin").prop("disabled", false);
+                    window.location.replace(result.RouteUrl);
+                }
+                else if (result.Status == 201) {
+                    $('#UserDetail').removeClass('d-none');
+                    $('#Form').addClass('d-none');
+                    $('#LoginForm').addClass('d-none');
+                    $('#SignUpForm').addClass('d-none');
+                    var msgbox = document.getElementById("add_to_me");
+                    $('#msgbox').removeClass('d-none');
+                    msgbox.innerHTML = result.Message;
+                    routeUrl = result.RouteUrl;
+                }
+                else {
+                    $("#error").removeAttr("style");
+                    $("#loginSpinner").addClass('d-none');
+                    $("#btnLogin").prop("disabled", false);
+                    $("#error").html('<b>' + result.Message + '</b>');
+                }
+            }),
+            error: (function (e) {
+                $("#error").removeAttr("style");
+                $("#loginSpinner").addClass('d-none');
+                $("#btnLogin").prop("disabled", false);
+                $("#error").html('<b>There was an issue while signing-In. Please contact your administrator.</b>');
+            })
+        });
+    });
+
+
+    $(document).ready(function () {
+        enableDisableAllUserDetailsTextbox(true);
+        // run every 3s
+        setInterval('cycleImages()', 5000);
+        //$("#txtDepartmentSU").change(function () {
+        //
+        //    var DepId = $('#txtDepartmentSU option:selected').id();
+        //    GetSubDepartmentList(DepId);
+        //});
+        $("#SignUp").on('click', function (e) {
+
+            SignupClearData();
+            $('#UserDetail').removeClass('d-none');
+            $('#Form').addClass('d-none');
+            $('#LoginForm').addClass('d-none');
+            $('#Search').addClass('d-none');
+            $('#headingErr').addClass('d-none');
+            //$('#msgbox').removeClass('d-none');
+            $('#infoSU').addClass('d-none');
+            $('#SignUpForm').removeClass('d-none');
+        });
+        $(".toggle-password").click(function () {
+
+            var passwordInput = $($(this).siblings(".password-input"));
+            var icon = $($(this).find("i"));
+            if (passwordInput.attr("type") == "password") {
+                passwordInput.attr("type", "text");
+                icon.removeClass("fa-eye").addClass("fa-eye-slash");
+            } else {
+                passwordInput.attr("type", "password");
+                icon.removeClass("fa-eye-slash").addClass("fa-eye");
+            }
+        });
+        $('#txtDepartmentSU').on('change', function (e) {
+            var DepId = $(this).children(":selected").attr("id");
+            var Depval = $('#txtDepartmentSU option:selected').val();
+
+            GetSubDepartmentList(DepId);
+            $('#txtSubDepartmentSU option[value="0"]').attr("selected", "selected").change();
+        });
+
+    });
+
+    function Onclick() {
+        SignupClearData();
+        $('#UserDetail').removeClass('d-none');
+        $('#Form').addClass('d-none');
+        $('#LoginForm').addClass('d-none');
+        $('#Search').addClass('d-none');
+        $('#headingErr').addClass('d-none');
+        $('#infoSU').addClass('d-none');
+        $('#SignUpForm').removeClass('d-none');
+    }
+    function SignupClearData() {
+
+        $("#txtEmployeeCodeSU").val("");
+        $("#txtEmployeeFirstNameSU").val("");
+        $("#txtEmployeeMiddleNameSU").val("");
+        $("#txtEmployeeLastNameSU").val("");
+        //$('#txtCostCenterSU').val("");
+        $("#txtEmailIdSU").val("");
+        $("#txtContactNoSU").val("");
+        $("#txtSubDepartmentSU").val("");
+        //$('#txtManagerEmployeeCodeSU').val("");
+        $("#txtUserNameSU").val("");
+        $("#txtPasswordSU").val("");
+        $('#txtEmployeeCodeSU').prop('readonly', false);
+        $('#txtEmployeeFirstNameSU').prop('readonly', false);
+        $('#txtEmployeeMiddleNameSU').prop('readonly', false);
+        $('#txtEmployeeLastNameSU').prop('readonly', false);
+        //$('#txtCostCenterSU').prop('readonly', false);
+        $('#txtEmailIdSU').prop('readonly', false);
+        $('#txtContactNoSU').prop('readonly', false);
+        $('#txtDepartmentSU').prop('readonly', false);
+        $('#txtSubDepartmentSU').prop('readonly', false);
+        //$('#txtManagerEmployeeCodeSU').prop('readonly', false);
+        $('#txtUserNameSU').prop('readonly', false);
+        $('#txtPasswordSU').prop('readonly', false);
+
+        $("#txtPasswordSU").attr("type", "password");
+        $("i.fa.fa-eye").removeClass("fa-eye-slash").addClass("fa-eye");
+        GetDepartmentList();
+        //GetSubDepartmentList();
+    }
+
+    function GetDepartmentList() {
+
+        $.ajax({
+            url: "/Login/GetDepartmentList",
+            dataType: "json",
+            success: function (data) {
+
+                console.log(data);
+                var s = '<option value="0" class="">Select Department</option>';
+
+                for (var i = 0; i < data.length; i++) {
+                    s += '<option id="' + data[i].DivId + '" value="' + data[i].DivName + '">' + data[i].DivName + '</option>';
+                }
+                $("#txtDepartmentSU").html(s);
+                $('#txtDepartmentSU option[value="0"]').attr("selected", "selected").change();
+            },
+            error: function (data) {
+                //code
+            }
+        });
+    }
+    function GetSubDepartmentList(DepId) {
+        $.ajax({
+            url: "/Login/GetSubDepartmentList",
+            dataType: "json",
+            cache: false,
+            async: true,
+            data: {
+                DepId: DepId
+            },
+            success: function (data) {
+                console.log(data);
+                var s = '<option value="0" class="">Sub Department</option>';
+
+                for (var i = 0; i < data.length; i++) {
+                    s += '<option value="' + data[i].DeptName + '">' + data[i].DeptName + '</option>';
+                }
+                $("#txtSubDepartmentSU").html(s);
+                $('#txtSubDepartmentSU option[value="0"]').attr("selected", "selected").change();
+            },
+            error: function (data) {
+                //code
+            }
+        });
+    }
+    function cycleImages() {
+        //
+        var $active = $('#cycler .active');
+        var $next = ($active.next().length > 0) ? $active.next() : $('#cycler img:first');
+        $next.css('z-index', 2);//move the next image up the pile
+        $active.fadeOut(2500, function () {//fade out the top image
+            $active.css('z-index', 1).show().removeClass('active');//reset the z-index and unhide the image
+            $next.css('z-index', 3).addClass('active');//make the next image the top one
+        });
+    }
+
+    window.onload = function () {
+        // Opera 8.0+
+        //var isOpera = (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
+
+        // Firefox 1.0+
+        //var isFirefox = typeof InstallTrigger !== 'undefined';
+
+        // Safari 3.0+ "[object HTMLElementConstructor]"
+        //var isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification));
+
+        // Internet Explorer 6-11
+        var isIE = false || !!document.documentMode;
+
+        // Edge 20+
+        //var isEdge = !isIE && !!window.StyleMedia;
+
+        //// Chrome 1 - 71
+        //var isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
+
+        // Blink engine detection
+        //var isBlink = (isChrome || isOpera) && !!window.CSS;
+        if (isIE) {
+            var ele = document.getElementById('browser-compatible-warning');
+            ele.style.display = "block";
+            document.getElementById("btnLogin").disabled = true;//
+            document.getElementById("warning").innerText = "Kindly use the Microsoft Edge browser";
+            document.getElementById("warning").style.display = "block";
+            /*$('#browser-compatible-warning').css('display', 'block');*/
+        }
+    }
+    function allowNumbersOnly(e) {
+        var code = (e.which) ? e.which : e.keyCode;
+        if (code > 31 && (code < 48 || code > 57)) {
+            e.preventDefault();
+        }
+    }
+
+    function alphaOnly(e) {
+        var key = e.keyCode;
+        if (key > 32 && (key < 65 || key > 122 || key == 91 || key == 92 || key == 93 || key == 94 || key == 95 || key == 96)) {
+            e.preventDefault();
+        }
+    }
+
+    $("#txtCostCenter").autocomplete({
+        source: function (request, response) {
+            $.ajax
+                ({
+                    url: "/List/GetCostCenterDetails",
+                    dataType: "json",
+                    cache: false,
+                    async: true,
+                    data: {
+                        searchText: $("#txtCostCenterSU").val()
+                    },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            return { label: item, value: item, raw: item };
+                        }));
+                    },
+                    error: (function (data) {
+                        failureModal();
+                    })
+                })
+        },
+        minLength: 2,
+        change: function (event, ui) {
+            if (!ui.item) {
+                $(this).val('');
+                DisplayAlert('error', 'Warning', 'Invalid CostCenter');
+            }
+        }
+    });
+
+    $("#txtOtherNewCostcenterCode").autocomplete("option", "appendTo", ".autocompleteCC-div");
+
+    $('#btnSearch').on('click', function (e) {
+        e.preventDefault();
+        var empCode = $('#txtEmployeeCode').val();
+        var error = $('#emp-code-req-error');
+        if (!empCode) {
+            error.html('Employee Code is required.');
+            error.removeClass('d-none');
+            return;
+        }
+        error.addClass('d-none');
+        SetAllTextBoxToBlankVal();
+        $.ajax({
+            url: "/Login/GetUserDataByEmpCode",
+            dataType: "json",
+            cache: false,
+            async: true,
+            data: {
+                EmpNumber: empCode
+            },
+            success: function (data) {
+                enableDisableAllUserDetailsTextbox(false);
+                $('#Form').removeClass('d-none');
+                if (data.Status === 200) {
+                    var userData = data.Model;
+                    $('#txtEmployeeCode').prop('readonly', true);
+                    if (userData.FirstName) {
+                        $('#txtEmployeeFirstName').val(userData.FirstName).change();
+                        $('#txtEmployeeFirstName').prop('readonly', true);
+                    }
+                    else {
+                        $('#txtEmployeeFirstName').removeAttr('readonly');
+                    }
+                    if (userData.MiddleName) {
+                        $('#txtEmployeeMiddleName').val(userData.MiddleName).change();
+                        $('#txtEmployeeMiddleName').prop('readonly', true);
+                    }
+                    else {
+                        $('#txtEmployeeMiddleName').removeAttr('readonly');
+                    }
+                    if (userData.LastName) {
+                        $('#txtEmployeeLastName').val(userData.LastName).change();
+                        $('#txtEmployeeLastName').prop('readonly', true);
+                    }
+                    else {
+                        $('#txtEmployeeLastName').removeAttr('readonly');
+                    }
+                    if (userData.CostCenter) {
+                        $('#txtCostCenter').val(userData.CostCenter).change();
+                        $('#txtCostCenter').prop('readonly', true);
+                    }
+                    else {
+                        $('#txtCostCenter').removeAttr('readonly');
+                    }
+                    if (userData.Email) {
+                        $('#txtEmailId').val(userData.Email).change();
+                        $('#txtEmailId').prop('readonly', true);
+                    }
+                    else {
+                        $('#txtEmailId').removeAttr('readonly');
+                    }
+                    if (userData.PhoneNumber) {
+                        $('#txtContactNo').val(userData.PhoneNumber).change();
+                        $('#txtContactNo').prop('readonly', true);
+                    }
+                    else {
+                        $('#txtContactNo').removeAttr('readonly');
+                    }
+                    if (userData.Department) {
+                        $('#txtDepartment').val(userData.Department).change();
+                        $('#txtDepartment').prop('readonly', true);
+                    }
+                    else {
+                        $('#txtDepartment').removeAttr('readonly');
+                    }
+                    if (userData.SubDepartment) {
+                        $('#txtSubDepartment').val(userData.SubDepartment).change();
+                        $('#txtSubDepartment').prop('readonly', true);
+                    }
+                    else {
+                        $('#txtSubDepartment').removeAttr('readonly');
+                    }
+                    if (userData.ManagerEmployeeNumber) {
+                        $('#txtManagerEmployeeCode').val(userData.ManagerEmployeeNumber).change();
+                        $('#txtManagerEmployeeCode').prop('readonly', true);
+                    }
+                    else {
+                        $('#txtManagerEmployeeCode').removeAttr('readonly');
+                    }
+                }
+                else if (data.Status === 404) {
+                    //$('#info').html(data.Message + '. Don\'t worry check if the Employee Code is correct or fill the details and submit the form');
+                    //$('#emp-code-req-error').html(data.Message);
+                    $('#add_to_me').html('<b>' + data.Message + '</b>');
+                    $("#add_to_me").removeClass('d-none');
+                    //error.removeClass('d-none');
+                    enableDisableAllUserDetailsTextbox(false);
+                    SetAllTextBoxToBlankVal();
+                }
+                else if (data.Status === 406) {
+                    //$('#info').html(data.Message + '. Don\'t worry check if the Employee Code is correct or fill the details and submit the form');
+                    $('#add_to_me').html(data.Message);
+                    $("#add_to_me").removeClass('d-none');
+                    //error.removeClass('d-none');
+                    $('#Form').addClass('d-none');
+                    enableDisableAllUserDetailsTextbox(true);
+                    SetAllTextBoxToBlankVal();
+                }
+            }
+        });
+    });
+
+    function SetAllTextBoxToBlankVal(EmpCodeBlank = false) {
+        var arr = ['txtEmployeeFirstName', 'txtEmployeeMiddleName', 'txtEmployeeLastName', 'txtCostCenter',
+            'txtEmailId', 'txtContactNo', 'txtDepartment', 'txtSubDepartment', 'txtManagerEmployeeCode'];
+
+        arr.forEach(x => $('#' + x).val(''));
+        if (EmpCodeBlank) {
+            $('#txtEmployeeCode').val('').change();
+        }
+    }
+
+    function enableDisableAllUserDetailsTextbox(status, EmpCodeDisable = false) {
+        status = status ? 'readonly' : '';
+        $('#txtEmployeeFirstName').prop('readonly', status);
+        $('#txtEmployeeMiddleName').prop('readonly', status);
+        $('#txtEmployeeLastName').prop('readonly', status);
+        $('#txtCostCenter').prop('readonly', status);
+        $('#txtEmailId').prop('readonly', status);
+        $('#txtContactNo').prop('readonly', status);
+        $('#txtDepartment').prop('readonly', status);
+        $('#txtSubDepartment').prop('readonly', status);
+        $('#txtManagerEmployeeCode').prop('readonly', status);
+        if (EmpCodeDisable) {
+            $('#Form').addClass('d-none');
+            $('#txtEmployeeCode').prop('readonly', status);
+        }
+    }
+    $('#btnUserUpdateSubmitSU').on('click', function (e) {
+        
+        var errorCount = 0;
+        e.preventDefault();
+
+        //var data = $('#txtEmployeeCodeSU').val();
+        //if (!data) {
+        //    AddError("txtEmployeeCodeSU", '', errorCount);
+        //    errorCount++;
+        //}
+        //else
+        //    RemoveError("txtEmployeeCodeSU");
+
+        data = $('#txtEmployeeFirstNameSU').val();
+        if ((data == '' || data.trim().length == 0) || !data) {
+            AddError("txtEmployeeFirstNameSU", '', errorCount);
+            errorCount++;
+        }
+        else
+            RemoveError("txtEmployeeFirstNameSU");
+
+        //data = $('#txtEmployeeMiddleName').val();
+        //if (!data) {
+        //    AddError("txtEmployeeMiddleName", '', errorCount);
+        //    errorCount++;
+        //}
+        //else
+        //    RemoveError("txtEmployeeMiddleName");
+
+        data = $('#txtEmployeeLastNameSU').val();
+        if ((data == '' || data.trim().length == 0) || !data) {
+            AddError("txtEmployeeLastNameSU", '', errorCount);
+            errorCount++;
+        }
+        else
+            RemoveError("txtEmployeeLastNameSU");
+
+        //data = $('#txtCostCenterSU').val();
+        //if (!data) {
+        //    AddError("txtCostCenterSU", '', errorCount);
+        //    errorCount++;
+        //}
+        //else
+        //    RemoveError("txtCostCenterSU");
+
+        data = $('#txtEmailIdSU').val();
+        if ((data == '' || data.trim().length == 0) || !data) {
+            AddError("txtEmailIdSU", '', errorCount);
+            errorCount++;
+        }
+        else
+            RemoveError("txtEmailIdSU");
+
+        //data = $('#txtContactNo').val();
+        //if (!data) {
+        //    AddError("txtContactNo", '', errorCount);
+        //    errorCount++;
+        //}
+        //else
+        //    RemoveError("txtContactNo");
+        
+        data = $('#txtDepartmentSU').val();
+        if ((data == 0) || !data) {
+            AddError("txtDepartmentSU", '', errorCount);
+            errorCount++;
+        }
+        else
+            RemoveError("txtDepartmentSU");
+
+        data = $('#txtSubDepartmentSU').val();
+        if ((data == 0) || !data) {
+            AddError("txtSubDepartmentSU", '', errorCount);
+            errorCount++;
+        }
+        else
+            RemoveError("txtSubDepartmentSU");
+
+        //data = $('#txtManagerEmployeeCodeSU').val();
+        //if (!data) {
+        //    AddError("txtManagerEmployeeCodeSU", '', errorCount);
+        //    errorCount++;
+        //}
+        //else
+        //    RemoveError("txtManagerEmployeeCodeSU");
+        data = $('#txtUserNameSU').val();
+        if ((data == '' || data.trim().length == 0) || !data) {
+            AddError("txtUserNameSU", '', errorCount);
+            errorCount++;
+        }
+        else
+            RemoveError("txtUserNameSU");
+        data = $('#txtPasswordSU').val();
+        if ((data == '' || data.trim().length == 0) || !data) {
+            AddError("txtPasswordSU", '', errorCount);
+            errorCount++;
+        }
+        else
+            RemoveError("txtPasswordSU");
+
+        data = validateEmailforSignUp();
+        if (!data) {
+            AddError("txtEmailIdSU", '', errorCount);
+            errorCount++;
+        }
+        else
+            RemoveError("txtEmailIdSU");
+
+
+        if (true) {
+            var arr = ['txtEmployeeFirstNameSU', 'txtEmployeeMiddleNameSU',
+                'txtEmployeeLastNameSU', 'txtEmailIdSU', 'txtContactNoSU',
+                'txtDepartmentSU', 'txtSubDepartmentSU', 'txtUserNameSU', 'txtPasswordSU'];
+            var isAnyReadOnly = arr.filter(id => $("#" + id).is('[readonly]') && !$("#" + id).val());
+            if (isAnyReadOnly && isAnyReadOnly.length === arr.length) {
+                $("#add_to_me").html('<b>Please search and fill all required fields to continue.</b>');
+                $("#add_to_me").removeClass('d-none');
+                $("#headingErr").removeClass('d-none');
+                return;
+            }
+        }
+        if (errorCount > 0) {
+            $("#add_to_me").html('<b>Please fill all required fields to continue.</b>');
+            $("#add_to_me").removeClass('d-none');
+            $("#headingErr").removeClass('d-none');
+            return;
+        }
+
+        var serializedArray = $('#SignUpUserForm').serializeArray();
+        var model = {};
+        serializedArray.forEach(
+            x => model[x.name] = x.value
+        );
+        var empNumber = $("#txtEmployeeCode").val();
+        model['EmpNumber'] = empNumber;
+
+        $("#UserUpdateSpinnerSU").removeClass('d-none');
+        $("#add_to_me").addClass('d-none');
+        //$("#headingErr").addClass('d-none');
+        $("#btnUserUpdateSubmitSU").prop("disabled", true);
+
+        $.ajax({
+            url: `/Login/SignUpUserDetails`,
+            data: model,
+            //body: JSON.stringify({ model }),
+            type: 'POST',
+            //type: 'PATCH',
+            dataType: 'json',
+            success: (function (result) {
+                ;
+                if (result.Status == 200) {
+                    //$("#add_to_me").html('<b>' + result.Message + '</b>');
+                    //$("#error").removeAttr("style");
+
+                    swal({
+                        title: "Success!",
+                        text: "Your data saved successfully, kindly get in touch with the HR team to get the details.",
+                        type: "success"
+                    }).then(function () {
+                        $("#UserUpdateSpinner").addClass('d-none');
+                        $("#SignUpUserForm").addClass('d-none');
+                        $("#SuccessSU").removeClass('d-none');
+                        $("#btnUserUpdateSubmit").prop("disabled", false);
+
+                        window.location.replace(routeUrl);
+                    });
+                    //window.location.replace(routeUrl);
+                } else {
+                    swal({
+                        title: "Error!",
+                        text: result.Message,
+                        type: "error"
+                    }).then(function () {
+                        $("#UserUpdateSpinner").addClass('d-none');
+                        //$("#SignUpUserForm").addClass('d-none');
+                        //  $("#SuccessSU").removeClass('d-none');
+                        $("#btnUserUpdateSubmit").prop("disabled", false);
+                        $("#btnUserUpdateSubmitSU").prop("disabled", false);
+                        $("#UserUpdateSpinnerSU").addClass('d-none');
+                    });
+                }
+
+            }),
+            error: (function (e) {
+                //$("#error").removeAttr("style");
+                $("#UserUpdateSpinner").addClass('d-none');
+                $("#btnUserUpdateSubmit").prop("disabled", false);
+                $('#add_to_me').html('<b>' + result.Message + '</b>');
+                $("#add_to_me").removeClass('d-none');
+                $("#headingErr").removeClass('d-none');
+                //$("#error").html('<b>There was an issue while signing-In. Please contact your administrator.</b>');
+            })
+        });
+    });
+    $('#btnUserUpdateSubmit').on('click', function (e) {
+        ;
+        var errorCount = 0;
+        e.preventDefault();
+
+        var data = $('#txtEmployeeCode').val();
+        if (!data) {
+            AddError("txtEmployeeCode", '', errorCount);
+            errorCount++;
+        }
+        else
+            RemoveError("txtEmployeeCode");
+
+        data = $('#txtEmployeeFirstName').val();
+        if (!data) {
+            AddError("txtEmployeeFirstName", '', errorCount);
+            errorCount++;
+        }
+        else
+            RemoveError("txtEmployeeFirstName");
+
+        //data = $('#txtEmployeeMiddleName').val();
+        //if (!data) {
+        //    AddError("txtEmployeeMiddleName", '', errorCount);
+        //    errorCount++;
+        //}
+        //else
+        //    RemoveError("txtEmployeeMiddleName");
+
+        data = $('#txtEmployeeLastName').val();
+        if (!data) {
+            AddError("txtEmployeeLastName", '', errorCount);
+            errorCount++;
+        }
+        else
+            RemoveError("txtEmployeeLastName");
+
+        data = $('#txtCostCenter').val();
+        if (!data) {
+            AddError("txtCostCenter", '', errorCount);
+            errorCount++;
+        }
+        else
+            RemoveError("txtCostCenter");
+
+        data = $('#txtEmailId').val();
+        if (!data) {
+            AddError("txtEmailId", '', errorCount);
+            errorCount++;
+        }
+        else
+            RemoveError("txtEmailId");
+
+        //data = $('#txtContactNo').val();
+        //if (!data) {
+        //    AddError("txtContactNo", '', errorCount);
+        //    errorCount++;
+        //}
+        //else
+        //    RemoveError("txtContactNo");
+
+        data = $('#txtDepartment').val();
+        if (!data) {
+            AddError("txtDepartment", '', errorCount);
+            errorCount++;
+        }
+        else
+            RemoveError("txtDepartment");
+
+        data = $('#txtSubDepartment').val();
+        if (!data) {
+            AddError("txtSubDepartment", '', errorCount);
+            errorCount++;
+        }
+        else
+            RemoveError("txtSubDepartment");
+
+        data = $('#txtManagerEmployeeCode').val();
+        if (!data) {
+            AddError("txtManagerEmployeeCode", '', errorCount);
+            errorCount++;
+        }
+        else
+            RemoveError("txtManagerEmployeeCode");
+
+
+        if ($('#txtEmployeeCode').val()) {
+            var arr = ['txtEmployeeFirstName', 'txtEmployeeMiddleName',
+                'txtEmployeeLastName', 'txtCostCenter', 'txtEmailId', 'txtContactNo',
+                'txtDepartment', 'txtSubDepartment', 'txtManagerEmployeeCode'];
+            var isAnyReadOnly = arr.filter(id => $("#" + id).is('[readonly]') && !$("#" + id).val());
+            if (isAnyReadOnly && isAnyReadOnly.length === arr.length) {
+                $("#add_to_me").html('<b>Please search and fill all required fields to continue.</b>');
+                $("#add_to_me").removeClass('d-none');
+                $("#headingErr").removeClass('d-none');
+                return;
+            }
+        }
+        if (errorCount > 0) {
+            $("#add_to_me").html('<b>Please fill all required fields to continue.</b>');
+            $("#add_to_me").removeClass('d-none');
+            $("#headingErr").removeClass('d-none');
+            return;
+        }
+
+        var serializedArray = $('#UserForm').serializeArray();
+        var model = {};
+        serializedArray.forEach(
+            x => model[x.name] = x.value
+        );
+        var empNumber = $("#txtEmployeeCode").val();
+        model['EmpNumber'] = empNumber;
+
+        $("#UserUpdateSpinner").removeClass('d-none');
+        $("#add_to_me").addClass('d-none');
+        //$("#headingErr").addClass('d-none');
+        $("#btnUserUpdateSubmit").prop("disabled", true);
+
+        $.ajax({
+            url: `/Login/UpdateUserDetails`,
+            data: model,
+            //body: JSON.stringify({ model }),
+            type: 'POST',
+            //type: 'PATCH',
+            dataType: 'json',
+            success: (function (result) {
+                if (result.Status == 200) {
+                    //$("#add_to_me").html('<b>' + result.Message + '</b>');
+                    //$("#error").removeAttr("style");
+                    $("#UserUpdateSpinner").addClass('d-none');
+                    $("#btnUserUpdateSubmit").prop("disabled", false);
+                    window.location.replace(routeUrl);
+                }
+                else if (result.Status == 201) {
+                    $('#Form').addClass('d-none');
+                    $('#clearDetails').click();
+                    $("#UserUpdateSpinner").addClass('d-none');
+                    $("#btnUserUpdateSubmit").prop("disabled", false);
+                    $('#add_to_me').html('<b>' + result.Message + '</b>');
+                    $("#add_to_me").removeClass('d-none');
+                    $("#headingErr").removeClass('d-none');
+                }
+                else if (result.Status == 401) {
+                    $("#UserUpdateSpinner").addClass('d-none');
+                    $("#btnUserUpdateSubmit").prop("disabled", false);
+                    $('#add_to_me').html('<b>' + result.Message + '</b>');
+                    $("#add_to_me").removeClass('d-none');
+                    $("#headingErr").removeClass('d-none');
+                    $('#UserDetail').removeClass('d-none');
+                    $('#LoginForm').addClass('d-none');
+                    $("#error").removeAttr("style");
+                    $("#loginSpinner").addClass('d-none');
+                    $("#btnLogin").prop("disabled", false);
+                    $("#error").html('<b>' + result.Message + '</b>');
+                }
+                else {
+                    //$("#error").removeAttr("style");
+                    $("#UserUpdateSpinner").addClass('d-none');
+                    $("#btnUserUpdateSubmit").prop("disabled", false);
+                    $('#add_to_me').html('<b>' + result.Message + '</b>');
+                    $("#add_to_me").removeClass('d-none');
+                    $("#headingErr").removeClass('d-none');
+                    //$("#error").html('<b>' + result.Message + '</b>');
+                }
+            }),
+            error: (function (e) {
+                //$("#error").removeAttr("style");
+                $("#UserUpdateSpinner").addClass('d-none');
+                $("#btnUserUpdateSubmit").prop("disabled", false);
+                $('#add_to_me').html('<b>' + result.Message + '</b>');
+                $("#add_to_me").removeClass('d-none');
+                $("#headingErr").removeClass('d-none');
+                //$("#error").html('<b>There was an issue while signing-In. Please contact your administrator.</b>');
+            })
+        });
+    });
+
+    $('#clearDetails').on('click', function (e) {
+        e.preventDefault();
+        SetAllTextBoxToBlankVal(true);
+        enableDisableAllUserDetailsTextbox(false, true);
+        if (!$('#add_to_me').hasClass('d-none')) {
+            $('#add_to_me').addClass('d-none');
+        }
+    });
+
+    function DisplayAlert(alertType = 'info', title = 'Info', message = '', timeInMs = 8000) {
+        var defaultClass = 'toast-header toast-header-';
+
+        if (alertType == 'warning') {
+            $("#toastHeaderDiv").attr('class', defaultClass + 'warning');
+        }
+        else if (alertType == 'error') {
+            $("#toastHeaderDiv").attr('class', defaultClass + 'error')
+        }
+        else if (alertType == 'info') {
+            $("#toastHeaderDiv").attr('class', defaultClass + 'info')
+        }
+        else if (alertType == 'success') {
+            $("#toastHeaderDiv").attr('class', defaultClass + 'success')
+        }
+        else if (alertType == 'failure') {
+            $("#toastHeaderDiv").attr('class', defaultClass + 'failure')
+        }
+
+        $("#toastTitle").text(title);
+        $("#toastMsg").text(message);
+        $('#toast').toast({
+            delay: timeInMs
+        });
+        /* $('#toast').toast('show');*/
+
+        $('#toast').toast('hide').css("z-index", "auto");
+        /*$('#toast').removeClass('d-none');*/
+        $('#toast').toast('show').css("z-index", "99999");
+    }
+
+    $("#txtManagerEmployeeCode").autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                url: "/List/GetEmployeeDetailsByEmpNumber",
+                dataType: "json",
+                cache: false,
+                async: true,
+                data: {
+                    EmpNum: $("#txtManagerEmployeeCode").val()
+                },
+                success: function (data) {
+                    console.log(data);
+                    response($.map(data, function (item) {
+                        return { label: item.FirstName, value: item.EmpNumber, raw: item };
+                    }));
+                }
+            });
+        },
+        search: function (event, ui) {
+            var value = $("#txtManagerEmployeeCode").val();
+            if (value.length < 2) {
+                event.preventDefault();
+            }
+        },
+        min_length: 2,
+        change: function (event, ui) {
+            if (!ui.item) {
+                $(this).val('');
+                DisplayAlert('error', 'Warning', 'Invalid Manager Employee Code');
+            }
+        },
+        delay: 0
+    });
+
+    $().autocomplete("option", "appendTo", ".autocompleteManagerEmpCode-div");
+
+    function validateEmail() {
+
+        var validationFailed = true;
+
+        var emailId = $("#emailId").val();
+        validationFailed = ValidateEmailID(emailId, "emailId");
+        if (!validationFailed)
+            return;
+
+        //AddBusySpinner('emailBtn', 'Validating');
+
+        $.ajax({
+            url: '/Login/validateEmail',
+            type: 'post',
+            data: { emailId: emailId },
+            dataType: 'json',
+            success: function (data) {
+                if (data.Status == 200) {
+                    swal({
+                        title: "Success!",
+                        text: "The new password has been successfully mailed to your Email Id",
+                        type: "success"
+                    }).then(function () {
+                        $('#exampleModalCenter').modal('hide');
+                    });
+                    $("#emailBtn").text('Reset Password');
+                    // RemoveSpinner('spinner');
+                    $('#exampleModalCenter').modal('hide');
+                }
+                else {
+                    swal({
+                        title: "Warning!",
+                        text: "Please enter valid Email-id or contact to HR",
+                        type: "warning"
+                    }).then(function () {
+                        $('#exampleModalCenter').modal('hide');
+                    });
+                }
+
+            },
+            failure: function (data) {
+                swal({
+                    title: "Error!",
+                    text: data.message,
+                    type: "error"
+                })
+                $("#emailBtn").text('Reset Password');
+                // RemoveSpinner('spinner');
+
+            },
+            error: function (data) {
+                swal({
+                    title: "Error!",
+                    text: data.message,
+                    type: "error"
+                })
+                $("#emailBtn").text('Reset Password');
+                //RemoveSpinner('spinner');
+                //DisplayAlert('error', 'Error', data);
+            }
+        });
+    }
+    function validateEmailforSignUp() {
+
+        var validationFailed = true;
+
+        var emailId = $("#txtEmailIdSU").val();
+        validationFailed = ValidateEmailID(emailId, "txtEmailIdSU");
+        if (validationFailed)
+            return validationFailed;
+        else
+            return false;
+    }
+
+    function ValidateEmailID(fieldValue, fieldId) {
+        var pattern = /[a-zA-Z0-9_\.\+-]+@@[a-zA-Z0-9-]+\.[a-zA-Z0-9-\.]+/;
+        if (String(fieldValue).match(pattern))
+            return true;
+        DisplayAlert('warning', 'Warning', 'Invalid Email Address', 5000);
+        $("#" + fieldId).focus();
+        return false;
+    }
+
+    function checkSelect(id) {
+
+        if ($('#' + id).val() != '') {
+            $('#' + id).addClass('spanUpperSide');
+        }
+    }
+</script>
+

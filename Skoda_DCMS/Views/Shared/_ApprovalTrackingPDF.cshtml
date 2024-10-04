@@ -1,0 +1,62 @@
+﻿@model Skoda_DCMS.Models.PdfParameterModel
+
+@{
+    var approverList = Model.ApproverData;
+    List<int> ApproverLevelCompleted = new List<int>();//= approverList.Any(x => x.Logic == "OR") ? approverList.Distinct(x => x.level) :;
+}
+<tr>
+    <td>
+        @(Model.RequesterData[0].Author.Title ?? " ")
+    </td>
+    @foreach (var approver in Model.ApproverData.Where(x=>x.Level != 0))
+    {
+        if (approver.Logic == "OR")
+        {
+            var level = approver.Level;
+            if (!ApproverLevelCompleted.Contains(level))
+            {
+                ApproverLevelCompleted.Add(level);
+                var ORLogicApprover = Model.ApproverData.Where(x => x.Level == level && x.ApproverStatus != "Pending").FirstOrDefault();
+                <td>@(ORLogicApprover != null ? ORLogicApprover.UserName ?? "" : "")</td>
+            }
+        }
+        else
+        {
+            <td>@(approver.ApproverStatus != "Pending" ? approver.UserName ?? "" : "")</td>
+        }
+    }
+</tr>
+<tr>
+    <td>
+        @("Submitted on " + Convert.ToDateTime(Model.RequesterData[0].FormId.Created).ToShortDateString() + " "
+                                                    + Convert.ToDateTime(Model.RequesterData[0].FormId.Created).ToShortTimeString() ?? "")
+    </td>
+    @{  ApproverLevelCompleted = new List<int>(); }
+    @foreach (var approver in Model.ApproverData.Where(x=>x.Level != 0))
+    {
+        if (approver.Logic == "OR")
+        {
+            var level = approver.Level;
+            if (!ApproverLevelCompleted.Contains(level))
+            {
+                ApproverLevelCompleted.Add(level);
+                var ORLogicApprover = Model.ApproverData.Where(x => x.Level == level && x.ApproverStatus != "Pending").FirstOrDefault();
+                <td>
+                    @(ORLogicApprover != null
+                        ? ORLogicApprover.ApproverStatus + " on " + " " + Convert.ToDateTime(ORLogicApprover.Modified).ToShortDateString()
+                            + " " + Convert.ToDateTime(ORLogicApprover.Modified).AddHours(5.5).ToShortTimeString()
+                        : "")
+                </td>
+            }
+        }
+        else
+        {
+            <td>
+                @(approver.ApproverStatus != "Pending"
+                    ? approver.ApproverStatus + " on " + " " + Convert.ToDateTime(approver.Modified).ToShortDateString()
+                        + " " + Convert.ToDateTime(approver.Modified).AddHours(5.5).ToShortTimeString()
+                    : "")
+            </td>
+        }
+    }
+</tr>

@@ -1,0 +1,546 @@
+﻿@model IEnumerable<Skoda_DCMS.Models.ApprovalDataModel>
+
+<style type="text/css">
+    .curPointer {
+        cursor: pointer;
+    }
+
+    .publishBtn {
+        line-height: 100% !important;
+    }
+
+    .commentSection {
+        max-height: 250px;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    .approvalTracking table th {
+        vertical-align: middle !important;
+    }
+
+    .commentSection .mb-3 {
+        word-break: break-all;
+    }
+
+    .smallText {
+        font-size: 12px;
+    }
+
+    .approvalTracking table th:nth-child(1) {
+        width: 28% !important;
+    }
+
+    .table td {
+        border: none;
+    }
+</style>
+
+@{
+    var appList = Model.OrderBy(x => x.Level);
+    var appGroups = appList.GroupBy(x => x.Level);
+    var isExtraDetails = appList.Any(x => !string.IsNullOrEmpty(x.ExtraDetails));
+}
+
+@functions{
+    public List<Skoda_DCMS.Models.ApprovalDataModel> GetApprovers(List<Skoda_DCMS.Models.ApprovalDataModel> appList, Skoda_DCMS.Models.ApprovalDataModel item)
+    {
+        var tempList = new List<Skoda_DCMS.Models.ApprovalDataModel>();
+        if (item.RelationWith == 0)
+        {
+            tempList.Add(item);
+            var list = GetSubApprovers(appList, item);
+            if (list != null && list.Count() > 0)
+                tempList.AddRange(list);
+        }
+        return tempList;
+    }
+
+    public List<Skoda_DCMS.Models.ApprovalDataModel> GetSubApprovers(List<Skoda_DCMS.Models.ApprovalDataModel> appList, Skoda_DCMS.Models.ApprovalDataModel approver)
+    {
+        var tempList = new List<Skoda_DCMS.Models.ApprovalDataModel>();
+        var a = appList.Where(x => x.RelationWith == approver.RelationId && x.RelationWith != 0);
+        if (a != null && a.Count() > 0)
+        {
+            foreach (var item in a)
+            {
+                tempList.Add(item);
+                var list = GetSubApprovers(appList, item);
+                if (list != null && list.Count() > 0)
+                    tempList.AddRange(list);
+            }
+        }
+        return tempList;
+    }
+
+    //Skoda_DCMS.Models.ApprovalDataModel GetApprovalStatus(List<Skoda_DCMS.Models.ApprovalDataModel> currentLevelApprovers, Skoda_DCMS.Models.ApprovalDataModel currentApprover = null)
+    //{
+    //    if (currentApprover == null)
+    //    {
+    //        currentApprover = new Skoda_DCMS.Models.ApprovalDataModel();
+    //        currentApprover.RelationId = 0;
+    //    }
+    //    try
+    //    {
+    //        Skoda_DCMS.Models.ApprovalDataModel status = null;
+    //        if (currentApprover.RelationId == 0)
+    //        {
+    //            if (currentLevelApprovers.Any(x => x.RelationWith == currentApprover.RelationId && x.Logic.ToLower() == "and"))
+    //            {
+    //                foreach (var item in currentLevelApprovers.Where(x => x.RelationWith == currentApprover.RelationId && x.Logic.ToLower() == "and"))
+    //                {
+    //                    status = GetApprovalStatus(currentLevelApprovers, item);
+    //                    if (status.ApproverStatus.ToLower() != "approved")
+    //                        return status;
+    //                }
+    //            }
+    //            if (currentLevelApprovers.Any(x => x.RelationWith == currentApprover.RelationId && x.Logic.ToLower() == "or"))
+    //            {
+    //                foreach (var item in currentLevelApprovers.Where(x => x.RelationWith == currentApprover.RelationId && x.Logic.ToLower() == "or"))
+    //                {
+    //                    status = GetApprovalStatus(currentLevelApprovers, item);
+    //                    if (status.ApproverStatus.ToLower() == "approved" || status.ApproverStatus.ToLower() == "enquired" || status.ApproverStatus.ToLower() == "rejected")
+    //                        return status;
+    //                }
+    //            }
+    //            return status;
+    //        }
+    //        if (!string.IsNullOrEmpty(currentApprover.ApproverStatus) && currentApprover.ApproverStatus.ToLower() == "approved")
+    //        {
+    //            if (currentLevelApprovers.Any(x => currentApprover.RelationId.HasValue && currentApprover.RelationId != 0 && x.RelationWith == currentApprover.RelationId && x.Logic.ToLower() == "and"))
+    //            {
+    //                foreach (var item in currentLevelApprovers.Where(x => x.RelationWith == currentApprover.RelationId && x.Logic.ToLower() == "and"))
+    //                {
+    //                    status = GetApprovalStatus(currentLevelApprovers, item);
+    //                    if (status.ApproverStatus.ToLower() != "approved")
+    //                        return status;
+    //                }
+    //            }
+    //            return currentApprover;//Approved
+    //        }
+    //        else
+    //        {
+    //            if (currentApprover.ApproverStatus.ToLower() != "pending")
+    //                return currentApprover;
+    //            if (currentLevelApprovers.Any(x => currentApprover.RelationId.HasValue && currentApprover.RelationId != 0 && x.RelationWith == currentApprover.RelationId && x.Logic.ToLower() == "or"))
+    //            {
+    //                foreach (var item in currentLevelApprovers.Where(x => x.RelationWith == currentApprover.RelationId && x.Logic.ToLower() == "or"))
+    //                {
+    //                    status = GetApprovalStatus(currentLevelApprovers, item);
+    //                    if (status.ApproverStatus.ToLower() == "approved" || status.ApproverStatus.ToLower() == "enquired" || status.ApproverStatus.ToLower() == "rejected")
+    //                        return status;
+    //                }
+    //            }
+    //            return currentApprover;//Pending/Enquire/Rejected/Null/Empty
+    //        }
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return null;
+    //    }
+    //}
+
+    //public int GetApprovalStatus(List<Skoda_DCMS.Models.ApprovalDataModel> appList, Skoda_DCMS.Models.ApprovalDataModel approver)
+    //{
+    //    int count = 0;
+    //    var approversRelated = appList.Where(x => x.RelationWith == approver.RelationId);
+    //    if (approversRelated != null && approversRelated.Count() > 0 && !approversRelated.All(x => x.RelationWith == 0))
+    //    {
+    //        foreach (var a in approversRelated)
+    //        {
+    //            count += GetApprovalStatus(appList, a);
+    //        }
+    //    }
+    //    if (approver.RelationWith != 0)
+    //    {
+    //        int pendingCount = 0;
+    //        if (appList.Any(x => x.Logic.ToLower() == "and"))
+    //        {
+    //            pendingCount += appList.Count(x =>
+    //                (
+    //                    x.RelationWith == approver.RelationWith
+    //                    && x.Logic.ToLower() == "and"
+    //                    && x.ApproverStatus.ToLower() == "pending"
+    //                )
+    //                || (x.RelationId == approver.RelationWith && approver.Logic.ToLower() == "and" && x.ApproverStatus.ToLower() == "pending")
+    //                || (x.RelationWith == approver.RelationId && approver.Logic.ToLower() == "and" && x.ApproverStatus.ToLower() == "pending")
+    //            );
+    //        }
+    //        if (appList.Any(x => x.Logic.ToLower() == "or"))
+    //        {
+    //            pendingCount += appList.Any(x =>
+    //                x.RelationWith == approver.RelationWith
+    //                && x.Logic.ToLower() == "or"
+    //                && x.ApproverStatus.ToLower() == "approved"
+    //                || (x.RelationId == approver.RelationWith && approver.Logic.ToLower() == "or" && x.ApproverStatus.ToLower() == "approved")
+    //                || (x.RelationWith == approver.RelationId && approver.Logic.ToLower() == "or" && x.ApproverStatus.ToLower() == "approved")
+    //            ) ? 0 : 1;
+    //        }
+    //        count += pendingCount;
+    //        if (pendingCount == 0)
+    //            approver.ApproverStatus = "Approved";//Temp making it as approved as we will check it in top level..
+    //    }
+    //    if (count == 0 && approversRelated.Count() == 0)
+    //    {
+    //        count += approver.ApproverStatus.ToLower() == "approved" ? 0 : 1;
+    //    }
+    //    //else
+    //    //{
+    //    //    count += approver.ApproverStatus.ToLower() == "approved" ? 0 : 1;
+    //    //}
+    //    return count;
+    //}
+
+    public string GetStatusOfApproval(List<Skoda_DCMS.Models.ApprovalDataModel> currentLevelApprovers, Skoda_DCMS.Models.ApprovalDataModel currentApprover = null)
+    {
+        if (currentApprover == null)
+        {
+            currentApprover = new Skoda_DCMS.Models.ApprovalDataModel();
+            currentApprover.RelationId = 0;
+        }
+        try
+        {
+            string status = "";
+            if (currentApprover.RelationId == 0)
+            {
+                if (currentLevelApprovers.Any(x => x.RelationWith == currentApprover.RelationId && x.Logic.ToLower() == "and"))
+                {
+                    var relatedAndApprovers = currentLevelApprovers.Where(x => x.RelationWith == currentApprover.RelationId && x.Logic.ToLower() == "and");
+                    foreach (var item in relatedAndApprovers)
+                    {
+                        //Prevent from infinite loop
+                        if (relatedAndApprovers.All(x => x.RelationId == 0))
+                        {
+                            //var r = relatedAndApprovers.Where(x => x.ApproverStatus.ToLower() != "approved");
+                            //status = r != null && r.Count() > 0 ? r.FirstOrDefault().ApproverStatus : "Approved";
+                            return currentApprover.ApproverStatus;
+                        }
+                        else
+                            status = GetStatusOfApproval(currentLevelApprovers, item);
+                        if (status.ToLower() != "approved")
+                            return status;
+                    }
+                }
+                if (currentLevelApprovers.Any(x => x.RelationWith == currentApprover.RelationId && x.Logic.ToLower() == "or"))
+                {
+                    var relatedOrApprovers = currentLevelApprovers.Where(x => x.RelationWith == currentApprover.RelationId && x.Logic.ToLower() == "or");
+                    foreach (var item in relatedOrApprovers)
+                    {
+                        if (relatedOrApprovers.All(x => x.RelationId == 0))
+                        {
+                            //var r = relatedOrApprovers.Where(x => x.ApproverStatus.ToLower() != "pending");
+                            //status = r != null && r.Count() > 0 ? r.FirstOrDefault().ApproverStatus : "Pending";
+                            return currentApprover.ApproverStatus;
+                        }
+                        else
+                            status = GetStatusOfApproval(currentLevelApprovers, item);
+                        if (status.ToLower() == "approved" || status.ToLower() == "enquired" || status.ToLower() == "rejected")
+                            return status;
+                    }
+                }
+                return status;
+            }
+            if (!string.IsNullOrEmpty(currentApprover.ApproverStatus) && currentApprover.ApproverStatus.ToLower() == "approved")
+            {
+                if (currentLevelApprovers.Any(x => x.RelationWith.HasValue && x.RelationWith != 0 && x.RelationWith == currentApprover.RelationId && x.Logic.ToLower() == "and"))
+                {
+                    foreach (var item in currentLevelApprovers.Where(x => x.RelationWith.HasValue && x.RelationWith != 0 && x.RelationWith == currentApprover.RelationId && x.Logic.ToLower() == "and"))
+                    {
+                        status = GetStatusOfApproval(currentLevelApprovers, item);
+                        if (status.ToLower() != "approved")
+                            return status;
+                    }
+                }
+                return currentApprover.ApproverStatus;//Approved
+            }
+            else
+            {
+                if (currentApprover.ApproverStatus.ToLower() != "pending")
+                    return currentApprover.ApproverStatus;
+                if (currentLevelApprovers.Any(x => x.RelationWith.HasValue && x.RelationWith != 0 && x.RelationWith == currentApprover.RelationId && x.Logic.ToLower() == "or"))
+                {
+                    foreach (var item in currentLevelApprovers.Where(x => x.RelationWith.HasValue && x.RelationWith != 0 && x.RelationWith == currentApprover.RelationId && x.Logic.ToLower() == "or"))
+                    {
+                        status = GetStatusOfApproval(currentLevelApprovers, item);
+                        if (status.ToLower() == "approved" || status.ToLower() == "enquired" || status.ToLower() == "rejected")
+                            return status;
+                    }
+                }
+                return currentApprover.ApproverStatus;//Pending/Enquire/Rejected/Null/Empty
+            }
+        }
+        catch (Exception ex)
+        {
+            return "Error";
+        }
+    }
+}
+
+@foreach (var currUser in appGroups)
+{
+    var currentLevel = currUser.Key;
+
+    if (currentLevel != 0)
+    {
+        var currentUsers = currUser.ToList();
+        var designation = "";
+        if (currentUsers.All(x => x.Designation.ToLower() == currentUsers.FirstOrDefault().Designation.ToLower()))
+        {
+            designation = currentUsers.FirstOrDefault().Designation;
+        }
+        else
+        {
+            designation = string.Join(" / ", currentUsers.Select(x => x.Designation.Contains("/") ? $"({x.Designation})" : x.Designation));
+        }
+        var lvl = currentUsers.FirstOrDefault().Level;
+        var usersName = currentUsers.Select(x => x.UserName);
+        var status = "";
+        var statusString = string.Join(" | ", currentUsers.Select(x => x.ApproverStatus));
+        var allstatus = "(" + statusString + ")";
+        var logic = currentUsers.FirstOrDefault().Logic;
+        var usersNameNew = currentUsers.Where(x => x.Logic == "OR" && x.ApproverStatus != "Pending").Select(x => x.UserName).FirstOrDefault();
+        var showTimeStamp = true;
+
+        if (logic == "AND")
+        {
+            if (currentUsers.All(x => x.ApproverStatus == "Approved"))
+            {
+                status = "Approved";
+            }
+            else if (currentUsers.Any(x => x.ApproverStatus == "Pending"))
+            {
+                status = "Pending";
+            }
+            else if (currentUsers.Any(x => x.ApproverStatus == "Rejected"))
+            {
+                status = "Rejected";
+            }
+            else if (currentUsers.Any(x => x.ApproverStatus == "Enquired"))
+            {
+                status = "Enquired";
+            }
+
+        }
+        else if (logic == "OR")
+        {
+            if (currentUsers.All(x => x.ApproverStatus == "Pending"))
+            {
+                status = "Pending";
+            }
+            else if (currentUsers.Any(x => x.ApproverStatus == "Approved"))
+            {
+                status = "Approved";
+                allstatus = "(Approved by " + @usersNameNew + ")";
+            }
+            else if (currentUsers.Any(x => x.ApproverStatus == "Rejected"))
+            {
+                status = "Rejected";
+                allstatus = "(Rejected by " + @usersNameNew + ")";
+            }
+            else if (currentUsers.Any(x => x.ApproverStatus == "Enquired"))
+            {
+                status = "Enquired";
+                allstatus = "(Enquired by " + @usersNameNew + ")";
+            }
+        }
+        else if (logic == "NOT")
+        {
+            if (currentUsers.Any(x => x.ApproverStatus == "Approved"))
+            {
+                status = "Approved";
+            }
+            else if (currentUsers.Any(x => x.ApproverStatus == "Pending"))
+            {
+                status = "Pending";
+            }
+            else if (currentUsers.Any(x => x.ApproverStatus == "Rejected"))
+            {
+                status = "Rejected";
+            }
+            else if (currentUsers.Any(x => x.ApproverStatus == "Enquired"))
+            {
+                status = "Enquired";
+            }
+        }
+
+
+        <tbody>
+            @foreach (var item in currentUsers)
+            {
+                <tr>
+
+                    <td class="ApName">
+                        <table class="approvalTrackingInnertbl">
+                            <tr>
+                                <td style="border-top: none; padding-left:10px !important; padding-right: 0px !important; padding-top: 0px !important; padding-bottom: 0px !important;">
+
+                                    <div>
+                                        <span style="color: #656565; @(string.IsNullOrEmpty(item.AssistantForEmployeeUserName) ? "font-weight: 600;" : "font-style: oblique;")">
+                                            @(item.UserName) <span style="font-weight: normal; font-size: 14px;">@(item.ApproverStatus.ToLower() == "approved" ? ("(" + item.ApproverStatus + ")") : "")</span>
+                                        </span>
+                                    </div>
+
+                                </td>
+                            </tr>
+
+                        </table>
+
+                    </td>
+
+                    @if (isExtraDetails)
+                    {
+                        <td>
+                            @if (!string.IsNullOrEmpty(item.ExtraDetails))
+                            {
+                                @(item.RelationWith == 0 ? Html.Raw(item.ExtraDetails) : Html.Raw(""))
+                            }
+                        </td>
+                    }
+
+
+                    @if (currentUsers.IndexOf(item) == 0)
+                    {
+                        @*<td class="text-center curPointer APComments"><i class="fa fa-commenting-o" id="comments_@lvl" onclick="DisplayComments(this, '@lvl')" aria-hidden="true"></i></td>*@
+
+                        <td class="text-center APLevel">@lvl</td>
+                    }
+                    else
+                    {
+                        <td class="text-center APLevel"></td>
+                    }
+
+                    <td class="APStatus">
+                        @if (currentUsers.Any(x => x.Logic.ToLower() == "and"))
+                        {
+
+                            <div>
+
+                                @{
+                                    //var assist = currentUsers.FirstOrDefault(x => x.AssistantForEmpUserId == item.ApproverId && x.ApproverStatus.ToLower() == "approved");
+                                    if (item.RelationWith != null)
+                                    {
+                                        if (item.RelationWith == 0)
+                                        {
+                                            var isEnquired = currentUsers.Any(x =>
+                                                x.RelationWith == item.RelationWith
+                                                && x.Logic.ToLower() == "or"
+                                                && x.ApproverStatus.ToLower() == "enquired"
+                                                || (x.RelationId == item.RelationWith && item.Logic.ToLower() == "or" && x.ApproverStatus.ToLower() == "enquired")
+                                                || (x.RelationWith == item.RelationId && x.Logic.ToLower() == "or" && x.ApproverStatus.ToLower() == "enquired")
+                                                || item.ApproverStatus.ToLower() == "enquired"
+                                            );
+                                            var isRejected = currentUsers.Any(x =>
+                                                x.RelationWith == item.RelationWith
+                                                && x.Logic.ToLower() == "or"
+                                                && x.ApproverStatus.ToLower() == "rejected"
+                                                || (x.RelationId == item.RelationWith && item.Logic.ToLower() == "or" && x.ApproverStatus.ToLower() == "rejected")
+                                                || (x.RelationWith == item.RelationId && x.Logic.ToLower() == "or" && x.ApproverStatus.ToLower() == "rejected")
+                                                || item.ApproverStatus.ToLower() == "enquired"
+                                            );
+
+                                            @(isEnquired
+                                            ? "Enquired"
+                                            : "")
+
+                                            if (!isEnquired)
+                                            {
+                                                @(isRejected
+                                            ? "Rejected"
+                                            : "")
+                                            }
+
+                                            if (!isEnquired && !isRejected)
+                                            {
+                                                var approvalStatus = GetStatusOfApproval(currentUsers, item);
+                                                @(approvalStatus)
+                                            }
+                                        }
+                                    }
+                                }
+                            </div>
+                            if (currentUsers.IndexOf(item) == 0)
+                            {
+                                <i class="fa fa-commenting-o" id="comments_@lvl" onclick="DisplayComments(this, '@lvl')" aria-hidden="true"></i>
+                            }
+                        }
+                        else
+                        {
+                            @(string.IsNullOrEmpty(item.AssistantForEmployeeUserName) ? status : "")
+                            status = "";
+                            if (currentUsers.IndexOf(item) == 0)
+                            {
+                                <i class="fa fa-commenting-o" id="comments_@lvl" onclick="DisplayComments(this, '@lvl')" aria-hidden="true"></i>
+                            }
+                        }
+
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+    }
+}
+
+<script>
+
+    var appUsers = @Html.Raw(Json.Encode(appList));
+
+    console.log(appUsers);
+    $(document).ready(function () {
+
+        $("#cmntBtn").on('click', function () {
+            console.log('here');
+            $("#appComments").modal('hide');
+        });
+
+        $("#cmntBtnClose").on('click', function () {
+            console.log('here');
+            $("#appComments").modal('hide');
+        });
+    });
+
+    $("#appComments").on('hidden.bs.modal', function () {
+        console.log('model hide');
+        $('body').addClass('modal-open');
+    })
+
+    function DisplayComments(elem, level) {
+
+        $("#appComments").modal('show');
+
+        let currentLevelUsers = appUsers.filter(x => x.Level == level)
+        let commentSection = $("#appComments .commentSection");
+        $(commentSection).empty();
+        var showTimeStampM = true;
+        for (let i = 0; i < currentLevelUsers.length; i++) {
+            //var latestApproved = currentLevelUsers.OrderByDescending(x => x.TimeStamp).FirstOrDefault();
+            //if (currentLevelUsers.filter(obj => obj.Logic.toLowerCase() == "or")) {
+            //    if (!string.IsNullOrEmpty(currentLevelUsers.ApproverStatus) && currentLevelUsers.ApproverStatus.ToLower() != "pending" && showTimeStamp)
+            //        {
+            //           latestApproved = latestApproved.TimeStamp.ToShortDateString() + " " + Convert.ToDateTime(latestApproved.TimeStamp).ToShortTimeString();
+            //        showTimeStampM = false;
+            //    }
+            //    else if ((item.ApproverStatus.ToLower() != "pending" && item.RelationWith.HasValue && item.RelationWith == 0))
+            //        {
+            //           latestApproved = latestApproved.TimeStamp.ToShortDateString() + " " + Convert.ToDateTime(latestApproved.TimeStamp).ToShortTimeString();
+            //        }
+            //}
+
+            $(commentSection).append('<div class="mb-3">'
+                + '<div><b>Name:</b> ' + currentLevelUsers[i].UserName + '</div>'
+                + '<div><b>Role:</b> ' + currentLevelUsers[i].Designation + '</div>'
+                /*+ '<div><b>Processed:</b> ' + latestApproved + '</div>'*/
+                + '<div><b>Comments:</b> ' + CheckIfNullOrUndefined(currentLevelUsers[i].Comment) + '</div>'
+                + '</div>');
+        };
+    }
+
+    function CheckIfNullOrUndefined(text) {
+        if (text)
+            return text;
+        else
+            return '';
+    }
+
+</script>
+

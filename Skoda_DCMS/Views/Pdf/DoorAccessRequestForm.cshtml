@@ -1,0 +1,2074 @@
+﻿@model Skoda_DCMS.Models.DARFResults
+@{
+    bool IsNew = true;
+    dynamic IDC = null;
+    dynamic FlagRedirect = null;
+    bool IsEdit = true;
+    int FormId = 0, AppRowId = 0, ApprovalType = 0;
+    string AREAID = "";
+    Layout = ViewBag.Layout;
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IsNew = ViewBag.IsNew;
+        IsEdit = ViewBag.IsEdit;
+        IDC = ViewBag.Model;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+    }
+    var currentUser = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    ViewBag.Title = "Door Access Request Form";
+    int count=0;
+}
+<style>
+    .form-table-container-2 tr td:first-child {
+        text-align: left !important;
+        padding-left: 15px !important;
+    }
+    .check-box {
+        font-size: 10px;
+        padding: 3px 3px 3px 0px;
+        display: table-cell;
+        width: 20% !important;
+        text-align: left !important;
+    }
+    .photogrphy-textarea1 {
+        border: 1px solid rgb(75,168,46);
+        border-radius: 0;
+        padding: 7px;
+    }
+    .bg-color td, .bg-color th {
+        border: 1px solid #dee2e6;
+        background-color: rgb(219,238,213) !important;
+    }
+    .bg-color-2 td {
+        background-color: rgba(75,168,46,0.4) !important;
+        border: 1px solid rgba(75,168,46,0.1) !important;
+    }
+
+    .bg-color-2 th {
+        background-color: rgba(75,168,46,0.4) !important;
+        border: 1px solid rgba(75,168,46,0.1) !important;
+    }
+
+    .bg-color-3 td {
+        background-color: rgba(75,168,46,0.2) !important;
+        border: 1px solid rgba(75,168,46,0.1) !important;
+        border-bottom: 1px solid rgba(75,168,46,0.1) !important;
+    }
+    .border-none {
+        border: none !important;
+    }
+   
+    .TableborderDiv {
+        border: 1px solid #ccc;
+        width: 100%;
+        display: table-cell;
+        vertical-align: middle;
+        padding: 10px 10px;
+        text-align: left;
+    }
+
+    .borderDiv {
+        border: 1px solid #ccc;
+        width: auto;
+        display: table-cell;
+    }
+
+    .div-table {
+        display: table;
+        width: 100%;
+    }
+
+    .authsuq {
+        page-break-after: always !important;
+    }
+    @@media print {
+        .authsuq {
+            display: block !important;
+            page-break-before: always !important;
+        }
+    }
+
+    .input-width-1 {
+        width: 100% !important;
+        margin: 5px auto !important;
+        border: 1px solid rgb(75,168,46);
+    }
+
+    .ui-front {
+        z-index: 9999999 !important;
+    }
+
+    #AreaTableView tr td {
+        padding: 20px !important;
+    }
+
+    #EditAreaTableView tr td {
+        padding: 11px 5px !important;
+    }
+</style>
+<body>
+    @if (IsNew)
+    {
+        if (!IsEdit)
+        {
+        }
+        else
+        {
+            <div class="breadcrumb-container right_col height-space">
+                <div>
+                    <ol class="breadcrumb">
+                        <li>
+                            <a href="/Dashboard?formName=DARF">
+                                Dashboard
+                            </a>
+                        </li>
+                        <li>
+                            Door Access Request Form
+                        </li>
+
+                    </ol>
+                </div>
+            </div>
+            <div class="right_col height-space">
+                <div class="form-main-container topContent">
+                    <div class="padd_space">
+
+                        Door Access Request Form
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    <div class="right_col">
+        <form action="/List/SaveIDCard" id="DARForm" method="post">
+            <input type="hidden" id="ScreenId" name="ScreenId" value="Door Access">
+            @if (IsNew)
+            {
+                if (!IsEdit)
+                {
+                    foreach (var item in IDC.one)
+                    {
+                        <div class="container">
+                            <div class="table-responsive">
+                                <table class="table mainTbl table-bordered bg-color">
+                                    <tr>
+                                        <td colspan="6" class="heading">
+                                            <span> MobiNext Technologies India Private Limited</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="6" class="subHeading">
+                                            <span>SAVWIPL - Door Access Request Form</span>
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td class="w-25 allFormLables noTopBorder">
+                                            <span class="pl-10">Form ID</span>
+                                        </td>
+                                        <td class="w-75 noTopBorder" colspan="5">
+                                            <input type="text" name="txtFormId" class="inpDisable" value="@(!IsNew ||!IsEdit ? ("DARF"+FormId ?? "" ) : "" )" readonly>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="w-25 allFormLables noTopBorder">
+                                            Self/OnBehalf<br />
+                                        </td>
+                                        <td class="w-75 noTopBorder" colspan="5">
+                                            <select name="drpSelfOnBehalf" id="drpSelfOnBehalf" class="drpDisable" onchange="RequestSubmission()">
+                                                <option @(item.SelfOnBehalf == "Self" ? "selected" : "" ) value="Self">Self</option>
+                                                <option @(item.SelfOnBehalf == "OnBehalf" ? "selected" : "" ) value="OnBehalf">On Behalf</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr id="OtherEmpName">
+                                        <td class="w-25 allFormLables noTopBorder">
+                                            <label id="lblOtherEmpName" class="control-label">Name (Type at least 4 letters for faster results)</label>
+                                        </td>
+                                        <td td class="w-25 borderLTB" colspan="5"><input type="text" name="txtOtherEmpname" id="txtOtherEmpname" class="" required="required"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="w-25 allFormLables noTopBorder">
+                                            Employee Type<br />
+                                            <input type="hidden" id="hiddentxtEmail" name="hiddentxtEmail" value="" />
+                                            <input type="hidden" id="FormSrId" name="FormSrId" value="@(IDC.one[0].Id)" />
+                                            <input type="hidden" id="FormId" name="FormId" value="@(FormId)" />
+                                            <input type="hidden" id="AppRowId" name="AppRowId" value="@(AppRowId)" />
+                                        </td>
+                                        <td class="w-75 noTopBorder" colspan="5">
+                                            <select name="drpEmployeeType" id="drpEmployeeType" class="drpDisable" onchange="func()">
+                                                <option @(item.EmployeeType == "Internal" ? "selected" : "" ) value="Internal">Internal</option>
+                                                <option @(item.EmployeeType == "Partner" ? "selected" : "" ) value="Partner">Partner</option>
+                                                <option @(item.EmployeeType == "External" ? "selected" : "" ) value="External">External</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="w-25 allFormLables borderLTB">
+                                            Employee Name<br />
+                                        </td>
+                                        <td class="w-25 borderLTB">
+                                            <input type="text" name="txtSurname" class="inpDisable" id="txtSurname" value="@(!IsEdit ? (item.Surname ?? " ") : " ")"><br />
+                                            <small>(Surname)</small>
+                                        </td>
+                                        <td class="w-25 borderLTB" colspan="2">
+                                            <input type="text" name="txtEmployeeName" class="inpDisable" id="txtEmployeeName" value="@(!IsEdit ? (item.EmployeeName ?? " ") : " ")"><br />
+                                            <small>(First Name)</small>
+                                        </td>
+                                        <td id="hiddenApproverInformation"></td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="w-25 allFormLables noTopBorder">
+                                            Employee Number
+
+                                        </td>
+                                        <td class="w-75 noTopBorder" colspan="5">
+                                            <input type="text" name="txtEmployeeNumber" class="inpDisable" id="txtEmployeeNumber" value="@(!IsEdit ? (item.EmployeeNumber ?? " ") : " ")">
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="w-25 allFormLables noTopBorder">
+                                            Cost Center
+                                        </td>
+                                        <td class="w-75 noTopBorder" colspan="5">
+                                            <select class="drpDisable" name="drpCostCentre" id="drpCostCentre"></select>
+                                            <input type="hidden" id="LocationId" name="LocationId" value="">
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="w-25 allFormLables noTopBorder">
+                                            Department
+                                        </td>
+                                        <td class="w-75 noTopBorder" colspan="5">
+                                            <select class="drpDisable" name="drpDepartment" id="drpDepartment"></select>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="w-25 allFormLables noTopBorder bold">
+                                            Profile
+
+                                        </td>
+                                        <td class="w-25 allFormLables noTopBorder bold" colspan="2">
+
+                                            <table class="w-100" border="0">
+                                                <tr>
+                                                    <td>
+                                                        Please tick if yes
+                                                    </td>
+
+                                                    <td>
+                                                        <input type="checkbox" id="inlineCheckbox1" value="option1" checked disabled>
+                                                    </td>
+                                                </tr>
+
+                                            </table>
+
+                                        </td>
+                                        <td class="w-50 allFormLables noTopBorder bold" colspan="2">
+                                            Sign of respective area in charge
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td class="w-25 allFormLables noTopBorder">
+                                            Regular Access (Aurangabad Plant)
+
+                                        </td>
+                                        <td class="w-75 noTopBorder" colspan="3">
+                                            <input type="checkbox" class="Access" id="AurangabadCheckbox" name="AurangabadCheckbox" @(item.AurangabadProfile == "Aurangabad" ? "checked" : "" ) value="Aurangabad">
+                                        </td>
+                                        <td class="w-50 noTopBorder">
+                                            @if (item.AurangabadProfile == "Aurangabad")
+                                            {
+                                                @*<input type="text"> <br>
+                        <small>(sign)</small>*@
+                                            }
+                                            else
+                                            {
+                                                @*<input type="text" disabled> <br>
+                        <small>(sign)</small>*@
+                                            }
+
+                                        </td>
+
+                                    </tr>
+
+                                    <tr>
+                                        <td class="w-25 allFormLables noTopBorder">
+                                            Mumbai Office
+
+                                        </td>
+                                        <td class="w-75 noTopBorder" colspan="3">
+                                            <input type="checkbox" class="Access" id="MumbaiCheckbox" name="MumbaiCheckbox" @(item.MumbaiProfile == "Mumbai" ? "checked" : "" ) value="Mumbai">
+                                        </td>
+                                        <td class="w-50 noTopBorder">
+                                            @if (item.MumbaiProfile == "Mumbai")
+                                            {
+                                                @*<input type="text"> <br>
+                        <small>(sign)</small>*@
+                                            }
+                                            else
+                                            {
+                                                @*<input type="text" disabled> <br>
+                        <small>(sign)</small>*@
+                                            }
+                                        </td>
+
+                                    </tr>
+
+                                    <tr>
+                                        <td class="w-25 allFormLables noTopBorder">
+                                            Regular Access (Pune Plant)
+
+                                        </td>
+                                        <td class="w-75 noTopBorder" colspan="3">
+                                            <input type="checkbox" class="Access" id="PuneCheckbox" name="PuneCheckbox" @(item.PuneProfile == "Pune" ? "checked" : "" ) value="Pune">
+                                        </td>
+                                        <td class="w-50 noTopBorder">
+                                            @if (item.PuneProfile == "Pune")
+                                            {
+                                                @*<input type="text"> <br>
+                        <small>(sign)</small>*@
+                                            }
+                                            else
+                                            {
+                                                @*<input type="text" disabled> <br>
+                        <small>(sign)</small>*@
+                                            }
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="w-25 allFormLables noTopBorder">
+                                            Location Name<br />
+                                        </td>
+                                        <td class="w-75 noTopBorder" colspan="4">
+                                            <input type="hidden" id="drpLocationValue" name="drpLocationValue" value="">
+                                            <select class="drpDisable" name="drpLocationName" id="drpLocationName" onchange="GetArea()"></select>
+                                        </td>
+                                    </tr>
+
+                                    <tr id="AreaTR">
+                                        <td class="w-25 allFormLables noTopBorder">
+                                            Area<br />
+                                        </td>
+                                        <td class="w-75 noTopBorder" colspan="4">
+                                            <select id="AreaListEdit" multiple="multiple"> </select>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <table class="table mainTbl table table-bordered table-sm dataTable no-footer bg-color">
+                                    @if (!IsEdit)
+                                    {
+                                        <tr class="bg-color-2">
+                                            <td colspan="4" class="f-600">Authorization by HOD</td>
+                                        </tr>
+                                        <tr class="bg-color-2">
+                                            <td colspan="2">
+                                                Name: <input type="text" name="" class="inpDisable inpIsNewDisable input-width-1" value="@(!IsEdit ? (IDC.three[0].UserName ?? " "): " ")">
+                                            </td>
+                                            <td>
+                                                <div class="form-group">
+                                                    <label for="comment" class="">Approver Comment:</label>
+                                                    <textarea class="form-control mx-auto" rows="5" id="comment" disabled>@(!IsEdit ? (IDC.three[0].Comment ?? " "): " ")</textarea>
+                                                </div>
+                                            </td>
+                                            <td>Signature: <input type="text" name="" disabled class="inpDisable inpIsNewDisable input-width-1" value="@(!IsEdit && IDC.three[0].ApproverStatus != "Pending" ? (IDC.three[0].ApproverStatus + " on " + Convert.ToDateTime(IDC.two[0].Modified).ToShortDateString() + " " + Convert.ToDateTime(IDC.two[0].Modified).ToShortTimeString()) : "" )"></td>
+                                        </tr>
+
+
+                                    }
+                                </table>
+                                @if (IDC.one[0].AreaDetails.Count != 0)
+                                {
+                                    <table id="AreaTableView" class="table mainTbl table table-bordered table-sm dataTable no-footer bg-color">
+                                        <tbody id="tableBodyView">
+                                            @*<tr>
+                        <td colspan="12" class="f-600 text-center">Authorization by Area/Sub Area In charge</td>
+                    </tr>*@
+                                            @foreach (var area in IDC.one[0].AreaDetails)
+                                            {
+                                                AREAID += area.AreaId + ",";
+                                                <tr id="@("tr_"+@area.AreaId)" class="authsuq">
+                                                    <td class="@("colspan_align"+@area.AreaId)" id="@area.AreaId" value="@area.AreaId">
+                                                        <div class="d-flex justify-content-around">
+
+                                                            <div class="TableborderDiv f-600">
+
+                                                                @area.Area
+                                                            </div>
+                                                            @if (area.SubAreas != null)
+                                                            {
+                                                                foreach (var subarea in area.SubAreas)
+                                                                {
+                                                                    <div class="TableborderDiv">
+                                                                        <input type="checkbox" id="@subarea.SubAreaId" value="@subarea.SubAreaId" checked>   @subarea.SubArea  <br>
+                                                                        @*@if (IDC.four != null)
+                                                {
+                                                    <input type="text" name="" class="inpDisable inpIsNewDisable input-width-1" value="@(!IsEdit ? (subarea.UserName ?? "") : "")"><br />
+                                                    <label for="comment" class="">Approver Comment:</label>
+                                                    <textarea class="form-control input-width-1 mx-auto" rows="5" id="comment" disabled>@(!IsEdit ? (subarea.Comment ?? " ") : " ")</textarea><br />
+                                                    <input type="text" name="" class="inpDisable inpIsNewDisable input-width-1" value="@(!IsEdit && subarea.ApproverStatus != "Pending" ? (subarea.ApproverStatus + " on " + Convert.ToDateTime(subarea.Modified).ToShortDateString()) : "" )">
+                                                    <br>
+                                                    <small>(sign)</small>
+                                                }*@
+                                                                    </div>
+
+                                                                }
+                                                            }
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            }
+                                            <input type="hidden" id="hidSelectedOptions" value=@AREAID.TrimEnd(',') />
+                                        </tbody>
+                                    </table>
+                                }
+                                <table id="AreaTable" class="table mainTbl table table-bordered table-sm dataTable no-footer bg-color">
+                                    <tbody id="tableBody">
+                                    </tbody>
+                                </table>
+                                <table class="table mainTbl table table-bordered table-sm dataTable no-footer bg-color">
+                                    @if (!IsEdit)
+                                    {
+                                        <tr>
+                                            <td colspan="4" class="f-600">Authorization by Security</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">
+                                                Name: <input type="text" name="" class="inpDisable inpIsNewDisable input-width-1" value="@(!IsEdit ? (IDC.three[1].UserName ?? " "): " ")">
+                                            </td>
+                                            <td>
+                                                <div class="form-group">
+                                                    <label for="comment" class="">Approver Comment:</label>
+                                                    <textarea class="form-control mx-auto" rows="5" id="comment" disabled>@(!IsEdit ? (IDC.three[1].Comment ?? " "): " ")</textarea>
+                                                </div>
+                                            </td>
+                                            <td>Signature: <input type="text" name="" disabled class="inpDisable inpIsNewDisable input-width-1" value="@(!IsEdit && IDC.three[1].ApproverStatus != "Pending" ? (IDC.three[1].ApproverStatus + " on " + Convert.ToDateTime(IDC.two[1].Modified).ToShortDateString() + " " + Convert.ToDateTime(IDC.two[1].Modified).ToShortTimeString()) : "" )"></td>
+                                        </tr>
+                                    }
+                                </table>
+                                <div>
+                                    <p class="text-left f-600">SF_SO/1_018.00</p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="container">
+
+                        <div class="table-responsive">
+                            <table class="table mainTbl table-bordered form-table-container bg-color">
+                                <tr>
+                                    <td colspan="6" class="heading form-heading">
+                                        <span>MobiNext Technologies India Private Limited</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="6" class="heading form-heading-1">
+                                        <span>SAVWIPL - Door Access Request Form</span>
+                                    </td>
+                                </tr>
+                            </table>
+                            <table class="table mainTbl table-bordered form-table-container-2 bg-color">
+                                <tr>
+                                    <td class="w-30 allFormLables noTopBorder">
+                                        <label class="f-600"> Self/OnBehalf</label>
+                                    </td>
+                                    <td class="w-70 noTopBorder" colspan="3">
+                                        <select name="drpSelfOnBehalf" id="drpSelfOnBehalf" class="w-40 drpDisable" onchange="RequestSubmission()">
+                                            <option value="-1">Choose</option>
+                                            <option value="Self">Self</option>
+                                            <option value="OnBehalf">On Behalf</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr id="OtherEmpName">
+                                    <td class="allFormLables noTopBorder">
+                                        <label id="lblOtherEmpName" class="control-label">Name (Type at least 4 letters for faster results)</label>
+                                    </td>
+                                    <td class="borderLTB" colspan="3"><input type="text" name="txtOtherEmpname" id="txtOtherEmpname" class="" required="required"></td>
+                                </tr>
+                                <tr>
+                                    <td class="allFormLables noTopBorder">
+                                        <label class="f-600">Employee Type</label>
+                                        <input type="hidden" id="hiddentxtEmail" name="hiddentxtEmail" value="" />
+                                    </td>
+                                    <td class="noTopBorder" colspan="3">
+                                        <select name="drpEmployeeType" class="w-40" id="drpEmployeeType" onchange="func()" required>
+                                            <option value="" selected>Choose</option>
+                                            <option value="Internal">Internal</option>
+                                            <option value="Partner">Partner</option>
+                                            <option value="External">External</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="allFormLables borderLTB">
+                                        <label class="f-600">Employee Name</label>
+                                    </td>
+                                    <td class="borderLTB" colspan="1">
+                                        <input type="text" name="txtSurname" autocomplete="off" class="w-100 inpDisable surname" id="txtSurname" value="@(!IsNew ? (IDC.one[0].Surname ?? " ") : " ")" onkeypress="alphaOnly(event)" required><br />
+                                        <small><label class="f-600 f-12">(Surname)</label></small>
+                                    </td>
+                                    <td class="borderLTB" colspan="2" style="text-align: left !important">
+                                        <input type="text" name="txtEmployeeName" autocomplete="off" class="w-100 inpDisable firstname" id="txtEmployeeName" value="@(!IsNew ? (IDC.one[0].EmployeeName ?? " ") : " ")" onkeypress="alphaOnly(event)" required><br />
+                                        <small><label class="f-600 f-12">(First Name)</label></small>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="allFormLables noTopBorder f-600">
+                                        <label class="f-600">Employee Number</label>
+                                    </td>
+                                    <td class="noTopBorder" colspan="3">
+                                        <input type="text" name="txtEmployeeNumber" autocomplete="off" class="w-40 inpDisable" id="txtEmployeeNumber" value="@(!IsNew ? (IDC.one[0].EmployeeNumber ?? " ") : " ")" onkeypress="allowNumbersOnly(event)" required>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="allFormLables noTopBorder">
+                                        <label class="f-600">Cost Center</label>
+                                    </td>
+                                    <td class="noTopBorder" colspan="3">
+                                        <select class="w-40 drpDisable" name="drpCostCentre" id="drpCostCentre" onchange="" required></select>
+                                        <input type="hidden" id="LocationId" name="LocationId" value="">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="allFormLables noTopBorder">
+                                        <label class="f-600">Department</label>
+                                    </td>
+                                    <td class="noTopBorder" colspan="3">
+                                        <select class="w-40 drpDisable" name="drpDepartment" id="drpDepartment" required></select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="w-25 allFormLables noTopBorder bold">
+                                        <label class="f-600">Profile</label>
+                                    </td>
+                                    <td class="allFormLables noTopBorder bold profile-sec-w">
+                                        <table class="w-100" border="0">
+                                            <tbody>
+                                                <tr>
+                                                    <td style="padding-left: 0px !important;">
+                                                        <label class="f-600">Please tick if yes</label>
+                                                    </td>
+                                                    <td>
+                                                        <input type="checkbox" id="inlineCheckbox1" value="option1" checked disabled>
+                                                    </td>
+                                                </tr>
+
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                    <td class="allFormLables noTopBorder bold text-left" colspan="3">
+                                        <label class="f-600 mt-2">Sign of respective area in charge</label>
+                                    </td>
+                                </tr>
+                                <tr id="AurangabadTR">
+                                    <td class="allFormLables noTopBorder">
+                                        <label class="f-600">Regular Access (Aurangabad Plant)</label>
+                                        <input type="checkbox" class="Access float-right mt-2" id="AurangabadCheckbox" name="AurangabadCheckbox" value="Aurangabad">
+                                    </td>
+                                    <td class="noTopBorder" colspan="3"></td>
+                                </tr>
+                                <tr id="MumbaiTR">
+                                    <td class="allFormLables noTopBorder">
+                                        <label class="f-600">Mumbai Office</label>
+                                        <input type="checkbox" class="Access float-right mt-2" id="MumbaiCheckbox" name="MumbaiCheckbox" value="Mumbai">
+                                    </td>
+                                    <td class="noTopBorder" colspan="3">
+                                    </td>
+                                </tr>
+                                <tr id="PuneTR">
+                                    <td class="allFormLables noTopBorder">
+                                        <label class="f-600">Regular Access (Pune Plant)</label>
+                                        <input type="checkbox" class="Access float-right mt-2" id="PuneCheckbox" name="PuneCheckbox" value="Pune">
+                                    </td>
+                                    <td class="noTopBorder" id="hiddenApproverInformation" colspan="3">
+                                    </td>
+                                </tr>
+                                <tr>
+                                <tr>
+                                    <td class="allFormLables noTopBorder">
+                                        <label class="f-600">Location Name</label>
+                                    </td>
+                                    <td class="noTopBorder" colspan="3">
+                                        <input type="hidden" id="drpLocationValue" name="drpLocationValue" value="">
+                                        <select class="w-40 drpDisable" name="drpLocationName" id="drpLocationName" onchange="GetArea()"></select>
+                                    </td>
+                                </tr>
+                                <tr id="AreaTR">
+                                    <td class="allFormLables noTopBorder">
+                                        <label class="f-600">Area</label>
+                                    </td>
+                                    <td class="noTopBorder" colspan="3">
+                                        <select id="AreaList" class="w-40" multiple="multiple"></select>
+                                    </td>
+                                </tr>
+                            </table>
+                            <table id="AreaTable" class="table mainTbl table table-bordered table-sm dataTable no-footer bg-color">
+                                <tbody id="tableBody">
+                                </tbody>
+                            </table>
+                            <div>
+                                <p class="text-left f-600">SF_SO/1_018.00</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                foreach (var item in IDC.one)
+                {
+        <div class="container">
+
+            <table class="table mainTbl table-bordered form-table-container bg-color">
+                <tr>
+                    <td colspan="6" class="heading form-heading">
+                        <span> MobiNext Technologies India Private Limited</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="6" class="heading form-heading-1">
+                        <span>SAVWIPL - Door Access Request Form</span>
+                    </td>
+
+                </tr>
+            </table>
+            <table class="table mainTbl table-bordered form-table-container-2 bg-color">
+
+                <tr>
+                    <td class="w-30 allFormLables noTopBorder">
+                        <label class="f-600 pl-10">Form ID</label>
+                    </td>
+                    <td class="w-70 noTopBorder" colspan="4">
+                        <input type="text" name="txtFormId" class="w-40 inpDisable" value="@(!IsNew ||!IsEdit ? ("DARF"+FormId ?? "" ) : "" )" readonly>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="allFormLables noTopBorder">
+                        <label class="f-600">Self/OnBehalf</label>
+                    </td>
+                    <td class="noTopBorder" colspan="4">
+                        <select name="drpSelfOnBehalf" id="drpSelfOnBehalf" class="w-40 drpDisable" onchange="">
+                            <option @(item.SelfOnBehalf == "Self" ? "selected" : "" ) value="Self">Self</option>
+                            <option @(item.SelfOnBehalf == "OnBehalf" ? "selected" : "" ) value="OnBehalf">On Behalf</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="allFormLables noTopBorder">
+                        <label class="f-600">Employee Type</label>
+                    </td>
+                    <td class="noTopBorder" colspan="4">
+                        <select name="drpEmployeeType" id="drpEmployeeType" class="w-40 drpDisable">
+                            <option @(item.EmployeeType == "Internal" ? "selected" : "" ) value="Internal">Internal</option>
+                            <option @(item.EmployeeType == "Partner" ? "selected" : "" ) value="Partner">Partner</option>
+                            <option @(item.EmployeeType == "External" ? "selected" : "" ) value="External">External</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="allFormLables borderLTB">
+                        <label class="f-600">Employee Name</label>
+                    </td>
+                    <td class="borderLTB">
+                        <input type="text" name="txtSurname" class="w-100 inpDisable surname" id="txtSurname" value="@(!IsNew ? (IDC.one[0].Surname ?? " ") : " ")"><br />
+                        <small class="f-600 f-12">(Surname)</small>
+                    </td>
+                    <td class="borderLTB" colspan="3" style="text-align: left !important">
+                        <input type="text" name="txtEmployeeName" class="w-100 inpDisable firstname" id="txtEmployeeName" value="@(!IsNew ? (IDC.one[0].EmployeeName ?? " ") : " ")"><br />
+                        <small class="f-600 f-12">(First Name)</small>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="allFormLables borderLTB f-600">
+                        <label class="f-600">Employee Number:</label>
+                    </td>
+                    <td class="borderLTB text-left" colspan="4">
+                        <input type="text" name="txtEmployeeNumber" class="w-40 inpDisable" id="txtEmployeeNumber" value="@(!IsNew ? (IDC.one[0].EmployeeNumber ?? " ") : " ")">
+                    </td>
+                </tr>
+                <tr>
+                    <td class="allFormLables borderLTB f-600">
+                        <label class="f-600">Cost Center:</label>
+                    </td>
+                    <td colspan="4" class="borderLTB text-left">
+                        <input type="text" name="drpCostCentre" class="w-40 inpDisable" id="drpCostCentre" value="@(!IsNew ? (IDC.one[0].CostCentre ?? " ") : " ")">
+                    </td>
+                </tr>
+                <tr>
+                    <td class="allFormLables borderLTB f-600">
+                        <label class="f-600">Department:</label>
+                    </td>
+                    <td class="borderLTB text-left" colspan="4">
+                        <input type="text" name="drpDepartment" class="w-40 inpDisable" id="drpDepartment" value="@(!IsNew ? (IDC.one[0].Department ?? " ") : " ")">
+                    </td>
+                </tr>
+                <tr>
+                    <td class="w-25 allFormLables noTopBorder bold f-600">
+                        <label>Profile</label>
+                    </td>
+                    <td class="allFormLables noTopBorder bold profile-sec-w">
+
+                        <table class="w-100" border="0">
+                            <tr>
+                                <td style="padding-left: 0px !important;">
+                                    <label class="f-600"> Please tick if yes</label>
+
+                                </td>
+
+                                <td>
+                                    <input type="checkbox" id="inlineCheckbox1" value="option1" checked disabled>
+                                </td>
+                            </tr>
+
+                        </table>
+
+                    </td>
+                    <td class="w-50 allFormLables noTopBorder bold f-600" colspan="3">
+                        <label class="f-600 mt-2">Sign of respective area in charge</label>
+
+                    </td>
+
+                </tr>
+                <tr>
+                    <td class="allFormLables noTopBorder f-600">
+                        Regular Access (Aurangabad Plant)
+                    </td>
+                    <td class="w-75 noTopBorder" colspan="4">
+                        <input type="checkbox" class="inpDisable" id="AurangabadCheckbox" @(item.AurangabadProfile == "Aurangabad" ? "checked" : "" ) value="Aurangabad">
+                    </td>
+                </tr>
+                <tr>
+                    <td class="allFormLables noTopBorder">
+                        <label class="f-600">Mumbai Office</label>
+                    </td>
+                    <td class="noTopBorder" colspan="4">
+                        <input type="checkbox" class="inpDisable" id="MumbaiCheckbox" @(item.MumbaiProfile == "Mumbai" ? "checked" : "" ) value="Mumbai">
+                    </td>
+                </tr>
+                <tr>
+                    <td class="allFormLables noTopBorder">
+                        <label class="f-600">Regular Access (Pune Plant)</label>
+                    </td>
+                    <td class="noTopBorder" colspan="4">
+                        <input type="checkbox" class="inpDisable" id="PuneCheckbox" @(item.PuneProfile == "Pune" ? "checked" : "" ) value="Pune">
+                    </td>
+                </tr>
+                <tr>
+                    <td class="allFormLables noTopBorder f-600">
+                        <label class="f-600">Location Name</label>
+                    </td>
+                    <td class="noTopBorder" colspan="4">
+                        <select name="drpLocationName" id="drpLocationName" class="w-40 drpDisable">
+                            <option @(item.LocationName == "Please Select Location Name" ? "selected" : "Please Select Location Name" ) value="-1"></option>
+                            <option @(item.LocationName == "Aurangabad" ? "selected" : "" ) value="3">Aurangabad</option>
+                            <option @(item.LocationName == "Mumbai" ? "selected" : "" ) value="2">Mumbai</option>
+                            <option @(item.LocationName == "Pune" ? "selected" : "" ) value="1">Pune</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+
+            <table class="table mainTbl table table-bordered table-sm dataTable no-footer">
+                @if (!IsNew)
+                {
+                    <tr class="bg-color-2">
+                        <td colspan="6" class="font-bold text-center authorize-container photogrph_header">Authorization by HOD</td>
+                    </tr>
+                    <tr class="bg-color-2">
+                        <td colspan="1" class="authorize-td">
+                            <label class="f-600">Name:</label>
+                            <input type="text" name="" class="input-width-1 author-width" value="@(!IsNew ? (IDC.three[0].UserName ?? " "): " ")">
+                        </td>
+                        <td class="authorize-td comment-box-2" colspan="2">
+                            <div class="form-group">
+                                <label class="f-600 align" for="comment">Approver Comment:</label>
+                                <textarea class="form-control textareawidth photogrphy-textarea" rows="2" id="comment" disabled>@(!IsNew ? (IDC.three[0].Comment ?? " "): " ")</textarea>
+                            </div>
+                        </td>
+
+                        <td class="authorize-td" colspan="2"><label class="f-600 signature-box-1">Signature:</label><input type="text" name="" class="inpDisable input-width-1 author-width signature-input-1" value="@(!IsNew && IDC.three[0].ApproverStatus != "Pending" ? (IDC.three[0].ApproverStatus + " on " + Convert.ToDateTime(IDC.two[0].Modified).ToShortDateString()+" "+Convert.ToDateTime(IDC.two[0].Modified).ToShortTimeString()) : "" )"></td>
+                    </tr>
+                }
+            </table>
+            @if (IDC.one[0].AreaDetails.Count != 0)
+            {
+                <table id="AreaTableView" class="table mainTbl table table-bordered table-sm dataTable no-footer bg-color">
+                    <tbody id="tableBodyView">
+                        <tr class="bg-color-2">
+                            <td class="authorize-container">Authorization by Area/Sub Area In charge</td>
+                        </tr>
+
+                        @foreach (var area in IDC.one[0].AreaDetails)
+                        {
+                            <tr id="@("tr_"+@area.AreaId)" class="authsuq bg-color-2">
+                                <td class="@("colspan_align"+@area.AreaId) vertical-top" id="@area.AreaId" value="@area.AreaId">
+                                    <div class="div-table">
+
+                                        <div class="area-title align-middle f-600">
+                                            <label>@area.Area</label>
+
+                                        </div>
+
+                                        @if (area.SubAreas != null)
+                                        {
+                                            foreach (var subarea in area.SubAreas)
+                                            {
+
+                                                <div class="check-box">
+
+                                                    <input type="checkbox" id="@subarea.SubAreaId" value="@subarea.SubAreaId" checked disabled>   @subarea.SubArea  <br>
+                                                    @if (IDC.four != null)
+                                                    {
+
+                                                        <input type="text" name="" class="inpDisable inpIsNewDisable input-width-1 auth-area-input" value="@(!IsNew ? (subarea.UserName ?? "") : "")"><br />
+
+
+                                                        <label for="comment" class="f-600">Approver Comment:</label>
+                                                        <textarea class="form-control textareawidth photogrphy-textarea1" rows="2" id="comment" disabled>@(!IsNew ? (subarea.Comment ?? " ") : " ")</textarea><br />
+
+
+                                                        <input type="text" name="" class="inpDisable inpIsNewDisable input-width-1 auth-area-input" value="@(!IsNew && subarea.ApproverStatus != "Pending" ? (subarea.ApproverStatus + " on " + Convert.ToDateTime(IDC.four[count].Modified).ToShortDateString()+ " "+ Convert.ToDateTime(IDC.four[count].Modified).ToShortTimeString()) : "" )">
+                                                        <br>
+                                                        <small class="f-600 pl-1">(sign)</small>
+
+
+                                                    }
+                                                </div>
+                                                count = count + 1;
+                                            }
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+
+            }
+            <table class="table mainTbl table table-bordered table-sm dataTable no-footer bg-color">
+                @if (!IsNew)
+                {
+                    <tr class="bg-color-2">
+                        <td colspan="6" class="authorize-container photogrph_header">Authorization by Security</td>
+                    </tr>
+                    <tr class="bg-color-2">
+                        <td colspan="1" class="authorize-td">
+                            <label class="f-600">Name:</label>
+                            <input type="text" name="" class="inpDisable inpIsNewDisable input-width-1" value="@(!IsNew ? (IDC.three[1].UserName ?? " "): " ")">
+                        </td>
+                        <td class="authorize-td comment-box-2" colspan="2">
+                            <div class="form-group">
+                                <label class="f-600 align" for="comment">Approver Comment:</label>
+                                <textarea class="form-control textareawidth photogrphy-textarea" rows="2" id="comment" disabled>@(!IsNew ? (IDC.three[1].Comment ?? " "): " ")</textarea>
+                        </td>
+
+                        <td class="authorize-td" colspan="2"><label class="f-600 signature-box-1">Signature:</label><input type="text" name="" class="inpDisable input-width-1 author-width signature-input-1" value="@(!IsNew && IDC.three[1].ApproverStatus != "Pending" ? (IDC.three[1].ApproverStatus + " on " + Convert.ToDateTime(IDC.two[1].Modified).ToShortDateString() + " " + Convert.ToDateTime(IDC.two[1].Modified).ToShortTimeString()) : "" )"></td>
+                    </tr>
+
+                }
+            </table>
+            <div>
+                <p class="text-left f-600">SF_SO/1_018.00</p>
+            </div>
+
+        </div>
+                    }
+                }
+
+            @if (IsNew)
+            {
+                if (!IsEdit)
+                {
+                    <div class="card-footer align-content-center">
+                        <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                            Re-Submit
+                        </button>
+                        <button type="reset" class="btn btn-danger btn-sm cancl-btn">
+                            Cancel
+                        </button>
+                    </div>
+                }
+                else
+                {
+                    <div class="card-footer align-content-center">
+                        <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                            Submit
+                        </button>
+                        <button type="reset" class="btn btn-danger btn-sm cancl-btn">
+                            Cancel
+                        </button>
+                    </div>
+                }
+            }
+            </form>
+            </div>
+        </body>
+
+
+<div class="modal fade" id="successModel" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header modelHeader">
+                <span class="modal-title modalMsgTitle" id="modalTitle"></span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label id="modalBody" class="lableMsg">  </label>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="submitBomBtn publishBtn" id="modalOkButton">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    var IsNew = @Html.Raw(Json.Encode(IsNew));
+    var IsEdit = @Html.Raw(Json.Encode(IsEdit));
+    var IDC = @Html.Raw(Json.Encode(IDC));
+    var appRowId = @Html.Raw(Json.Encode(AppRowId));
+    var approvalType =@Html.Raw(Json.Encode(ApprovalType));
+    var FlagRedirect = @Html.Raw(Json.Encode(FlagRedirect));
+    pageLoad();
+
+    function pageLoad() {
+        var data = "";
+        if (!IsNew) {
+            //AreaSubArea();
+            $(".inpDisable").attr("disabled", "disabled");
+            $("#OtherEmpName").hide();
+        }
+        if (!IsNew) {
+            $(".drpDisable").attr("disabled", "disabled");
+        }
+        if (IsNew) {
+            if (!IsEdit) {
+                GetCostCenter();
+                getDepartment();
+                GetLocationName();
+                GetArea();
+                GetApprovers();
+                $("#OtherEmpName").hide();
+                //$("#AreaTR").hide();
+            }
+            else {
+                GetCostCenter();
+                getDepartment();
+                GetLocationName();
+                GetApprovers();
+                $("#AreaTR").hide();
+                $("#OtherEmpName").hide();
+                $(".inpIsNewDisable").attr("disabled", "disabled");
+            }
+        }
+    };
+
+    function successModal(txt) {
+        ////
+        $('#modalTitle').html('Success');
+        if (txt == "approve") {
+            $('#modalBody').html('Form has been approved!');
+        }
+        else if (txt == "reject") {
+            $('#modalBody').html('Form has been rejected!');
+        }
+        else if (txt == "enquire") {
+            $('#modalBody').html('Form has been enquired!');
+        }
+        else if (txt == "cancelled") {
+            $('#modalBody').html('Form has been cancelled!');
+        }
+        else {
+            $('#modalBody').html('Your form with ID: DARF' + txt + ' has been submitted! Kindly use this for future reference');
+            FlagRedirect = txt;
+        }
+        //$('#modalBody').html('Your form has been submitted!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function failureModal() {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html('Some error occurred!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function permissionModal() {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html('No permssion granted since the device is not SAVWIPL owned!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function requiredModal(text) {
+        $('#modalTitle').html('Required!');
+        $('#modalBody').html(text);
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function GetApprovers() {
+        $.ajax({
+            url: '/IDCard/GetDARFApprovalList',
+            type: 'GET',
+            data: {},
+            dataType: 'JSON',
+            success: (function (data) {
+                ////
+                approverData = data;
+                console.log(data);
+                var row = "";
+                for (var i = 0; i < data.length; i++) {
+                    row += '<input type="hidden" id="hidden' + data[i].Department + 'Approver" name="hidden' + data[i].Department + 'Approver" value="' + data[i].ApproverEmailId + '">';
+                }
+                $("#hiddenApproverInformation").html(row);
+
+            }),
+            error: (function (data) {
+                //code
+            })
+        })
+
+    }
+
+    function func() {
+        ////
+        var dropdown = document.getElementById("drpEmployeeType");
+        var selection = dropdown.value;
+        var dropdown1 = document.getElementById("drpSelfOnBehalf");
+        var selection1 = dropdown1.value;
+        if (selection1 != "OnBehalf") {
+            if (selection == "Internal") {
+                var firstName = document.getElementById("txtEmployeeName");
+                var lastName = document.getElementById("txtSurname");
+                var CostCenter = document.getElementById("drpCostCentre");
+                var department = document.getElementById("drpDepartment");
+                var txtEmployeeNumber = document.getElementById("txtEmployeeNumber");
+
+                firstName.value = "@currentUser.FirstName";
+                lastName.value = "@currentUser.LastName";
+                CostCenter.value = "@currentUser.CostCenter";
+                department.value = "@currentUser.Department";
+                txtEmployeeNumber.value = "@currentUser.EmpNumber";
+            }
+            else {
+                var firstName = document.getElementById("txtEmployeeName");
+                var lastName = document.getElementById("txtSurname");
+                var CostCenter = document.getElementById("drpCostCentre");
+                var department = document.getElementById("drpDepartment");
+                var txtEmployeeNumber = document.getElementById("txtEmployeeNumber");
+
+                firstName.value = "";
+                lastName.value = "";
+                CostCenter.value = "-1";
+                department.value = "-1";
+                txtEmployeeNumber.value = "";
+            }
+        }
+    }
+
+    $("#txtOtherEmpname").autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                url: "/List/GetPAFEmployeeDetails",
+                dataType: "json",
+                cache: false,
+                async: false,
+                data: {
+                    searchText: $("#txtOtherEmpname").val()
+                },
+                success: function (data) {
+                    ////
+                    response($.map(data, function (item) {
+                        console.log(data, 'data');
+                        return { label: item.UserName, value: item.UserName, raw: item };
+                    }));
+                }
+            });
+        },
+        search: function (event, ui) {
+            var value = $("#txtOtherEmpname").val();
+            // If less than three chars, cancel the search event
+            if (value.length < 4) {
+                event.preventDefault();
+            }
+        },
+        min_length: 4,
+        delay: 0,
+        select: function (event, ui) {
+            var empOtherDetails = ui.item['raw'];
+            //$('#txtOtherUserId').val(empOtherDetails.UserID);
+            //$('#txtOtherEmpDept').val(empOtherDetails.EmployeeDept);
+            //$('#txtOtherEmpEmailId').val(empOtherDetails.Email);
+            //Get the other details like Cost Center Code, Employee Number from DB.
+            $.ajax({
+                url: "/List/GetPAFExistingEmployeeDetails",
+                dataType: "json",
+                cache: false,
+                async: false,
+                data: {
+                    otherEmpUserId: empOtherDetails.UserId,
+                    //otherEmpEmail: empOtherDetails.Email
+                },
+                success: function (data) {
+                    console.log(data, 'data');
+                    //$('#txtOtherEmpCCCode').val(data.CostCenter);
+                    $('#txtEmployeeNumber').val(data.EmpNumber);
+                    $('#txtDepartment').val(data.Department);
+                    $('#txtEmployeeName').val(data.FirstName);
+                    $('#txtSurname').val(data.LastName);
+                    $('#hiddentxtEmail').val(data.Email);
+                    /*$('#txtTelephone').val(data.PhoneNumber);*/
+
+                }
+            });
+        }
+    });
+
+    function RequestSubmission() {
+        //
+        var drpRequestSubType = $("#drpSelfOnBehalf").val();
+        if (drpRequestSubType == "OnBehalf") {
+            $("#OtherEmpName").show();
+            $("#txtOtherEmpname").val('');
+            $('#drpEmployeeType').val("null");
+            $('#txtSurname').val('');
+            $('#txtEmployeeName').val('');
+            $('#txtEmployeeNumber').val('');
+            $('#txtDepartment').val('');
+        }
+        else if (drpRequestSubType == "Self") {
+            $('#drpEmployeeType').val("Internal");
+            $('#txtOtherEmpname').val('');
+            $("#OtherEmpName").hide();
+            func();
+            $('#drpEmployeeType').trigger('change');
+        }
+        else {
+            $('#drpEmployeeType').val("null");
+            $("#OtherEmpName").hide();
+            $('#txtSurname').val('');
+            $('#txtFirstName').val('');
+            $('#txtEmpId').val('');
+            $('#txtDepartment').val('');
+        }
+
+    }
+
+    function allowNumbersOnly(e) {
+        var code = (e.which) ? e.which : e.keyCode;
+        if (code > 31 && (code < 48 || code > 57)) {
+            e.preventDefault();
+        }
+    }
+
+    function alphaOnly(e) {
+        var key = e.keyCode;
+        if (key > 32 && (key < 65 || key > 122 || key == 91 || key == 92 || key == 93 || key == 94 || key == 95 || key == 96)) {
+            e.preventDefault();
+        }
+    }
+
+    //$("#btnCancel").on('click', function (e) {
+    //    //
+    //    window.location.href = "../dashboard";
+    //});
+
+    function GetCostCenter() {
+        ////
+        if (IsNew) {
+            if (!IsEdit) {
+                var value = JSON.stringify(IDC[0]);
+                var value_1 = JSON.parse(value);
+                var selectedLocation = value_1.Value[0].CostCentre;
+                console.log(selectedLocation);
+
+                $.ajax({
+                    url: '/List/CostCenter',
+                    type: 'GET',
+                    data: {},
+                    dataType: 'JSON',
+                    success: (function (data) {
+                        //locdata = data;
+
+                        //console.log(data);
+                        var s = '<option value="-1">Please Select Cost Center</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            if (data[i].CostCenter == selectedLocation) {
+                                s += '<option value="' + data[i].CostCenter + '" location="' + data[i].Location + '"' + 'id="' + data[i].Id + '" selected>' + data[i].CostCenter + '</option>';
+                            }
+                            else {
+                                s += '<option value="' + data[i].CostCenter + '" location="' + data[i].Location + '"' + 'id="' + data[i].Id + '">' + data[i].CostCenter + '</option>';
+                            }
+                        }
+                        $("#drpCostCentre").html(s);
+
+
+                    }),
+                    error: (function (data) {
+                        //code
+                    })
+                })
+            }
+            else {
+                $.ajax({
+                    url: '/List/CostCenter',
+                    type: 'GET',
+                    data: {},
+                    dataType: 'JSON',
+                    success: (function (data) {
+                        locdata = data;
+
+                        //console.log(data);
+                        var s = '<option value="-1">Please Select Cost Center</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            s += '<option value="' + data[i].CostCenter + '" location="' + data[i].Location + '"' + 'id="' + data[i].Id + '">' + data[i].CostCenter + '</option>';
+                        }
+                        $("#drpCostCentre").html(s);
+
+
+                    }),
+                    error: (function (data) {
+                        //code
+                    })
+                })
+            }
+
+        }
+    }
+
+    function getDepartment() {
+        if (IsNew) {
+            if (!IsEdit) {
+                var value = JSON.stringify(IDC[0]);
+                var value_1 = JSON.parse(value);
+                var selectedLocation = value_1.Value[0].Department;
+                console.log(selectedLocation);
+
+                $.ajax({
+                    url: '/List/Department',
+                    type: 'GET',
+                    data: {},
+                    dataType: 'JSON',
+                    success: (function (data) {
+                        //locdata = data;
+
+                        //console.log(data);
+                        var s = '<option value="-1">Please Select Department</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            if (data[i].Department == selectedLocation) {
+                                s += '<option value="' + data[i].Department + '" id="' + data[i].Id + '" selected>' + data[i].Department + '</option>';
+                            }
+                            else {
+                                s += '<option value="' + data[i].Department + '" id="' + data[i].Id + '">' + data[i].Department + '</option>';
+                            }
+                        }
+                        $("#drpDepartment").html(s);
+
+
+                    }),
+                    error: (function (data) {
+                        //code
+                    })
+                })
+            }
+            else {
+                $.ajax({
+                    url: '/List/Department',
+                    type: 'GET',
+                    data: {},
+                    dataType: 'JSON',
+                    success: (function (data) {
+                        locdata = data;
+
+                        //console.log(data);
+                        var s = '<option value="-1">Please Select Department</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            s += '<option value="' + data[i].Department + '" id="' + data[i].Id + '">' + data[i].Department + '</option>';
+                        }
+                        $("#drpDepartment").html(s);
+
+
+                    }),
+                    error: (function (data) {
+                        //code
+                    })
+                })
+            }
+        }
+
+    }
+
+    function GetLocationName() {
+        if (IsNew) {
+            if (!IsEdit) {
+                //
+                var value = JSON.stringify(IDC[0]);
+                var value_1 = JSON.parse(value);
+                var selectedLocation = value_1.Value[0].LocationName;
+                console.log(selectedLocation);
+
+                $.ajax({
+                    url: '/List/LocationMaster',
+                    type: 'GET',
+                    data: {},
+                    dataType: 'JSON',
+                    success: (function (data) {
+                        locdata = data;
+
+                        //console.log(data);
+                        var s = '<option value="-1">Please Select Location Name</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            if (data[i].LocationName == selectedLocation) {
+                                s += '<option value="' + data[i].Id + '" selected>' + data[i].LocationName + '</option>';
+                            }
+                            else {
+                                s += '<option value="' + data[i].Id + '">' + data[i].LocationName + '</option>';
+                            }
+
+                        }
+                        $("#drpLocationName").html(s);
+
+                    }),
+                    error: (function (data) {
+                        //code
+                    })
+                })
+            }
+            else {
+                $.ajax({
+                    url: '/List/LocationMaster',
+                    type: 'GET',
+                    data: {},
+                    dataType: 'JSON',
+                    success: (function (data) {
+                        locdata = data;
+
+                        //console.log(data);
+                        var s = '<option value="-1">Please Select Location Name</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            s += '<option value="' + data[i].Id + '">' + data[i].LocationName + '</option>';
+
+                        }
+                        $("#drpLocationName").html(s);
+
+                    }),
+                    error: (function (data) {
+                        //code
+                    })
+                })
+
+            }
+        }
+
+    }
+
+    function GetArea() {
+        //
+        if (IsNew) {
+            if (!IsEdit) {
+                var value = JSON.stringify(IDC[0]);
+                var value_1 = JSON.parse(value);
+                var selectedLocation = value_1.Value[0].LocationId;
+                console.log(selectedLocation);
+
+
+                $("#AreaTR").show();
+                $('#AreaListEdit').multiselect('destroy');
+                /*$('#tableBody').empty();*/
+                var Locationid = selectedLocation;
+                $.ajax({
+                    url: '/IDCard/AreaMaster',
+                    type: 'GET',
+                    data: { Locationid: Locationid },
+                    dataType: 'JSON',
+                    success: (function (data) {
+                        locdata = data;
+
+                        //console.log(data);
+                        var s = null;
+                        for (var i = 0; i < data.length; i++) {
+                            //  s += '<option value="' + data[i].Id + '">' + data[i].AreaName + '</option>';
+                            s += '<option value="' + data[i].Id + '" LocationId="' + data[i].LocationId + '">' + data[i].AreaName + '</option>';
+                        }
+                        $("#AreaListEdit").html(s);
+
+
+                        //$('#AreaList').multiselect({
+                        //    includeSelectAllOption: false,
+                        //    onChange: function (option, checked) {
+                        //        AreaListOnChange(option, checked);
+                        //    },
+                        //});
+
+                        $("#AreaListEdit").multiselect({
+                            includeSelectAllOption: false,
+                            onChange: function (option, checked) {
+                                AreaListOnChangeEdit(option, checked);
+                            },
+                        });
+                        var hidValue = $("#hidSelectedOptions").val();
+                        //alert(hidValue);
+                        var selectedOptions = hidValue.split(",");
+                        for (var i in selectedOptions) {
+                            var optionVal = selectedOptions[i];
+                            $("#AreaListEdit").find("option[value=" + optionVal + "]").prop("selected", "selected");
+                        }
+                        $("#AreaListEdit").multiselect('refresh');
+                    }),
+                    error: (function (data) {
+                        //code
+                    })
+                })
+
+            }
+            else {
+
+                $("#AreaTR").show();
+                $('#AreaList').multiselect('destroy');
+                $('#tableBody').empty();
+                var Locationid = $("#drpLocationName").val();
+                $.ajax({
+                    url: '/IDCard/AreaMaster',
+                    type: 'GET',
+                    data: { Locationid: Locationid },
+                    dataType: 'JSON',
+                    success: (function (data) {
+                        locdata = data;
+
+                        //console.log(data);
+                        var s = null;
+                        for (var i = 0; i < data.length; i++) {
+                            //  s += '<option value="' + data[i].Id + '">' + data[i].AreaName + '</option>';
+                            s += '<option value="' + data[i].Id + '" LocationId="' + data[i].LocationId + '">' + data[i].AreaName + '</option>';
+                        }
+                        $("#AreaList").html(s);
+
+
+                        //$('#AreaList').multiselect({
+                        //    includeSelectAllOption: true
+                        //});
+
+                        $('#AreaList').multiselect({
+                            includeSelectAllOption: false,
+                            onChange: function (option, checked) {
+                                //console.log($(option));
+                                //console.log(checked);
+                                AreaListOnChange(option, checked);
+                            },
+
+                        });
+                    }),
+                    error: (function (data) {
+                        //code
+                    })
+                })
+
+            }
+        }
+
+    }
+
+    function AreaListOnChange(option, checked) {
+        var AreaText = $(option).text();
+        var AreaId = $(option).val();
+        var Locationid = $("#drpLocationName").val();
+        //
+        if (checked) {
+            $.ajax({
+                url: '/IDCard/SubAreaMaster',
+                type: 'GET',
+                data: { Locationid: Locationid, AreaID: AreaId },
+                dataType: 'JSON',
+                success: (function (data) {
+                    locdata = data;
+                    console.log(data);
+
+                    if (data.length == 0) {
+                        start = "<tr class='align_colspan" + AreaId + "' id='" + AreaId + "' value='" + AreaId + "'><td value='" + AreaId + "' id='" + AreaId + "' class='w-25 allFormLables noTopBorder' data-hasSubAreas='0'>" + AreaText + "</td><td><input type='checkbox' value='" + AreaId + "'  id='" + AreaId + "'></td><td><input class='w-50 noTopBorder' type='text' readonly  id='" + AreaId + "'></br><small>(sign)</small></td></tr>";
+                    }
+                    else {
+                        //Adding Sub Areas
+                        var $table = $("#AreaTable");
+                        var rowCount = $('#AreaTable tr').length;
+                        var count = rowCount;
+                        var start = "";
+                        start = "<tr id=tr_" + AreaId + "><td class='align_colspan" + AreaId + "' id='" + AreaId + "' value='" + AreaId + "'><div class='d-flex justify-content-around'> <div class='TableborderDiv f-600'>" + AreaText + "</div>";
+                        for (var k = 0; k < data.length; k++) {
+                            /*start += "<div class='TableborderDiv'>" + data[k].SubAreaName + " <input type = 'checkbox' value = '" + data[k].Id + "'  id = '" + data[k].Id + "' >" + "</div >";                        */
+                            start += "<div class='TableborderDiv'>" + " <input type = 'checkbox' value = '" + data[k].Id + "'  id = '" + data[k].Id + "' >" + data[k].SubAreaName + "</div >";
+                        }
+                        console.log(start);
+                        $('#tableBody').append(start + "</div></td></tr>");
+                    }
+                }),
+                error: (function (data) {
+                })
+            })
+        }
+        else {
+            $('#tableBody').find("#tr_" + AreaId).remove();
+        }
+
+
+        //$("#AreaList option:selected").each(function () {
+        //    //var markup = null;
+        //    //var trs = false;
+        //    //var AreaText = null;
+        //    //var AreaId = null;
+        //    //var $this = $(this);
+        //    //if ($this.length) {
+        //    //    AreaText = $this.text();
+        //    //    AreaId = $this.val();
+        //    //}
+        //    //var uncheckedValues = $("select#AreaList").find('option').not(':selected');
+        //    //var uncheckedArray = uncheckedValues.map(function () {
+        //    //    return this.text;
+
+        //    //}).get();
+
+        //    //$('#AreaTable').find('tr').each(function (i, el) {
+        //    //    var $tds = $(this).find('td');
+        //    //    var areaname = $tds.eq(0).text();
+        //    //    if (areaname == AreaText) {
+        //    //        trs = true;
+        //    //    }
+        //    //    for (var j = 0; j < uncheckedArray.length; j++) {
+        //    //        if (areaname == uncheckedArray[j]) {
+        //    //            $(this).closest("tr").remove();
+        //    //        }
+        //    //    }
+        //    //});
+
+
+        //});
+
+        //    if (ID.length == 0) {
+        //        $('#tableBody').empty();
+        //    }
+
+        //});
+    }
+    //$('#AreaList').on('change', function () {
+    //    //
+    //    var ID = $(this).val();
+    //    $("#AreaList option:selected").each(function () {
+    //        var markup = null;
+    //        var trs = false;
+    //        var AreaText = null;
+    //        var AreaId = null;
+    //        var $this = $(this);
+    //        if ($this.length) {
+    //            AreaText = $this.text();
+    //            AreaId = $this.val();
+    //        }
+    //        var uncheckedValues = $("select#AreaList").find('option').not(':selected');
+    //        var uncheckedArray = uncheckedValues.map(function () {
+    //            return this.text;
+
+    //        }).get();
+
+    //        $('#AreaTable').find('tr').each(function (i, el) {
+    //            var $tds = $(this).find('td');
+    //            var areaname = $tds.eq(0).text();
+    //            if (areaname == AreaText) {
+    //                trs = true;
+    //            }
+    //            for (var j = 0; j < uncheckedArray.length; j++) {
+    //                if (areaname == uncheckedArray[j]) {
+    //                    $(this).closest("tr").remove();
+    //                }
+    //            }
+    //        });
+
+    //        if (trs == true) {
+    //            var exists = true;
+    //        }
+    //        else {
+    //            //
+    //            //Sub - Area
+
+    //            var locdata = null;
+    //            var Locationid = $("#drpLocationName").val();
+    //            var AreaID = AreaId;
+    //            $.ajax({
+    //                url: '/List/SubAreaMaster',
+    //                type: 'GET',
+    //                data: { Locationid: Locationid, AreaID: AreaID },
+    //                dataType: 'JSON',
+    //                success: (function (data) {
+    //                    locdata = data;
+
+    //                    ////Adding Areas
+    //                    //if (data.length == 0) {
+    //                    //    markup = "<tr id='" + AreaId + "' value='" + AreaId + "'><td value='" + AreaId + "' id='" + AreaId + "' class='w-25 allFormLables noTopBorder' data-hasSubAreas='0'>" + AreaText + "</td><td><input type='checkbox' value='" + AreaId + "'  id='" + AreaId + "'></td><td><input class='w-50 noTopBorder' type='text' readonly  id='" + AreaId + "'><br><small>(sign)</small></td></tr>";
+    //                    ///* $('#tableBody').append(markup);*/
+    //                    //    $("#AreaTable > tbody").append(markup);
+    //                    //}
+    //                    //else {
+    //                    //  //Adding Sub Areas
+    //                    //    var $table = $("#AreaTable");
+    //                    //    var rowCount = $('#AreaTable tr').length;
+    //                    //    var count = rowCount;
+    //                    //    var $row = $('#tableBody').append("<tr id='" + AreaId + "' value='" + AreaId + "'><td value='" + AreaId + "' id='" + AreaId + "' class='w-25 allFormLables noTopBorder'>"+AreaText+"</td><tr />").children("tr:eq(" + count + ")");
+    //                    //        for (var k = 0; k < data.length; k++) {
+    //                    //            $row.append("<td> "+data[k].SubAreaName+"  <input type='checkbox' value='" + data[k].Id + "'  id='" + data[k].Id + "'></td>");
+    //                    //        }
+    //                    //    $row.append("<td><input class='w-50 noTopBorder' type='text' readonly id='" + AreaId + "'><br><small>(sign)</small></td>");
+    //                    //}
+
+    //                    if (data.length == 0) {
+    //                        markup = "<tr class='align_colspan" + AreaId + "' id='" + AreaId + "' value='" + AreaId + "'><td value='" + AreaId + "' id='" + AreaId + "' class='w-25 allFormLables noTopBorder' data-hasSubAreas='0'>" + AreaText + "</td><td><input type='checkbox' value='" + AreaId + "'  id='" + AreaId + "'></td><td><input class='w-50 noTopBorder' type='text' readonly  id='" + AreaId + "'></br><small>(sign)</small></td></tr>";
+    //                        /* $('#tableBody').append(markup);*/
+    //                        $("#AreaTable > tbody").append(markup);
+    //                        $(".align_colspan1").children('td').eq(1).attr('colspan', 6);
+    //                        $(".align_colspan12").children('td').eq(1).attr('colspan', 3);
+    //                        $(".align_colspan9").children('td').eq(1).attr('colspan', 4);
+    //                        $(".align_colspan7").children('td').eq(1).attr('colspan', 5);
+    //                        $(".align_colspan11").children('td').eq(1).attr('colspan', 3);
+    //                        $(".align_colspan8").children('td').eq(1).attr('colspan', 5);
+    //                        $(".align_colspan6").children('td').eq(1).attr('colspan', 6);
+    //                        $(".align_colspan5").children('td').eq(1).attr('colspan', 6);
+    //                        $(".align_colspan3").children('td').eq(1).attr('colspan', 6);
+    //                        $(".align_colspan2").children('td').eq(1).attr('colspan', 6);
+    //                        $(".align_colspan4").children('td').eq(1).attr('colspan', 6);
+    //                    }
+    //                    else {
+    //                        //Adding Sub Areas
+    //                        var $table = $("#AreaTable");
+    //                        var rowCount = $('#AreaTable tr').length;
+    //                        var count = rowCount;
+    //                        var $row = $('#tableBody').append("<tr class='align_colspan" + AreaId + "' id='" + AreaId + "' value='" + AreaId + "'><td value='" + AreaId + "' id='" + AreaId + "' class='w-25 allFormLables noTopBorder'>" + AreaText + "</td><tr />").children("tr:eq(" + count + ")");
+    //                        for (var k = 0; k < data.length; k++) {
+    //                            $row.append("<td> " + data[k].SubAreaName + "  <input type='checkbox' value='" + data[k].Id + "'  id='" + data[k].Id + "'></td>");
+    //                        }
+    //                        $row.append("<td><input class='w-50 noTopBorder' type='text' readonly id='" + AreaId + "'><br><small>(sign)</small></td>");
+    //                        $(".align_colspan1").children('td').eq(1).attr('colspan', 6);
+    //                        $(".align_colspan12").children('td').eq(1).attr('colspan', 3);
+    //                        $(".align_colspan9").children('td').eq(1).attr('colspan', 4);
+    //                        $(".align_colspan7").children('td').eq(1).attr('colspan', 5);
+    //                        $(".align_colspan11").children('td').eq(1).attr('colspan', 3);
+    //                        $(".align_colspan8").children('td').eq(1).attr('colspan', 5);
+    //                        $(".align_colspan6").children('td').eq(1).attr('colspan', 6);
+    //                        $(".align_colspan5").children('td').eq(1).attr('colspan', 6);
+    //                        $(".align_colspan3").children('td').eq(1).attr('colspan', 6);
+    //                        $(".align_colspan2").children('td').eq(1).attr('colspan', 6);
+    //                        $(".align_colspan4").children('td').eq(1).attr('colspan', 6);
+    //                    }
+
+    //                }),
+    //                error: (function (data) {
+    //                    //code
+    //                })
+    //            })
+    //        }
+
+    //    });
+
+    //    if (ID.length == 0) {
+    //        $('#tableBody').empty();
+    //    }
+
+    //});
+
+    function AreaListOnChangeEdit(option, checked) {
+        //
+        var AreaText = $(option).text();
+        var AreaId = $(option).val();
+        var Locationid = $("#drpLocationName").val();
+
+        if (checked) {
+            $.ajax({
+                url: '/IDCard/SubAreaMaster',
+                type: 'GET',
+                data: { Locationid: Locationid, AreaID: AreaId },
+                dataType: 'JSON',
+                success: (function (data) {
+                    locdata = data;
+                    console.log(data);
+
+                    if (data.length == 0) {
+                        start = "<tr class='align_colspan" + AreaId + "' id='" + AreaId + "' value='" + AreaId + "'><td value='" + AreaId + "' id='" + AreaId + "' class='w-25 allFormLables noTopBorder' data-hasSubAreas='0'>" + AreaText + "</td><td><input type='checkbox' value='" + AreaId + "'  id='" + AreaId + "'></td><td><input class='w-50 noTopBorder' type='text' readonly  id='" + AreaId + "'></br><small>(sign)</small></td></tr>";
+                    }
+                    else {
+                        //Adding Sub Areas
+                        var $table = $("#AreaTableView");
+                        var rowCount = $('#AreaTableView tr').length;
+                        var count = rowCount;
+                        var start = "";
+                        start = "<tr id=tr_" + AreaId + "><td class='align_colspan" + AreaId + "' id='" + AreaId + "' value='" + AreaId + "'><div class='d-flex justify-content-around'> <div class='TableborderDiv f-600'>" + AreaText + "</div>";
+                        for (var k = 0; k < data.length; k++) {
+                            /*start += "<div class='TableborderDiv'>" + data[k].SubAreaName + " <input type = 'checkbox' value = '" + data[k].Id + "'  id = '" + data[k].Id + "' >" + "</div >";                        */
+                            start += "<div class='TableborderDiv'>" + " <input type = 'checkbox' value = '" + data[k].Id + "'  id = '" + data[k].Id + "' >" + " " + data[k].SubAreaName + "</div >";
+                        }
+                        console.log(start);
+                        $('#tableBodyView').append(start + "</div></td></tr>");
+                    }
+                }),
+                error: (function (data) {
+                })
+            })
+        }
+        else {
+            $('#tableBodyView').find("#tr_" + AreaId).remove();
+        }
+    }
+
+    function AreaSubArea() {
+        ////
+        GetAreaOnEdit();
+    }
+
+    function GetAreaOnEdit() {
+        ////
+        $('#AreaList').multiselect('destroy');
+        $('#tableBody').empty();
+        var Locationid = $("#drpLocationName").val();
+        $.ajax({
+            url: '/IDCard/AreaMaster',
+            type: 'GET',
+            data: { Locationid: Locationid },
+            dataType: 'JSON',
+            success: (function (data) {
+                locdata = data;
+
+                //console.log(data);
+                var s = null;
+                for (var i = 0; i < data.length; i++) {
+
+                    s += '<option value="' + data[i].Id + '" LocationId="' + data[i].LocationId + '">' + data[i].AreaName + '</option>';
+                }
+                $("#AreaList").html(s);
+
+
+                $('#AreaList').multiselect({
+                    includeSelectAllOption: true,
+                });
+
+                // $("#AreaList").val([2, 4]);
+
+            }),
+            error: (function (data) {
+                //code
+            })
+        })
+    }
+
+    //function GetAccess(e) {
+    //    //
+
+    //    $("#drpCostCentre option:selected").each(function () {
+    //        $(e.options).removeAttr('selected', 'selected');
+    //    });
+
+    //    var LocationId = e.options[e.selectedIndex].getAttribute("location");
+    //    var drpCostCentre = $("#drpCostCentre").val();
+    //    $("#LocationId").val(drpCostCentre);
+
+    //    $("#drpCostCentre option[value='" + drpCostCentre + "']").attr('selected', 'selected');
+    //    if (LocationId == "Mumbai") {
+    //        $("#AurangabadTR").hide();
+    //        $("#PuneTR").hide();
+    //        $("#MumbaiTR").show();
+    //    }
+    //    else if (LocationId == "Pune") {
+    //        $("#AurangabadTR").hide();
+    //        $("#MumbaiTR").hide();
+    //        $("#PuneTR").show();
+    //    }
+    //    else if (LocationId == "Aurangabad") {
+    //        $("#MumbaiTR").hide()
+    //        $("#PuneTR").hide();
+    //        $("#AurangabadTR").show();
+    //    }
+    //    else {
+    //        $("#MumbaiTR").show()
+    //        $("#PuneTR").show();
+    //        $("#AurangabadTR").show();
+    //          }
+    //}
+
+    $("#btnSubmit").on('click', function (e) {
+        //
+
+        var drpEmployeeType = $("#drpEmployeeType option:selected").val();
+        var surname = document.getElementById("txtSurname").value;
+        var firstname = document.getElementById("txtEmployeeName").value;
+        var empid = document.getElementById("txtEmployeeNumber").value;
+        var cost = $("#drpCostCentre option:selected").val();
+        var dept = $("#drpDepartment option:selected").val();
+        var drpLocationName = $("#drpLocationName option:selected").val();
+
+        if (IsNew) {
+            if (!IsEdit) {
+                subAreaSelection = $("#AreaListEdit option:selected").val();
+            }
+            else {
+                subAreaSelection = $("#AreaList option:selected").val();
+            }
+        }
+
+        if (drpEmployeeType == "") {
+            requiredModal("Please select the Employee Type");
+            return false;
+        }
+        if (surname == "") {
+            requiredModal("Please enter the Surname");
+            return false;
+        }
+        if (firstname == "") {
+            requiredModal("Please enter the First Name");
+            return false;
+        }
+        if (empid == "") {
+            requiredModal("Please enter the Employee Number");
+            return false;
+        }
+        if (cost == -1) {
+            requiredModal("Please select the Cost Centre");
+            return false;
+        }
+        if (dept == -1) {
+            requiredModal("Please select the Department");
+            return false;
+        }
+        if ($('.Access:checkbox:checked').length == 0) {
+            requiredModal("Please select at least one Profile Access");
+            return false;
+        }
+        if (drpLocationName == "-1") {
+            requiredModal("Please select the Location Name");
+            return false;
+        }
+        if (subAreaSelection == undefined) {
+            requiredModal("Please select Areas");
+            return false;
+        }
+
+        if (IsNew) {
+            if (!IsEdit) {
+                //Area & Sub-Area Array binding
+                var doors = Array();
+                var abc = [];
+                $("#AreaTableView tr").each(function (i, v) {
+                    let tempObject = { Area: 0, SubAreas: [] }
+                    var area = $(this).children('td').first().attr('id');
+                    if (area != undefined) {
+                        tempObject.Area = $(this).children('td').first().attr('id');
+                    }
+
+                    $(this).children('td').each(function (j, w) {
+                        $(this).children('div').each(function (k, z) {
+                            $(this).children('div').each(function (p, q) {
+
+                                if ($(this).find('input:checkbox:checked:first').length > 0) {
+                                    tempObject.SubAreas.push($(this).find('input:checkbox:checked:first').val());
+                                }
+                                else {
+                                    if (!($(this).text()) == '(sign)')
+                                        tempObject.SubAreas.push($(this).text());
+                                }
+
+                            });
+                        });
+                    });
+                    if (area != undefined) {
+                        abc.push(tempObject);
+                    }
+                });
+
+                console.log(abc);
+
+                var LocationName = $("#drpLocationName option:selected").text();
+                $("#drpLocationValue").val(LocationName);
+                console.log(LocationName);
+
+                var form = $("#DARForm").serialize();
+                form += "&areaArr=" + JSON.stringify(abc);
+
+                console.log(form);
+            }
+            else {
+
+                //Area & Sub-Area Array binding
+                var doors = Array();
+                var abc = [];
+                $("#AreaTable tr").each(function (i, v) {
+                    let tempObject = { Area: 0, SubAreas: [] }
+                    var area = $(this).children('td').first().attr('id');
+                    if (area != undefined) {
+                        tempObject.Area = $(this).children('td').first().attr('id');
+                    }
+
+                    $(this).children('td').each(function (j, w) {
+                        $(this).children('div').each(function (k, z) {
+                            $(this).children('div').each(function (p, q) {
+
+                                if ($(this).find('input:checkbox:checked:first').length > 0) {
+                                    tempObject.SubAreas.push($(this).find('input:checkbox:checked:first').val());
+                                }
+                                else {
+                                    if (!($(this).text()) == '(sign)')
+                                        tempObject.SubAreas.push($(this).text());
+                                }
+
+                            });
+                        });
+                    });
+                    if (area != undefined) {
+                        abc.push(tempObject);
+                    }
+                });
+
+                //console.log(abc);
+
+                var LocationName = $("#drpLocationName option:selected").text();
+                $("#drpLocationValue").val(LocationName);
+                //console.log(LocationName);
+
+                var form = $("#DARForm").serialize();
+                form += "&areaArr=" + JSON.stringify(abc);
+
+                //console.log(form);
+            }
+        }
+        $("#pageLoader").removeClass('invisible');
+        //return;
+
+        $.ajax({
+            url: '/IDCard/SaveIDCard',
+            type: 'POST',
+            data: form,
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data[1].Value == 1) {
+                    ////
+                    $("#pageLoader").addClass('invisible');
+                    successModal(data[0].Value);
+                    $("#DARForm").trigger("reset");
+                    if (IsNew) {
+                        if (!IsEdit) {
+                            setTimeout(function () {// wait for 4 secs(2)
+                                location.reload(); // then reload the page.(3)
+                            }, 4000);
+                        }
+                    }
+                    $('#AreaList').multiselect('destroy');
+                    $('#tableBody').empty();
+                }
+                else {
+                    $("#pageLoader").addClass('invisible');
+                    failureModal();
+                    $("#DARForm").trigger("reset");
+                    $('#AreaList').multiselect('destroy');
+                    $('#tableBody').empty();
+                }
+            }),
+            error: (function (data) {
+                $("#pageLoader").addClass('invisible');
+                failureModal();
+                $("#DARForm").trigger("reset");
+                $('#AreaList').multiselect('destroy');
+                $('#tableBody').empty();
+            })
+        })
+    });
+
+    function validityModal(txt) {
+        ////
+        if (txt == 'approve') {
+        }
+        else if (txt == 'reject') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for rejecting the form');
+        }
+        else if (txt == 'enquire') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for enquiring the form');
+        }
+    }
+
+    function saveResponse(text) {
+        //
+        var status = '', comment = '';
+        comment = $("#comment-" + text).val();
+        switch (text) {
+            case 'approve': {
+                status = 'Approved';
+                break;
+            }
+            case 'reject': {
+                status = 'Rejected';
+                break;
+            }
+            case 'enquire': {
+                status = 'Enquired';
+                break;
+            }
+        }
+        $.ajax({
+            url: '/List/SaveResponse',
+            type: 'POST',
+            data: { response: status, appRowId: appRowId, comment: comment, approvalType: approvalType},
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data == 1) {
+                    successModal(text);
+                    $("#DARForm").trigger("reset");
+                    setTimeout(FilterMyTasks, 8000)
+                }
+                else {
+                    failureModal();
+                    $("#DARForm").trigger("reset");
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+                $("#DARForm").trigger("reset");
+            })
+        })
+    }
+
+    $(document).ready(function () {
+        $(".colspan_align1").children('td').eq(1).attr('colspan', 6);
+        $(".colspan_align12").children('td').eq(1).attr('colspan', 3);
+        $(".colspan_align9").children('td').eq(1).attr('colspan', 4);
+        $(".colspan_align7").children('td').eq(1).attr('colspan', 5);
+        $(".colspan_align11").children('td').eq(1).attr('colspan', 3);
+        $(".colspan_align8").children('td').eq(1).attr('colspan', 5);
+        $(".colspan_align6").children('td').eq(1).attr('colspan', 6);
+        $(".colspan_align5").children('td').eq(1).attr('colspan', 6);
+        $(".colspan_align3").children('td').eq(1).attr('colspan', 6);
+        $(".colspan_align2").children('td').eq(1).attr('colspan', 6);
+        $(".colspan_align4").children('td').eq(1).attr('colspan', 6);
+    })
+
+    $("#modalOkButton").on('click', function () {
+        ////
+        if (FlagRedirect != null) {
+            window.location = "../Dashboard";
+        }
+    });
+</script>

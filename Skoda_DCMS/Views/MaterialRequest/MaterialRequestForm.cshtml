@@ -1,0 +1,1946 @@
+﻿@model Skoda_DCMS.Models.MaterialRequestResults
+@{
+    var currentUser = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    ViewBag.Title = "Material Request Form";
+    Layout = ViewBag.Layout;
+    bool IsNewMode = true, IsEditMode = false, IsViewMode = false;
+    bool IsValidityCheck = true;
+    int FormId = 0, AppRowId = 0, ApprovalType = 0;
+    Skoda_DCMS.Models.MaterialRequestData MRF = null;
+    List<Skoda_DCMS.Models.MaterialDetailsData> MaterialDetails = new List<Skoda_DCMS.Models.MaterialDetailsData>();
+    List<Skoda_DCMS.Models.ApprovalDataModel> appList = new List<Skoda_DCMS.Models.ApprovalDataModel>();
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IsNewMode = ViewBag.IsNewMode;
+        IsEditMode = ViewBag.IsEditMode;
+        IsViewMode = ViewBag.IsViewMode;
+        MRF = ViewBag.Model.one[0] as Skoda_DCMS.Models.MaterialRequestData;
+        MaterialDetails = ViewBag.Model?.two as List<Skoda_DCMS.Models.MaterialDetailsData>;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        IsValidityCheck = ViewBag.IsValidityCheck != null ? (bool)ViewBag.IsValidityCheck : false; 
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+        appList = ViewBag.Model?.four as List<Skoda_DCMS.Models.ApprovalDataModel>;
+    }
+}
+
+<style>
+    /*New design css start here*/
+    .astColor {
+        color: red;
+    }
+
+    .textTrans {
+        width: 100%;
+        max-width: 99%;
+        border-radius: 5px;
+        margin-right: 0px;
+        border: 1px solid !important;
+    }
+
+    .empDetailsBg {
+        background-color: #fffbef;
+    }
+
+    #accordion select {
+        color: #000;
+        width: 100% !important;
+        height: 45px;
+        /*background-color: #F8F8F8;*/
+        border: 1px solid #BFBFBF;
+        box-sizing: border-box;
+        border-radius: 5px;
+        background-image: url(data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>);
+        background-repeat: no-repeat;
+        background-position: right .75rem center;
+        background-size: 16px 12px;
+    }
+
+    #accordion input[type='text'] {
+        width: 100% !important;
+        max-width: 100%;
+        height: 45px;
+        /*background-color: #F8F8F8;*/
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px !important;
+    }
+
+    #accordion input[type='date'] {
+        width: 100% !important;
+        max-width: 100%;
+        height: 45px;
+        background-color: #F8F8F8;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px;
+    }
+
+    #accordion input[type='time'] {
+        height: 45px;
+    }
+
+    #accordion label {
+        font-size: 16px;
+        line-height: 22px;
+        font-weight: 600;
+        color: #201F1F;
+    }
+
+    #accordion table tr td {
+        font-size: 16px;
+        line-height: 19px;
+        color: #201F1F;
+        background-color: white;
+    }
+
+    #accordion label {
+        display: block;
+    }
+
+    #accordion .card-header {
+        background: rgb(4 59 100) !important;
+        border-radius: 5px 5px 0px 0px;
+        position: relative;
+        margin-top: 15px;
+    }
+
+        #accordion .card-header.collapsed h5:after {
+            content: '+';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        #accordion .card-header h5:after {
+            content: '-';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+    #accordion h5 button {
+        font-size: 18px;
+        line-height: 22px;
+        /* identical to box height */
+        padding-left: 0px;
+        display: flex;
+        align-items: center;
+        text-transform: uppercase;
+        /* Text_white */
+
+        color: #FFFFFF;
+    }
+
+        #accordion h5 button:focus {
+            box-shadow: none;
+        }
+
+    .empDetailsFields label {
+        display: block !important;
+        margin-bottom: 0px;
+    }
+
+    .empDetailsFields .row label {
+        display: block;
+        margin-bottom: 0px;
+    }
+
+        .empDetailsFields .row label:nth-child(1) {
+            font-style: normal;
+            font-weight: normal !important;
+            font-size: 12px;
+            line-height: 18px;
+            color: #A9A9A9 !important;
+        }
+
+        .empDetailsFields .row label:nth-child(2) {
+            font-style: normal;
+            font-weight: normal;
+            font-size: 18px;
+            line-height: 22px;
+            color: #201F1F;
+        }
+
+    .firstLastName {
+        font-style: normal;
+        font-weight: normal;
+        font-size: 20px;
+        line-height: 24px;
+        /* identical to box height */
+
+        display: flex;
+        align-items: center;
+        color: #201F1F;
+    }
+
+    .submit-btn {
+        background: #3D3D3D;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #FFFFFF;
+        border-color: transparent !important;
+    }
+
+    .cancl-btn {
+        background: #FAE99B;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        border-color: transparent !important;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #212221;
+        margin-left: 10px;
+    }
+
+
+
+
+    .card-footer {
+        display: flex;
+        background-color: transparent !important;
+    }
+
+    .photo-form {
+        width: 100%;
+    }
+
+    .ui-front {
+        z-index: 9999999 !important;
+    }
+
+    /* NEW UI CSS END*/
+
+
+    .showBorder {
+        border: 1px solid #dee2e6;
+    }
+
+    .multiselect {
+        height: 47px;
+        margin-top: -1px;
+    }
+    /*Animation CSS Starts*/
+
+    div.input-block {
+        position: relative;
+    }
+
+        div.input-block input {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 188px;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block textarea {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 100%;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            background-color: #fff;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block span.placeholder {
+            position: absolute;
+            margin: 17px 0;
+            padding: 0 4px;
+            font-family: Roboto, sans-serif;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            top: -6px;
+            left: 15px;
+            transition: all 0.2s;
+            transform-origin: 0% 0%;
+            background: none;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        div.input-block textarea:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: #fff !important;
+        }
+
+        div.input-block textarea:valid + span.placeholder,
+        div.input-block textarea:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px) !important;
+            background: #fff !important;
+        }
+
+        div.input-block input:valid + span.placeholder,
+        div.input-block input:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: rgb(219,238,213);
+        }
+
+
+        div.input-block input.spanUpperSide + span.placeholder,
+        div.inputSelect select.spanUpperSide + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: rgb(219,238,213);
+        }
+
+        div.input-block input:read-only + span.placeholder,
+        div.input-block input:read-only + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background: rgb(219,238,213);
+        }
+
+
+    div.inputSelect span.placeholder {
+        position: absolute;
+        margin: 17px 0;
+        padding: 0 4px;
+        font-family: Roboto, sans-serif;
+        color: #000;
+        display: flex;
+        align-items: center;
+        font-size: 1rem;
+        top: -6px;
+        left: 15px;
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+        background: none;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    div.inputSelect select:focus + span.placeholder {
+        transform: scale(0.8) translateY(-30px);
+        background: rgb(219,238,213);
+        z-index: 9;
+    }
+
+    div.inputSelect select:not([value=""]):valid + span.placeholder {
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+    }
+
+
+
+    div.input-block input:focus + span.placeholder {
+        color: #284B63;
+    }
+
+    .breadcrumb {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+        padding: 1rem 1rem 0;
+        margin-bottom: 0;
+        list-style: none;
+        background-color: #FFFFFF;
+        border-radius: .25rem;
+    }
+
+    body.nav-sm .container.body .left_col {
+        width: 63px;
+        padding: 0;
+        position: fixed;
+        height: 100%;
+        z-index: 8;
+    }
+
+    .card {
+        position: relative;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        min-width: 0;
+        word-wrap: break-word;
+        background-color: #fff;
+        background-clip: border-box;
+        border: 0px;
+        border-radius: .25rem;
+    }
+
+    .dropdown-toggle::after {
+        display: none;
+        width: 0;
+        height: 0;
+        margin-left: .255em;
+        vertical-align: .255em;
+        content: "";
+        border-top: .3em solid;
+        border-right: .3em solid transparent;
+        border-bottom: 0;
+        border-left: .3em solid transparent;
+    }
+
+    input.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213);
+    }
+
+    inputSelect.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213) !important;
+    }
+
+    .empDetailsBg select.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background-color: rgb(219,238,213) !important;
+        z-index: 9;
+    }
+
+    textarea.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    .TransView {
+        background-color: white !important;
+    }
+
+    @@media only screen and (min-width: 992px) {
+        div .input-block span.placeholder {
+            font-size: 15px;
+        }
+
+        div.inputSelect span.placeholder {
+            font-size: 14px;
+        }
+    }
+
+    input[type='date'].spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    .showBorder {
+        border: 1px solid #dee2e6;
+    }
+
+    .wField {
+        width: 233px !important;
+        margin-left: 10px;
+    }
+
+    @@-moz-document url-prefix() {
+        input[type=time]::-ms-clear {
+            display: none;
+        }
+    }
+
+    .datetime-reset-button {
+        display: none !important;
+    }
+
+    .forShoppingCart {
+        margin-left: 14% !important;
+    }
+
+    .btn-group {
+        display: block !important;
+    }
+
+    #accordion label {
+        display: inline-block !important;
+    }
+
+
+    .custom-select:focus {
+        box-shadow: none !important;
+        border-color: none !important;
+    }
+
+    #addSoftwarebtn td {
+        border-top: none !important;
+    }
+
+    #locationBody select {
+        background-color: #fff !important;
+    }
+
+    #loader {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        
+        z-index: 10000;
+    }
+</style>
+@*<style>
+    .astColor {
+        color: red;
+    }
+    /*New design css start here*/
+
+    .textTrans {
+        width: 100%;
+        max-width: 99%;
+        border-radius: 5px;
+        margin-right: 0px;
+        border: 1px solid #BFBFBF !important;
+    }
+
+    .empDetailsBg {
+        background-color: #fffbef;
+    }
+
+    #accordion select {
+        color: #000;
+        width: 100% !important;
+        max-width: 100%;
+        height: 45px;
+        background-color: #fff;
+        border: 1px solid #BFBFBF;
+        box-sizing: border-box;
+        border-radius: 5px;
+        background-image: url(data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>);
+        background-repeat: no-repeat;
+        background-position: right .75rem center;
+        background-size: 16px 12px;
+    }
+
+    #accordion input[type='text'] {
+        width: 100% !important;
+        max-width: 100%;
+        height: 45px;
+        background-color: #fff;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px !important;
+    }
+
+    #accordion input[type='date'] {
+        width: 100% !important;
+        max-width: 100%;
+        height: 45px;
+        background-color: #fff;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px;
+    }
+
+    #accordion input[type='time'] {
+        height: 45px;
+    }
+
+    #accordion label {
+        font-size: 16px;
+        line-height: 22px;
+        font-weight: 600;
+        color: #201F1F;
+    }
+
+    #accordion table tr td {
+        font-size: 16px;
+        line-height: 19px;
+        color: #201F1F;
+        background-color: white;
+    }
+
+    #accordion label {
+        display: block;
+    }
+
+    #accordion .card-header {
+        background: rgb(4 59 100) !important;
+        border-radius: 5px 5px 0px 0px;
+        position: relative;
+        margin-top: 15px;
+    }
+
+        #accordion .card-header.collapsed h5:after {
+            content: '+';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        #accordion .card-header h5:after {
+            content: '-';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+    #accordion h5 button {
+        font-size: 18px;
+        line-height: 22px;
+        /* identical to box height */
+        padding-left: 0px;
+        display: flex;
+        align-items: center;
+        text-transform: uppercase;
+        /* Text_white */
+
+        color: #FFFFFF;
+    }
+
+        #accordion h5 button:focus {
+            box-shadow: none;
+        }
+
+    .empDetailsFields label {
+        display: block !important;
+        margin-bottom: 0px;
+    }
+
+    .empDetailsFields .row label {
+        display: block;
+        margin-bottom: 0px;
+    }
+
+        .empDetailsFields .row label:nth-child(1) {
+            font-style: normal;
+            font-weight: normal !important;
+            font-size: 12px;
+            line-height: 18px;
+            color: #A9A9A9 !important;
+        }
+
+        .empDetailsFields .row label:nth-child(2) {
+            font-style: normal;
+            font-weight: normal;
+            font-size: 18px;
+            line-height: 22px;
+            color: #201F1F;
+        }
+
+    .firstLastName {
+        font-style: normal;
+        font-weight: normal;
+        font-size: 20px;
+        line-height: 24px;
+        /* identical to box height */
+
+        display: flex;
+        align-items: center;
+        color: #201F1F;
+    }
+
+    .submit-btn {
+        background: #3D3D3D;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #FFFFFF;
+        border-color: transparent !important;
+    }
+
+    .cancl-btn {
+        background: #FAE99B;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        border-color: transparent !important;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #212221;
+        margin-left: 10px;
+    }
+
+
+
+
+    .card-footer {
+        display: flex;
+        background-color: transparent !important;
+    }
+
+    .photo-form {
+        width: 100%;
+    }
+
+    .ui-front {
+        z-index: 9999999 !important;
+    }
+    /*Animation CSS Starts*/
+
+    div.input-block {
+        position: relative;
+    }
+
+        div.input-block input {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 188px;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 5px !important;
+            border-top-right-radius: 5px !important;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block textarea {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 100%;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            background-color: #fff;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block span.placeholder {
+            position: absolute;
+            margin: 17px 0;
+            padding: 0 4px;
+            font-family: Roboto, sans-serif;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            top: -6px;
+            left: 15px;
+            transition: all 0.2s;
+            transform-origin: 0% 0%;
+            background: none;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        div.input-block textarea:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: #fff !important;
+        }
+
+        div.input-block textarea:valid + span.placeholder,
+        div.input-block textarea:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px) !important;
+            background: #fff !important;
+        }
+
+        div.input-block input:valid + span.placeholder,
+        div.input-block input:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: #fff;
+        }
+
+    .empDetailsFields div.input-block input:valid + span.placeholder,
+    .empDetailsFields div.input-block input:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: rgb(219,238,213);
+    }
+
+    div.input-block input.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: rgb(219,238,213);
+    }
+
+    .empDetailsFields div.input-block input:read-only + span.placeholder,
+    .empDetailsFields div.input-block input:read-only + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: rgb(219,238,213);
+    }
+
+    div.input-block input:read-only + span.placeholder,
+    div.input-block input:read-only + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: #fff;
+    }
+
+
+    div.inputSelect span.placeholder {
+        position: absolute;
+        margin: 17px 0;
+        padding: 0 4px;
+        font-family: Roboto, sans-serif;
+        color: #000;
+        display: flex;
+        align-items: center;
+        font-size: 1rem;
+        top: -6px;
+        left: 15px;
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+        background: none;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    div.inputSelect select:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background: #fff;
+        z-index: 9;
+    }
+
+    .empDetailsFields div.inputSelect select:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: rgb(219,238,213);
+        z-index: 9;
+    }
+
+    div.inputSelect select:not([value=""]):valid + span.placeholder {
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+    }
+
+
+
+    div.input-block input:focus + span.placeholder {
+        color: #284B63;
+    }
+
+    .breadcrumb {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+        padding: 1rem 1rem 0;
+        margin-bottom: 0;
+        list-style: none;
+        background-color: #FFFFFF;
+        border-radius: .25rem;
+        padding-bottom: 0.75rem !important;
+        padding-left: 0px !important;
+    }
+
+    body.nav-sm .container.body .left_col {
+        width: 63px;
+        padding: 0;
+        position: fixed;
+        height: 100%;
+        z-index: 8;
+    }
+
+    .card {
+        position: relative;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        min-width: 0;
+        word-wrap: break-word;
+        background-color: #fff;
+        background-clip: border-box;
+        border: 0px;
+        border-radius: .25rem;
+    }
+
+    .dropdown-toggle::after {
+        display: none;
+        width: 0;
+        height: 0;
+        margin-left: .255em;
+        vertical-align: .255em;
+        content: "";
+        border-top: .3em solid;
+        border-right: .3em solid transparent;
+        border-bottom: 0;
+        border-left: .3em solid transparent;
+    }
+
+    input.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213);
+    }
+
+    inputSelect.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213) !important;
+    }
+
+    select.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background-color: #fff !important;
+        z-index: 9;
+    }
+
+    .empDetailsFields select.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background-color: rgb(219,238,213) !important;
+        ;
+        z-index: 9;
+    }
+
+    textarea.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    .TransView {
+        background-color: white !important;
+    }
+
+    @media only screen and (min-width: 992px) {
+        div.input-block span.placeholder {
+            font-size: 15px;
+        }
+
+        div.inputSelect span.placeholder {
+            font-size: 14px;
+        }
+    }
+
+    input[type='date'].spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    .showBorder {
+        border: 1px solid #dee2e6;
+    }
+
+    .forSameHt {
+        padding-bottom: 40px;
+        height: 78px !important;
+    }
+
+    .forPoints input[type='checkbox'] {
+        margin-right: 2px;
+        position: relative;
+        top: 2px;
+    }
+
+    #lblReason {
+        font-size: 16px !important;
+    }
+
+    #loader {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        
+        z-index: 10000;
+    }
+</style>*@
+<script type="text/javascript">
+    function checkSelect(id) {
+
+        if ($('#' + id).val() != '') {
+            $('#' + id).addClass('spanUpperSide');
+        }
+    }
+    /*$('#timedemo').pickatime({ twelvehour: true });*/
+</script>
+
+<body>
+
+    <div class="right_col bg-color">
+
+        <div>
+            <ol class="breadcrumb pl-0">
+                <li>
+                    <a href="/Dashboard?formName=MRF">
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    Material Request Form
+                </li>
+            </ol>
+        </div>
+        <div class="container">
+            <div class="">
+                <div class="breadcrumb-container table-bordered" style="background-color: rgb(219,238,213) !important; ">
+                    <div class="col-md-4 col-lg-4">
+                        <span class="placeholder">Date : @(IsViewMode || IsEditMode ? (Convert.ToDateTime(MRF.FormID.CreatedDate).ToShortDateString()) : DateTime.Now.ToShortDateString())</span>
+                    </div>
+                    <div class="col-md-4 col-lg-4 mb-1 form-heading" style="text-align:center; margin-top:5px">
+                        <span>
+                            Material Request Form
+                        </span>
+                    </div>
+                    <div class="col-md-4 col-lg-4 text-right">
+                        @if (IsViewMode || IsEditMode)
+                        {
+                            <span class="placeholder"> Form Id : @(IsViewMode || IsEditMode ? ("MRF" + MRF.FormID.Id ?? "") : "" )</span>
+                        }
+                    </div>
+                </div>
+            </div>
+            <form action="/MaterialRequest/CreateMaterialRequest" id="MRForm" method="post">
+                <div class="heading d-none" id="headingErr">
+                    <h1 id="" class="info-header">Following fields are mandatory. Please fill in information for<br /></h1>
+                    <div id="add_to_me" class="header-list" style="color:red;">
+
+                    </div>
+                </div>
+                @if (IsEditMode || IsViewMode)
+                {
+                    <div>
+                        <input type="hidden" id="FormSrId" name="FormSrId" value="@(ViewBag.Model.one[0].Id)" />
+                        <input type="hidden" id="FormId" name="FormId" value="@(FormId)" />
+                        <input type="hidden" id="AppRowId" name="AppRowId" value="@(AppRowId)" />
+                    </div>
+                }
+
+
+                @{
+                    Html.RenderPartial("_SubmitterDetailsWithModel", (ViewBag as object));
+                }
+                @{
+                    Html.RenderPartial("_ApplicantDetailsWithModel", (ViewBag as object));
+                }
+
+              
+
+                <div id="accordion">
+                    <div class="card">
+                        <div class="card-header collapsed" id="headingOne" data-toggle="collapse" data-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                            <h5 class="mb-0">
+                                <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                                    <img src="~/assets/img/transactionIcon.svg" width="24" height="24" class="mr-2" />Transaction Fields
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseThree" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+                            <div class="card-body">
+                                <div class="form-row">
+                                    <div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                        <input type="text" class="inpDisable" name="txtRequestNumber" id="txtRequestNumber" value="@(IsViewMode||IsEditMode?MRF.RequestNumber:"")" required readonly>
+                                        <span class="placeholder TransView">Request No.<span class="astColor">*</span></span>
+                                    </div>
+
+                                    @if (IsNewMode || IsEditMode)
+                                    {
+                                        <div class="form-group col-md-4 col-lg-4 col-12 inputSelect">
+                                            <select name="drpRequestTo" class="" id="drpRequestTo" onchange="checkSelect('drpRequestTo')" required>
+                                                <option style="display: none;"></option>
+                                                <option value="Logistics">Logistics</option>
+                                            </select>
+                                            <span class="placeholder TransView">To<span class="astColor">*</span></span>
+                                        </div>
+                                    }
+                                    else if (IsViewMode)
+                                    {
+                                        <div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                            <input type="text" class="inpDisable" name="txtRequestToField" id="txtRequestToField" value="@(MRF.RequestTo??"")" required />
+                                            <span class="placeholder" style="background-color: #fff;">To<span class="astColor">*</span></span>
+                                        </div>
+                                    }
+
+                                    @if (IsNewMode || IsEditMode)
+                                    {
+                                        <div class="form-group col-md-4 col-lg-4 col-12 inputSelect">
+                                            <select name="drpRequestFrom" class="" id="drpRequestFrom" onchange="checkSelect('drpRequestFrom')" required>
+                                                <option style="display: none;"></option>
+                                                <option value="RFDLogistics">RFD Logistics</option>
+                                                @*<option value="Production">Production</option>
+                                                <option value="Quality">Quality</option>
+                                                <option value="Technical Services">Technical Services</option>*@
+                                            </select>
+                                            <span class="placeholder TransView">From<span class="astColor">*</span></span>
+                                        </div>
+                                    }
+                                    else if (IsViewMode)
+                                    {
+                                        <div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                            <input type="text" class="inpDisable" name="txtRequestFromField" id="txtRequestFromField" value="@(MRF.RequestFrom??"")" required />
+                                            <span class="placeholder TransView">From<span class="astColor">*</span></span>
+                                        </div>
+                                    }
+
+                                </div>
+
+                                <div class="form-row mt-3">
+                                    <div class="form-group col-12" id="uploadFileDiv">
+                                        @if (IsNewMode)
+                                        {
+                                            <div class="form-group col-md-6 col-lg-6 col-12" id="dnfFileUpload">
+                                                <label class="">
+                                                    Upload Document
+                                                </label>
+                                                <input type="file" id="fileToUpload" name="fileToUpload" style="background-color: white !important; width: 215px" />
+                                            </div>
+                                        }
+                                        else if (IsEditMode)
+                                        {
+                                            if (MRF.AttachmentFiles.Attachments.Count != 0)
+                                            {
+                                                foreach (var attachment in MRF.AttachmentFiles.Attachments)
+                                                {
+                                                    <div class="form-group col-md-6 col-lg-6 col-12" id="dnfFileUpload">
+                                                        <label class="">Upload Image for ID Card</label>
+                                                        <input type="file" id="fileToUpload" name="fileToUpload" style="background-color: white !important; width: 215px" />
+                                                        <input type="hidden" id="attachedfile" name="attachedfile" value="@System.Configuration.ConfigurationManager.AppSettings["SharepointSiteURL"]@attachment.ServerRelativeUrl" />
+                                                        <input type="hidden" id="attachedfileName" name="attachedfileName" value="@attachment.FileName" />
+                                                        <a href=@System.Configuration.ConfigurationManager.AppSettings["SharepointSiteURL"]@attachment.ServerRelativeUrl download=@attachment.FileName target="_blank">@attachment.FileName</a>
+                                                    </div>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <div class="form-group col-md-6 col-lg-6 col-12" id="dnfFileUpload">
+                                                    <label class="">
+                                                        Upload Document
+                                                    </label>
+                                                    <input type="file" id="fileToUpload" name="fileToUpload" style="background-color: white !important; width: 215px" />
+                                                </div>
+                                            }
+                                        }
+                                        else if (IsViewMode)
+                                        {
+                                            if (MRF.AttachmentFiles.Attachments.Count != 0)
+                                            {
+                                                foreach (var attachment in MRF.AttachmentFiles.Attachments)
+                                                {
+                                                    <div class="form-group col-md-6 col-lg-6 col-12" id="dnfFileUpload">
+                                                        <label class="">Upload Document</label>
+                                                        <a href=@System.Configuration.ConfigurationManager.AppSettings["SharepointSiteURL"]@attachment.ServerRelativeUrl download=@attachment.FileName target="_blank">@attachment.FileName </a>
+                                                    </div>
+                                                }
+                                            }
+                                        }
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="w-100 form-group">
+                                        <table class="mainTbl table table-border form-table-container-2">
+                                            <tbody>
+                                                <tr>
+                                                    <td class="bt-0 bb-0 pr-1 pl-1">
+                                                        <div><label id="lblDetails" class="f-600">Material Details<span class="astColor">*</span></label></div>
+                                                        <table style="width: 100%" class="w-100 mx-auto table table-border form-border text-center" id="tblMaterial">
+                                                            <thead class="form-head-1" style="margin-left:inherit !important;">
+                                                                <tr>
+                                                                    <th>Sr. No.</th>
+                                                                    <th>Part No.</th>
+                                                                    <th>Part Description</th>
+                                                                    <th>Quantity</th>
+                                                                    <th>Remarks</th>
+                                                                    @if (IsNewMode || IsEditMode)
+                                                                    {
+                                                                        <th></th>
+                                                                    }
+                                                                </tr>
+                                                            </thead>
+                                                            @if (IsEditMode)
+                                                            {
+                                                                var count = 1;
+                                                                <tbody class="form-border tableMaterial" id="materialBody">
+                                                                    @foreach (var item in MaterialDetails)
+                                                                    {
+                                                                        <tr id='@("row" + count)' class="tr_input">
+                                                                            <td class="sNo text-center">@count</td>
+                                                                            <td class="text-center"><input type="text" class="inpDisable inpPartNumValidate" name="txtPartNumber" id="txtPartNumber" value="@(IsViewMode||IsEditMode ? item.PartNumber:"")"></td>
+                                                                            <td class="text-center"><input type="text" class="inpDisable inpPartDescValidate" name="txtPartDescription" id="txtPartDescription" value="@(IsViewMode||IsEditMode ? item.PartDescription:"")"></td>
+                                                                            <td class="text-center"><input type="text" class="inpDisable inpQuantityValidate" name="txtQuantity" id="txtQuantity" value="@(IsViewMode||IsEditMode ? Convert.ToInt32(item.Quantity):0)" onkeypress="allowNumbersOnly(event)"></td>
+                                                                            <td class="text-center"><input type="text" name="txtRemarks" class="inpDisable inpRemarksValidate" id="txtRemarks" value="@(IsViewMode||IsEditMode ? item.Remarks:"")"></td>
+                                                                            <td style="max-width: 60px; vertical-align: central;">
+                                                                                <input class="remove-btn remove" type="image" src="~/assets/img/remove.png"
+                                                                                       alt="Remove" style="max-width: 85% !important; background-color: white;" />
+                                                                            </td>
+                                                                        </tr>
+                                                                        count++;
+                                                                    }
+                                                                </tbody>
+                                                            }
+                                                            else if (IsViewMode)
+                                                            {
+                                                                var count = 1;
+                                                                <tbody class="form-border tableMaterial" id="materialBody">
+                                                                    @foreach (var item in MaterialDetails)
+                                                                    {
+                                                                        <tr id='@("row" + count)' class="tr_input">
+                                                                            <td class="sNo text-center">@count</td>
+                                                                            <td class="text-center"><input type="text" class="inpDisable inpPartNumValidate" name="txtPartNumber" id="txtPartNumber" value="@(IsViewMode||IsEditMode ? item.PartNumber:"")"></td>
+                                                                            <td class="text-center"><input type="text" class="inpDisable inpPartDescValidate" name="txtPartDescription" id="txtPartDescription" value="@(IsViewMode||IsEditMode ? item.PartDescription:"")"></td>
+                                                                            <td class="text-center"><input type="text" class="inpDisable inpQuantityValidate" name="txtQuantity" id="txtQuantity" value="@(IsViewMode||IsEditMode ? Convert.ToInt32(item.Quantity):0)" onkeypress="allowNumbersOnly(event)"></td>
+                                                                            <td class="text-center"><input type="text" name="txtRemarks" class="inpDisable inpRemarksValidate" id="txtRemarks" value="@(IsViewMode||IsEditMode ? item.Remarks:"")"></td>                                                                     
+                                                                        </tr>
+                                                                        count++;
+                                                                    }
+                                                                </tbody>
+                                                            }
+                                                            else
+                                                            {
+                                                                <tbody class="form-border tableMaterial" id="materialBody">
+                                                                    @for (var i = 1; i < 2; i++)
+                                                                    {
+                                                                        <tr id="row1" class="tr_input">
+                                                                            <td class="sNo text-center">@i</td>
+                                                                            <td class="text-center"><input type="text" class="inpDisable inpPartNumValidate" name="txtPartNumber" id="txtPartNumber" value=""></td>
+                                                                            <td class="text-center"><input type="text" class="inpDisable inpPartDescValidate" name="txtPartDescription" id="txtPartDescription" value=""></td>
+                                                                            <td class="text-center"><input type="text" class="inpDisable inpQuantityValidate" name="txtQuantity" id="txtQuantity" value="" onkeypress="allowNumbersOnly(event)"></td>
+                                                                            <td class="text-center"><input type="text" name="txtRemarks" class="inpDisable inpRemarksValidate" id="txtRemarks" value=""></td>
+                                                                            <td style="max-width: 60px; vertical-align: central;">
+                                                                                <input class="remove-btn remove" type="image" src="~/assets/img/remove.png"
+                                                                                       alt="Remove" style="max-width: 85% !important; background-color: white;">
+                                                                            </td>
+                                                                        </tr>
+                                                                    }
+                                                                </tbody>
+                                                            }
+                                                        </table>
+                                                    </td>
+                                                </tr>
+                                                @if(IsNewMode||IsEditMode){
+                                                <tr align="right" id="addSoftwarebtn">
+                                                    <td class="">
+                                                        <button type="button" class="btn btn-sm submit-btn d-flex float-right mb-2 bl-1 " onclick="AddRows()">
+                                                            + Add
+                                                        </button>
+                                                        <input type="hidden" name="totalrows" id="totalrows">
+                                                    </td>
+                                                </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div class="form-row input-block">
+                                    <div class="form-group col-12">
+                                        @if (IsViewMode || IsEditMode)
+                                        {
+                                            <textarea class="textTrans inpDisable spanUpperSide" cols="90" rows="3" name="txtBusinessNeed" id="txtBusinessNeed" maxlength="500" required>@(MRF.BusinessNeed??"")</textarea>
+                                        }
+                                        else
+                                        {
+                                            <textarea class="textTrans" cols="90" rows="3" name="txtBusinessNeed" id="txtBusinessNeed" maxlength="500" required></textarea>
+                                        }
+                                        <span class="placeholder TransView">Business Function & Responsibility (Max. 500)<span class="astColor">*</span></span>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+               
+                @if (IsViewMode || IsEditMode)
+                {
+                    <div id="accordion">
+                        <div class="card">
+                            <div class="card-header collapsed" id="headingThree" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                                <h5 class="mb-0">
+                                    <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                                        <img src="~/assets/img/approvalTracking.svg" width="24" height="24" class="mr-2" />Approval Tracking
+                                    </button>
+                                </h5>
+                            </div>
+                            <div id="collapseFour" class="collapse" aria-labelledby="headingThree">
+                                <div class="card-body">
+                                    <div class="form-row">
+                                        <div class="col-md-12">
+                                            <table class="table w-100 td-border showBorder">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Name</th>
+                                                        <th>Role</th>
+                                                        <th>Processed on</th>
+                                                        <th>Status</th>
+                                                        <th class="text-center">Comments</th>
+                                                        <th class="text-center">Approval Level</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @if (IsViewMode || IsEditMode)
+                                                    {
+                                                        //Dynamic Code
+                                                        appList = ViewBag.Model?.four as List<Skoda_DCMS.Models.ApprovalDataModel>;
+                                                        {
+                                                            Html.RenderPartial("_ApprovalTracking", appList);
+                                                        }
+
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <div class="pt-3">
+                    <p class="text-left f-600">SF_PLP_029</p>
+                </div>
+
+
+                @if (IsEditMode)
+                {
+                    <div class="card-footer align-content-center">
+                        <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                            Re-Submit
+                        </button>
+                        <button type="reset" class="btn btn-danger btn-sm cancl-btn" id="btnCancel">
+                            Cancel
+                        </button>
+                    </div>
+                }
+                else if (IsNewMode)
+                {
+                    <div class="card-footer align-content-center">
+                        <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                            Submit
+                        </button>
+                        <button type="reset" class="btn btn-danger btn-sm cancl-btn" id="btnCancel">
+                            Cancel
+                        </button>
+                    </div>
+                }
+
+            </form>
+        </div>
+
+    </div>
+
+</body>
+
+<div class="modal fade" id="successModel" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header modelHeader">
+                <span class="modal-title modalMsgTitle" id="modalTitle"></span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label id="modalBody" class="lableMsg">  </label>
+                <input type="hidden" id="tab" value="0" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="submitBomBtn publishBtn" data-dismiss="modal" id="modalOkButton">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var spinner = $('#loader');
+    var isNewMode = @Html.Raw(Json.Encode(IsNewMode));
+     var isViewMode = @Html.Raw(Json.Encode(IsViewMode));
+    var isEditMode = @Html.Raw(Json.Encode(IsEditMode));
+    var mrf = @Html.Raw(Json.Encode(MRF));
+    var appRowId = @Html.Raw(Json.Encode(AppRowId));
+    var approvalType =@Html.Raw(Json.Encode(ApprovalType));
+    var materialDetails=@Html.Raw(Json.Encode(MaterialDetails));
+    var errorCount = 0;
+    var errors = "";
+    console.log("data : " + materialDetails);
+    //console.log(ridcf);
+    $(document).ready(function () {
+        pageLoad();
+      
+    });
+
+    function pageLoad() {
+        
+        $("#headingErr").addClass('d-none');
+        spinner.hide();
+        $("#rdOnBehalfOptionOthersLabel").text('Blue Collar Employee');
+
+        if (isEditMode) {
+            var value = JSON.stringify(mrf);
+           // console.log("mrf DATA : " + value);
+            var value_1 = JSON.parse(value);
+            //console.log("Parsed data : " + value_1);
+            var requestTo = value_1.RequestTo;
+           // console.log("requestTo" + requestTo);
+            $("#drpRequestTo option[value='" + requestTo + "']").prop('selected', 'selected');
+            $('#drpRequestTo').addClass("spanUpperSide");
+
+            var requestFrom = value_1.RequestFrom;
+            // console.log("requestTo" + requestTo);
+            $("#drpRequestFrom option[value='" + requestFrom + "']").prop('selected', 'selected');
+            $('#drpRequestFrom').addClass("spanUpperSide");
+        }
+
+        if (isViewMode) {
+
+            $(".inpDisable").attr("disabled", "disabled");
+            $(".txtDisable").attr("disabled", "disabled");
+          
+            var value = JSON.stringify(mrf);
+            var value_1 = JSON.parse(value);
+         
+        }
+    };
+
+    function successModal(txt) {
+        ////
+        $('#modalTitle').html('Success');
+        if (txt == "approve") {
+            $('#modalBody').html('Form has been approved!');
+        }
+        else if (txt == "reject") {
+            $('#modalBody').html('Form has been rejected!');
+        }
+        else if (txt == "enquire") {
+            $('#modalBody').html('Form has been enquired!');
+        }
+        else if (txt == "cancelled") {
+            $('#modalBody').html('Form has been cancelled!');
+        }
+        else {
+            if (isEditMode) {
+                $('#modalBody').html('Your form with ID: MRF' + txt + ' has been re-submitted! Kindly use this for future reference');
+            }
+            else {
+                $('#modalBody').html('Your form with ID: MRF' + txt + ' has been submitted! Kindly use this for future reference');
+            }
+        }
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function failureModal(txt) {
+        $('#modalTitle').html('Failure');
+        if (txt == null)
+            $('#modalBody').html('Some error occurred!');
+        else
+            $('#modalBody').html(txt);
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    $("#btnSubmit").on('click', function (e) {
+
+        validateSubmitter();
+        validateApplicant();
+
+
+        var requestTo = $("#drpRequestTo option:selected").val();
+        if (requestTo == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Request To" + "</li>";
+            AddError("drpRequestTo", '', errorCount);
+            errorCount++;
+        }
+        else {
+            RemoveError("drpRequestTo");
+        }
+
+        var requestFrom = $("#drpRequestFrom option:selected").val();
+        if (requestFrom == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Request From" + "</li>";
+            AddError("drpRequestFrom", '', errorCount);
+            errorCount++;
+        }
+        else {
+            RemoveError("drpRequestFrom");
+        }
+        
+        let firstMaterialCount = $(".inpPartNumValidate").length;
+
+        if (firstMaterialCount > 0) {
+
+            let rowCount = 1;
+
+            $(".tableMaterial").find('tr').each(function () {
+                let currentTr = $(this);
+                let currPartNum = $(currentTr).find(".inpPartNumValidate").val();
+                let currPartDesc = $(currentTr).find(".inpPartDescValidate").val();
+                let currQuantity = $(currentTr).find(".inpQuantityValidate").val();
+                let currRemarks = $(currentTr).find(".inpRemarksValidate").val();
+
+                if (currPartNum.trim() == '' && currPartDesc.trim() == '' && currQuantity.trim() == '' && currRemarks.trim() == '') {
+
+                    errors += "<li id='error" + errorCount + "'>" + "Enter data in row " + rowCount + " or remove the row in Material Details." + "</li>";
+                    $("#lblDetails").addClass('removeDetails');
+                    AddError("lblDetails", 'removeDetails', errorCount);
+                    errorCount++;
+                }
+                else if (currPartNum.trim() != '' && currPartDesc.trim() != '' && currQuantity.trim() != '' && currRemarks.trim() != '') {
+                    RemoveError("lblDetails");
+                }
+                else if (currPartNum.trim() != '' || currPartDesc.trim() != '' || currQuantity.trim() != '' || currRemarks.trim() != '') {
+                    if (currPartNum.trim() == '') {
+
+                        errors += "<li id='error" + errorCount + "'>" + "Part Number in Row " + rowCount + "</li>";
+                        $("#lblDetails").addClass('removeDetails');
+                        AddError("lblDetails", 'removeDetails', errorCount);
+                        errorCount++;
+                    }
+                    if (currPartDesc.trim() == '') {
+
+                        errors += "<li id='error" + errorCount + "'>" + "Part Desciption in Row " + rowCount + "</li>";
+                        $("#lblDetails").addClass('removeDetails');
+                        AddError("lblDetails", 'removeDetails', errorCount);
+                        errorCount++;
+                    }
+                    else {
+                        RemoveError("lblAddRemoveUserIDList");
+                    }
+                    if (currQuantity.trim() == '') {
+
+                        errors += "<li id='error" + errorCount + "'>" + "Quantity in Row " + rowCount + "</li>";
+                        $("#lblDetails").addClass('removeDetails');
+                        AddError("lblDetails", 'removeDetails', errorCount);
+                        errorCount++;
+                    }
+                    else {
+                        RemoveError("lblDetails");
+                    }
+                    if (currRemarks.trim() == '') {
+
+                        errors += "<li id='error" + errorCount + "'>" + "Remarks in Row " + rowCount + "</li>";
+                        $("#lblDetails").addClass('removeDetails');
+                        AddError("lblDetails", 'removeDetails', errorCount);
+                        errorCount++;
+                    }
+                    else {
+                        RemoveError("lblDetails");
+                    }
+                }
+                rowCount++;
+            });
+        }
+        else {
+            RemoveError("lblDetails");
+            errors += "<li id='error" + errorCount + "'>" + "Fill data for atleast 1 Material Details" + "</li>";
+            $("#lblDetails").addClass('removeDet');
+            AddError("lblDetails", 'removeDet', errorCount);
+            errorCount++;
+        }
+
+        var businessNeed = document.getElementById("txtBusinessNeed").value;
+        if (businessNeed == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Business Function & Responsibility" + "</li>";
+            AddError("txtBusinessNeed", '', errorCount);
+            errorCount++;
+        }
+        else {
+            RemoveError("txtBusinessNeed");
+        }
+
+        if (errors.length) {
+            errors = "<ol id='errorList'>" + errors + "</ol>";
+            $("#headingErr").removeClass('d-none');
+            document.getElementById("add_to_me").innerHTML = errors;
+            errors = "";
+            errorCount = 0;
+            if (isEditMode) {
+                $("#myModalRequest").scrollTop(0);
+            }
+            else {
+                $(window).scrollTop(0);
+            }
+            return false;
+        }
+        $("#headingErr").addClass('d-none');
+        document.getElementById("add_to_me").innerHTML = '';
+        errors = "";
+        errorCount = 0;
+
+        $(".dynamicHiddenField").remove();
+        $("#tblMaterial tr").each(function (index, element) {
+
+            if (index != 0) {
+                let currentRow = $(this);
+                let currentRowId = $(currentRow).attr('id');
+                /*let colCount = $('#' + currentRowId + ' td').length;*/
+                let input1 = $(currentRow).find("td:eq(1) input");
+                let input2 = $(currentRow).find("td:eq(2) input");
+                let input3 = $(currentRow).find("td:eq(3) input");
+                let input4 = $(currentRow).find("td:eq(4) input");
+
+                $(input1).closest('td').append('<input type="hidden" class="dynamicHiddenField" value="' + $(input1).val().replace(/,/g, '|!') + '" name="txtPartNumPost" />');
+
+                $(input2).closest('td').append('<input type="hidden" class="dynamicHiddenField" value="' + $(input2).val().replace(/,/g, '|!') + '" name="txtPartDescPost" />');
+
+                $(input3).closest('td').append('<input type="hidden" class="dynamicHiddenField" value="' + $(input3).val().replace(/,/g, '|!') + '" name="txtQtyPost" />');
+
+                $(input4).closest('td').append('<input type="hidden" class="dynamicHiddenField" value="' + $(input4).val().replace(/,/g, '|!') + '" name="txtRmkPost" />');
+            }
+        })
+
+        $("#pageLoader").removeClass('invisible');
+        $("#btnSubmit").text('Saving');
+        $("#btnSubmit").prop("disabled", true);
+        $("#btnCancel").prop("disabled", true);
+
+        var form = $("#MRForm");
+        var formData = new FormData(form[0]);
+        $.ajax({
+            url: '/MaterialRequest/CreateMaterialRequest',
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            data: formData,
+            enctype: 'multipart/form-data',
+            success: (function (data) {
+                console.log(data);
+                if (data.Status == 200) {
+                    
+                    $("#pageLoader").addClass('invisible');
+                    if (isNewMode && isEditMode) {
+                        $("#btnSubmit").text('Submit');
+                    }
+                    else {
+                        $("#btnSubmit").text('Re-Submit');
+                    }
+                    successModal(data.Message);
+                    $("#btnSubmit").prop("disabled", false);
+                    $("#btnCancel").prop("disabled", false);
+                    //UpdateRequestNumber(data);
+                }
+                else {
+                    failureModal(data.Message);
+                    console.log("failure");
+                    if (isNewMode && isEditMode) {
+                        $("#btnSubmit").text('Submit');
+                    }
+                    else {
+                        $("#btnSubmit").text('Re-Submit');
+                    }
+                    $("#pageLoader").addClass('invisible');
+                    $("#btnSubmit").prop("disabled", false);
+                    $("#btnCancel").prop("disabled", false);
+                }
+            }),
+            error: (function (data) {
+                failureModal(data.Message);
+                console.log("error");
+                if (isNewMode && isEditMode) {
+                    $("#btnSubmit").text('Submit');
+                }
+                else {
+                    $("#btnSubmit").text('Re-Submit');
+                }
+                $("#btnSubmit").prop("disabled", false);
+                $("#btnCancel").prop("disabled", false);
+                $("#pageLoader").addClass('invisible');
+            })
+        })
+        $("#tab").val(2);
+    });
+
+    //function UpdateRequestNumber(data) {
+    //    
+    //    console.log("data : " + data);
+    //   // var form = $("#CRForm").serialize();   
+
+    //    spinner.show();
+    //    $.ajax({
+    //        url: '/MaterialRequest/UpdateRequestNumber',
+    //        type: 'POST',
+    //        data: { rowId: data.RowId },
+    //        dataType: 'JSON',
+    //        async: true,
+    //        success: (function (response) {
+    //            console.log("response : " + response);
+    //            if (response == 1) {
+
+    //                successModal(data.Message);
+    //                $("#pageLoader").addClass('invisible');
+    //                $("#btnSubmit").prop("disabled", false);
+    //                $("#btnCancel").prop("disabled", false);
+    //            }
+    //            else {
+    //                failureModal();
+    //                $("#pageLoader").addClass('invisible');
+    //                $("#btnSubmit").prop("disabled", false);
+    //                $("#btnCancel").prop("disabled", false);
+    //            }
+    //        }),
+    //        error: (function (data) {
+    //            failureModal();
+    //            $("#pageLoader").addClass('invisible');
+    //            $("#btnSubmit").prop("disabled", false);
+    //            $("#btnCancel").prop("disabled", false);
+    //        })
+    //    })
+
+    //}
+
+    $("#btnCancel").on('click', function (e) {
+        ////
+        $("#headingErr").addClass('d-none');
+        document.getElementById("add_to_me").innerHTML = '';
+        if ($('#myModalRequest').hasClass('show'))
+            $('#myModalRequest').modal('hide');
+        else
+            $('#myModalEdit').modal('hide');
+        if (isNewMode || isEditMode) {
+            window.location = "../Dashboard";
+        }
+    });
+
+    function validityModal(txt) {
+        ////
+        if (txt == 'approve') {
+        }
+        else if (txt == 'reject') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for rejecting the form');
+        }
+        else if (txt == 'enquire') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for enquiring the form');
+        }
+    }
+
+    function saveResponse(text) {
+        var status = '', comment = '';
+        comment = $("#comment-" + text).val();
+        switch (text) {
+            case 'approve': {
+                status = 'Approved';
+                break;
+            }
+            case 'reject': {
+                status = 'Rejected';
+                if (comment == '') {
+                    validityModal(text);
+                    return;
+                }
+                break;
+            }
+            case 'enquire': {
+                status = 'Enquired';
+                if (comment == '') {
+                    validityModal(text);
+                    return;
+                }
+                break;
+            }
+        }
+        spinner.show();
+        $.ajax({
+            url: '/List/SaveResponse',
+            type: 'POST',
+            data: { response: status, appRowId: appRowId, comment: comment, approvalType: approvalType },
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data.Result == 1) {
+                    successModal(text);
+                    setTimeout(FilterMyTasks, 5000)
+                    spinner.hide();
+                }
+                else {
+                    failureModal();
+                    spinner.hide();
+                }
+
+            }),
+            error: (function (data) {
+                failureModal();
+                spinner.hide();
+            })
+        })
+        $("#tab").val(1);
+        return false;
+    }
+  
+    function allowNumbersOnly(e) {
+        var code = (e.which) ? e.which : e.keyCode;
+        if (code > 31 && (code < 48 || code > 57)) {
+            e.preventDefault();
+        }
+    }
+
+    function avoidSpecialSymbols(e) {
+        var keyCode = e.keyCode;
+        //console.log("keyCode=" + keyCode);
+        if ((keyCode >= 33 && keyCode <= 44) || (keyCode >= 58 && keyCode <= 64) || (keyCode >= 91 && keyCode <= 96) || (keyCode >= 123 && keyCode <= 126)) { e.preventDefault(); }
+
+    }
+
+    function alphaOnly(e) {
+        var key = e.keyCode;
+        if (key > 32 && (key < 65 || key > 122 || key == 91 || key == 92 || key == 93 || key == 94 || key == 95 || key == 96)) {
+            e.preventDefault();
+        }
+    }
+
+    $('#successModel').on('hide.bs.modal', function () {
+        
+        var tab = $("#tab").val();
+        console.log("tab = "+tab);
+        if (tab == 1) {
+            GetMyTaskTab();
+        }
+        else if (tab == 2) {
+            window.location = "../Dashboard?tab=" + tab;
+        }
+    })
+
+    function AddRows() {
+        
+        var newCount = rowIdx + 1;
+
+       // if (newCount <= 10) {
+        var row = '<tr id="row' + newCount + '" class="tr_input text-center td-border"><td class="sNo text-center">' + newCount + '</td>'
+            + '<td class="td-border"><input type="text" class="inpPartNumValidate" name="txtPartNumber" id="txtPartNumber" /></td>'
+            + '  <td class="td-border"><input type="text" class="inpPartDescValidate" name="txtPartDescription" id="txtPartDescription" /></td>'
+            + ' <td class="td-border"><input type="text" class="inpQuantityValidate" name="txtQuantity" id="txtQuantity" /></td>'
+            + ' <td class="td-border"><input type="text" class="inpRemarksValidate" name="txtRemarks" id="txtRemarks" /></td>'
+            + '<td class="td-border" style="background-color:white; max-width:60px; border-bottom:none; vertical-align:central;" >'
+            + '<input class="remove-btn remove" type="image" src="/assets/img/remove.png" alt="Remove" style="max-width: 35%; background-color: white;">'
+            + '</td></tr>';
+
+            if (newCount == 1) {
+                $('.tableMaterial').prepend(row);
+            }
+            else {
+                $(".tableMaterial tr:last").after(row);
+            }
+            //count = newCount;
+
+            rowIdx++;
+        //}
+        //else {
+        //    alert('Maximum 10 Softwares can be added.');
+        //}
+    }
+
+    $(document).ready(function () {
+        rowIdx = 1;
+        srNo = 1;
+        newCount = 0;
+        if (isEditMode) {
+            var totalRows = materialDetails.length;
+            console.log("count:" + totalRows);
+            rowIdx = totalRows;
+        }
+        else {
+            rowIdx = 1;
+            srNo = 1;
+        }
+
+
+
+        $('#materialBody').on('click', '.remove', function () {
+            
+            var delRow = $(this).closest('tr').attr('id');
+            console.log(delRow + " a");
+            var delRowNo = parseInt(delRow.substring(3));
+            console.log(delRowNo + " b");
+            var rowCount = $('#materialBody tr').length;
+            //if (rowCount == 1) {
+            //    requiredModal();
+            //    return false;
+            //}
+            //else {
+            ////
+            var child = $(this).closest('tr').nextAll();
+            console.log(child);
+            child.each(function () {
+                ////
+                // Getting <tr> id.
+                var id = $(this).attr('id');
+                console.log(id);
+
+                //  Getting the <p> inside the .row-index class.
+                var idx = $(this).children('.row-index').children('p');
+                console.log(idx);
+
+                // Gets the row number from <tr> id.
+                var dig = parseInt(id.substring(3));
+                console.log(dig);
+
+                // Modifying row index.
+                idx.html(`row${dig - 1}`);
+
+                // Modifying row id.
+                $(this).attr('id', `row${dig - 1}`);
+
+                //assigning updated serial number
+                ////
+                updatedDig = dig - 1;
+                console.log(updatedDig);
+                $('#row' + updatedDig + ' .sNo').html(updatedDig);
+
+            });
+
+            // Removing the current row.
+            $(this).closest('tr').remove();
+            // Decreasing total number of rows by 1.
+            rowIdx--;
+            //console.log(rowIdx);
+            //}
+        });
+
+
+     
+    });
+
+        /*  $('#myModal').modal({ backdrop: 'static', keyboard: false })*/
+
+    //function fileValidation() {
+    //    var fileInput = document.getElementById('fileToUpload');
+    //    //console.log("fileInput "+fileInput);
+    //    if (!(fileInput == null)) {
+    //        var filePath = fileInput.value;
+    //        var allowedExtensions = /(\.jpg|\.jpeg|\.png)$/i;
+    //        if (!allowedExtensions.exec(filePath)) {
+    //            // alert('Please upload file having extensions .jpeg/.jpg/.png/.gif only.');
+    //            fileInput.value = '';
+    //            return false;
+    //        }
+    //    }
+    //}
+
+</script>

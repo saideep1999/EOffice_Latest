@@ -1,0 +1,1808 @@
+﻿@model Skoda_DCMS.Models.BTFResults
+@{
+    bool IsNew = true;
+    Skoda_DCMS.Models.BTFData BTF = null;
+    dynamic FlagRedirect = null;
+    bool IsEdit = true, IsNewMode = true, IsEditMode = false, IsViewMode = false;
+    bool IsValidityCheck = true;
+    int FormId = 0, AppRowId = 0, ApprovalType = 0;
+    var CurrentUserDesgn = "";
+    Layout = ViewBag.Layout;
+    var currentUser = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    List<Skoda_DCMS.Models.ApprovalDataModel> appList = new List<Skoda_DCMS.Models.ApprovalDataModel>();
+    string disabled = "";
+    string AdminDesgnString = "Admin";
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IsNew = ViewBag.IsNew;
+        IsEdit = ViewBag.IsEdit;
+        IsNewMode = ViewBag.IsNewMode;
+        IsEditMode = ViewBag.IsEditMode;
+        IsViewMode = ViewBag.IsViewMode;
+        disabled = IsViewMode ? "disabled" : "";
+        BTF = ViewBag.Model.one[0] as Skoda_DCMS.Models.BTFData;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        IsValidityCheck = ViewBag.IsValidityCheck != null ? (bool)ViewBag.IsValidityCheck : false;
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+        appList = ViewBag.Model?.three as List<Skoda_DCMS.Models.ApprovalDataModel>;
+        //CurrentUserDesgn = appList?.Where(x => x.ApproverId == currentUser.UserId).Select(x => x.Designation).FirstOrDefault();
+        var Ap = appList?.Where(x => x.ApproverUserName.ToLower() == currentUser.UserName.ToLower() && x.ApproverStatus.ToLower() == "pending")
+                        .Where(x => x.Logic.ToLower() == "or"
+                            ? !appList.Any(y => y.Level == x.Level && y.ApproverStatus.ToLower() == "approved")
+                            : true)
+                        .OrderBy(x => x.Level).Select(x => new { Designation = x.Designation, Level = x.Level }).FirstOrDefault();
+        CurrentUserDesgn = Ap?.Designation;
+        var CurrentUserLevel = Ap?.Level;
+        //Logic to change assistant to doctor(if he/she has) for editing the fields doctor fields
+        CurrentUserDesgn = appList.Where(x => x.Level == CurrentUserLevel).Any(x => x.Designation == AdminDesgnString)
+            ? AdminDesgnString : CurrentUserDesgn;
+    }
+    ViewBag.Title = "Bus Transportation Form";
+    int count = 0;
+}
+
+<style>
+    /*New design css start here*/
+    .astColor {
+        color: red;
+    }
+
+    .textTrans {
+        width: 100%;
+        max-width: 99%;
+        border-radius: 5px;
+        margin-right: 0px;
+        border: 1px solid !important;
+    }
+
+    .empDetailsBg {
+        background-color: #fffbef;
+    }
+
+    #accordion select {
+        color: #000;
+        width: 100% !important;
+        max-width: 100%;
+        height: 45px;
+        background-color: #fff;
+        border: 1px solid #BFBFBF;
+        box-sizing: border-box;
+        border-radius: 5px;
+        background-image: url(data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>);
+        background-repeat: no-repeat;
+        background-position: right .75rem center;
+        background-size: 16px 12px;
+    }
+
+    .tblRowBtn input {
+        text-align: center;
+        width: 7% !important;
+        border-radius: 0 !important
+    }
+
+    #accordion input[type='text'] {
+        width: 100%;
+        max-width: 100%;
+        height: 45px;
+        background-color: #fff;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px !important;
+    }
+
+    #accordion input[type='date'] {
+        width: 100% !important;
+        max-width: 100%;
+        height: 45px;
+        background-color: #F8F8F8;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px;
+    }
+
+    #accordion input[type='time'] {
+        height: 45px;
+    }
+
+    #accordion label {
+        font-size: 16px;
+        line-height: 22px;
+        font-weight: 600;
+        color: #201F1F;
+    }
+
+    #accordion table tr td {
+        font-size: 16px;
+        line-height: 19px;
+        color: #201F1F;
+        background-color: white;
+    }
+
+    #accordion label {
+        display: block;
+    }
+
+    #accordion .card-header {
+        background: rgb(4 59 100) !important;
+        border-radius: 5px 5px 0px 0px;
+        position: relative;
+        margin-top: 15px;
+    }
+
+        #accordion .card-header.collapsed h5:after {
+            content: '+';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        #accordion .card-header h5:after {
+            content: '-';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+    #accordion h5 button {
+        font-size: 18px;
+        line-height: 22px;
+        /* identical to box height */
+        padding-left: 0px;
+        display: flex;
+        align-items: center;
+        text-transform: uppercase;
+        /* Text_white */
+
+        color: #FFFFFF;
+    }
+
+        #accordion h5 button:focus {
+            box-shadow: none;
+        }
+
+    .empDetailsFields label {
+        display: block !important;
+        margin-bottom: 0px;
+    }
+
+    .empDetailsFields .row label {
+        display: block;
+        margin-bottom: 0px;
+    }
+
+        .empDetailsFields .row label:nth-child(1) {
+            font-style: normal;
+            font-weight: normal !important;
+            font-size: 12px;
+            line-height: 18px;
+            color: #A9A9A9 !important;
+        }
+
+        .empDetailsFields .row label:nth-child(2) {
+            font-style: normal;
+            font-weight: normal;
+            font-size: 18px;
+            line-height: 22px;
+            color: #201F1F;
+        }
+
+    .firstLastName {
+        font-style: normal;
+        font-weight: normal;
+        font-size: 20px;
+        line-height: 24px;
+        /* identical to box height */
+
+        display: flex;
+        align-items: center;
+        color: #201F1F;
+    }
+
+    .submit-btn {
+        background: #3D3D3D;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #FFFFFF;
+        border-color: transparent !important;
+    }
+
+    .cancl-btn {
+        background: #FAE99B;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        border-color: transparent !important;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #212221;
+        margin-left: 10px;
+    }
+
+
+
+
+    .card-footer {
+        display: flex;
+        background-color: transparent !important;
+    }
+
+    .photo-form {
+        width: 100%;
+    }
+
+    .ui-front {
+        z-index: 9999999 !important;
+    }
+    /*Animation CSS Starts*/
+
+    div.input-block {
+        position: relative;
+    }
+
+        div.input-block input {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 188px;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block textarea {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 100%;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 5px !important;
+            border-top-right-radius: 5px !important;
+            background-color: #fff;
+            border: 1px solid #bfbfbf !important;
+            outline: none;
+        }
+
+        div.input-block span.placeholder {
+            position: absolute;
+            margin: 17px 0;
+            padding: 0 4px;
+            font-family: Roboto, sans-serif;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            top: -6px;
+            left: 15px;
+            transition: all 0.2s;
+            transform-origin: 0% 0%;
+            background: none;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        div.input-block textarea:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: #fff !important;
+        }
+
+        div.input-block textarea:valid + span.placeholder,
+        div.input-block textarea:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px) !important;
+            background: #fff !important;
+        }
+
+        div.input-block input:valid + span.placeholder,
+        div.input-block input:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: rgb(255,255,255) !important;
+        }
+
+
+        div.input-block input.spanUpperSide + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: rgb(219,238,213);
+        }
+
+        div.input-block input:read-only + span.placeholder,
+        div.input-block input:read-only + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background: rgb(219,238,213);
+        }
+
+
+    div.inputSelect span.placeholder {
+        position: absolute;
+        margin: 17px 0;
+        padding: 0 4px;
+        font-family: Roboto, sans-serif;
+        color: #000;
+        display: flex;
+        align-items: center;
+        font-size: 1rem;
+        top: -6px;
+        left: 15px;
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+        background: none;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    div.inputSelect select:focus + span.placeholder {
+        transform: scale(0.8) translateY(-30px);
+        background: rgb(219,238,213);
+        z-index: 9;
+    }
+
+    div.inputSelect select:not([value=""]):valid + span.placeholder {
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+    }
+
+
+
+    div.input-block input:focus + span.placeholder {
+        color: #284B63;
+    }
+
+    .breadcrumb {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+        padding: 1rem 1rem 0;
+        margin-bottom: 0;
+        list-style: none;
+        background-color: #FFFFFF;
+        border-radius: .25rem;
+    }
+
+    body.nav-sm .container.body .left_col {
+        width: 63px;
+        padding: 0;
+        position: fixed;
+        height: 100%;
+        z-index: 8;
+    }
+
+    .card {
+        position: relative;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        min-width: 0;
+        word-wrap: break-word;
+        background-color: #fff;
+        background-clip: border-box;
+        border: 0px;
+        border-radius: .25rem;
+    }
+
+    .dropdown-toggle::after {
+        display: none;
+        width: 0;
+        height: 0;
+        margin-left: .255em;
+        vertical-align: .255em;
+        content: "";
+        border-top: .3em solid;
+        border-right: .3em solid transparent;
+        border-bottom: 0;
+        border-left: .3em solid transparent;
+    }
+
+    input.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213);
+    }
+
+    inputSelect.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213) !important;
+    }
+
+    select.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background-color: rgb(255,255,255) !important;
+        z-index: 9;
+    }
+
+    .empDetailsBg inputSelect.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213) !important;
+    }
+
+    .empDetailsBg select.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background-color: rgb(219,238,213) !important;
+        z-index: 9;
+    }
+
+    textarea.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    .TransView {
+        background-color: white !important;
+    }
+
+    @@media only screen and (min-width: 992px) {
+        div .input-block span.placeholder {
+            font-size: 15px;
+        }
+
+        div.inputSelect span.placeholder {
+            font-size: 14px;
+        }
+    }
+
+    input[type='date'].spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    .showBorder {
+        border: 1px solid #dee2e6;
+    }
+
+        .showBorder td {
+            border: none !important;
+        }
+
+    .wField {
+        width: 233px !important;
+        margin-left: 10px;
+    }
+
+    @@-moz-document url-prefix() {
+        input[type=time]::-ms-clear {
+            display: none;
+        }
+    }
+
+    .datetime-reset-button {
+        display: none !important;
+    }
+
+    .forShoppingCart {
+        margin-left: 16% !important;
+    }
+
+    #txtCarRequiredFromTime, #txtCarRequiredToTime, #txtReportingTime, #txtFlightTime {
+        cursor: pointer;
+    }
+
+    input:-webkit-autofill {
+        -webkit-box-shadow: 0 0 0px 1000px white inset;
+    }
+
+
+    input::-webkit-calendar-picker-indicator {
+        cursor: pointer;
+    }
+
+    .showBorder {
+        border: 1px solid #dee2e6;
+    }
+
+    #usersBody td {
+        vertical-align: middle !important;
+    }
+
+    .form-table-container-2 tr td input {
+        border-color: #bfbfbf !important;
+    }
+
+    .widthForTime {
+        width: 130px !important;
+        margin-left: 0px !important;
+    }
+
+    .showBorder {
+        border: 1px solid #dee2e6;
+    }
+</style>
+<script type="text/javascript">
+
+    function checkSelect(id) {
+        
+
+        if ($('#' + id).val() != '') {
+            $('#' + id).addClass('spanUpperSide');
+        }
+    }
+    /*$('#timedemo').pickatime({ twelvehour: true });*/
+
+</script>
+
+@*Loader*@
+<style type="text/css">
+    #loader {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        
+        z-index: 10000;
+    }
+</style>
+
+@*Loader*@
+<body class="nav-sm dash-body">
+
+    <div class="right_col bg-color">
+        <form id="BTForm" method="post">
+            <div class="">
+                @if (IsEditMode || IsViewMode)
+                {
+                    <div>
+                        <input type="hidden" id="FormSrId" name="FormSrId" value="@(ViewBag.Model.one[0].Id)" />
+                        <input type="hidden" id="FormId" name="FormId" value="@(FormId)" />
+                        <input type="hidden" id="AppRowId" name="AppRowId" value="@(AppRowId)" />
+                    </div>
+                }
+                <div>
+                    <ol class="breadcrumb pl-0">
+                        <li>
+                            <a href="/Dashboard?formName=BTF">
+                                Dashboard
+                            </a>
+                        </li>
+                        <li>
+                            Bus Transportation Form
+                        </li>
+
+                    </ol>
+                </div>
+
+                <div class="breadcrumb-container table-bordered" style="background-color: rgb(219,238,213) !important; ">
+                    <div class="col-md-2 col-lg-2">
+                        <span class="placeholder">Date : @(!IsNew || !IsEdit ? (Convert.ToDateTime(ViewBag.Model.one[0].Created_Date).ToShortDateString()) : DateTime.Now.ToShortDateString())</span>
+                    </div>
+                    <div class="col-md-8 col-lg-8 mt-2 mb-1 form-heading" style="text-align:center; margin-top:5px">
+                        <span>
+                            Bus Transportation Form
+                        </span>
+                    </div>
+                    <div class="col-md-2 col-lg-2">
+                        @if (!IsNew || !IsEdit)
+                        {
+                            <span class="placeholder"> Form Id : @(!IsNew || !IsEdit ? ("BTF" + FormId ?? "") : "" )</span>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="heading d-none" id="headingErr">
+                <h1 id="" class="info-header">Following fields are mandatory. Please fill in information for<br /></h1>
+                <div id="add_to_me" class="header-list" style="color:red;"></div>
+            </div>
+
+            @{
+                Html.RenderPartial("_SubmitterDetailsWithModel", (ViewBag as object));
+            }
+            @{
+                Html.RenderPartial("_ApplicantDetailsWithModel", (ViewBag as object));
+            }
+
+            <div id="accordion">
+                <div class="card">
+                    <div class="card-header collapsed" id="headingOne" data-toggle="collapse" data-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                        <h5 class="mb-0">
+                            <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                                <img src="~/assets/img/transactionIcon.svg" width="24" height="24" class="mr-2" />Transaction Fields
+                            </button>
+                        </h5>
+                    </div>
+                    <div id="collapseThree" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+                        <div class="card-body">
+                            <div class="form-row">
+                                @if (IsNewMode)
+                                {
+                                    <div class="form-group col-md-6 col-lg-6 col-12 inputSelect">
+                                        <select class="selctTransport spanUpperSide" id="drpTransportationRequired" name="drpTransportationRequired" onchange="checkSelect('drpTransportationRequired'); EnableDisable();" required>
+                                            <option value=-1 style="display: none;">Select</option>
+                                            <option value="Yes">Yes</option>
+                                            <option value="No">No</option>
+                                        </select>
+                                        <span class="placeholder TransView">
+                                            Transportation Required(Yes/No)
+                                        </span>
+                                    </div>
+                                    <div class="form-group col-md-6 col-lg-6 col-12 inputSelect">
+                                        <select class="selctTransport spanUpperSide" id="drpGender" name="drpGender" onchange="checkSelect('drpGender'); EnableDisable();" required>
+                                            @*<option value=-1 style="display: none;">Select</option>
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>*@
+                                        </select>
+                                        <span class="placeholder TransView">
+                                            Gender
+                                        </span>
+                                    </div>
+                                    <div class="form-group col-md-6 col-lg-6 col-12 inputSelect">
+                                        <select class="selctTransport spanUpperSide" id="drpShift" name="drpShift" onchange="checkSelect('drpShift'); EnableDisable();" required>
+                                            
+                                            
+                                        </select>
+                                        <span class="placeholder TransView">
+                                            Shift
+                                        </span>
+                                    </div>
+                                }
+                                @if (IsEditMode)
+                                {
+                                    <div class="form-group col-md-6 col-lg-6 col-12 inputSelect">
+                                        <select class="selctTransport spanUpperSide" id="drpTransportationRequired" name="drpTransportationRequired" onchange="checkSelect('drpTransportationRequired'); EnableDisable();" required>
+                                            <option value=-1 style="display: none;">Select</option>
+                                            <option value="Yes" @(BTF?.TransportationRequired == "Yes" ? "selected" : "")>Yes</option>
+                                            <option value="No" @(BTF?.TransportationRequired == "No" ? "selected" : "")>No</option>
+                                        </select>
+                                        <span class="placeholder TransView">
+                                            Transportation Required(Yes/No)
+                                        </span>
+                                    </div>
+                                    <div class="form-group col-md-6 col-lg-6 col-12 inputSelect">
+                                        <select class="selctTransport spanUpperSide" id="drpGender" vaule="@BTF.Gender" name="drpGender" onchange="checkSelect('drpGender'); EnableDisable();" required>
+                                            <option vaule="@BTF.Gender"></option>
+                                            
+                                        </select>
+                                        <span class="placeholder TransView">
+                                            Gender
+                                        </span>
+                                    </div>
+                                    <div class="form-group col-md-6 col-lg-6 col-12 inputSelect">
+                                        <select class="selctTransport spanUpperSide" id="drpShift" vaule="@BTF.BusShift" name="drpShift" onchange="checkSelect('drpShift');" required>
+                                            <option vaule="@BTF.BusShift"></option>
+                                           
+                                        </select>
+                                        <span class="placeholder TransView">
+                                            Shift
+                                        </span>
+                                    </div>
+                                }
+                                @if (IsViewMode)
+                                {
+                                    <div class="form-group col-md-6 col-lg-6 col-12 input-block">
+                                        <input class="inputTrans" type="text" value="@(BTF?.TransportationRequired ?? "")" disabled id="drpTransportationRequired" name="drpTransportationRequired">
+                                        <span class="placeholder TransView">
+                                            Transportation Required(Yes/No)
+                                        </span>
+                                    </div>
+                                    <div class="form-group col-md-6 col-lg-6 col-12 inputSelect">
+                                        <select disabled class="selctTransport spanUpperSide" id="drpGender" name="drpGender" onchange="checkSelect('drpGender'); EnableDisable();" required>
+                                            @*<option value=-1 style="display: none;">Select</option>
+                                            <option value="Male" @(BTF?.Gender == "Male" ? "selected" : "")>Male</option>
+                                            <option value="Female" @(BTF?.Gender == "Female" ? "selected" : "")>Female</option>*@
+                                        </select>
+                                        <span class="placeholder TransView">
+                                            Gender
+                                        </span>
+                                    </div>
+                                    <div class="form-group col-md-6 col-lg-6 col-12 inputSelect">
+                                        <select disabled class="selctTransport spanUpperSide" id="drpShift" name="drpShift" onchange="checkSelect('drpShift');" required>
+                                            <option value=-1 style="display: none;">Select</option>
+                                            @*<option value="General" @(BTF?.BusShift == "General" ? "selected" : "")>General</option>
+                                            <option value="ABC" @(BTF?.BusShift == "ABC" ? "selected" : "")>ABC</option>*@
+                                        </select>
+                                        <span class="placeholder TransView">
+                                            Shift
+                                        </span>
+                                    </div>
+                                }
+                                <div class="form-group col-md-6 col-12 input-block">
+                                    <select name="ddBusRouteName" class="w-40" id="ddBusRouteName"
+                                            @(disabled)
+                                            onchange="checkSelect('ddBusRouteName'); GetBusRouteNumber(); OnBusRouteNameChange();"></select>
+                                    <span class="placeholder TransView">Bus Route Name</span>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-3 col-12 input-block">
+                                    <select name="ddBusRouteNumber" class="w-40" id="ddBusRouteNumber"
+                                            @(disabled)
+                                            onchange="checkSelect('ddBusRouteNumber'); GetBusPickUpPoint(); OnBusRouteNumberChange();"></select>
+                                    <span class="placeholder TransView">Bus Route No.</span>
+                                </div>
+                                <div class="form-group col-md-3 col-12 input-block">
+                                    <select name="ddPickUpPoint" class="w-40" id="ddPickUpPoint"
+                                            @(disabled)
+                                            onchange="checkSelect('ddPickUpPoint')"></select>
+                                    <span class="placeholder TransView">Pick Up Point</span>
+                                </div>
+                                <div class="form-group col-md-6 col-lg-6 col-12 input-block">
+                                    <input class="inputTrans" maxlength="15" autocomplete="off" type="text" @(disabled) value="@(BTF?.Distance ?? "")" id="txtDistance" name="txtDistance" required>
+                                    <span class="placeholder TransView">
+                                        Distance from Residence to Pickup Point
+                                    </span>
+                                </div>
+
+
+                                <div class="form-group col-md-6 col-lg-6 col-12 input-block">
+                                    <textarea class="textTrans" name="txtAddress" id="txtAddress" cols="60" rows="3" maxlength="255" required @(disabled)>@(BTF?.Address ?? "")</textarea>
+                                    <span class="firstLastName placeholder" style="background-color: #fff !important;">Address</span>
+                                </div>
+
+                                <div class="form-group col-md-6 col-lg-6 col-12 input-block">
+                                    <textarea class="textTrans spanUpperSide" cols="90" rows="3" name="txtBusinessNeed" id="txtBusinessNeed" maxlength="500" required @(disabled)>@(BTF?.BusinessNeed ?? "")</textarea>
+                                    <span class="placeholder">Business Function & Responsibility (Max. 500)</span>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @if (IsViewMode || IsEditMode)
+            {
+                <div id="accordion">
+                    <div class="card">
+                        <div class="card-header collapsed" id="headingFour" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                            <h5 class="mb-0">
+                                <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                                    <img src="~/assets/img/approvalTracking.svg" width="24" height="24" class="mr-2" />Approval Tracking
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseFour" class="collapse" aria-labelledby="headingFour">
+                            <div class="card-body">
+                                <div class="form-row">
+                                    <div class="col-12">
+                                        <table class="table w-100 td-border showBorder">
+                                            <thead>
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>Role</th>
+                                                    <th>Processed on</th>
+                                                    <th>Status</th>
+                                                    <th class="text-center">Comments</th>
+                                                    <th class="text-center">Approval Level</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @if (!IsNew || !IsEdit)
+                                                {
+                                                    Html.RenderPartial("_ApprovalTracking", appList);
+                                                }
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="accordion">
+                    <div class="card">
+                        @*<div class="card-header collapsed" id="headingFive" data-toggle="collapse" data-target="#collapseFive" aria-expanded="true" aria-controls="collapseFive">
+                            <h5 class="mb-0">
+                                <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFive" aria-expanded="true" aria-controls="collapseFive">
+                                    <img src="~/assets/img/approvalTracking.svg" width="24" height="24" class="mr-2" /> Action
+                                </button>
+                            </h5>
+                        </div>*@
+
+                        <div id="collapseFive" class="collapse" aria-labelledby="headingFive" style="display:none">
+                            <div class="card-body actionTab">
+                                @{
+                                    <div class="form-row">
+                                        @*<div class="form-group col-md-6 col-12 input-block">
+                                                <input class="inputTrans" autocomplete="off" type="text" id="txtSlab" name="txtSlab" onkeypress="allowNumbersOnly(event)" value="@(BTF?.Slab ?? "")" @(CurrentUserDesgn == AdminDesgnString ? "" : "disabled") required>
+                                                <span class="placeholder TransView">
+                                                    Slab
+                                                </span>
+                                            </div>*@
+                                        <div class="form-group col-md-6 col-lg-6 col-12 inputSelect">
+                                            <select @(CurrentUserDesgn == AdminDesgnString ? "" : "disabled") class="selctTransport spanUpperSide" id="drpSlab" name="drpSlab" onchange="checkSelect('drpSlab');" required>
+                                                <option value=-1 style="display: none;">Select</option>
+                                                <option value="1-210" @(BTF?.Slab == "1-210" ? "selected" : "")>1-210</option>
+                                                <option value="2-232" @(BTF?.Slab == "2-232" ? "selected" : "")>2-232</option>
+                                                <option value="3-256" @(BTF?.Slab == "3-256" ? "selected" : "")>3-256</option>
+                                                <option value="4-348" @(BTF?.Slab == "4-348" ? "selected" : "")>4-348</option>
+                                            </select>
+                                            <span class="placeholder TransView">
+                                                Slab
+                                            </span>
+                                        </div>
+                                    </div>
+                                }
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <div>
+                <p class="text-left f-600">  SF_SO/1_021.00</p>
+            </div>
+
+            @if (IsNew)
+            {
+                if (!IsEdit)
+                {
+                    <div class="card-footer align-content-center">
+                        <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                            Re-Submit
+                        </button>
+                        <button type="reset" class="btn btn-danger btn-sm cancl-btn" id="btnCancel">
+                            Cancel
+                        </button>
+                    </div>
+                }
+                else
+                {
+                    <div class="card-footer align-content-center">
+                        <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                            Submit
+                        </button>
+                        <button type="reset" class="btn btn-danger btn-sm cancl-btn" id="btnCancel">
+                            Cancel
+                        </button>
+                    </div>
+                }
+            }
+        </form>
+    </div>
+</body>
+
+<div class="modal fade" id="successModel" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header modelHeader">
+                <span class="modal-title modalMsgTitle" id="modalTitle"></span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label id="modalBody" class="lableMsg">  </label>
+                <input type="hidden" id="tab" value="0" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="submitBomBtn publishBtn" id="modalOkButton" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var spinner = $('#loader');
+    var currentUserDesgn = @Html.Raw(Json.Encode(CurrentUserDesgn));
+    var AdminDesgnString = @Html.Raw(Json.Encode(AdminDesgnString));
+    var IsNew = @Html.Raw(Json.Encode(IsNew));
+    var IsEdit = @Html.Raw(Json.Encode(IsEdit));
+    var IsNewMode = @Html.Raw(Json.Encode(IsNewMode));
+    var IsEditMode = @Html.Raw(Json.Encode(IsEditMode));
+    var IsViewMode = @Html.Raw(Json.Encode(IsViewMode));
+    var BTF = @Html.Raw(Json.Encode(BTF));
+    var appRowId = @Html.Raw(Json.Encode(AppRowId));
+    var approvalType =@Html.Raw(Json.Encode(ApprovalType));
+    var IsValidityCheck = @Html.Raw(Json.Encode(IsValidityCheck));
+    var FlagRedirect = @Html.Raw(Json.Encode(FlagRedirect));
+    pageLoad();
+    var errorCount = 0;
+    var errors = "";
+
+    function pageLoad() {
+        
+        GetGenderName();
+        GetShiftName();
+        if (IsEditMode || IsViewMode)
+        {
+            ASSIGNddlVALUES();
+        }
+
+        if (IsNewMode) {
+            $("#txtAddress").attr("disabled", "disabled");
+            $("#txtDistance").attr("disabled", "disabled");
+            $("#ddBusRouteName").attr("disabled", "disabled");
+            $("#ddBusRouteNumber").attr("disabled", "disabled");
+            $("#ddPickUpPoint").attr("disabled", "disabled");
+            $("#drpShift").attr("disabled", "disabled");
+            //$("#txtSlab").attr("disabled", "disabled");
+        }
+        else if (IsEditMode) {
+            var drpTransportationRequired = $("#drpTransportationRequired option:selected").val();
+            if (drpTransportationRequired == "Yes") {
+                $("#drpTransportationRequired").addClass('spanUpperSide');
+                $("#txtAddress").removeAttr("disabled", "disabled");
+                $("#txtDistance").removeAttr("disabled", "disabled");
+                $("#ddBusRouteName").removeAttr("disabled", "disabled");
+                $("#ddBusRouteNumber").removeAttr("disabled", "disabled");
+                $("#ddPickUpPoint").removeAttr("disabled", "disabled");
+                $("#drpShift").removeAttr("disabled", "disabled");
+            }
+            else {
+                $("#txtAddress").attr("disabled", "disabled");
+                $("#txtDistance").attr("disabled", "disabled");
+                $("#ddBusRouteName").attr("disabled", "disabled");
+                $("#ddBusRouteNumber").attr("disabled", "disabled");
+                $("#ddPickUpPoint").attr("disabled", "disabled");
+                $("#drpShift").attr("disabled", "disabled");
+            }
+        }
+        else if (IsViewMode) {
+            $("#drpTransportationRequired").addClass('spanUpperSide');
+            $("#drpGender").addClass('spanUpperSide');
+            $("#drpSlab").addClass('spanUpperSide');
+            $("#txtAddress").addClass('spanUpperSide');
+            $("#divRequestSubmissionFor").addClass('d-none');
+        }
+    };
+
+    function ASSIGNddlVALUES() {
+        
+        if (IsEditMode || IsViewMode) {
+
+            
+            $('#drpGender option[value="' + BTF.Gender + '"]').attr("selected", "selected").change();
+            $('#drpShift option[value="' + BTF.BusShift + '"]').attr("selected", "selected").change();
+
+        }
+    }
+
+    $(document).ready(function () {
+        //
+        if (IsViewMode || IsEditMode) {
+            $("#drpShift").trigger("change");
+        }
+    })
+
+    function successBTFModal(txt) {
+        ////
+        $('#modalTitle').html('Success');
+        if (txt == "approve") {
+            $('#modalBody').html('Form has been approved!');
+        }
+        else if (txt == "reject") {
+            $('#modalBody').html('Form has been rejected!');
+        }
+        else if (txt == "enquire") {
+            $('#modalBody').html('Form has been enquired!');
+        }
+        else if (txt == "cancelled") {
+            $('#modalBody').html('Form has been cancelled!');
+        }
+        else {
+            if (IsEditMode) {
+                $('#modalBody').html('Your form with ID: BTF' + txt + ' has been re-submitted! Kindly use this for future reference');
+            }
+            else {
+                $('#modalBody').html('Your form with ID: BTF' + txt + ' has been submitted! Kindly use this for future reference');
+            }
+        }
+        //$('#modalBody').html('Your form has been submitted!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+  
+    function failureModal(msg) {
+        if (msg == null) {
+            $('#modalBody').html('Some error occured');
+        }
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html(msg);
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function permissionModal() {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html('No permssion granted since the device is not SAVWIPL owned!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function requiredModal(text) {
+        $('#modalTitle').html('Required!');
+        $('#modalBody').html(text);
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function validityModal(txt) {
+        ////
+        if (txt == 'approve') {
+            //DisplayAlert('error', 'Error', 'Please select the Type of Car');
+        }
+        else if (txt == 'reject') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for rejecting the form');
+        }
+        else if (txt == 'enquire') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for enquiring the form');
+        }
+
+    }
+
+    function allowNumbersOnly(e) {
+        var code = (e.which) ? e.which : e.keyCode;
+        if (code > 31 && (code < 48 || code > 57)) {
+            e.preventDefault();
+        }
+    }
+
+    $("#btnSubmit").on('click', function (e) {
+
+        validateSubmitter();
+        validateApplicant();
+
+        var drpTransportationRequired = $("#drpTransportationRequired option:selected").val();
+        console.log(drpTransportationRequired);
+        if (drpTransportationRequired == "-1") {
+            errors += "<li id='error" + errorCount + "'>" + "Transportation Required" + "</li>";
+            AddError("drpTransportationRequired", '', errorCount);
+            errorCount++;
+        }
+        else {
+            RemoveError("drpTransportationRequired");
+        }
+
+        var drpGender = $("#drpGender option:selected").val();
+        if (drpGender == "-1") {
+            errors += "<li id='error" + errorCount + "'>" + "Gender" + "</li>";
+            AddError("drpGender", '', errorCount);
+            errorCount++;
+        }
+        else {
+            RemoveError("drpGender");
+        }
+
+        var drpTransportationRequired = $("#drpTransportationRequired option:selected").val();
+        if (drpTransportationRequired == "Yes") {
+
+            var drpShift = $("#drpShift option:selected").val();
+            if (drpShift == "-1") {
+                errors += "<li id='error" + errorCount + "'>" + "Shift" + "</li>";
+                AddError("drpShift", '', errorCount);
+                errorCount++;
+            }
+            else {
+                RemoveError("drpShift");
+            }
+
+            var txtAddress = document.getElementById("txtAddress").value;
+            if (txtAddress == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Address" + "</li>";
+                AddError("txtAddress", '', errorCount);
+            }
+            else {
+                RemoveError("txtAddress");
+            }
+
+            var txtDistance = document.getElementById("txtDistance").value;
+            if (txtDistance == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Distance" + "</li>";
+                AddError("txtDistance", '', errorCount);
+                errorCount++;
+            }
+            else {
+                RemoveError("txtDistance");
+            }
+
+            var ddBusRouteName = $("#ddBusRouteName option:selected").val();
+            console.log(ddBusRouteName);
+            if (ddBusRouteName == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Bus Route Name" + "</li>";
+                AddError("ddBusRouteName", '', errorCount);
+                errorCount++;
+            }
+            else {
+                RemoveError("ddBusRouteName");
+            }
+
+            var ddBusRouteNumber = $("#ddBusRouteNumber option:selected").val();
+            console.log(ddBusRouteNumber);
+            if (ddBusRouteNumber == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Bus Route Number" + "</li>";
+                AddError("ddBusRouteNumber", '', errorCount);
+                errorCount++;
+            }
+            else {
+                RemoveError("ddBusRouteNumber");
+            }
+
+            var ddPickUpPoint = $("#ddPickUpPoint option:selected").val();
+            console.log(ddPickUpPoint);
+            if (ddPickUpPoint == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Pick Up Point" + "</li>";
+                AddError("ddPickUpPoint", '', errorCount);
+                errorCount++;
+            }
+            else {
+                RemoveError("ddPickUpPoint");
+            }
+
+            //var ddSlab = $("#txtSlab").val();
+            //console.log(ddSlab);
+            //if (ddSlab == "") {
+            //    errors += "<li id='error" + errorCount + "'>" + "Slab" + "</li>";
+            //    AddError("txtSlab", '', errorCount);
+            //    errorCount++;
+            //}
+            //else {
+            //    RemoveError("txtSlab");
+            //}
+        }
+
+        var businessNeed = document.getElementById("txtBusinessNeed").value;
+        if (businessNeed == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Business Function & Responsibility" + "</li>";
+            AddError("txtBusinessNeed", '', errorCount);
+            errorCount++;
+        }
+        else {
+            RemoveError("txtBusinessNeed");
+        }
+
+        //
+        if (errors.length) {
+            errors = "<ol id='errorList'>" + errors + "</ol>";
+            $("#headingErr").removeClass('d-none');
+            document.getElementById("add_to_me").innerHTML = errors;
+            errors = "";
+            errorCount = 0;
+            if (IsEditMode) {
+                $("#myModalEdit").scrollTop(0);
+                $("#myModalRequest").scrollTop(0);
+            }
+            else {
+                $(window).scrollTop(0);
+            }
+            return false;
+        }
+        $("#headingErr").addClass('d-none');
+        document.getElementById("add_to_me").innerHTML = '';
+        $('#ddEmpDesignation').prop("disabled", false);
+        $('#txtOnBehalfdesignation').prop("disabled", false);
+        $("#pageLoader").removeClass('invisible');
+        $("#btnSubmit").text('Saving');
+        $("#btnSubmit").prop("disabled", true);
+        $("#btnCancel").prop("disabled", true);
+
+        var form = $("#BTForm");
+        var formData = new FormData(form[0]);
+        $.ajax({
+            url: '/BusTransportation/SaveBusTransportationForm',
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            data: formData,
+            enctype: 'multipart/form-data',
+            success: (function (data) {
+                if (data.Status == 200) {
+                    $("#pageLoader").addClass('invisible');
+                    if (IsNewMode && IsEditMode) {
+                        $("#btnSubmit").text('Submit');
+                    }
+                    else {
+                        $("#btnSubmit").text('Re-Submit');
+                    }
+                    successBTFModal(data.Message);
+                    $("#btnSubmit").prop("disabled", false);
+                    $("#btnCancel").prop("disabled", false);
+                }
+                else {
+                    failureModal(data.Message);
+                    console.log("failure");
+                    if (IsNewMode && IsEditMode) {
+                        $("#btnSubmit").text('Submit');
+                    }
+                    else {
+                        $("#btnSubmit").text('Re-Submit');
+                    }
+                    $("#pageLoader").addClass('invisible');
+                    $("#btnSubmit").prop("disabled", false);
+                    $("#btnCancel").prop("disabled", false);
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+                console.log("error");
+                if (IsNewMode && IsEditMode) {
+                    $("#btnSubmit").text('Submit');
+                }
+                else {
+                    $("#btnSubmit").text('Re-Submit');
+                }
+                $("#btnSubmit").prop("disabled", false);
+                $("#btnCancel").prop("disabled", false);
+                $("#pageLoader").addClass('invisible');
+            })
+        })
+        $("#tab").val(2);
+    });
+
+    $("#btnCancel").on('click', function (e) {
+        ////
+        console.log('cancel');
+        $("#headingErr").addClass('d-none');
+        document.getElementById("add_to_me").innerHTML = '';
+        if ($('#myModalRequest').hasClass('show'))
+            $('#myModalRequest').modal('hide');
+        else
+            $('#myModalEdit').modal('hide');
+        if (IsNewMode) {
+            window.location = "../Dashboard";
+        }
+    });
+
+    function saveResponse(text) {
+        
+        var status = '', comment = '';
+        comment = $("#comment-" + text).val();
+        switch (text) {
+            case 'approve': {
+                status = 'Approved';
+                if (currentUserDesgn == AdminDesgnString) {
+                    FormApproval(status, appRowId, comment, approvalType, text);
+                }
+                else {
+                    FormApproval(status, appRowId, comment, approvalType, text);
+                }
+                break;
+            }
+            case 'reject': {
+                status = 'Rejected';
+                if (comment == '') {
+                    validityModal(text);
+                    return;
+                }
+                else {
+                    FormApproval(status, appRowId, comment, approvalType, text);
+                }
+                break;
+            }
+            case 'enquire': {
+                status = 'Enquired';
+                if (comment == '') {
+                    validityModal(text);
+                    return;
+                }
+                else {
+                    FormApproval(status, appRowId, comment, approvalType, text);
+                }
+                break;
+            }
+        }
+
+
+        $("#tab").val(1);
+    }
+
+    function SlabUpdate(status, appRowId, comment, approvalType, text) {
+        ////
+        var form = $("#BTForm").serialize();
+        $.ajax({
+            url: '/BusTransportation/BusActionUpdate',
+            type: 'POST',
+            data: form,
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data == 1) {
+                    FormApproval(status, appRowId, comment, approvalType, text);
+                }
+                else {
+                    failureModal();
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+            })
+        })
+
+    }
+
+    function FormApproval(status, appRowId, comment, approvalType, text) {
+        
+        spinner.show();
+        $.ajax({
+            url: '/List/SaveResponse',
+            type: 'POST',
+            data: { response: status, appRowId: appRowId, comment: comment, approvalType: approvalType },
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data.Result == 1) {
+                    successBTFModal(text);
+                    spinner.hide();
+                    setTimeout(FilterMyTasks, 5000);
+                    spinner.hide();
+                }
+                else {
+                    failureModal();
+                    spinner.hide();
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+                spinner.hide();
+            })
+        })
+        $("#tab").val(1);
+    }
+
+    function EnableDisable() {
+        //
+        var drpTransportationRequired = $("#drpTransportationRequired option:selected").val();
+        if (drpTransportationRequired == "Yes") {
+            $("#txtAddress").removeAttr("disabled", "disabled");
+            $("#txtDistance").removeAttr("disabled", "disabled");
+            $("#ddBusRouteName").removeAttr("disabled", "disabled");
+            $("#ddBusRouteNumber").removeAttr("disabled", "disabled");
+            $("#ddPickUpPoint").removeAttr("disabled", "disabled");
+            //$("#txtSlab").removeAttr("disabled", "disabled");
+            $("#drpShift").removeAttr("disabled", "disabled");
+        }
+        else {
+            $("#txtAddress").val("");
+            $("#txtDistance").val("");
+            $("#ddBusRouteName").val('');
+            $("#ddBusRouteNumber").val('');
+            $("#ddPickUpPoint").val('');
+            //$("#txtSlab").val("");
+            $("#drpShift").val('');
+            $("#txtAddress").attr("disabled", "disabled");
+            $("#txtDistance").attr("disabled", "disabled");
+            $("#ddBusRouteName").attr("disabled", "disabled");
+            $("#ddBusRouteNumber").attr("disabled", "disabled");
+            $("#ddPickUpPoint").attr("disabled", "disabled");
+            //$("#txtSlab").attr("disabled", "disabled");
+            $("#drpShift").attr("disabled", "disabled");
+        }
+    }
+
+    function GetGenderName()
+    {
+        
+        $.ajax({
+            url: '/BusTransportation/GetGenderName',
+            data: {},
+            type: "GET",
+            dataType: 'JSON',
+            async: false,
+            success: function (data) {
+                var s = '<option value="" selected disabled>Select</option>';
+
+                for (var i = 0; i < data.length; i++) {
+                    s += '<option value="' + data[i].Gender + '">' + data[i].Gender + '</option>';
+                }
+         
+                    /*  $("#selappURL_" + i + "").html(s);*/
+                $("#drpGender" ).html(s);
+                
+
+
+
+
+            },
+            error: function () {
+
+            }
+        });
+
+    }
+
+
+    function GetShiftName() {
+        
+        $.ajax({
+            url: '/BusTransportation/GetShiftName',
+            data: {},
+            type: "GET",
+            dataType: 'JSON',
+            async: false,
+            success: function (data) {
+                var s = '<option value="" selected disabled>Select</option>';
+
+                for (var i = 0; i < data.length; i++) {
+                    s += '<option value="' + data[i].BusShift + '">' + data[i].BusShift + '</option>';
+                }
+
+                /*  $("#selappURL_" + i + "").html(s);*/
+                $("#drpShift").html(s);
+
+
+
+
+
+            },
+            error: function () {
+
+            }
+        });
+
+    }
+
+    function GetBusRouteName() {
+        
+        $("#ddBusRouteNumber").val('');
+        $("#ddPickUpPoint").val('');
+        var routeName = $("#ddBusRouteName option:selected").text();
+        var routeNumber = $("#ddBusRouteNumber option:selected").text();
+        var shift = $("#drpShift option:selected").text();
+        var locationName = "";
+        var drpRequestSubmissionFor = $("#drpRequestSubmissionFor option:selected").val();
+        if (drpRequestSubmissionFor == "Self") {
+            locationName = $("#ddEmpLocation option:selected").text();
+        }
+        else {
+            var rdOnBehalfOptionSelected = $("#rdOnBehalfOptionSelected").val();
+            if (rdOnBehalfOptionSelected == "SAVWIPLEmployee") {
+                locationName = $("#ddOtherEmpLocation option:selected").text();
+            }
+            else if (rdOnBehalfOptionSelected == "Others") {
+                locationName = $("#ddOtherNewEmpLocation option:selected").text();
+            }
+        }
+
+
+        if (IsEditMode || IsViewMode) {
+                var value = JSON.stringify(BTF);
+                var value_1 = JSON.parse(value);
+                var selectedBusRouteName = value_1.BusRouteName;
+                console.log(selectedBusRouteName);
+
+                $.ajax({
+                    url: '/BusTransportation/GetBusRouteName',
+                    type: 'GET',
+                    data: { routeName: routeName, routeNumber: routeNumber, shift: shift, locationName: locationName },
+                    dataType: 'JSON',
+                    success: (function (data) {
+                        //locdata = data;
+
+                        //console.log(data);
+                        var s = '<option value="">Choose</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            if (data[i].BusRouteName == selectedBusRouteName) {
+                                s += '<option value="' + data[i].BusRouteName + '" id="' + data[i].BusRouteName + '" selected>' + data[i].BusRouteName + '</option>';
+                            }
+                            else {
+                                s += '<option value="' + data[i].BusRouteName + '" id="' + data[i].BusRouteName + '">' + data[i].BusRouteName + '</option>';
+                            }
+                        }
+                        $("#ddBusRouteName").html(s);
+                        $("#ddBusRouteName").addClass('spanUpperSide');
+                        $("#ddBusRouteName option[value='" + selectedBusRouteName + "']").prop('selected', 'selected').change();
+
+
+                    }),
+                    error: (function (data) {
+                        //code
+                    })
+                })
+            }
+         else {
+                $.ajax({
+                    url: '/BusTransportation/GetBusRouteName',
+                    type: 'GET',
+                    data: { routeName: routeName, routeNumber: routeNumber, shift: shift, locationName: locationName },
+                    dataType: 'JSON',
+                    success: (function (data) {
+                        locdata = data;
+
+                        //console.log(data);
+                        var s = '<option value=""></option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            s += '<option value="' + data[i].BusRouteName + '" id="' + data[i].BusRouteName + '">' + data[i].BusRouteName + '</option>';
+                        }
+                        $("#ddBusRouteName").html(s);
+
+                    }),
+                    error: (function (data) {
+                        //code
+                    })
+                })
+            }
+    }
+
+    function GetBusRouteNumber() {
+        //
+        $("#ddPickUpPoint").val('');
+        var routeName = $("#ddBusRouteName option:selected").text();
+        var routeNumber = $("#ddBusRouteNumber option:selected").text();
+        var shift = $("#drpShift option:selected").text();
+        var locationName = "";
+        var drpRequestSubmissionFor = $("#drpRequestSubmissionFor option:selected").val();
+        if (drpRequestSubmissionFor == "Self") {
+            locationName = $("#ddEmpLocation option:selected").text();
+        }
+        else {
+            var rdOnBehalfOptionSelected = $("#rdOnBehalfOptionSelected").val();
+            if (rdOnBehalfOptionSelected == "SAVWIPLEmployee") {
+                locationName = $("#ddOtherEmpLocation option:selected").text();
+            }
+            else if (rdOnBehalfOptionSelected == "Others") {
+                locationName = $("#ddOtherNewEmpLocation option:selected").text();
+            }
+        }
+
+        if (IsEditMode || IsViewMode) {
+            var value = JSON.stringify(BTF);
+            var value_1 = JSON.parse(value);
+            var selectedBusRouteNumber = value_1.BusRouteNumber;
+            console.log(selectedBusRouteNumber);
+
+            $.ajax({
+                url: '/BusTransportation/GetBusRouteNumber',
+                type: 'GET',
+                data: { routeName: routeName, routeNumber: routeNumber, shift: shift, locationName: locationName },
+                dataType: 'JSON',
+                success: (function (data) {
+                    //locdata = data;
+
+                    //console.log(data);
+                    var s = '<option value=""></option>';
+
+                    for (var i = 0; i < data.length; i++) {
+                        if (data[i].BusRouteNumber == selectedBusRouteNumber) {
+                            s += '<option value="' + data[i].BusRouteNumber + '" id="' + data[i].BusRouteNumber + '" selected>' + data[i].BusRouteNumber + '</option>';
+                        }
+                        else {
+                            s += '<option value="' + data[i].BusRouteNumber + '" id="' + data[i].BusRouteNumber + '">' + data[i].BusRouteNumber + '</option>';
+                        }
+                    }
+                    $("#ddBusRouteNumber").html(s);
+                    $("#ddBusRouteNumber").addClass('spanUpperSide');
+                    $("#ddBusRouteNumber option[value='" + selectedBusRouteNumber + "']").prop('selected', 'selected').change();
+
+
+                }),
+                error: (function (data) {
+                    //code
+                })
+            })
+        }
+        else {
+            $.ajax({
+                url: '/BusTransportation/GetBusRouteNumber',
+                type: 'GET',
+                data: { routeName: routeName, routeNumber: routeNumber, shift: shift, locationName: locationName },
+                dataType: 'JSON',
+                success: (function (data) {
+                    locdata = data;
+
+                    //console.log(data);
+                    var s = '<option value=""></option>';
+
+                    for (var i = 0; i < data.length; i++) {
+                        s += '<option value="' + data[i].BusRouteNumber + '" id="' + data[i].BusRouteNumber + '">' + data[i].BusRouteNumber + '</option>';
+                    }
+                    $("#ddBusRouteNumber").html(s);
+
+                }),
+                error: (function (data) {
+                    //code
+                })
+            })
+        }
+    }
+
+    function GetBusPickUpPoint() {
+        //
+
+        var routeName = $("#ddBusRouteName option:selected").text();
+        var routeNumber = $("#ddBusRouteNumber option:selected").text();
+        var shift = $("#drpShift option:selected").text();
+        var locationName = "";
+        var drpRequestSubmissionFor = $("#drpRequestSubmissionFor option:selected").val();
+        if (drpRequestSubmissionFor == "Self") {
+            locationName = $("#ddEmpLocation option:selected").text();
+        }
+        else {
+            var rdOnBehalfOptionSelected = $("#rdOnBehalfOptionSelected").val();
+            if (rdOnBehalfOptionSelected == "SAVWIPLEmployee") {
+                locationName = $("#ddOtherEmpLocation option:selected").text();
+            }
+            else if (rdOnBehalfOptionSelected == "Others") {
+                locationName = $("#ddOtherNewEmpLocation option:selected").text();
+            }
+        }
+
+        if (IsEditMode || IsViewMode) {
+            var value = JSON.stringify(BTF);
+            var value_1 = JSON.parse(value);
+            var selectedPickupPoint = value_1.PickupPoint;
+            console.log(selectedPickupPoint);
+
+            $.ajax({
+                url: '/BusTransportation/GetBusPickUpPoint',
+                type: 'GET',
+                data: { routeName: routeName, routeNumber: routeNumber, shift: shift, locationName: locationName},
+                dataType: 'JSON',
+                success: (function (data) {
+                    var s = '<option value=""></option>';
+                    for (var i = 0; i < data.length; i++) {
+                        if (data[i].PickupPoint == selectedPickupPoint) {
+                            s += '<option value="' + data[i].PickupPoint + '" id="' + data[i].PickupPoint + '" selected>' + data[i].PickupPoint + '</option>';
+                        }
+                        else {
+                            s += '<option value="' + data[i].PickupPoint + '" id="' + data[i].PickupPoint + '">' + data[i].PickupPoint + '</option>';
+                        }
+                    }
+                    $("#ddPickUpPoint").html(s);
+                    $("#ddPickUpPoint").addClass('spanUpperSide');
+
+                }),
+                error: (function (data) {
+                    //code
+                })
+            })
+        }
+        else {
+            $.ajax({
+                url: '/BusTransportation/GetBusPickUpPoint',
+                type: 'GET',
+                data: { routeName: routeName, routeNumber: routeNumber, shift: shift, locationName: locationName },
+                dataType: 'JSON',
+                success: (function (data) {
+                    locdata = data;
+
+                    //console.log(data);
+                    var s = '<option value=""></option>';
+
+                    for (var i = 0; i < data.length; i++) {
+                        s += '<option value="' + data[i].PickupPoint + '" id="' + data[i].PickupPoint + '">' + data[i].PickupPoint + '</option>';
+                    }
+                    $("#ddPickUpPoint").html(s);
+
+
+                }),
+                error: (function (data) {
+                    //code
+                })
+            })
+        }
+    }
+
+    $('#successModel').on('hidden.bs.modal', function () {
+        ////
+        var tab = $("#tab").val();
+        console.log(tab);
+        if (tab == 1) {
+            GetMyTaskTab();
+        }
+        else if (tab == 2) {
+            window.location = "../Dashboard?tab=" + tab;
+        }
+    })
+
+    function OnBusRouteNameChange() {
+        //
+        if (IsNewMode || IsEditMode) {
+        var ddBusRouteName = $("#ddBusRouteName option:selected").val();
+        if (ddBusRouteName == "") {
+            $("#ddBusRouteNumber").val("");
+            $("#ddPickUpPoint").val("");
+            $("#ddBusRouteNumber").attr("disabled", "disabled");
+            $("#ddPickUpPoint").attr("disabled", "disabled");
+        }
+        else {
+            $("#ddBusRouteNumber").removeAttr("disabled", "disabled");
+            $("#ddPickUpPoint").removeAttr("disabled", "disabled");
+        }
+        }
+    }
+
+    function OnBusRouteNumberChange() {
+        //
+        if (IsNewMode || IsEditMode) {
+            var ddBusRouteNumber = $("#ddBusRouteNumber option:selected").val();
+            if (ddBusRouteNumber == "") {
+                $("#ddPickUpPoint").val("");
+                $("#ddPickUpPoint").attr("disabled", "disabled");
+            }
+            else {
+                $("#ddPickUpPoint").removeAttr("disabled", "disabled");
+            }
+        }
+    }
+
+    $("#drpShift").on("change", function () {
+        
+        $("#ddBusRouteName").val('');
+        $("#ddBusRouteNumber").val('');
+        $("#ddPickUpPoint").val('');
+        var drpRequestSubmissionFor = $("#drpRequestSubmissionFor option:selected").val();
+        var EmpLocation = "";
+        if (drpRequestSubmissionFor == "Self") {
+            EmpLocation = $("#ddEmpLocation option:selected").val();
+            if (EmpLocation == "") {
+                DisplayAlert('error', 'Error', 'Please select the Location');
+                return false;
+            }
+        }
+        else {
+            var rdOnBehalfOptionSelected = $("#rdOnBehalfOptionSelected").val();
+            if (rdOnBehalfOptionSelected == "SAVWIPLEmployee") {
+                EmpLocation = $("#ddOtherEmpLocation option:selected").val();
+            }
+            else if (rdOnBehalfOptionSelected == "Others") {
+                EmpLocation = $("#ddOtherNewEmpLocation option:selected").val();
+            }
+
+            if (EmpLocation == "") {
+                DisplayAlert('error', 'Error', 'Please select the Applicant Location ');
+                return false;
+            }
+        }
+        GetBusRouteName();
+    });
+
+    $("#ddEmpLocation").on("change", function () {
+        //
+        var drpShift = $("#drpShift option:selected").val();
+        if (drpShift == "-1") {
+            //DisplayAlert('error', 'Error', 'Please select the Shift');
+            //return false;
+        }
+        else {
+            GetBusRouteName();
+        }
+    });
+
+    $("#ddOtherEmpLocation").on("change", function () {
+        //
+        var drpShift = $("#drpShift option:selected").val();
+        if (drpShift == "-1") {
+            //DisplayAlert('error', 'Error', 'Please select the Shift');
+            //return false;
+        }
+        else {
+            GetBusRouteName();
+        }
+    });
+
+    $("#ddOtherNewEmpLocation").on("change", function () {
+        //
+        var drpShift = $("#drpShift option:selected").val();
+        if (drpShift == "-1") {
+            //DisplayAlert('error', 'Error', 'Please select the Shift');
+            //return false;
+        }
+        else {
+            GetBusRouteName();
+        }
+    });
+
+</script>

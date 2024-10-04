@@ -1,0 +1,2097 @@
+﻿@model Skoda_DCMS.Models.IDCFResults
+@{
+    bool IsNew = true;
+    Skoda_DCMS.Models.IDCFData IDC = null;
+    dynamic FlagRedirect = null;
+    bool IsEdit = true, IsNewMode = true, IsEditMode = false, IsViewMode = false;
+    bool IsValidityCheck = true;
+    int FormId = 0, AppRowId = 0, ApprovalType = 0;
+    string AREAID = "";
+    var CurrentUserDesgn = "";
+    Layout = ViewBag.Layout;
+    var currentUser = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    List<Skoda_DCMS.Models.ApprovalDataModel> appList = new List<Skoda_DCMS.Models.ApprovalDataModel>();
+    string disabled = "", slctDisabled = "";
+    string SecurityDesgnString = "ID Card Office";
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IsNew = ViewBag.IsNew;
+        IsEdit = ViewBag.IsEdit;
+        IsNewMode = ViewBag.IsNewMode;
+        IsEditMode = ViewBag.IsEditMode;
+        IsViewMode = ViewBag.IsViewMode;
+        disabled = IsViewMode ? "readonly" : "";
+        slctDisabled = IsViewMode ? "disabled" : "";
+        IDC = ViewBag.Model.one[0] as Skoda_DCMS.Models.IDCFData;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        IsValidityCheck = ViewBag.IsValidityCheck != null ? (bool)ViewBag.IsValidityCheck : false;
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+        appList = ViewBag.Model?.three as List<Skoda_DCMS.Models.ApprovalDataModel>;
+        //CurrentUserDesgn = appList?.Where(x => x.ApproverId == currentUser.UserId).Select(x => x.Designation).FirstOrDefault();
+        var Ap = appList?.Where(x => x.ApproverUserName.ToLower() == currentUser.UserName.ToLower() && x.ApproverStatus.ToLower() == "pending")
+                        .Where(x => x.Logic.ToLower() == "or"
+                            ? !appList.Any(y => y.Level == x.Level && y.ApproverStatus.ToLower() == "approved")
+                            : true)
+                        .OrderBy(x => x.Level).Select(x => new { Designation = x.Designation, Level = x.Level }).FirstOrDefault();
+        CurrentUserDesgn = Ap?.Designation;
+        var CurrentUserLevel = Ap?.Level;
+        //Logic to change assistant to doctor(if he/she has) for editing the fields doctor fields
+        CurrentUserDesgn = appList.Where(x => x.Level == CurrentUserLevel).Any(x => x.Designation == SecurityDesgnString)
+            ? SecurityDesgnString : CurrentUserDesgn;
+    }
+    ViewBag.Title = "ID Card Form";
+    int count = 0;
+}
+
+<style>
+    .astColor {
+        color: red;
+    }
+    /*New design css start here*/
+
+    .textTrans {
+        width: 100%;
+        max-width: 99%;
+        border-radius: 5px;
+        margin-right: 0px;
+        border: 1px solid #BFBFBF !important;
+    }
+
+    .empDetailsBg {
+        background-color: #fffbef;
+    }
+
+    #accordion select {
+        color: #000;
+        width: 100% !important;
+        max-width: 100%;
+        height: 45px;
+        background-color: #fff;
+        border: 1px solid #BFBFBF;
+        box-sizing: border-box;
+        border-radius: 5px;
+        background-image: url(data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>);
+        background-repeat: no-repeat;
+        background-position: right .75rem center;
+        background-size: 16px 12px;
+    }
+
+    #accordion input[type='text'] {
+        width: 100% !important;
+        max-width: 100%;
+        height: 45px;
+        background-color: #fff;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px !important;
+    }
+
+    #accordion input[type='date'] {
+        width: 100% !important;
+        max-width: 100%;
+        height: 45px;
+        background-color: #fff;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px;
+    }
+
+    #accordion input[type='time'] {
+        height: 45px;
+    }
+
+    #accordion label {
+        font-size: 16px;
+        line-height: 22px;
+        font-weight: 600;
+        color: #201F1F;
+    }
+
+    #accordion table tr td {
+        border: none !important;
+        font-size: 16px;
+        line-height: 19px;
+        color: #201F1F;
+        background-color: white;
+
+    }
+
+    #accordion label {
+        display: block;
+    }
+
+    #accordion .card-header {
+        background: rgb(4 59 100) !important;
+        border-radius: 5px 5px 0px 0px;
+        position: relative;
+        margin-top: 15px;
+    }
+
+        #accordion .card-header.collapsed h5:after {
+            content: '+';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        #accordion .card-header h5:after {
+            content: '-';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+    #accordion h5 button {
+        font-size: 18px;
+        line-height: 22px;
+        /* identical to box height */
+        padding-left: 0px;
+        display: flex;
+        align-items: center;
+        text-transform: uppercase;
+        /* Text_white */
+
+        color: #FFFFFF;
+    }
+
+        #accordion h5 button:focus {
+            box-shadow: none;
+        }
+
+    .empDetailsFields label {
+        display: block !important;
+        margin-bottom: 0px;
+    }
+
+    .empDetailsFields .row label {
+        display: block;
+        margin-bottom: 0px;
+    }
+
+        .empDetailsFields .row label:nth-child(1) {
+            font-style: normal;
+            font-weight: normal !important;
+            font-size: 12px;
+            line-height: 18px;
+            color: #A9A9A9 !important;
+        }
+
+        .empDetailsFields .row label:nth-child(2) {
+            font-style: normal;
+            font-weight: normal;
+            font-size: 18px;
+            line-height: 22px;
+            color: #201F1F;
+        }
+
+    .firstLastName {
+        font-style: normal;
+        font-weight: normal;
+        font-size: 20px;
+        line-height: 24px;
+        /* identical to box height */
+
+        display: flex;
+        align-items: center;
+        color: #201F1F;
+    }
+
+    .submit-btn {
+        background: #3D3D3D;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #FFFFFF;
+        border-color: transparent !important;
+    }
+
+    .cancl-btn {
+        background: #FAE99B;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        border-color: transparent !important;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #212221;
+        margin-left: 10px;
+    }
+
+
+
+
+    .card-footer {
+        display: flex;
+        background-color: transparent !important;
+    }
+
+    .photo-form {
+        width: 100%;
+    }
+
+    .ui-front {
+        z-index: 9999999 !important;
+    }
+    /*Animation CSS Starts*/
+
+    div.input-block {
+        position: relative;
+    }
+
+        div.input-block input {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 188px;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 5px !important;
+            border-top-right-radius: 5px !important;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block textarea {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 100%;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            background-color: #fff;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block span.placeholder {
+            position: absolute;
+            margin: 17px 0;
+            padding: 0 4px;
+            font-family: Roboto, sans-serif;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            top: -6px;
+            left: 15px;
+            transition: all 0.2s;
+            transform-origin: 0% 0%;
+            background: none;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        div.input-block textarea:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: #fff !important;
+        }
+
+        div.input-block textarea:valid + span.placeholder,
+        div.input-block textarea:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px) !important;
+            background: #fff !important;
+        }
+
+        div.input-block input:valid + span.placeholder,
+        div.input-block input:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: #fff;
+        }
+
+    .empDetailsFields div.input-block input:valid + span.placeholder,
+    .empDetailsFields div.input-block input:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: rgb(219,238,213);
+    }
+
+    div.input-block input.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: rgb(219,238,213);
+    }
+
+    .empDetailsFields div.input-block input:read-only + span.placeholder,
+    .empDetailsFields div.input-block input:read-only + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: rgb(219,238,213);
+    }
+
+    div.input-block input:read-only + span.placeholder,
+    div.input-block input:read-only + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: #fff;
+    }
+
+
+    div.inputSelect span.placeholder {
+        position: absolute;
+        margin: 17px 0;
+        padding: 0 4px;
+        font-family: Roboto, sans-serif;
+        color: #000;
+        display: flex;
+        align-items: center;
+        font-size: 1rem;
+        top: -6px;
+        left: 15px;
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+        background: none;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+   @* div.inputSelect select:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background: #fff;
+        z-index: 9;
+    }
+
+    .empDetailsFields div.inputSelect select:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background: #fff;
+        z-index: 9;
+    }*@
+
+    div.inputSelect select:not([value=""]):valid + span.placeholder {
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+    }
+
+
+
+    div.input-block input:focus + span.placeholder {
+        color: #284B63;
+    }
+
+    .breadcrumb {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+        padding: 1rem 1rem 0;
+        margin-bottom: 0;
+        list-style: none;
+        background-color: #FFFFFF;
+        border-radius: .25rem;
+        padding-bottom: 0.75rem !important;
+        padding-left: 0px !important;
+    }
+
+    body.nav-sm .container.body .left_col {
+        width: 63px;
+        padding: 0;
+        position: fixed;
+        height: 100%;
+        z-index: 8;
+    }
+
+    .card {
+        position: relative;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        min-width: 0;
+        word-wrap: break-word;
+        background-color: #fff;
+        background-clip: border-box;
+        border: 0px;
+        border-radius: .25rem;
+    }
+
+    .dropdown-toggle::after {
+        display: none;
+        width: 0;
+        height: 0;
+        margin-left: .255em;
+        vertical-align: .255em;
+        content: "";
+        border-top: .3em solid;
+        border-right: .3em solid transparent;
+        border-bottom: 0;
+        border-left: .3em solid transparent;
+    }
+
+    input.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213);
+    }
+
+    inputSelect.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213) !important;
+    }
+
+    select.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background-color: #fff !important;
+        z-index: 9;
+    }
+
+    .empDetailsFields select.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background-color: rgb(219,238,213) !important;
+        ;
+        z-index: 9;
+    }
+
+    textarea.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    .TransView {
+        background-color: white !important;
+    }
+
+    @@media only screen and (min-width: 992px) {
+        div .input-block span.placeholder {
+            font-size: 15px;
+        }
+
+        div.inputSelect span.placeholder {
+            font-size: 14px;
+        }
+    }
+
+    input[type='date'].spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    .showBorder {
+        border: 1px solid #dee2e6;
+    }
+
+    .forSameHt {
+        padding-bottom: 40px;
+        height: 78px !important;
+    }
+
+    .forPoints input[type='checkbox'] {
+        margin-right: 2px;
+        position: relative;
+        top: 2px;
+    }
+
+    #lblReason {
+        font-size: 16px !important;
+    }
+
+    #loader {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        
+        z-index: 10000;
+    }
+</style>
+<script type="text/javascript">
+
+    function checkSelect(id) {
+
+        if ($('#' + id).val() != '') {
+            $('#' + id).addClass('spanUpperSide');
+        }
+    }
+    /*$('#timedemo').pickatime({ twelvehour: true });*/
+
+</script>
+
+<body>
+    <div class="right_col bg-color">
+        <!-- NEW UI 30-03-2022 START -->
+        <div class="container">
+
+            <form action="/List/SaveIDCard" id="IDCForm" method="post">
+                <div class="">
+                    @if (IsEditMode || IsViewMode)
+                    {
+                        <div>
+                            <input type="hidden" id="FormSrId" name="FormSrId" value="@(ViewBag.Model.one[0].Id)" />
+                            <input type="hidden" id="FormId" name="FormId" value="@(FormId)" />
+                            <input type="hidden" id="AppRowId" name="AppRowId" value="@(AppRowId)" />
+                        </div>
+                    }
+                    <div>
+                        <ol class="breadcrumb pl-0">
+                            <li>
+                                <a href="/Dashboard?formName=IDCF">
+                                    Dashboard
+                                </a>
+                            </li>
+                            <li>
+                                New ID Card Request Form
+                            </li>
+
+                        </ol>
+                    </div>
+
+                    <div class="breadcrumb-container table-bordered" style="background-color: rgb(219,238,213) !important; ">
+                        <div class="col-md-2 col-lg-2">
+                            <span class="placeholder">Date : @(!IsNew || !IsEdit ? (Convert.ToDateTime(ViewBag.Model.two[0].FormId.Created).ToShortDateString()) : DateTime.Now.ToShortDateString())</span>
+                        </div>
+                        <div class="col-md-8 col-lg-8 mt-2 mb-1 form-heading" style="text-align:center; margin-top:5px">
+                            <span>
+                                SAVWIPL - New ID Card
+                            </span>
+                        </div>
+                        <div class="col-md-2 col-lg-2">
+                            @if (!IsNew || !IsEdit)
+                            {
+                                <span class="placeholder"> Form Id : @(!IsNew || !IsEdit ? ("IDCF" + FormId ?? "") : "" )</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <input type="hidden" id="ScreenId" name="ScreenId" value="New">
+                <div class="heading d-none" id="headingErr">
+                    <h1 id="" class="info-header">Following fields are mandatory. Please fill in information for<br /></h1>
+                    <div id="add_to_me" class="header-list" style="color:red;"></div>
+                </div>
+
+                @{
+                    Html.RenderPartial("_SubmitterDetailsWithModel", (ViewBag as object));
+                }
+                @{
+                    Html.RenderPartial("_ApplicantDetailsWithModel", (ViewBag as object));
+                }
+
+                <div id="accordion">
+
+                    <div class="card">
+                        <div class="card-header collapsed" id="headingOne" data-toggle="collapse" data-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                            <h5 class="mb-0">
+                                <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                                    <img src="~/assets/img/transactionIcon.svg" width="24" height="24" class="mr-2" />Transaction Fields
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseThree" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+                            <div class="card-body">
+
+                                <div class="form-row">
+                                    <div class="table mainTbl form-table-container-2 bg-color">
+
+                                        <div class="form-group col-md-3 col-lg-3 col-12 inputSelect">
+                                            <select name="ddTypeOfCard" class="" id="ddTypeOfCard" onchange="checkSelect('ddTypeOfCard'), ChangeChargeableOptions()" @(slctDisabled)>
+                                                <option value="" class="d-none"></option>
+                                                <option value="PKI">PKI</option>
+                                                <option value="Non-PKI">Non-PKI</option>
+                                            </select>
+                                            <span class="placeholder">Type of Card<span class="astColor">*</span></span>
+                                        </div>
+
+                                        <div class="form-group col-md-3 col-lg-3 col-12 input-block">
+                                            <input type="date" name="txtDateofJoining" class="w-40 spanUpperSide" id="txtDateofJoining" onchange="changeValidity()" value="@(IDC?.DateofJoining.ToString("yyyy-MM-dd"))" @(disabled)>
+                                            <span class="placeholder">Date of Joining<span class="astColor">*</span></span>
+                                        </div>
+
+                                        <div class="form-group col-md-3 col-12 input-block d-none valid-block">
+                                            <input type="date" name="txtValidityStartDate" class="w-40" id="txtValidityStartDate" value="@(IDC?.ValidityStartDate.ToString("yyyy-MM-dd"))" readonly>
+                                            <span class="placeholder">Valid From</span>
+                                        </div>
+
+                                        <div class="form-group col-md-3 col-12 input-block d-none valid-block">
+                                            <input type="date" name="txtValidityEndDate" class="w-40" id="txtValidityEndDate" value="@(IDC?.ValidityEndDate.ToString("yyyy-MM-dd"))" readonly>
+                                            <span class="placeholder">Valid Upto</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-row mt-3">
+                                    <div class="form-group col-md-6 col-12 input-block" id="idcfFileUpload">
+                                        <label>Upload Image for ID Card:</label>
+                                        @if ((IsEditMode || IsViewMode) && IDC != null && IDC.AttachmentFiles != null)
+                                        {
+                                            foreach (var attachment in IDC.AttachmentFiles.Attachments)
+                                            {
+                                                if (!IsViewMode)
+                                                {
+                                                    <input type="file" id="fileToUpload" class="d-none" name="fileToUpload" style="background-color: white !important; width: 100%;" accept="image/*" />
+                                                    <button for="fileToUpload"
+                                                            style="border: 1px solid #BFBFBF !important; box-sizing: border-box; border-radius: 5px !important; padding: 10px 20px;"
+                                                            onclick="document.getElementById('fileToUpload').click()">
+                                                        Choose File
+                                                    </button>
+                                                }
+                                                <input type="hidden" id="attachedfile" name="attachedfile" value="@System.Configuration.ConfigurationManager.AppSettings["SharepointSiteURL"]@attachment.ServerRelativeUrl" />
+                                                <input type="hidden" id="attachedfileName" name="attachedfileName" value="@attachment.FileName" />
+                                                <a id="attachedFileLink" href=@System.Configuration.ConfigurationManager.AppSettings["SharepointSiteURL"]@attachment.ServerRelativeUrl download=@attachment.FileName target="_blank">@attachment.FileName</a>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <input type="file" id="fileToUpload" name="fileToUpload" style="background-color: white !important; width: 100%;" accept="image/*" />
+                                        }
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group col-md-12 col-12 input-block">
+                                        <table class="w-100">
+
+                                            <tbody>
+                                                <tr>
+                                                    <td colspan="6" class="allFormLables borderLTB">
+                                                        <div class="input-block">
+                                                            <textarea class="textTrans" cols="90" rows="3" name="txtBusinessNeed" id="txtBusinessNeed" maxlength="500" required @(disabled)>@(IDC?.BusinessNeed ?? "")</textarea>
+                                                            <span class="placeholder">Business Function & Responsibility (Max. 500)<span class="astColor">*</span></span>
+                                                        </div>
+                                                    </td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="6" class="allFormLables borderLTB">
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <table id="AreaTable" class="table mainTbl table table-bordered table-sm dataTable no-footer bg-color">
+                                    <tbody id="tableBody">
+                                    </tbody>
+                                </table>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+                @if (IsViewMode || IsEditMode)
+                {
+                    <div id="accordion">
+                        <div class="card">
+                            <div class="card-header collapsed" id="headingFour" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                                <h5 class="mb-0">
+                                    <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                                        <img src="~/assets/img/approvalTracking.svg" width="24" height="24" class="mr-2" />Approval Tracking
+                                    </button>
+                                </h5>
+                            </div>
+                            <div id="collapseFour" class="collapse show" aria-labelledby="headingFour">
+                                <div class="card-body">
+                                    <div class="form-row">
+                                        <div class="col-12">
+                                            <table class="table w-100 td-border showBorder">
+                                                <thead>
+                                                    <tr>
+                                                        @*<th>Sr. No.</th>*@
+                                                        <th>Name</th>
+                                                        <th>Role</th>
+                                                        <th>Processed on</th>
+                                                        <th>Status</th>
+                                                        <th class="text-center">Comments</th>
+                                                        <th class="text-center">Approval Level</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @if (!IsNew || !IsEdit)
+                                                    {
+                                                        Html.RenderPartial("_ApprovalTracking", appList);
+                                                    }
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="accordion">
+                        <div class="card">
+                            <div class="card-header collapsed" id="headingFive" data-toggle="collapse" data-target="#collapseFive" aria-expanded="true" aria-controls="collapseFive">
+                                <h5 class="mb-0">
+                                    <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFive" aria-expanded="true" aria-controls="collapseFive">
+                                        <img src="~/assets/img/approvalTracking.svg" width="24" height="24" class="mr-2" /> Action
+                                    </button>
+                                </h5>
+                            </div>
+
+                            <div id="collapseFive" class="collapse show" aria-labelledby="headingFive">
+                                <div class="card-body actionTab">
+                                    @{
+
+                                        <div class="form-row">
+                                            <div class="form-group col-md-4 col-12 input-block">
+                                                <input type="date" name="txtDateofIssue" class="w-40" id="txtDateofIssue" onclick="setStartDate()"
+                                       value="@(IDC?.DateofIssue.ToString("yyyy-MM-dd") != "0001-01-01" ? IDC?.DateofIssue.ToString("yyyy-MM-dd") : "")"
+                                                       @(CurrentUserDesgn == SecurityDesgnString ? "" : "disabled")
+                                                       onchange="checkSelect('txtDateofIssue')">
+                                                <span class="placeholder TransView">Date of Issue</span>
+                                            </div>
+                                            <div class="form-group col-md-4 col-12 input-block">
+                                                <select name="ddChargable" class="w-40" id="ddChargable"
+                                                        @(CurrentUserDesgn == SecurityDesgnString ? "" : "disabled")
+                                                        onchange="checkSelect('ddChargable')"></select>
+                                                <span class="placeholder">Chargable</span>
+                                            </div>
+                                            <div class="form-group col-md-4 col-12 input-block">
+                                                <input type="text" name="txtIdCardNo" class="w-40" id="txtIdCardNo"
+                                                       onkeypress="avoidSpecialSymbols(event)" value="@(IDC?.IDCardNumber ?? "")"
+                                                       @(CurrentUserDesgn == SecurityDesgnString ? "" : "disabled") required>
+                                                <span class="placeholder">ID Card Number</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-row">
+                                            <div class="form-group col-md-4 col-12 input-block">
+                                                <input type="text" name="txtVendorCode" class="w-40" id="txtVendorCode"
+                                                       value="@(IDC?.VendorCode ?? "")"
+                                                       @(CurrentUserDesgn == SecurityDesgnString ? "" : "disabled") required>
+                                                <span class="placeholder">Vendor Code</span>
+                                            </div>
+                                        </div>
+                                    }
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                @if (IsNew)
+                {
+                    if (!IsEdit)
+                    {
+                        <div class="card-footer align-content-center">
+                            <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                                Re-Submit
+                            </button>
+                            <button type="reset" class="btn btn-danger btn-sm cancl-btn" id="btnCancel">
+                                Cancel
+                            </button>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="card-footer align-content-center">
+                            <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                                Submit
+                            </button>
+                            <button type="reset" class="btn btn-danger btn-sm cancl-btn" id="btnCancel">
+                                Cancel
+                            </button>
+                        </div>
+                    }
+                }
+            </form>
+        </div>
+
+
+        <div class="modal fade" id="successModel" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header modelHeader">
+                        <span class="modal-title modalMsgTitle" id="modalTitle"></span>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <label id="modalBody" class="lableMsg">  </label>
+                        <input type="hidden" id="tab" value="0" />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="submitBomBtn publishBtn" id="modalOkButton" data-dismiss="modal">OK</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+
+
+
+<script>
+    var spinner = $('#loader');
+    var CurrentUserDesgn = @Html.Raw(Json.Encode(CurrentUserDesgn));
+    var SecurityDesgnString = @Html.Raw(Json.Encode(SecurityDesgnString));
+    var IsNew = @Html.Raw(Json.Encode(IsNew));
+    var IsEdit = @Html.Raw(Json.Encode(IsEdit));
+    var IsNewMode = @Html.Raw(Json.Encode(IsNewMode));
+    var IsEditMode = @Html.Raw(Json.Encode(IsEditMode));
+    var IsViewMode = @Html.Raw(Json.Encode(IsViewMode));
+    var IDC = @Html.Raw(Json.Encode(IDC));
+    var appRowId = @Html.Raw(Json.Encode(AppRowId));
+    var approvalType =@Html.Raw(Json.Encode(ApprovalType));
+    var IsValidityCheck = @Html.Raw(Json.Encode(IsValidityCheck));
+    var FlagRedirect = @Html.Raw(Json.Encode(FlagRedirect));
+    pageLoad();
+    var errorCount = 0;
+    var errors = "";
+
+    function pageLoad() {
+
+        if ($('#txtBusinessNeed').val() != "") {
+            $('#txtBusinessNeed').addClass('spanUpperSide');
+        }
+
+
+        ////
+        $("#headingErr").addClass('d-none');
+        ShowHideValidity();
+        var data = "";
+        //getSubmitterData();
+        if (IsViewMode) {
+            //AreaSubArea();
+            //$(".inpDisable").prop("readonly", true);
+            //$(".drpDisable").prop("readonly", true);
+            ChangeChargeableOptions();
+            // // console.log(IDC.TypeOfCard);
+            $("#ddTypeOfCard option[value='" + IDC.TypeOfCard + "']").prop('selected', 'selected');
+            $("#ddTypeOfCard").prop("readonly", true);
+            $("#ddTypeOfCard").addClass("spanUpperSide");
+        }
+        if (!IsViewMode) {
+            GetCostCenter();
+            getDepartment();
+            GetLocationName();
+            GetApprovers();
+            setStartDate();
+            //TypeOfCard();
+            if (IsEditMode) {
+                var value = JSON.stringify(IDC);
+                var value_1 = JSON.parse(value);
+                var empType = value_1.EmployeeType;
+                var priority = value_1.Priority;
+                //GetCostCenter();
+                //getDepartment();
+                //GetLocationName();
+                //GetApprovers();
+                //GetArea();
+                //if (empType == "Intern") {
+                //    calculateEndDate();
+                //    $("#endDateRow").show();
+                //}
+                //else {
+                //    $("#endDateRow").hide();
+                //}
+                //if (empType == "External") {
+                //    $("#externalCompany").show();
+                //}
+                //else {
+                //    $("#externalCompany").hide();
+                //}
+                //if (priority == "Normal") {
+                //    $("#AreaTR").show();
+                //    //GetArea();
+                //}
+                //else {
+                //    $("#AreaTR").hide();
+                //}
+                //$("#AreaTR").hide();
+                $("#ddTypeOfCard option[value='" + IDC.TypeOfCard + "']").prop('selected', 'selected');
+                $("#ddTypeOfCard").addClass("spanUpperSide");
+            }
+            if (IsNewMode) {
+                //GetCostCenter();
+                //getDepartment();
+                //GetLocationName();
+                //GetApprovers();
+                //$("#AreaTR").hide();
+                //$("#endDateRow").hide();
+                $("#externalCompany").hide();
+                $(".inpIsNewDisable").attr("readonly", "readonly");
+            }
+        }
+        ChangeChargeableOptions();
+        if (CurrentUserDesgn === SecurityDesgnString) {
+            $('#txtDateofIssue').prop("readonly", false);
+            $('#ddChargable').prop("readonly", false);
+            $('#txtIdCardNo').prop("readonly", false);
+        }
+    }
+
+    function successModal(txt) {
+        ////
+        $('#modalTitle').html('Success');
+        if (txt == "approve") {
+            $('#modalBody').html('Form has been approved!');
+        }
+        else if (txt == "reject") {
+            $('#modalBody').html('Form has been rejected!');
+        }
+        else if (txt == "enquire") {
+            $('#modalBody').html('Form has been enquired!');
+        }
+        else if (txt == "cancelled") {
+            $('#modalBody').html('Form has been cancelled!');
+        }
+        else {
+            if (IsEditMode) {
+                $('#modalBody').html('Your form with ID: IDCF' + txt + ' has been re-submitted! Kindly use this for future reference');
+            }
+            else {
+                $('#modalBody').html('Your form with ID: IDCF' + txt + ' has been submitted! Kindly use this for future reference');
+            }
+        }
+        //$('#modalBody').html('Your form has been submitted!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function failureModal(msg) {
+        if (txt == null) {
+            $('#modalBody').html('Some error occurred!');
+        }
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html(msg);
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function permissionModal() {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html('No permssion granted since the device is not SAVWIPL owned!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function requiredModal(text) {
+        $('#modalTitle').html('Required!');
+        $('#modalBody').html(text);
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function GetApprovers() {
+        $.ajax({
+            url: '/IDCard/GetIDCFApprovalList',
+            type: 'GET',
+            data: {},
+            dataType: 'JSON',
+            success: (function (data) {
+                ////
+                approverData = data;
+                // // console.log(data);
+                var row = "";
+                for (var i = 0; i < data.length; i++) {
+                    row += '<input type="hidden" id="hidden' + data[i].Department + 'Approver" name="hidden' + data[i].Department + 'Approver" value="' + data[i].ApproverEmailId + '">';
+                }
+                $("#hiddenApproverInformation").html(row);
+
+            }),
+            error: (function (data) {
+                //code
+            })
+        })
+
+    }
+
+    function formPriority() {
+       // //
+        var dropdown = document.getElementById("drpPriority");
+        var selection = dropdown.value;
+        var dropdown1 = document.getElementById("drpLocationName");
+        var selection1 = dropdown1.value;
+        if (selection == "Urgent") {
+            $("#AreaTR").hide();
+        }
+        else if (selection == "Normal") {
+            if (selection1 != -1) {
+                $("#AreaTR").show();
+            }
+            else {
+                $("#AreaTR").hide();
+            }
+        }
+    }
+
+    function calculateEndDate() {
+        ////
+        var dropdown = document.getElementById("drpEndDate");
+        var selection = dropdown.value;
+
+        var dateString = document.getElementsByName("txtDate")[0].value;
+        var dateParts = dateString.split("-");
+        var seperatedParts = new Date(dateParts[2], dateParts[1] - 1, dateParts[0]);
+
+        if (selection == 1) {
+            var months = seperatedParts;
+            months.setMonth(months.getMonth()+6);
+            var endMonth = months.toISOString().split('T')[0];
+            document.getElementsByName("txtEndDate")[0].setAttribute("value", endMonth);
+        }
+        else if (selection == 2) {
+            var years = seperatedParts;
+            years.setFullYear(years.getFullYear() + 1);
+            var endYear = years.toISOString().split('T')[0];
+            document.getElementsByName("txtEndDate")[0].setAttribute("value", endYear);
+        }
+    }
+
+    function func() {
+        ////
+        var dropdown = document.getElementById("drpEmployeeType");
+        var selection = dropdown.value;
+
+        if (selection == "Internal") {
+            $("#endDateRow").hide();
+            $("#externalCompany").hide();
+        }
+        else if (selection == "External") {
+            $("#endDateRow").hide();
+            $("#externalCompany").show();
+        }
+        else if (selection == "Intern") {
+            $("#endDateRow").show();
+            $("#externalCompany").hide();
+        }
+    }
+
+    function setStartDate() {
+        var today = new Date().toISOString().split('T')[0];
+        var dateOfJoining = document.getElementById("txtDateofJoining");
+        /*dateOfJoining.setAttribute("max", today);*/
+        //if (!IsNewMode) {
+        //    var startDate = document.getElementById("txtValidityStartDate");
+        //    if (startDate.value)
+        //        endDate.setAttribute("min", startDate.value.split('T')[0]);
+        //}
+        //var endDate = document.getElementById("txtValidityEndDate");
+        //var dateOfIssue = document.getElementById("txtDateofIssue");
+        //if (dateOfJoining.value) {
+        //    startDate.setAttribute("min", dateOfJoining.value.split('T')[0]);
+        //    dateOfIssue.setAttribute("min", dateOfJoining.value.split('T')[0]);
+        //}
+    }
+
+    function allowNumbersOnly(e) {
+        var code = (e.which) ? e.which : e.keyCode;
+        if (code > 31 && (code < 48 || code > 57)) {
+            e.preventDefault();
+        }
+    }
+
+    function alphaOnly(e) {
+        var key = e.keyCode;
+        if (key > 32 && (key < 65 || key > 122 || key == 91 || key == 92 || key == 93 || key == 94 || key == 95 || key == 96)) {
+            e.preventDefault();
+        }
+    }
+
+    $("#txtEmployeeNumber").autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                url: "/IDCard/GetIDCFEmployeeDetails",
+                dataType: "json",
+                cache: false,
+                async: false,
+                data: {
+                    searchText: $("#txtEmployeeNumber").val()
+                },
+                success: function (data) {
+                    ////
+                    response($.map(data, function (item) {
+                        // // console.log("EmployeeCode");
+                        // // console.log(data, 'data');
+                        return { label: item.UserId, value: item.UserId, raw: item };
+                    }));
+                }
+            });
+        },
+        search: function (event, ui) {
+            var value = $("#txtEmployeeNumber").val();
+            // // console.log(value);
+            // If less than three chars, cancel the search event
+            if (value.length < 4) {
+                event.preventDefault();
+            }
+        },
+        min_length: 4,
+        delay: 0,
+        select: function (event, ui) {
+            ////
+            var empOtherDetails = ui.item['raw'];
+            // // console.log(empOtherDetails);
+            // // console.log("select");
+            //Get the other details like Cost Center Code, Employee Number from DB.
+            $.ajax({
+                url: "/List/GetPAFExistingEmployeeDetails",
+                dataType: "json",
+                cache: false,
+                async: false,
+                data: {
+                    otherEmpUserId: empOtherDetails.UserId,
+                },
+                success: function (data) {
+                    // // console.log("select success");
+                    // // console.log(data, 'data');
+
+                    $('#txtSurname').val(data.LastName);
+                    $('#txtEmployeeName').val(data.FirstName);
+                    $('#drpDepartment').val(data.Department);
+                    $('#drpCostCentre').val(data.CostCenter);
+                    $('#txtDepartment').val(data.Department);
+                    $('#drpEmployeeType').val("Internal");
+
+                }
+            });
+        }
+    });
+
+    $("#btnCancel").on('click', function (e) {
+        ////
+        // // console.log('cancel');
+        $("#headingErr").addClass('d-none');
+        document.getElementById("add_to_me").innerHTML = '';
+        if ($('#myModalRequest').hasClass('show'))
+            $('#myModalRequest').modal('hide');
+        else
+            $('#myModalEdit').modal('hide');
+        if (IsNewMode) {
+            window.location = "../Dashboard";
+        }
+    });
+
+    function GetCostCenter() {
+        ////
+        if (IsNew) {
+            if (!IsEdit) {
+                var value = JSON.stringify(IDC);
+                var value_1 = JSON.parse(value);
+                var selectedLocation = value_1.CostCentre;
+                // // console.log(selectedLocation);
+
+                $.ajax({
+                    url: '/List/CostCenter',
+                    type: 'GET',
+                    data: {},
+                    dataType: 'JSON',
+                    success: (function (data) {
+                        //locdata = data;
+
+                        //// // console.log(data);
+                        var s = '<option value="-1">Please Select Cost Center</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            if (data[i].CostCenter == selectedLocation) {
+                                s += '<option value="' + data[i].CostCenter + '" location="' + data[i].Location + '"' + 'id="' + data[i].Id + '" selected>' + data[i].CostCenter + '</option>';
+                            }
+                            else {
+                                s += '<option value="' + data[i].CostCenter + '" location="' + data[i].Location + '"' + 'id="' + data[i].Id + '">' + data[i].CostCenter + '</option>';
+                            }
+                        }
+                        $("#drpCostCentre").html(s);
+
+
+                    }),
+                    error: (function (data) {
+                        //code
+                    })
+                })
+            }
+            else {
+                $.ajax({
+                    url: '/List/CostCenter',
+                    type: 'GET',
+                    data: {},
+                    dataType: 'JSON',
+                    success: (function (data) {
+                        locdata = data;
+
+                        //// // console.log(data);
+                        var s = '<option value="-1">Please Select Cost Center</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            s += '<option value="' + data[i].CostCenter + '" location="' + data[i].Location + '"' + 'id="' + data[i].Id + '">' + data[i].CostCenter + '</option>';
+                        }
+                        $("#drpCostCentre").html(s);
+
+
+                    }),
+                    error: (function (data) {
+                        //code
+                    })
+                })
+            }
+
+        }
+    }
+
+    function getDepartment() {
+        if (IsNew) {
+            if (!IsEdit) {
+                var value = JSON.stringify(IDC);
+                var value_1 = JSON.parse(value);
+                var selectedLocation = value_1.Department;
+                // // console.log(selectedLocation);
+
+                $.ajax({
+                    url: '/List/Department',
+                    type: 'GET',
+                    data: {},
+                    dataType: 'JSON',
+                    success: (function (data) {
+                        //locdata = data;
+
+                        //// // console.log(data);
+                        var s = '<option value="-1">Please Select Department</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            if (data[i].Department == selectedLocation) {
+                                s += '<option value="' + data[i].Department + '" id="' + data[i].Id + '" selected>' + data[i].Department + '</option>';
+                            }
+                            else {
+                                s += '<option value="' + data[i].Department + '" id="' + data[i].Id + '">' + data[i].Department + '</option>';
+                            }
+                        }
+                        $("#drpDepartment").html(s);
+
+
+                    }),
+                    error: (function (data) {
+                        //code
+                    })
+                })
+            }
+            else {
+                $.ajax({
+                    url: '/List/Department',
+                    type: 'GET',
+                    data: {},
+                    dataType: 'JSON',
+                    success: (function (data) {
+                        locdata = data;
+
+                        //// // console.log(data);
+                        var s = '<option value="-1">Please Select Department</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            s += '<option value="' + data[i].Department + '" id="' + data[i].Id + '">' + data[i].Department + '</option>';
+                        }
+                        $("#drpDepartment").html(s);
+
+
+                    }),
+                    error: (function (data) {
+                        //code
+                    })
+                })
+            }
+        }
+
+    }
+
+    function GetLocationName() {
+        if (IsNew) {
+            if (!IsEdit) {
+                ////
+                var value = JSON.stringify(IDC);
+                var value_1 = JSON.parse(value);
+                var selectedLocation = value_1.LocationName;
+                // // console.log(selectedLocation);
+
+                $.ajax({
+                    url: '/List/LocationMaster',
+                    type: 'GET',
+                    data: {},
+                    dataType: 'JSON',
+                    success: (function (data) {
+                        locdata = data;
+
+                        //// // console.log(data);
+                        var s = '<option value="-1" style="display:none;"></option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            if (data[i].LocationName == selectedLocation) {
+                                s += '<option value="' + data[i].Id + '" selected>' + data[i].LocationName + '</option>';
+                            }
+                            else {
+                                s += '<option value="' + data[i].Id + '">' + data[i].LocationName + '</option>';
+                            }
+
+                        }
+                        $("#drpLocationName").html(s);
+
+                    }),
+                    error: (function (data) {
+                        //code
+                    })
+                })
+            }
+            else {
+                $.ajax({
+                    url: '/List/LocationMaster',
+                    type: 'GET',
+                    data: {},
+                    dataType: 'JSON',
+                    success: (function (data) {
+                        locdata = data;
+
+                        //// // console.log(data);
+                        var s = '<option value="1" sstyle="display: none;"></option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            s += '<option value="' + data[i].Id + '">' + data[i].LocationName + '</option>';
+
+                        }
+                        $("#drpLocationName").html(s);
+
+                    }),
+                    error: (function (data) {
+                        //code
+                    })
+                })
+
+            }
+        }
+
+    }
+
+    function AreaListOnChange(option, checked) {
+        var AreaText = $(option).text();
+        var AreaId = $(option).val();
+        var Locationid = $("#drpLocationName").val();
+       // //
+        if (checked) {
+            $.ajax({
+                url: '/IDCard/SubAreaMaster',
+                type: 'GET',
+                data: { Locationid: Locationid, AreaID: AreaId },
+                dataType: 'JSON',
+                success: (function (data) {
+                    locdata = data;
+                    // // console.log(data);
+
+                    if (data.length == 0) {
+                        start = "<tr class='align_colspan" + AreaId + "' id='" + AreaId + "' value='" + AreaId + "'><td value='" + AreaId + "' id='" + AreaId + "' class='w-25 allFormLables noTopBorder' data-hasSubAreas='0'>" + AreaText + "</td><td><input type='checkbox' value='" + AreaId + "'  id='" + AreaId + "'></td><td><input class='w-50 noTopBorder' type='text' readonly  id='" + AreaId + "'></br><small>(sign)</small></td></tr>";
+                    }
+                    else {
+                        //Adding Sub Areas
+                        var $table = $("#AreaTable");
+                        var rowCount = $('#AreaTable tr').length;
+                        var count = rowCount;
+                        var start = "";
+                        start = "<tr id=tr_" + AreaId + "><td class='align_colspan" + AreaId + "' id='" + AreaId + "' value='" + AreaId + "'><div class='d-flex justify-content-around'> <div class='TableborderDiv f-600'>" + AreaText + "</div>";
+                        for (var k = 0; k < data.length; k++) {
+                            /*start += "<div class='TableborderDiv'>" + data[k].SubAreaName + " <input type = 'checkbox' value = '" + data[k].Id + "'  id = '" + data[k].Id + "' >" + "</div >";                        */
+                            start += "<div class='TableborderDiv'>" + " <input type = 'checkbox' value = '" + data[k].Id + "'  id = '" + data[k].Id + "' >" + data[k].SubAreaName + "</div >";
+                        }
+                        // // console.log(start);
+                        $('#tableBody').append(start + "</div></td></tr>");
+                    }
+                }),
+                error: (function (data) {
+                })
+            })
+        }
+        else {
+            $('#tableBody').find("#tr_" + AreaId).remove();
+        }
+    }
+
+    function AreaListOnChangeEdit(option, checked) {
+       // //
+        var AreaText = $(option).text();
+        var AreaId = $(option).val();
+        var Locationid = $("#drpLocationName").val();
+
+        if (checked) {
+            $.ajax({
+                url: '/IDCard/SubAreaMaster',
+                type: 'GET',
+                data: { Locationid: Locationid, AreaID: AreaId },
+                dataType: 'JSON',
+                success: (function (data) {
+                    locdata = data;
+                    // // console.log(data);
+
+                    if (data.length == 0) {
+                        start = "<tr class='align_colspan" + AreaId + "' id='" + AreaId + "' value='" + AreaId + "'><td value='" + AreaId + "' id='" + AreaId + "' class='w-25 allFormLables noTopBorder' data-hasSubAreas='0'>" + AreaText + "</td><td><input type='checkbox' value='" + AreaId + "'  id='" + AreaId + "'></td><td><input class='w-50 noTopBorder' type='text' readonly  id='" + AreaId + "'></br><small>(sign)</small></td></tr>";
+                    }
+                    else {
+                        //Adding Sub Areas
+                        var $table = $("#AreaTableView");
+                        var rowCount = $('#AreaTableView tr').length;
+                        var count = rowCount;
+                        var start = "";
+                        start = "<tr id=tr_" + AreaId + "><td class='align_colspan" + AreaId + "' id='" + AreaId + "' value='" + AreaId + "'><div class='d-flex justify-content-around'> <div class='TableborderDiv f-600'>" + AreaText + "</div>";
+                        for (var k = 0; k < data.length; k++) {
+                            /*start += "<div class='TableborderDiv'>" + data[k].SubAreaName + " <input type = 'checkbox' value = '" + data[k].Id + "'  id = '" + data[k].Id + "' >" + "</div >";                        */
+                            start += "<div class='TableborderDiv'>" + " <input type = 'checkbox' value = '" + data[k].Id + "'  id = '" + data[k].Id + "' >" + " " + data[k].SubAreaName + "</div >";
+                        }
+                        // // console.log(start);
+                        $('#tableBodyView').append(start + "</div></td></tr>");
+                    }
+                }),
+                error: (function (data) {
+                })
+            })
+        }
+        else {
+            $('#tableBodyView').find("#tr_" + AreaId).remove();
+        }
+    }
+
+    function AreaSubArea() {
+        ////
+        GetAreaOnEdit();
+    }
+
+    function GetAreaOnEdit() {
+        ////
+        $('#AreaList').multiselect('destroy');
+        $('#tableBody').empty();
+        var Locationid = $("#drpLocationName").val();
+        $.ajax({
+            url: '/IDCard/AreaMaster',
+            type: 'GET',
+            data: { Locationid: Locationid },
+            dataType: 'JSON',
+            success: (function (data) {
+                locdata = data;
+
+                //// // console.log(data);
+                var s = null;
+                for (var i = 0; i < data.length; i++) {
+
+                    s += '<option value="' + data[i].Id + '" LocationId="' + data[i].LocationId + '">' + data[i].AreaName + '</option>';
+                }
+                $("#AreaList").html(s);
+
+
+                $('#AreaList').multiselect({
+                    includeSelectAllOption: true,
+                });
+
+                // $("#AreaList").val([2, 4]);
+
+            }),
+            error: (function (data) {
+                //code
+            })
+        })
+    }
+
+    $("#btnSubmit").on('click', function (e) {
+        //
+        validateSubmitter();
+        validateApplicant();
+
+        if (IsEditMode) {
+            var fileToUpload = $("#fileToUpload").val();
+            if (fileToUpload != "") {
+                $("#attachedfile").val('');
+                $("#attachedfileName").val('');
+            }
+        }
+        var dateOfJoining = document.getElementById("txtDateofJoining").value;
+        if (dateOfJoining == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Date of Joining" + "</li>";
+            AddError("txtDateofJoining", '', errorCount);
+            errorCount++;
+        }
+        else {
+            RemoveError("txtDateofJoining");
+        }
+
+        var typeOfCard = $("#ddTypeOfCard option:selected").val();
+        if (typeOfCard == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Type Of Card" + "</li>";
+            AddError("ddTypeOfCard", '', errorCount);
+            errorCount++;
+        }
+        else {
+            RemoveError("ddTypeOfCard");
+        }
+
+        var fileToUpload = $("#fileToUpload").val();
+        if (IsNewMode && fileToUpload == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Upload Photo" + "</li>";
+            AddError("fileToUpload", '', errorCount);
+            errorCount++;
+        }
+        else if (IsEditMode && $("#attachedfile").val() == "" && fileToUpload == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Upload Photo" + "</li>";
+            AddError("fileToUpload", '', errorCount);
+            errorCount++;
+        }
+        else {
+            RemoveError("fileToUpload");
+        }
+
+        var list = ["Apprentice", "Intern", "Graduate Engineer Trainee"];
+        if (($("#drpRequestSubmissionFor option:selected").val() === "OnBehalf"
+            && ((list.find(x => x === $("#ddOtherEmpDesignation option:selected").val()) && $('#rdOnBehalfOptionSelected').val() === "SAVWIPLEmployee")
+                || (list.find(x => x === $("#ddOtherNewEmpDesignation option:selected").val()) && $('#rdOnBehalfOptionSelected').val() === "Others")))
+            || ($("#drpRequestSubmissionFor option:selected").val() === "Self" && list.find(x => x === $("#ddEmpDesignation option:selected").val()))) {
+            var startDate = document.getElementById("txtValidityStartDate").value;
+            if (startDate == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Valid From" + "</li>";
+                AddError("txtValidityStartDate", '', errorCount);
+                errorCount++;
+            }
+            else {
+                RemoveError("txtValidityStartDate");
+            }
+
+            var endDate = document.getElementById("txtValidityEndDate").value;
+            if (endDate == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Valid Upto" + "</li>";
+                AddError("txtValidityEndDate", '', errorCount);
+                errorCount++;
+            }
+            else {
+                RemoveError("txtValidityEndDate");
+            }
+        }
+
+        if (CurrentUserDesgn == SecurityDesgnString) {
+            var dateOfIssue = document.getElementById("txtDateofIssue").value;
+            if (dateOfIssue == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Date of Issue" + "</li>";
+                AddError("txtDateofIssue", '', errorCount);
+                errorCount++;
+            }
+            else {
+                RemoveError("txtDateofIssue");
+            }
+
+            var location = $("#ddChargable option:selected").val();
+            if (location == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Chargable " + "</li>";
+                AddError("ddChargable", '', errorCount);
+                errorCount++;
+            }
+            else {
+                RemoveError("ddChargable");
+            }
+
+            var idCarNo = document.getElementById("txtIdCardNo").value;
+            if (idCarNo == "") {
+                errors += "<li id='error" + errorCount + "'>" + "IDCard Number" + "</li>";
+                AddError("txtIdCardNo", '', errorCount);
+                errorCount++;
+            }
+            else {
+                RemoveError("txtIdCardNo");
+            }
+
+            var vendorCode = document.getElementById("txtVendorCode").value;
+            if (vendorCode == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Vendor Code" + "</li>";
+                AddError("txtVendorCode", '', errorCount);
+                errorCount++;
+            }
+            else {
+                RemoveError("txtVendorCode");
+            }
+        }
+
+
+        var businessNeed = document.getElementById("txtBusinessNeed").value;
+        // // console.log(businessNeed);
+        if (businessNeed == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Business Function & Responsibility" + "</li>";
+            AddError("txtBusinessNeed", '', errorCount);
+            errorCount++;
+        }
+        else {
+            RemoveError("txtBusinessNeed");
+        }
+
+        if (errors.length) {
+            errors = "<ol id='errorList'>" + errors + "</ol>";
+            $("#headingErr").removeClass('d-none');
+            document.getElementById("add_to_me").innerHTML = errors;
+            errors = "";
+            errorCount = 0;
+            if (IsEditMode) {
+                $("#myModalRequest").scrollTop(0);
+            }
+            else {
+                $(window).scrollTop(0);
+            }
+            return false;
+        }
+        $("#headingErr").addClass('d-none');
+        document.getElementById("add_to_me").innerHTML = '';
+        errors = "";
+        errorCount = 0;
+
+        $("#pageLoader").removeClass('invisible');
+        $("#btnSubmit").text('Saving');
+        $("#btnSubmit").prop("readonly", true);
+        $("#btnCancel").prop("readonly", true);
+
+        var form = $("#IDCForm");
+        // // console.log(form);
+        var formData = new FormData(form[0]);
+        formData.append('EmpLocationID', $("#ddEmpLocation option:selected").attr("LocationId"));
+        formData.append('OtherEmpLocationID', $("#ddOtherEmpLocation option:selected").attr("LocationId"));
+        formData.append('OtherNewEmpLocationID', $("#ddOtherNewEmpLocation option:selected").attr("LocationId"));
+        //formData.forEach((x, y) => {
+        //    // // console.log(y + " = " + x);
+        //});
+        $("#tab").val(2);
+        //
+        $.ajax({
+            url: '/IDCard/SaveIDCard',
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            data: formData,
+            enctype: 'multipart/form-data',
+            //dataType: 'JSON',
+            success: (function (data) {
+                // // console.log(data);
+                if (data.Status == 200) {
+                    $("#pageLoader").addClass('invisible');
+                    if (IsNew && IsEdit) {
+                        $("#btnSubmit").text('Submit');
+                    }
+                    else {
+                        $("#btnSubmit").text('Re-Submit');
+                    }
+                    $("#btnSubmit").prop("readonly", false);
+                    $("#btnCancel").prop("readonly", false);
+                    successModal(data.Message);
+                    ////
+                    //successModal(data[0].Value);
+                    //$("#IDCForm").trigger("reset");
+                    //if (IsNew) {
+                    //    if (!IsEdit) {
+                    //        setTimeout(function () {// wait for 4 secs(2)
+                    //            location.reload(); // then reload the page.(3)
+                    //        }, 4000);
+                    //    }
+                    //}
+                    ////$('#AreaList').multiselect('destroy');
+                    //$('#tableBody').empty();
+                    //$("#pageLoader").addClass('invisible');
+                }
+                else {
+                    failureModal(data.Message);
+                    if (IsNew && IsEdit) {
+                        $("#btnSubmit").text('Submit');
+                    }
+                    else {
+                        $("#btnSubmit").text('Re-Submit');
+                    }
+                    $("#pageLoader").addClass('invisible');
+                    $("#btnSubmit").prop("readonly", false);
+                    $("#btnCancel").prop("readonly", false);
+                    // // console.log("failure");
+                    //$("#pageLoader").addClass('invisible');
+                    //failureModal();
+                    //$("#IDCForm").trigger("reset");
+                    ////$('#AreaList').multiselect('destroy');
+                    //$('#tableBody').empty();
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+                // console.log("error");
+                if (IsNew && IsEdit) {
+                    $("#btnSubmit").text('Submit');
+                }
+                else {
+                    $("#btnSubmit").text('Re-Submit');
+                }
+                $("#pageLoader").addClass('invisible');
+                $("#btnSubmit").prop("readonly", false);
+                $("#btnCancel").prop("readonly", false);
+                //$("#pageLoader").addClass('invisible');
+                //failureModal();
+                //$("#IDCForm").trigger("reset");
+                ////$('#AreaList').multiselect('destroy');
+                //$('#tableBody').empty();
+            })
+        })
+    });
+
+    function validityModal(txt) {
+        ////
+        if (txt == 'approve') {
+            DisplayAlert('error', 'Warning', 'Please fill the Date of Issue, Active From Date, and Id Card Number');
+        }
+        else if (txt == 'reject') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for rejecting the form');
+        }
+        else if (txt == 'enquire') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for enquiring the form');
+        }
+    }
+
+    function ValidityUpdate() {
+        ////
+        var form = $("#IDCForm").serialize();
+        $.ajax({
+            url: '/IDCard/IdCardValidityUpdate',
+            type: 'POST',
+            data: form,
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data == 1) {
+                    //successModal(text);
+                    $("#IDCForm").trigger("reset");
+                    //setTimeout(FilterMyTasks(0, 0), 8000);
+                    //window.location.reload();
+                    //setTimeout(FilterMyTasks, 8000)
+                    /*setTimeout(ReloadMyTasks, 8000)*/
+                }
+                else {
+                    failureModal();
+                    $("#IDCForm").trigger("reset");
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+                $("#IDCForm").trigger("reset");
+            })
+        })
+
+    }
+
+    function saveResponse(text) {
+      //  //
+        var errors=""
+        if (CurrentUserDesgn == SecurityDesgnString) {
+            //var dateOfIssue = document.getElementById("txtDateofIssue").value;
+            //var chargable = document.getElementById("ddChargable").value;
+            //var idcard = document.getElementById("txtIdCardNo").value;
+        }
+        var status = '', comment = '';
+        comment = $("#comment-" + text).val();
+        switch (text) {
+            case 'approve': {
+                status = 'Approved';
+                if (CurrentUserDesgn == SecurityDesgnString) {
+                    var dateOfIssue = document.getElementById("txtDateofIssue").value;
+                    if (dateOfIssue == "") {
+                        errors += "<li id='error" + errorCount + "'>" + "Date of Issue" + "</li>";
+                        AddError("txtDateofIssue", '', errorCount);
+                        errorCount++;
+                    }
+                    else {
+                        RemoveError("txtDateofIssue");
+                    }
+
+                    var location = $("#ddChargable option:selected").val();
+                    if (location == "") {
+                        errors += "<li id='error" + errorCount + "'>" + "Chargable " + "</li>";
+                        AddError("ddChargable", '', errorCount);
+                        errorCount++;
+                    }
+                    else {
+                        RemoveError("ddChargable");
+                    }
+
+                    var idCarNo = document.getElementById("txtIdCardNo").value;
+                    if (idCarNo == "") {
+                        errors += "<li id='error" + errorCount + "'>" + "ID Card Number" + "</li>";
+                        AddError("txtIdCardNo", '', errorCount);
+                        errorCount++;
+                    }
+                    else {
+                        RemoveError("txtIdCardNo");
+                    }
+
+                    var vendorCode = document.getElementById("txtVendorCode").value;
+                    if (vendorCode == "") {
+                        errors += "<li id='error" + errorCount + "'>" + "Vendor Code" + "</li>";
+                        AddError("txtVendorCode", '', errorCount);
+                        errorCount++;
+                    }
+                    else {
+                        RemoveError("txtVendorCode");
+                    }
+                }
+                if (errors.length) {
+                    DisplayAlert('error', 'Error', 'Please enter the details in Action Section');
+                    errors = "<ol id='errorList'>" + errors + "</ol>";
+                    $("#headingErr").removeClass('d-none');
+                    document.getElementById("add_to_me").innerHTML = errors;
+                    errors = "";
+                    errorCount = 0;
+                    if (IsViewMode) {
+                        $("#myModal5").scrollTop(0);
+                    }
+                    else {
+                        $(window).scrollTop(0);
+                    }
+                    return false;
+                }
+                $("#headingErr").addClass('d-none');
+                document.getElementById("add_to_me").innerHTML = '';
+                errors = "";
+                errorCount = 0;
+                var form = $("#IDCForm").serialize();
+                spinner.show();
+                $.ajax({
+                    url: '/IDCard/SaveApproverResponse',
+                    type: 'POST',
+                    data: form,
+                    dataType: 'JSON',
+                    success: (function (data) {
+                        if (data) {
+                            SaveFormStatusResponse(status, appRowId, comment, approvalType, text);
+                            //$("#CBRFForm").trigger("reset");
+                        }
+                        else {
+                            failureModal();
+                            spinner.hide();
+                            //$("#CBRFForm").trigger("reset");
+                        }
+                    }),
+                    error: (function (data) {
+                        failureModal();
+                        spinner.hide();
+                        //$("#CBRFForm").trigger("reset");
+                    })
+                })
+                break;
+            }
+            case 'reject': {
+                status = 'Rejected';
+                if (comment == '') {
+                    validityModal(text);
+                    return;
+                }
+                spinner.show();
+                SaveFormStatusResponse(status, appRowId, comment, approvalType, text);
+                break;
+            }
+            case 'enquire': {
+                status = 'Enquired';
+                if (comment == '') {
+                    validityModal(text);
+                    return;
+                }
+                spinner.show();
+                SaveFormStatusResponse(status, appRowId, comment, approvalType, text);
+                break;
+            }
+        }
+
+        $("#tab").val(1);
+    }
+
+    function SaveFormStatusResponse(status, appRowId, comment, approvalType, text) {
+        $.ajax({
+            url: '/List/SaveResponse',
+            type: 'POST',
+            data: { response: status, appRowId: appRowId, comment: comment, approvalType: approvalType },
+            dataType: 'JSON',
+            success: (function (data) {
+                // console.log(data)
+                if (data.Result == 1) {
+                    successModal(text);
+                    spinner.hide();
+                    $("#IDCForm").trigger("reset");
+                    setTimeout(FilterMyTasks, 8000);
+                }
+                else {
+                    failureModal();
+                    $("#IDCForm").trigger("reset");
+                    spinner.hide();
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+                $("#IDCForm").trigger("reset");
+                spinner.hide();
+            })
+        })
+    }
+
+    $(document).ready(function () {
+        //$(".colspan_align1").children('td').eq(1).attr('colspan', 6);
+        //$(".colspan_align12").children('td').eq(1).attr('colspan', 3);
+        //$(".colspan_align9").children('td').eq(1).attr('colspan', 4);
+        //$(".colspan_align7").children('td').eq(1).attr('colspan', 5);
+        //$(".colspan_align11").children('td').eq(1).attr('colspan', 3);
+        //$(".colspan_align8").children('td').eq(1).attr('colspan', 5);
+        //$(".colspan_align6").children('td').eq(1).attr('colspan', 6);
+        //$(".colspan_align5").children('td').eq(1).attr('colspan', 6);
+        //$(".colspan_align3").children('td').eq(1).attr('colspan', 6);
+        //$(".colspan_align2").children('td').eq(1).attr('colspan', 6);
+        //$(".colspan_align4").children('td').eq(1).attr('colspan', 6);
+        if (IsViewMode) {
+            //var dateofIssue = document.getElementById("txtDateofIssue");
+            //dateofIssue.setAttribute("min", document.getElementById("txtDateofJoining").value);
+            var selectedChargable = "@(IDC?.Chargable ?? "")";
+            if (selectedChargable) {
+                $("#ddChargable option[value='" + selectedChargable + "']").prop('selected', 'selected').change();
+                $("#ddChargable").addClass('spanUpperSide');
+            }
+        }
+
+        $('#fileToUpload').change(function (e) {
+            if (!this.value) {
+                return;
+            }
+            var ext = this.value.match(/\.([^\.]+)$/)[1];
+            switch (ext.toLowerCase()) {
+                case 'jpg':
+                case 'jpeg':
+                case 'png':
+                    var splittedValue = this.value.split("\\");
+                    var fileName = splittedValue[splittedValue.length - 1];
+                    $("#attachedFileLink").text(fileName);
+                    $('#attachedFileLink').prop('href', '');
+                    break;
+                default:
+                    DisplayAlert('error', 'Warning', 'Please Upload the image with jpg, jpeg, png extensions.', 2000);
+                    this.value = '';
+            }
+        });
+    })
+
+    $("#modalOkButton").on('click', function () {
+        ////
+        if (FlagRedirect != null) {
+            window.location = "../Dashboard";
+        }
+    });
+
+    function changeValidity() {
+        var selectedDate = document.getElementById("txtDateofJoining").value;
+        var date = new Date(selectedDate);
+        var list = ["Apprentice", "Intern", "Graduate Engineer Trainee"];
+        if (($("#drpRequestSubmissionFor option:selected").val() === "OnBehalf"
+            && ((list.find(x => x === $("#ddOtherEmpDesignation option:selected").val()) && $('#rdOnBehalfOptionSelected').val() === "SAVWIPLEmployee")
+                || (list.find(x => x === $("#ddOtherNewEmpDesignation option:selected").val()) && $('#rdOnBehalfOptionSelected').val() === "Others")))
+            || ($("#drpRequestSubmissionFor option:selected").val() === "Self" && list.find(x => x === $("#ddEmpDesignation option:selected").val()))) {
+            document.getElementById("txtValidityStartDate").value = selectedDate;
+            var m = date.getMonth() + (date.getDate() == 1 ? 0 : 1), d = new Date(date.setDate(date.getDate() + 364)).getDate();
+            var month = m < 10 ? "0" + m : m;
+            var dt = d < 10 ? "0" + d : d;
+            document.getElementById("txtValidityEndDate").value = new Date(date.getFullYear() + "-" + month + "-" + dt).toISOString().slice(0, 10);
+            return;
+        }
+        document.getElementById("txtValidityStartDate").value = "";
+        document.getElementById("txtValidityEndDate").value = "";
+        //else {
+        //    document.getElementById("txtValidityStartDate").value = "";
+        //    document.getElementById("txtValidityEndDate").value = "";
+        //}
+    }
+
+    function ShowHideValidity() {
+        var list = ["Apprentice", "Intern", "Graduate Engineer Trainee"];
+        var func = function () {
+            if ($("#drpRequestSubmissionFor option:selected").val() === "OnBehalf" && $('#rdOnBehalfOptionSelected').val() === "SAVWIPLEmployee") {
+                func1();
+                return;
+            }
+            if ($("#drpRequestSubmissionFor option:selected").val() === "OnBehalf" && $('#rdOnBehalfOptionSelected').val() === "Others") {
+                func2();
+                return;
+            }
+            var item = list.find(x => x === $("#ddEmpDesignation option:selected").val());
+            if ($("#drpRequestSubmissionFor option:selected").val() === "Self" && item) {
+                $('.valid-block').removeClass('d-none');
+                var selectedDate = document.getElementById("txtDateofJoining").value;
+                if (selectedDate)
+                    changeValidity();
+                return;
+            }
+            $('.valid-block').addClass('d-none');
+            changeValidity();
+            //$('#txtValidityStartDate').val("");
+            //$('#txtValidityEndDate').val("");
+        };
+        var func1 = function () {
+            var item = list.find(x => x === $("#ddOtherEmpDesignation option:selected").val());
+            if ($("#drpRequestSubmissionFor option:selected").val() === "OnBehalf" && item) {
+                $('.valid-block').removeClass('d-none');
+                var selectedDate = document.getElementById("txtDateofJoining").value;
+                if (selectedDate)
+                    changeValidity();
+                return;
+            }
+            $('.valid-block').addClass('d-none');
+            changeValidity();
+        }
+        var func2 = function () {
+            var item = list.find(x => x === $("#ddOtherNewEmpDesignation option:selected").val());
+            // console.log(item);
+            if ($("#drpRequestSubmissionFor option:selected").val() === "OnBehalf" && item) {
+                $('.valid-block').removeClass('d-none');
+                var selectedDate = document.getElementById("txtDateofJoining").value;
+                if (selectedDate)
+                    changeValidity();
+                return;
+            }
+            $('.valid-block').addClass('d-none');
+            changeValidity();
+        }
+        $("#ddEmpDesignation").change(func);
+        $("#ddOtherEmpDesignation").change(func1);
+        $("#ddOtherNewEmpDesignation").change(func2);
+        $("#drpRequestSubmissionFor").change(func);
+        $("#rdOnBehalfOption").change(func);
+    }
+
+    function ChangeChargeableOptions() {
+        var typeOfCard = $("#ddTypeOfCard option:selected").val();
+        if (typeOfCard == "PKI") {
+            $('#ddChargable').html('<option class="d-none"></option><option value="Yes">Yes (500rs)</option><option value="No">No</option>');
+            return;
+        }
+        $('#ddChargable').html('<option class="d-none"></option><option value="Yes">Yes (250rs)</option><option value="No">No</option>');
+    }
+
+    $('#successModel').on('hide.bs.modal', function () {
+        ////
+        var tab = $("#tab").val();
+        if (tab == 1) {
+            GetMyTaskTab();
+        }
+        else if (tab == 2) {
+            window.location = "../Dashboard?tab=" + tab;
+        }
+    })
+
+    function avoidSpecialSymbols(e) {
+        var keyCode = e.keyCode;
+        //// console.log("keyCode=" + keyCode);
+        if ((keyCode >= 33 && keyCode <= 44) || (keyCode >= 58 && keyCode <= 64) || (keyCode >= 91 && keyCode <= 96) || (keyCode >= 123 && keyCode <= 126)) { e.preventDefault(); }
+
+    }
+
+</script>

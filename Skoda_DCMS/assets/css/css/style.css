@@ -1,0 +1,107 @@
+
+.remove-btn-position {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+}
+
+.top_logo .rgt_logo {
+    width: 100% !important;
+}
+
+.news_slide .arrow_slide {
+    background: #4ba82e;
+}
+
+    .news_slide .arrow_slide:after {
+        border-left: 18px solid #4ba82e;
+    }
+
+.list-icon::before {
+    background: #4ba82e;
+    left: 2px;
+}
+
+.tile-stats_blue {
+    background: #4ba82e;
+}
+
+.tile-stats_gray {
+    background: #4ba82e;
+}
+
+.tile-stats_maroon {
+    background: #4ba82e;
+}
+
+.tile-stats_gold {
+    background: #4ba82e;
+}
+
+body.nav-sm .container.body .left_col {
+    background: #4ba82e;
+}
+
+.input-inline-group {
+    display: flex;
+}
+
+.input-group.md-form.form-sm.form-1 input {
+    /*border: 1px solid #bdbdbd;*/
+    border-top-right-radius: 0.25rem;
+    border-bottom-right-radius: 0.25rem;
+}
+
+.input-group.md-form.form-sm.form-2 input {
+    /*border: 1px solid #bdbdbd;*/
+    border-top-left-radius: 0.25rem;
+    border-bottom-left-radius: 0.25rem;
+}
+
+    .input-group.md-form.form-sm.form-2 input.red-border {
+        border-bottom: 1px solid #bdbdbd;
+    }
+
+.input-search-icon {
+    border-top: 1px solid #bdbdbd;
+    border-bottom: 1px solid #bdbdbd;
+    border-right: 1px solid #bdbdbd;
+    border-top-right-radius: 0.25rem;
+    border-bottom-right-radius: 0.25rem;
+    cursor: pointer;
+}
+
+.itbest-color .p_box {
+    background: #a8d49a !important;
+}
+
+.search-icon-box {
+    margin-top: 25px;
+    margin-bottom: 25px;
+}
+
+.form-control:focus {
+    border-color: none !important;
+    outline: 0 !important;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6) !important;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6) !important;
+}
+/*.input-group.md-form.form-sm.form-2 input.lime-border {
+  border: 1px solid #cddc39;
+}*/
+/*.input-group.md-form.form-sm.form-2 input.amber-border {
+	  border: 1px solid #ffca28;
+	}
+*/
+.text-grey {
+    color: #989898;
+    padding: 8px 5px 0px 5px;
+}
+
+.sNo {
+    vertical-align: middle !important;
+}
+.submit-btn:hover {
+    background-color: rgb(115, 177, 221) !important;
+    color: #fff;
+}

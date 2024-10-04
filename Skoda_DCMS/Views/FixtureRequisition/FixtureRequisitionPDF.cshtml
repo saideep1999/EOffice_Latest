@@ -1,0 +1,860 @@
+﻿
+@model dynamic
+@{
+    ViewBag.Title = "Fixture Requisition PDF";
+    var user = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    bool IsNew = true;
+    bool IsEdit = true;
+    dynamic QFRF = null;
+    Layout = ViewBag.Layout;
+    int RowId = 0, FormId = 0, AppRowId = 0, ApprovalType = 0;
+    List<Skoda_DCMS.Models.ApprovalDataModel> appList = new List<Skoda_DCMS.Models.ApprovalDataModel>();
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IsNew = ViewBag.IsNew;
+        IsEdit = ViewBag.IsEdit;
+        QFRF = ViewBag.Model;
+        RowId = ViewBag.RowId;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+        appList = ViewBag.Model?.three as List<Skoda_DCMS.Models.ApprovalDataModel>;
+    }
+}
+
+
+<!DOCTYPE html>
+<html>
+<head>
+
+    <style type="text/css">
+        *:visited, *:focus {
+            box-shadow: none;
+        }
+
+        input, select, input:focus, select:focus, textarea, textarea:focus {
+            border: 1px solid #000;
+        }
+
+        input, textarea {
+            padding: 5px;
+        }
+
+        .asset {
+            border: 1px solid black;
+            height: 20px;
+        }
+
+        .signature-table thead td {
+            border-bottom: 1px solid black;
+            border-left: 1px solid black;
+            border-collapse: collapse;
+        }
+
+        .signature-table tbody, .signature-table td {
+            border: none;
+            border-left: 1px solid black;
+            border-collapse: collapse;
+            padding: 5px;
+        }
+
+            .signature-table td:first-child {
+                border-left: none;
+            }
+
+        .signature-table {
+            border: 1px solid black;
+        }
+
+        @@font-face {
+            font-family: 'SKODANext-Black';
+            src: url('../../fonts/SKODANextfont/SKODANext-Black.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Bold.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Light.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Regular.ttf') format('truetype');
+        }
+
+        body {
+            font-family: 'SKODANext-Black';
+        }
+
+        .form_lbl {
+            color: #000;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <table style="width: 100%; font-size: 14px; color: rgb(110,110,110); font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+        <tr>
+            <td>
+                <table style="width: 100%;" cellspadding="0" cellspacing="0">
+                    <tr>
+                        <td width="20%" style="text-align: center; border-right: 1px solid #000; border-bottom: 1px solid #000;">
+                            Classification
+                        </td>
+                        <td width="20%" style="text-align: center; border-right: 1px solid #000; border-bottom: 1px solid #000;">
+                            Internal
+                        </td>
+                        <td rowspan="2" width="60%" style="text-align: right;">
+                            <img style="width: 50%;" src='@Server.MapPath("~/assets/img/SAVWIPL_Merger_Logo.JPG")'>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: center; border-right: 1px solid #000;">
+                            Version
+                        </td>
+                        <td style="text-align: center; border-right: 1px solid #000;">
+                            01
+                        </td>
+
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td style="height: 45px; text-align: center; border-left: 1px solid #000; border-right: 1px solid #000; border-bottom: 1px solid #000;">
+                <b style="color:black">Fixture Requisition Form</b>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 15px;">
+                <table cellspacing="0" cellpadding="0" width="100%">
+                    <tr>
+                        <td style="height: 15px;" colspan="6">
+                            <b style="color:black"><u>Submitter Details</u></b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="form_lbl">
+                            Type of Employee
+                        </td>
+                        <td>
+                            @(QFRF.one[0].EmployeeType)
+                        </td>
+                        <td>
+                        </td>
+                        <td colspan="3">
+                            @*<input type="text" placeholder="External Company Name" style="height: 25px; border-radius: 0; " value="" />*@
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="height: 15px;" colspan="6">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="form_lbl">
+                            Employee Code
+                        </td>
+                        <td>
+                            @(QFRF.one[0].EmployeeCode)
+                        </td>
+                        <td class="form_lbl">
+                            Cost Center No.
+                        </td>
+                        <td>
+                            @(QFRF.one[0].EmployeeCCCode)
+                        </td>
+                        <td class="form_lbl">
+                            UserId
+                        </td>
+                        <td>
+                            @(QFRF.one[0].EmployeeUserId)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="height: 15px;" colspan="6">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="form_lbl">
+                            Employee Name
+                        </td>
+                        <td>
+                            @(QFRF.one[0].EmployeeName)
+                        </td>
+                        <td class="form_lbl">
+                            Department
+                        </td>
+                        <td>
+                            @(QFRF.one[0].EmployeeDepartment)
+                        </td>
+                        <td class="form_lbl">
+                            Contact Number
+                        </td>
+                        <td>
+                            @(QFRF.one[0].EmployeeContactNo)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="height: 15px;" colspan="6">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="form_lbl">
+                            Designation
+                        </td>
+                        <td>
+                            @(QFRF.one[0].EmployeeDesignation)
+                        </td>
+
+                        <td class="form_lbl">
+                            Location
+                        </td>
+
+                        <td>
+                            @(QFRF.one[0].EmployeeLocation)
+                        </td>
+                        <td colspan="2">
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="height: 25px;">
+                        </td>
+                    </tr>
+
+                    @if (QFRF.one[0].EmployeeType == "SAVWIPLEmployee")
+                    {
+                        <tr>
+                            <td style="height: 15px;" colspan="6">
+                                <b style="color:black"><u>Applicants Details</u></b>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="form_lbl">
+                                Employee Code
+                            </td>
+                            <td>
+                                @(QFRF.one[0].OtherEmployeeCode)
+                            </td>
+                            <td class="form_lbl">
+                                Cost Center No.
+                            </td>
+                            <td>
+                                @(QFRF.one[0].OtherEmployeeCCCode)
+                            </td>
+                            <td class="form_lbl">
+                                UserId
+                            </td>
+                            <td>
+                                @(QFRF.one[0].OtherEmployeeUserId)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="height: 15px;" colspan="6">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="form_lbl">
+                                Employee Name
+                            </td>
+                            <td>
+                                @(QFRF.one[0].OtherEmployeeName)
+                            </td>
+                            <td class="form_lbl">
+                                Department
+                            </td>
+                            <td>
+                                @(QFRF.one[0].OtherEmployeeDepartment)
+                            </td>
+                            <td class="form_lbl">
+                                Contact Number
+                            </td>
+                            <td>
+                                @(QFRF.one[0].OtherEmployeeContactNo)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="height: 15px;" colspan="6">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="form_lbl">
+                                Designation
+                            </td>
+                            <td>
+                                @(QFRF.one[0].OtherEmployeeDesignation)
+                            </td>
+
+                            <td class="form_lbl">
+                                Location
+                            </td>
+
+                            <td>
+                                @(QFRF.one[0].OtherEmployeeLocation)
+                            </td>
+                            <td colspan="2">
+                            </td>
+                        </tr>
+
+                    }
+                    <tr>
+                        <td style="height: 15px;" colspan="6">
+                        </td>
+                    </tr>
+
+                </table>
+    </table>
+
+    <table style="width: 100%; font-size: 14px; color: rgb(110,110,110); font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+        <tr>
+            <td style="padding: 15px">
+                <table style="width:100%;" cellspadding="0" cellspacing="0">
+                    <tr>
+                        <td style="height: 15px;" colspan="6">
+                            <b style="color:black"><u>Transaction Details</u></b>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="form_lbl">
+                            Fixture Name
+                        </td>
+                        <td>
+                            @(QFRF.one[0].FixtureName)
+                        </td>
+                        <td class="form_lbl">
+                            Fixture No
+                        </td>
+                        <td>
+                            @(QFRF.one[0].FixtureNo)
+                        </td>
+                        <td class="form_lbl">
+                            Project Name
+                        </td>
+                        <td>
+                            @(QFRF.one[0].ProjectName)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="form_lbl" style="height: 15px;" colspan="6">
+                            Fixture Required
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="form_lbl">
+                           From
+                        </td>
+                        <td>
+                            @(QFRF.one[0].FromDate.ToString("yyyy-MM-dd"))
+                        </td>
+                        <td class="form_lbl">
+                           To
+                        </td>
+                        <td>
+                            @(QFRF.one[0].ToDate.ToString("yyyy-MM-dd"))
+                        </td>
+                        <td class="form_lbl">
+                            
+                        </td>
+                        <td>
+                           
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="height: 15px;" colspan="6">
+                        </td>
+                    </tr>
+                   
+                    <tr>
+                        <td colspan="6">
+                            <table class="w-100 mx-auto table table-border form-border text-center" id="maintable" style="table-layout: fixed;">
+                                <thead class="form-head-1" style="margin-left:inherit !important;">
+                                    <tr><th colspan="6">Receiving in Measurement Room</th></tr>
+                                    <tr>
+                                        <th style="width: 50px !important;">Sr. No.</th>
+                                        <th style="width: 122px !important;">Check point</th>
+                                        <th style="width: 100px !important;">OK</th>
+                                        <th style="width: 100px !important;">NOK</th>
+                                        <th colspan="2" style="width: 114px !important;">Remarks</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="form-border tableSoftware" id="softwareBody">
+                                    <tr id="row1" class="tr_input tr1">
+                                        <td>1</td>
+                                        <td><label>RPS Pins</label></td>
+                                        @if (QFRF.one[0].RpsPin == "Ok")
+                                        {
+                                            <td class="text-center">
+                                                <input type="checkbox" checked>
+
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td class="text-center">
+                                                <input type="checkbox">
+
+                                            </td>
+                                        }
+                                        @if (QFRF.one[0].RpsPin == "NotOK")
+                                        {
+                                            <td class="text-center">
+                                                <input type="checkbox"  checked>
+
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td class="text-center">
+                                                <input type="checkbox">
+
+                                            </td>
+                                        }
+                                        <td colspan="2" class="text-center">
+                                            <input type="text" name="ARpsPinRemark" id="txt_Arpsremarks" value="@(QFRF.one[0].RpsPinRemark)">
+
+                                        </td>
+                                    </tr>
+                                    <tr id="row1" class="tr_input tr2">
+                                        <td>2</td>
+                                        <td><label>Clamps</label></td>
+                                        @if (QFRF.one[0].Clamps == "Ok")
+                                        {
+                                            <td class="text-center">
+                                                <input type="checkbox" checked>
+
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td class="text-center">
+                                                <input type="checkbox">
+
+                                            </td>
+                                        }
+                                        @if (QFRF.one[0].Clamps == "NotOK")
+                                        {
+                                            <td class="text-center">
+                                                <input type="checkbox" checked>
+
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td class="text-center">
+                                                <input type="checkbox">
+
+                                            </td>
+                                        }
+                                        <td colspan="2" class="text-center">
+                                            <input type="text" name="AClampsRemark" id="txt_Aclampsremarks" value="@(QFRF.one[0].ClampsRemark)">
+                                        </td>
+                                    </tr>
+                                    <tr id="row1" class="tr_input tr3">
+                                        <td>3</td>
+                                        <td><label>Wheels</label></td>
+                                        @if (QFRF.one[0].Wheels == "Ok")
+                                        {
+                                            <td class="text-center">
+                                                <input type="checkbox" checked>
+
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td class="text-center">
+                                                <input type="checkbox">
+
+                                            </td>
+                                        }
+                                        @if (QFRF.one[0].Wheels == "NotOK")
+                                        {
+                                            <td class="text-center">
+                                                <input type="checkbox" checked>
+
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td class="text-center">
+                                                <input type="checkbox">
+
+                                            </td>
+                                        }
+                                        <td colspan="2" class="text-center">
+                                            <input type="text" name="AWheelsRemark" id="txt_Awheelsremarks" value="@(QFRF.one[0].WheelsRemark)">
+
+                                        </td>
+                                    </tr>
+                                    <tr id="row1" class="tr_input tr4">
+                                        <td>4</td>
+                                        <td><label>RPS Sticker</label></td>
+                                        @if (QFRF.one[0].RpsStick == "Ok")
+                                        {
+                                            <td class="text-center">
+                                                <input type="checkbox" checked>
+
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td class="text-center">
+                                                <input type="checkbox">
+
+                                            </td>
+                                        }
+                                        @if (QFRF.one[0].RpsStick == "NotOK")
+                                        {
+                                            <td class="text-center">
+                                                <input type="checkbox" checked>
+
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td class="text-center">
+                                                <input type="checkbox">
+
+                                            </td>
+                                        }
+                                        <td colspan="2" class="text-center">
+                                            <input type="text" name="ARpsStickRemark" id="txt_ARpsStickremarks" value="@(QFRF.one[0].RpsStickRemark)">
+                                        </td>
+                                    </tr>
+                                    <tr id="row1" class="tr_input tr5">
+                                        <td>5</td>
+                                        <td><label>Lose element</label></td>
+                                        @if (QFRF.one[0].LoseElement == "Ok")
+                                        {
+                                            <td class="text-center">
+                                                <input type="checkbox" checked>
+
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td class="text-center">
+                                                <input type="checkbox">
+
+                                            </td>
+                                        }
+                                        @if (QFRF.one[0].LoseElement == "NotOK")
+                                        {
+                                            <td class="text-center">
+                                                <input type="checkbox" checked>
+
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td class="text-center">
+                                                <input type="checkbox">
+
+                                            </td>
+                                        }
+                                        <td colspan="2" class="text-center">
+                                            <input type="text" name="ALoseRemark" id="txt_ALoseremarks" value="@(QFRF.one[0].LoseRemark)">
+                                        </td>
+                                    </tr>
+                                    <tr id="row1" class="tr_input tr6">
+                                        <td>6</td>
+                                        <td><label>Mylers</label></td>
+                                        @if (QFRF.one[0].Mylers == "Ok")
+                                        {
+                                            <td class="text-center">
+                                                <input type="checkbox" checked>
+
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td class="text-center">
+                                                <input type="checkbox">
+
+                                            </td>
+                                        }
+                                        @if (QFRF.one[0].Mylers == "NotOK")
+                                        {
+                                            <td class="text-center">
+                                                <input type="checkbox" checked>
+
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td class="text-center">
+                                                <input type="checkbox">
+
+                                            </td>
+                                        }
+                                        <td colspan="2" class="text-center">
+                                            <input type="text" name="AMylerRemark" id="txt_AMylerremarks" value="@(QFRF.one[0].MylerRemark)">
+                                        </td>
+                                    </tr>
+                                    <tr id="row1" class="tr_input tr7">
+                                        <td>7</td>
+                                        <td><label>Pin Threads</label></td>
+                                        @if (QFRF.one[0].PinThreads == "Ok")
+                                        {
+                                            <td class="text-center">
+                                                <input type="checkbox" checked>
+
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td class="text-center">
+                                                <input type="checkbox">
+
+                                            </td>
+                                        }
+                                        @if (QFRF.one[0].PinThreads == "NotOK")
+                                        {
+                                            <td class="text-center">
+                                                <input type="checkbox" checked>
+
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td class="text-center">
+                                                <input type="checkbox">
+
+                                            </td>
+                                        }
+                                        <td colspan="2" class="text-center">
+                                            <input type="text" name="APinRemark" id="txt_APinremarks" value="@(QFRF.one[0].PinRemark)">
+                                        </td>
+                                    </tr>
+                                    <tr id="row1" class="tr_input tr8">
+                                        <td>8</td>
+                                        <td><label>Resting Pads</label></td>
+                                        @if (QFRF.one[0].RestingPads == "Ok")
+                                        {
+                                            <td class="text-center">
+                                                <input type="checkbox" checked>
+
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td class="text-center">
+                                                <input type="checkbox">
+
+                                            </td>
+                                        }
+                                        @if (QFRF.one[0].RestingPads == "NotOK")
+                                        {
+                                            <td class="text-center">
+                                                <input type="checkbox" checked>
+
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td class="text-center">
+                                                <input type="checkbox">
+
+                                            </td>
+                                        }
+                                        <td colspan="2" class="text-center">
+                                            <input type="text" value="@(QFRF.one[0].PadsRemark)">
+                                        </td>
+                                    </tr>
+                                    <tr id="row1" class="tr_input tr9">
+                                        <td>9</td>
+                                        <td><label>Sliders</label></td>
+                                        @if (QFRF.one[0].Sliders == "Ok")
+                                        {
+                                            <td class="text-center">
+                                                <input type="checkbox" checked>
+
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td class="text-center">
+                                                <input type="checkbox">
+
+                                            </td>
+                                        }
+                                        @if (QFRF.one[0].Sliders == "NotOK")
+                                        {
+                                            <td class="text-center">
+                                                <input type="checkbox" checked>
+
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td class="text-center">
+                                                <input type="checkbox">
+
+                                            </td>
+                                        }
+                                        <td colspan="2" class="text-center">
+                                            <input type="text" name="ASlidersRemark" id="txt_ASlidersremarks" value="@(QFRF.one[0].SlidersRemark)">
+                                        </td>
+                                    </tr>
+                                    <tr id="row1" class="tr_input tr10">
+                                        <td>10</td>
+                                        <td><label>Kugel</label></td>
+                                        @if (QFRF.one[0].Kugel == "Ok")
+                                        {
+                                            <td class="text-center">
+                                                <input type="checkbox" checked>
+
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td class="text-center">
+                                                <input type="checkbox">
+
+                                            </td>
+                                        }
+                                        @if (QFRF.one[0].Kugel == "NotOK")
+                                        {
+                                            <td class="text-center">
+                                                <input type="checkbox" checked>
+
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td class="text-center">
+                                                <input type="checkbox">
+
+                                            </td>
+                                        }
+                                        <td colspan="2" class="text-center">
+                                            <input type="text" name="AKugelRemark" id="txt_AKugelremarks" value="@(QFRF.one[0].KugelRemark)">
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 15px">
+                <table style="width:100%;" cellspadding="0" cellspacing="0">
+                    <tr>
+                        <td colspan="6">
+                            <lable class="form_lbl">Reason for fixture requisition</lable>
+                            <div style="margin-bottom: 10px; margin-top: 10px;">
+                                <textarea type="text" id="Details" rows="5" @*value="@(QFRF.one[0].Reason)"*@ style="width: 200%;"></textarea>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td style="height: 15px;" colspan="6">
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 15px">
+                <table style="width:100%;" cellspadding="0" cellspacing="0">
+                    @if (appList.Count > 0)
+                    {
+                        if (appList.Any(x => x.ApproverStatus.Contains("Approved")))
+                        {
+                            <tr>
+                                <td colspan="6" align='left'>
+                                    <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Approval Tracking</u></b></h6>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="1" style="color:black">Name</td>
+                                <td colspan="1" style="color:black">Proccessed On</td>
+                                <td colspan="1" style="color:black">Status</td>
+                                <td colspan="1" style="color:black">Level</td>
+                            </tr>
+                            foreach (var item in appList)
+                            {
+                                <tr>
+                                    <td colspan="1">
+                                        <div style="margin-bottom: 10px; font-weight: normal;">
+                                            <div>@item.UserName</div>
+                                            <div>@item.Designation</div>
+                                        </div>
+                                    </td>
+                                    <td colspan="1" style="font-weight: normal;">
+                                        @if (item.Logic == "OR")
+                                        {
+                                            if (item.ApproverStatus != "Pending")
+                                            {
+                                                <div>
+                                                    @item.TimeStamp
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div>
+                                                @item.TimeStamp
+                                            </div>
+                                        }
+                                    </td>
+                                    <td colspan="1" style="font-weight: normal;">
+                                        @if (item.Logic == "OR")
+                                        {
+                                            if (item.ApproverStatus != "Pending")
+                                            {
+                                                <div>
+                                                    @item.ApproverStatus
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div>
+                                                @item.ApproverStatus
+                                            </div>
+                                        }
+                                    </td>
+                                    <td colspan="1" style="font-weight: normal;">
+                                        <div>
+                                            @item.Level
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+
+                        }
+
+                    }
+                    <tr>
+                        <td colspan="6" align='left'>
+                            <h6 style="margin-top:5px;margin-left:5px;color:black;font-weight:bold"><b>SF_II_024</b></h6>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+
+<script>
+    $(document).ready(function () {
+        $("#Details").val('@(QFRF.one[0].Reason)');
+
+    })
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

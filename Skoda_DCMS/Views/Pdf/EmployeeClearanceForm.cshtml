@@ -1,0 +1,1580 @@
+﻿@model Skoda_DCMS.Models.ECFResults
+@{
+    bool IsNew = true;
+    bool IsEdit = true;
+    bool IsValidityCheck = true;
+    dynamic FlagRedirect = null;
+    dynamic ECF = null;
+    int FormId = 0, AppRowId = 0, ApprovalType = 0;
+    int FormSrId = 0;
+    string Department = "";
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IsNew = ViewBag.IsNew;
+        IsEdit = ViewBag.IsEdit;
+        ECF = ViewBag.Model;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        IsValidityCheck = ViewBag.IsValidityCheck != null ? (bool)ViewBag.IsValidityCheck : false;
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+        Department = ViewBag.Department;
+    }
+    var currentUser = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    ViewBag.Title = "Employee Clearance Form";
+    int count1 = 7;
+}
+<style>
+    .authorize-container {
+        font-size: 22px !important;
+        font-weight: 600 !important;
+        text-align: center !important;
+    }
+    .comment-box-2 textarea {
+        font-size: 14px;
+        border-radius: 0rem;
+        border: 1px solid rgb(75,168,46) !important;
+    }
+    .form-heading-1 span {
+        font-weight: bold;
+        font-size: 22px;
+        text-align: center !important;
+    }
+    /*table.dataTable thead th, table.dataTable tbody td, table.dataTable tfoot th {
+        font-size: 20px;
+    }*/
+    .bg-color td, .bg-color th {
+        text-align: left;
+    }
+    .form-table-container-2 tr td:first-child {
+        text-align: left !important;
+       padding-left: 5px !important;
+    }
+    .authorize-td input {
+        font-size:14px;
+        margin-left: 1px !important;
+        text-align: left;
+        align-items: flex-start;
+        display: flex;
+        border: 1px solid rgb(75,168,46) !important;
+    }
+    .authorize-td label {
+        display: block;
+        text-align: left;
+        padding-left: 1px;
+    }
+    .author-width {
+        width: 100%;
+    }
+    .align {
+        padding-left: 2% !important;
+        text-align: left !important;
+    }
+    .size-align {
+        font-size: 20px;
+        text-align: left;
+    }
+    .bg-color td, .bg-color th {
+        border: 1px solid #dee2e6;
+        background-color: rgb(219,238,213) !important;
+    }
+    .ui-front {
+        z-index: 9999999 !important;
+    }
+    /*.table-bordered td, .table-bordered th {
+        border: 1px solid #dee2e6;
+        background-color: rgb(219,238,213) !important;
+    }*/
+    .skd-9 {
+        background: url("./img/home.png") no-repeat;
+    }
+</style>
+
+    <div class="container">
+                    @if (IsNew)
+            {
+                if (!IsEdit)
+                {
+                }
+                else
+                {
+                <div class="breadcrumb-container right_col height-space">
+                    <div>
+                        <ol class="breadcrumb">
+                            <li>
+                                <a href="/Dashboard?formName=ECF">
+                                    Dashboard
+                                </a>
+                            </li>
+                            <li>
+                                Employee Clearance Form
+                            </li>
+
+                        </ol>
+                    </div>
+                </div>
+                <div class="right_col height-space">
+                    <div class="form-main-container topContent">
+                        <div class="padd_space">
+
+                            Employee Clearance Form
+                        </div>
+                    </div>
+                </div>
+                }
+            }
+        <form action="/EmployeeClearance/SaveECF" id="ECFForm" method="post">
+            <div class="main_container">
+                <div class="right_col bg-transparent" role="main">
+                    @if (IsNew)
+                    {
+                    if (!IsEdit){
+                        <div class="container">
+                            <div class="container form-container" style="background-color: rgb(219,238,213);">
+                                <div class="card-header pb-4 pt-4">
+                                    @*<input type="hidden" id="departmentName" name="departmentName" value="@(Department)" />*@
+                                    <input type="hidden" id="FormId" name="FormId" value="@(FormId)" />
+                                    <input type="hidden" id="AppRowId" name="AppRowId" value="@(AppRowId)" />
+                                    <table class="table mainTbl table-bordered form-table bg-color">
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="6" class="heading form-heading" style="text-align:center !important;">
+                                                    <span> MobiNext Technologies India Private Limited</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="6" class="heading form-heading-1" style="text-align:center !important">
+                                                    <span>Employee Clearance Form</span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="table mainTbl table-bordered form-table-container-2 bg-color">
+                                        <tbody>
+                                            <tr>
+                                                <td class="allFormLables borderLTB f-600">
+                                                    <label class="f-600">Name:</label><br>
+                                                </td>
+                                                <td colspan="2" class="borderLTB text-left">
+                                                    <input class="w-100 inputCourier" type="text" id="txtName" name="txtName" value="@(ECF.one[0].Name)">
+                                                </td>
+
+                                                <td class="allFormLables borderLTB f-600 align">
+                                                    <label class="f-600">Employee Code:</label><br>
+                                                </td>
+                                                <td colspan="3" class="borderLTB">
+                                                    <input class="w-100 inputCourier" type="text" id="txtEmployeeCode" name="txtEmployeeCode" value="@(ECF.one[0].EmployeeCode)">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="allFormLables borderLTB f-600">
+                                                    <label class="f-600">Designation:</label><br>
+                                                </td>
+                                                <td colspan="2" class="borderLTB text-left">
+                                                    <input class="w-100 inputCourier" type="text" id="txtDesignation" name="txtDesignation" value="@(ECF.one[0].Designation)">
+                                                </td>
+                                                <td class="allFormLables borderLTB f-600 align">
+                                                    <label class="f-600">Location:</label><br>
+                                                </td>
+                                                <td colspan="3" class="borderLTB">
+                                                    <input class="w-100 inputCourier" type="text" id="txtLocation" name="txtLocation" value="@(ECF.one[0].EmployeeLocation)">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="allFormLables borderLTB f-600">
+                                                    <label class="f-600">Department:</label><br>
+                                                </td>
+                                                <td colspan="2" class="borderLTB text-left">
+                                                    <input class="w-100 inputCourier" type="text" id="txtDepartment" name="txtDepartment" value="@(ECF.one[0].EmployeeDepartment)">
+                                                </td>
+                                                <td class="allFormLables borderLTB f-600 align">
+                                                    <label class="f-600">Section:</label><br>
+                                                </td>
+                                                <td colspan="3" class="borderLTB">
+                                                    <input class="w-100 inputCourier" type="text" id="txtSection" name="txtSection" value="@(ECF.one[0].EmployeeSection)">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="allFormLables borderLTB f-600">
+                                                    <label class="f-600">Date of joining:</label><br>
+                                                </td>
+                                                <td colspan="2" class="borderLTB text-left">
+                                                    <input class="w-100 inputCourier" type="date" id="txtDateofJoining" name="txtDateofJoining" value="@(ECF.one[0].DateOfJoining.ToString("yyyy-MM-dd"))">
+                                                </td>
+                                                <td class="allFormLables borderLTB f-600 align">
+                                                    <label class="f-600">Date of Relieving:</label><br>
+                                                </td>
+                                                <td colspan="3" class="borderLTB">
+                                                    <input class="w-100 inputCourier" type="date" id="txtDateOfRelieving" name="txtDateOfRelieving" value="@(ECF.one[0].DateOfRelieving.ToString("yyyy-MM-dd"))">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="allFormLables borderLTB f-600">
+                                                    <label class="f-600">Email:</label><br>
+                                                </td>
+                                                <td colspan="2" class="borderLTB text-left">
+                                                    <input class="w-100 inputCourier" type="text" id="txtEmail" name="txtEmail" value="@(ECF.one[0].Email)">
+                                                </td>
+                                                <td class="allFormLables borderLTB f-600 align">
+                                                    <label class="f-600">Phone number:</label><br>
+                                                </td>
+                                                <td colspan="3" class="borderLTB">
+                                                    <input class="w-100 inputCourier" type="text" id="txtPhoneNumber" name="txtPhoneNumber" value="@(ECF.one[0].PhoneNumber)">
+                                                </td>
+                                            </tr>
+
+
+                                        </tbody>
+                                    </table>
+                                    <table class="table mainTbl table table-bordered table-sm dataTable no-footer bg-color">
+                                        <tr>
+                                            <th class="f-600 size-align">Sr. No</th>
+                                            <th class="f-600 size-align">Contents</th>
+                                            <th class="f-600 size-align">Department</th>
+                                            <th class="f-600 size-align">Name</th>
+                                            <th class="f-600 size-align">Remarks</th>
+                                            <th class="f-600 size-align">Signature</th>
+                                        </tr>
+                                        <tr>
+                                            <td><label class="f-600">1</label></td>
+                                            <td><label class="f-600 size-align">Company’ Material Returned</label></td>
+                                            <td rowspan="6"><img class="curlyImg" src="img/VzRagV.default.png" alt=""><label class="f-600 size-align">Immediate Superior</label></td>
+                                            <td rowspan="6" class="authorize-td"><input type="text" class="inpDisable" value="@(ECF.three[0].UserName)"></td>
+                                            <td class="authorize-td comment-box-2" rowspan="6"><textarea cols="50" rows="7" class="inpDisable textareawidth">@(ECF.three[0].Comment)</textarea></td>
+                                            <td class="w-20 authorize-td" rowspan="6"><input class="w-100 Signature inpDisable" type="text" value="@(ECF.three[0].ApproverStatus != "Pending" ? (ECF.three[0].ApproverStatus + " on " + Convert.ToDateTime(ECF.two[0].Modified).ToShortDateString() + " " + Convert.ToDateTime(ECF.two[0].Modified).ToShortTimeString()):"")"></td>
+                                        </tr>
+                                        <tr>
+                                            <td><label class="f-600">2</label></td>
+                                            <td><label class="f-600 size-align">Tools / Tool Kit</label></td>
+                                        </tr>
+                                        <tr>
+                                            <td><label class="f-600">3</label></td>
+                                            <td>
+                                                <label class="f-600 size-align">
+                                                    Literature / Documents /
+                                                    Drawings / Manuals
+                                                </label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><label class="f-600">4</label></td>
+                                            <td><label class="f-600 size-align">Table / Drawer / Amirah /Filing cabinet keys</label></td>
+                                        </tr>
+                                        <tr>
+                                            <td><label class="f-600">5</label></td>
+                                            <td><label class="f-600 size-align">Locker Keys</label></td>
+
+                                        </tr>
+                                        <tr>
+                                            <td><label class="f-600">6</label></td>
+                                            <td><label class="f-600 size-align">Other : Please specify</label></td>
+
+                                        </tr>
+                                        @if (!IsEdit)
+                                        {
+                                        foreach (var item in ECF.six)
+                                        {
+                                        <tr>
+                                            <td class="f-600" style="font-size:20px;text-align:left;">@count1</td>
+                                            <td class="f-600" style="font-size:20px;text-align:left;">@item.Section</td>
+                                            <td class="f-600" style="font-size:20px;text-align:left;">
+                                                @item.Department
+                                            </td>
+                                            <td class="authorize-td"><input type="text" class="inpDisable" value="@(item.UserName)"></td>
+                                            <td class="authorize-td comment-box-2"><textarea cols="50" rows="7" class="inpDisable textareawidth">@item.Comment</textarea></td>
+                                            <td class="w-20 authorize-td"><input style="" class="w-100 Signature inpDisable" type="text" value="@(!IsEdit && item.ApproverStatus != "Pending" ? (item.ApproverStatus + " on " + Convert.ToDateTime(item.Modified).ToShortDateString()+ " " + Convert.ToDateTime(item.Modified).AddHours(5.5).ToShortTimeString()) : "" )"></td>
+                                        </tr>
+                                        count1 = count1 + 1;
+                                        }
+                                        }
+
+                                    </table>
+                                    <table class="table mainTbl table-bordered form-table-container-2 bg-color">
+                                        <tr>
+                                            <td>
+
+                                                <table class="table mainTbl table table-bordered table-sm dataTable no-footer bg-color">
+                                                    <tbody>
+                                                        <tr class="bg-color-2">
+                                                            <td colspan="1" class="authorize-td">
+                                                                <label class="f-600 size-align">Charge to be handed over to:</label>
+
+                                                            </td>
+                                                            <td class="authorize-td comment-box-2" colspan="2" style="padding-left: 10px !important;">
+                                                                <input type="text" name="txtHandOver" id="txtHandOver" class="input-width-1 author-width inputDate" value="@(ECF.one[0].HandOverTo)">
+                                                            </td>
+
+
+                                                        </tr>
+                                                        <tr class="bg-color-2">
+                                                            <td colspan="6" class="font-bold text-center authorize-container photogrph_header" style="text-align: center !IMPORTANT;">Head Of Department</td>
+                                                        </tr>
+                                                        <tr class="bg-color-2">
+                                                            <td colspan="1" class="authorize-td">
+                                                                <label class="f-600 size-align">Date:</label>
+                                                                <input type="text" name="" class="input-width-1 author-width inputDate" value="@(Convert.ToDateTime(ECF.two[0].FormId.Created).ToShortDateString())" readonly>
+                                                                <br />
+                                                                <label class="f-600 size-align">Name:</label>
+                                                                <input type="text" name="" class="input-width-1 author-width inputDate inpDisable" value="@(ECF.three[1].UserName)" readonly>
+                                                            </td>
+                                                            <td class="authorize-td comment-box-2" colspan="2" style="padding-left: 10px !important;">
+                                                                <div class="form-group">
+                                                                    <label class="f-600 size-align" for="comment">Remarks:</label>
+                                                                    <textarea class="inpDisable textareawidth photogrphy-textarea" cols="50" rows="7" id="comment" disabled="">@(ECF.three[1].Comment) </textarea>
+                                                                </div>
+                                                            </td>
+
+                                                            <td class="authorize-td" colspan="2" style="word-wrap: break-word;width:25%;">
+                                                                <label class="f-600 size-align">Signature of HOD:</label>
+                                                                <input type="text" name="" class="inpDisable input-width-1 author-width" value="@(ECF.three[1].ApproverStatus != "Pending" ? (ECF.three[1].ApproverStatus + " on " + Convert.ToDateTime(ECF.two[1].Modified).ToShortDateString() + " " + Convert.ToDateTime(ECF.two[1].Modified).ToShortTimeString()):"")">
+                                                                <br />
+                                                                <label class="f-600 size-align">Signature of Payroll Admin:</label>
+                                                                <input type="text" name="" class="inpDisable input-width-1 author-width" value="@(ECF.three[2].ApproverStatus != "Pending" ? (ECF.three[2].ApproverStatus + " on " + Convert.ToDateTime(ECF.two[2].Modified).ToShortDateString() + " " + Convert.ToDateTime(ECF.two[2].Modified).ToShortTimeString()):"")">
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                                <table class="table mainTbl table-bordered form-table-container-2">
+                                                    <tr class="bg-color-2">
+                                                        <td colspan="6" class="font-bold text-center authorize-container photogrph_header" style="text-align: center !IMPORTANT;">Payroll clearance</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="w-20 allFormLables borderLTB f-600">
+                                                            <label class="f-600">Date of Relieving:</label><br>
+                                                        </td>
+                                                        <td colspan="2" class="borderLTB text-left">
+                                                            <input class="w-100 inputCourier inpDisable" type="text" value="@(ECF.one[0].DateOfRelieving.ToString(" dd-MM-yyyy"))">
+                                                        </td>
+                                                        <td class="allFormLables borderLTB f-600 align">
+                                                            <label class="f-600">Resignation given date:</label><br>
+                                                        </td>
+                                                        <td colspan="3" class="borderLTB">
+                                                            <input class="w-100 inputCourier inpDisable" type="text" value="@(!(ECF.one[0].ResignationGiven.Year==1) ? ECF.one[0].ResignationGiven.ToShortDateString():" ")">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="allFormLables borderLTB f-600">
+                                                            <label class="f-600">Notice Period:</label><br>
+                                                        </td>
+                                                        <td colspan="2" class="borderLTB text-left">
+                                                            <input class="w-100 inputCourier inpDisable" type="text" value="@(ECF.one[0].NoticePeriod)">
+                                                        </td>
+                                                        @if(ECF.one[0].ApplicableDays!=null){
+                                                        <td class="allFormLables borderLTB f-600 align">
+                                                            <label class="f-600">Applicable days:</label><br>
+                                                        </td>
+                                                        <td colspan="3" class="borderLTB">
+                                                            <input class="w-100 inputCourier inpDisable" type="text" value="@(ECF.one[0].ApplicableDays)">
+                                                        </td>
+                                                        }
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="allFormLables borderLTB f-600">
+                                                            <label class="f-600">Eligible for Gratuity:</label><br>
+                                                        </td>
+                                                        <td colspan="2" class="borderLTB text-left">
+                                                            <input class="w-100 inputCourier inpDisable" type="text" value="@(ECF.one[0].EligibleForGratuity)">
+                                                        </td>
+                                                        <td class="allFormLables borderLTB f-600 align">
+                                                            <label></label><br>
+                                                        </td>
+                                                        <td colspan="3" class="borderLTB" id="hiddenApproverInformation">
+                                                        </td>
+                                                    </tr>
+
+                                                </table>
+                                                <table class="table mainTbl table table-bordered table-sm dataTable no-footer">
+                                                    <tbody>
+
+                                                        <tr class="bg-color-2">
+                                                            <td colspan="1" class="authorize-td">
+                                                                <label class="f-600 size-align">Date:</label>
+                                                                <input type="text" name="" class="input-width-1 author-width inputDate" value="@(Convert.ToDateTime(ECF.two[0].FormId.Created).ToShortDateString())" readonly>
+                                                                <label class="f-600 size-align">Name:</label>
+                                                                <input type="text" name="" class="input-width-1 author-width inputDate" value="@(ECF.three[2].UserName)" readonly>
+                                                            </td>
+                                                            <td class="authorize-td comment-box-2" colspan="2" style="padding-left: 18px !important;">
+                                                                <div class="form-group">
+                                                                    <label class="f-600 size-align" for="comment">Remarks:</label>
+                                                                    <textarea class="inpDisable textareawidth photogrphy-textarea" cols="50" rows="7" id="comment" disabled="">@(ECF.three[2].Comment)</textarea>
+                                                                </div>
+                                                            </td>
+
+                                                            <td class="authorize-td" colspan="2" style="word-wrap: break-word;width:25%;">
+                                                                <label class="f-600 size-align">Signature:</label><input type="text" name="" class="inpDisable input-width-1 author-width"
+                                                                                                                         value="@(ECF.three[2].ApproverStatus != "Pending" ? (ECF.three[2].ApproverStatus + " on " + Convert.ToDateTime(ECF.two[2].Modified).ToShortDateString() + " " + Convert.ToDateTime(ECF.two[2].Modified).ToShortTimeString()):"")" readonly>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                           
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="container">
+                             <div class="container form-container" style="background-color: rgb(219,238,213);">
+                                <div class="card-header pb-4 pt-4">
+                                    <table class="w-95 m-auto">
+                                        <tr>
+                                            <td>
+                                                <table class="table mainTbl table-bordered form-table bg-color">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td colspan="6" class="heading form-heading" style="text-align:center !important; font-size:25px;">
+                                                                <span> MobiNext Technologies India Private Limited</span>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="6" class="heading form-heading-1" style="text-align:center !important">
+                                                                <span>Employee Clearance Form</span>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                                <table class="table mainTbl table-bordered form-table-container-2 bg-color">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td class="allFormLables borderLTB f-600">
+                                                                <label class="f-600">Name:</label><br>
+                                                            </td>
+                                                            <td colspan="2" class="borderLTB text-left">
+                                                                <input class="w-100 inputCourier" type="text" id="txtName" name="txtName">
+                                                            </td>
+                                                            <td class="allFormLables borderLTB f-600 align">
+                                                                <label class="f-600">Employee Code:</label><br>
+                                                            </td>
+                                                            <td colspan="3" class="borderLTB">
+                                                                <input class="w-100 inputCourier" type="text" id="txtEmployeeCode" name="txtEmployeeCode" onkeypress="allowNumbersOnly(event)">
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="allFormLables borderLTB f-600">
+                                                                <label class="f-600">Designation:</label><br>
+                                                            </td>
+                                                            <td colspan="2" class="borderLTB text-left">
+                                                                <input class="w-100 inputCourier" type="text" id="txtDesignation" name="txtDesignation">
+                                                            </td>
+                                                            <td class="allFormLables borderLTB f-600 align">
+                                                                <label class="f-600">Location:</label><br>
+                                                            </td>
+                                                            <td colspan="3" class="borderLTB">
+                                                                <input class="w-100 inputCourier" type="text" id="txtLocation" name="txtLocation">
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="allFormLables borderLTB f-600">
+                                                                <label class="f-600">Department:</label><br>
+                                                            </td>
+                                                            <td colspan="2" class="borderLTB text-left">
+                                                                <input class="w-100 inputCourier" type="text" id="txtDepartment" name="txtDepartment">
+                                                            </td>
+                                                            <td class="allFormLables borderLTB f-600 align">
+                                                                <label class="f-600">Section:</label><br>
+                                                            </td>
+                                                            <td colspan="3" class="borderLTB">
+                                                                <input class="w-100 inputCourier" type="text" id="txtSection" name="txtSection">
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="allFormLables borderLTB f-600">
+                                                                <label class="f-600">Date of joining:</label><br>
+                                                            </td>
+                                                            <td colspan="2" class="borderLTB text-left">
+                                                                <input class="w-100 inputCourier" type="date" id="txtDateofJoining" name="txtDateofJoining">
+                                                            </td>
+                                                            <td class="allFormLables borderLTB f-600 align">
+                                                                <label class="f-600">Date of Relieving:</label><br>
+                                                            </td>
+                                                            <td colspan="3" class="borderLTB">
+                                                                <input class="w-100 inputCourier" type="date" id="txtDateOfRelieving" name="txtDateOfRelieving" onclick="setStartDate()">
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="allFormLables borderLTB f-600">
+                                                                <label class="f-600">Email:</label><br>
+                                                            </td>
+                                                            <td colspan="2" class="borderLTB text-left">
+                                                                <input class="w-100 inputCourier" type="text" id="txtEmail" name="txtEmail">
+                                                            </td>
+                                                            <td class="allFormLables borderLTB f-600 align">
+                                                                <label class="f-600">Phone number:</label><br>
+                                                            </td>
+                                                            <td colspan="3" class="borderLTB">
+                                                                <input class="w-100 inputCourier" type="text" id="txtPhoneNumber" name="txtPhoneNumber" onkeypress="allowNumbersOnly(event)">
+                                                            </td>
+                                                        </tr>
+
+
+                                                    </tbody>
+                                                </table>
+                                                <table class="table mainTbl table table-bordered table-sm dataTable no-footer bg-color">
+                                                    <tr>
+                                                        <th class="f-600 size-align">Sr. No</th>
+                                                        <th class="f-600 size-align">Contents</th>
+                                                        <th class="f-600 size-align">Department</th>
+                                                        <th class="f-600 size-align">Name</th>
+                                                        <th class="f-600 size-align">Remarks</th>
+                                                        <th class="f-600 size-align">Signature</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><label class="f-600">1</label></td>
+                                                        <td><label class="f-600 size-align">Company’ Material Returned</label></td>
+                                                        <td rowspan="6"><img class="curlyImg" src="img/VzRagV.default.png" alt=""><label class="f-600 size-align">Immediate Superior</label></td>
+                                                        <td rowspan="6" id="hiddenApproverInformation"></td>
+                                                        <td rowspan="6"></td>
+                                                        <td rowspan="6"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><label class="f-600">2</label></td>
+                                                        <td><label class="f-600 size-align">Tools / Tool Kit</label></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><label class="f-600">3</label></td>
+                                                        <td>
+                                                            <label class="f-600 size-align">
+                                                                Literature / Documents /
+                                                                Drawings / Manuals
+                                                            </label>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><label class="f-600">4</label></td>
+                                                        <td><label class="f-600 size-align">Table / Drawer / Amirah /Filing cabinet keys</label></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><label class="f-600">5</label></td>
+                                                        <td><label class="f-600 size-align">Locker Keys</label></td>
+
+                                                    </tr>
+                                                    <tr>
+                                                        <td><label class="f-600">6</label></td>
+                                                        <td><label class="f-600 size-align">Other : Please specify</label></td>
+
+                                                    </tr>
+                                                    @if (IsNew && ECF == null)
+                                                    {
+                                                        foreach (var item in Model.ecfData)
+                                                        {
+                                                            <tr>
+                                                                <td class="f-600" style="font-size:20px;text-align:left;">@count1</td>
+                                                                <td class="f-600" style="font-size:20px;text-align:left;">@item.Section</td>
+                                                                <td class="f-600" style="font-size:20px;text-align:left;">@item.Department</td>
+                                                                <td><input type="hidden" id='@("Approver"+count1)' name='@("Approver"+count1)' value="@item.ApproverEmailId" /></td>
+                                                                <td></td>
+                                                                <td></td>
+
+                                                            </tr>
+                                                            count1 = count1 + 1;
+                                                        }
+                                                    }
+                                                </table>
+                                                <table class="table mainTbl table-bordered form-table-container-2 bg-color">
+                                                    <tr>
+                                                        <td>
+
+                                                            <table class="table mainTbl table table-bordered table-sm dataTable no-footer bg-color">
+                                                                <tbody>
+                                                                    <tr class="bg-color-2">
+                                                                        <td colspan="1" class="authorize-td">
+                                                                            <label class="f-600 size-align">Charge to be handed over to:</label>
+
+                                                                        </td>
+                                                                        <td class="authorize-td comment-box-2" colspan="2" style="padding-left: 12px !IMPORTANT;">
+                                                                            <input type="text" id="txtHandOver" name="txtHandOver" class="input-width-1 author-width inputDate">
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr class="bg-color-2">
+                                                                        <td colspan="6" class="font-bold text-center authorize-container photogrph_header" style="text-align: center !IMPORTANT;">Head Of Department</td>
+                                                                    </tr>
+                                                                    <tr class="bg-color-2">
+                                                                        <td colspan="1" class="authorize-td">
+                                                                            <label class="f-600 size-align">Date:</label>
+                                                                            <input type="text" name="" class="input-width-1 author-width inputDate" value="@(DateTime.Now.ToShortDateString())" readonly>
+                                                                            <br />
+                                                                            <label class="f-600 size-align">Name:</label>
+                                                                            <input type="text" name="" class="input-width-1 author-width inputDate">
+                                                                        </td>
+                                                                        <td class="authorize-td comment-box-2" colspan="2" style="padding-left: 10px !important;">
+                                                                            <div class="form-group">
+                                                                                <label class="f-600 size-align" for="comment">Remarks:</label>
+                                                                                <textarea class="inpDisable textareawidth photogrphy-textarea" cols="50" rows="7" id="comment" disabled=""></textarea>
+                                                                            </div>
+                                                                        </td>
+
+                                                                        <td class="authorize-td" colspan="2" style="word-wrap: break-word;width:25%;">
+                                                                            <label class="f-600 size-align">Signature of HOD:</label>
+                                                                            <input type="text" name="" class="inpDisable input-width-1 author-width">
+                                                                            <br />
+                                                                            <label class="f-600 size-align">Signature of Payroll Admin:</label>
+                                                                            <input type="text" name="" class="inpDisable input-width-1 author-width">
+                                                                        </td>
+                                                                    </tr>
+
+                                                                </tbody>
+                                                            </table>
+
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </table>
+
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    }
+                    @if (IsNew)
+                        {
+                            if (!IsEdit)
+                            {
+                                <div class="card-footer align-content-center">
+                                    <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                                        Re-Submit
+                                    </button>
+                                    <button type="reset" class="btn btn-danger btn-sm cancl-btn">
+                                        Cancel
+                                    </button>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="card-footer align-content-center">
+                                    <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                                        Submit
+                                    </button>
+                                    <button type="reset" class="btn btn-danger btn-sm cancl-btn">
+                                        Cancel
+                                    </button>
+                                </div>
+                            }
+                        }
+                    else
+                    {
+                        <div class="container">
+                            <div class="container form-container" style="background-color: rgb(219,238,213);">
+                                <div class="card-header pb-4 pt-4">
+                                    <input type="hidden" id="departmentName" name="departmentName" value="@(Department)" />
+                                    <input type="hidden" id="formId" name="FormId" value="@(ECF.one[0].Id)" />
+                                    <table class="table mainTbl table-bordered form-table bg-color">
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="6" class="heading form-heading" style="text-align:center !important;">
+                                                    <span> MobiNext Technologies India Private Limited</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="6" class="heading form-heading-1" style="text-align:center !important">
+                                                    <span>Employee Clearance Form</span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="table mainTbl table-bordered form-table-container-2 bg-color">
+                                        <tbody>
+                                            <tr>
+                                                <td class="allFormLables borderLTB f-600">
+                                                    <label class="f-600">Name:</label><br>
+                                                </td>
+                                                <td colspan="2" class="borderLTB text-left">
+                                                    <input class="w-100 inputCourier inpDisable" type="text" id="txtName" name="txtName" value="@(ECF.one[0].Name)">
+                                                </td>
+
+                                                <td class="allFormLables borderLTB f-600 align">
+                                                    <label class="f-600">Employee Code:</label><br>
+                                                </td>
+                                                <td colspan="3" class="borderLTB">
+                                                    <input class="w-100 inputCourier inpDisable" type="text" id="txtEmployeeCode" name="txtEmployeeCode" value="@(ECF.one[0].EmployeeCode)">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="allFormLables borderLTB f-600">
+                                                    <label class="f-600">Designation:</label><br>
+                                                </td>
+                                                <td colspan="2" class="borderLTB text-left">
+                                                    <input class="w-100 inputCourier inpDisable" type="text" id="txtDesignation" name="txtDesignation" value="@(ECF.one[0].Designation)">
+                                                </td>
+                                                <td class="allFormLables borderLTB f-600 align">
+                                                    <label class="f-600">Location:</label><br>
+                                                </td>
+                                                <td colspan="3" class="borderLTB">
+                                                    <input class="w-100 inputCourier inpDisable" type="text" id="txtLocation" name="txtLocation" value="@(ECF.one[0].EmployeeLocation)">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="allFormLables borderLTB f-600">
+                                                    <label class="f-600">Department:</label><br>
+                                                </td>
+                                                <td colspan="2" class="borderLTB text-left">
+                                                    <input class="w-100 inputCourier inpDisable" type="text" id="txtDepartment" name="txtDepartment" value="@(ECF.one[0].EmployeeDepartment)">
+                                                </td>
+                                                <td class="allFormLables borderLTB f-600 align">
+                                                    <label class="f-600">Section:</label><br>
+                                                </td>
+                                                <td colspan="3" class="borderLTB">
+                                                    <input class="w-100 inputCourier inpDisable" type="text" id="txtSection" name="txtSection" value="@(ECF.one[0].EmployeeSection)">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="allFormLables borderLTB f-600">
+                                                    <label class="f-600">Date of joining:</label><br>
+                                                </td>
+                                                <td colspan="2" class="borderLTB text-left">
+                                                    <input class="w-100 inputCourier" type="text" id="txtDateofJoining" name="txtDateofJoining" value="@(ECF.one[0].DateOfJoining.ToShortDateString())">
+                                                </td>
+                                                @if (!IsValidityCheck && Department == "Immediate Supervisor")
+                                                {
+                                                    <td class="allFormLables borderLTB f-600 align">
+                                                        <label class="f-600">Date of Relieving:</label><br>
+                                                    </td>
+                                                    <td colspan="3" class="borderLTB">
+                                                        <input class="w-100 inputCourier" type="date" id="txtDateOfRelieving" name="txtDateOfRelieving" value="@(ECF.one[0].DateOfRelieving.ToString("yyyy-MM-dd"))">
+                                                    </td>
+                                                }
+                                                else
+                                                {
+                                                    <td class="allFormLables borderLTB f-600 align">
+                                                        <label class="f-600">Date of Relieving:</label><br>
+                                                    </td>
+                                                    <td colspan="3" class="borderLTB">
+                                                        <input class="w-100 inputCourier inpDisable" type="text" id="txtDateOfRelieving" name="txtDateOfRelieving" value="@(ECF.one[0].DateOfRelieving.ToShortDateString())">
+                                                    </td>
+                                                }
+                                            </tr>
+                                            <tr>
+                                                <td class="allFormLables borderLTB f-600">
+                                                    <label class="f-600">Email:</label><br>
+                                                </td>
+                                                <td colspan="2" class="borderLTB text-left">
+                                                    <input class="w-100 inputCourier inpDisable" type="text" id="txtEmail" name="txtEmail" value="@(ECF.one[0].Email)">
+                                                </td>
+                                                <td class="allFormLables borderLTB f-600 align">
+                                                    <label class="f-600">Phone number:</label><br>
+                                                </td>
+                                                <td colspan="3" class="borderLTB">
+                                                    <input class="w-100 inputCourier inpDisable" type="text" id="txtPhoneNumber" name="txtPhoneNumber" value="@(ECF.one[0].PhoneNumber)">
+                                                </td>
+                                            </tr>
+
+
+                                        </tbody>
+                                    </table>
+                                    <table class="table mainTbl table table-bordered table-sm dataTable no-footer bg-color">
+                                        <tr>
+                                            <th class="f-600 size-align">Sr. No</th>
+                                            <th class="f-600 size-align">Contents</th>
+                                            <th class="f-600 size-align">Department</th>
+                                            <th class="f-600 size-align">Name</th>
+                                            <th class="f-600 size-align">Remarks</th>
+                                            <th class="f-600 size-align">Signature</th>
+                                        </tr>
+                                        <tr>
+                                            <td><label class="f-600">1</label></td>
+                                            <td><label class="f-600 size-align">Company’ Material Returned</label></td>
+                                            <td rowspan="6"><img class="curlyImg" src="img/VzRagV.default.png" alt=""><label class="f-600 size-align">Immediate Superior</label></td>
+                                            <td rowspan="6" class="authorize-td"><input type="text" class="inpDisable" value="@(ECF.three[0].UserName)"></td>
+                                            <td class="authorize-td comment-box-2" rowspan="6"><textarea cols="50" rows="7" class="inpDisable textareawidth">@(ECF.three[0].Comment)</textarea></td>
+                                            <td class="w-20 authorize-td" rowspan="6"><input class="w-100 Signature inpDisable" type="text" value="@(ECF.three[0].ApproverStatus != "Pending" ? (ECF.three[0].ApproverStatus + " on " + Convert.ToDateTime(ECF.two[0].Modified).ToShortDateString() + " " + Convert.ToDateTime(ECF.two[0].Modified).ToShortTimeString()):"")"></td>
+                                        </tr>
+                                        <tr>
+                                            <td><label class="f-600">2</label></td>
+                                            <td><label class="f-600 size-align">Tools / Tool Kit</label></td>
+                                        </tr>
+                                        <tr>
+                                            <td><label class="f-600">3</label></td>
+                                            <td>
+                                                <label class="f-600 size-align">
+                                                    Literature / Documents /
+                                                    Drawings / Manuals
+                                                </label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><label class="f-600">4</label></td>
+                                            <td><label class="f-600 size-align">Table / Drawer / Amirah /Filing cabinet keys</label></td>
+                                        </tr>
+                                        <tr>
+                                            <td><label class="f-600">5</label></td>
+                                            <td><label class="f-600 size-align">Locker Keys</label></td>
+
+                                        </tr>
+                                        <tr>
+                                            <td><label class="f-600">6</label></td>
+                                            <td><label class="f-600 size-align">Other : Please specify</label></td>
+
+                                        </tr>
+                                        @if (!IsNew)
+                                        {
+                                            foreach (var item in ECF.six)
+                                            {
+                                                <tr>
+                                                    <td class="f-600" style="font-size:20px;text-align:left;">@count1</td>
+                                                    <td class="f-600" style="font-size:20px;text-align:left;">@item.Section</td>
+                                                    <td class="f-600" style="font-size:20px;text-align:left;">
+                                                        @item.Department
+                                                    </td>
+                                                    <td class="authorize-td"><input type="text" class="inpDisable" value="@(item.UserName)"></td>
+                                                    <td class="authorize-td comment-box-2"><textarea cols="50" rows="7" class="inpDisable textareawidth">@item.Comment</textarea></td>
+                                                    <td class="w-20 authorize-td"><input style="" class="w-100 Signature inpDisable" type="text" value="@(!IsNew && item.ApproverStatus != "Pending" ? ( item.ApproverStatus + " on " + Convert.ToDateTime(item.Modified).ToShortDateString()+ " "+ Convert.ToDateTime(item.Modified).AddHours(5.5).ToShortTimeString()) : "" )"></td>
+                                                </tr>
+                                                count1 = count1 + 1;
+                                            }
+                                        }
+
+                                    </table>
+                                    <table class="table mainTbl table-bordered form-table-container-2 bg-color">
+                                        <tr>
+                                            <td>
+
+                                                <table class="table mainTbl table table-bordered table-sm dataTable no-footer bg-color">
+                                                    <tbody>
+                                                        <tr class="bg-color-2">
+                                                            <td colspan="1" class="authorize-td">
+                                                                <label class="f-600 size-align">Charge to be handed over to:</label>
+
+                                                            </td>
+                                                            <td class="authorize-td comment-box-2" colspan="2" style="padding-left: 10px !important;">
+                                                                <input type="text" name="" class="input-width-1 author-width inputDate" value="@(ECF.one[0].HandOverTo)" readonly>
+                                                            </td>
+
+
+                                                        </tr>
+                                                        <tr class="bg-color-2">
+                                                            <td colspan="6" class="font-bold text-center authorize-container photogrph_header" style="text-align: center !IMPORTANT;">Head Of Department</td>
+                                                        </tr>
+                                                        <tr class="bg-color-2">
+                                                            <td colspan="1" class="authorize-td">
+                                                                <label class="f-600 size-align">Date:</label>
+                                                                <input type="text" name="" class="input-width-1 author-width inputDate" value="@(Convert.ToDateTime(ECF.two[0].FormId.Created).ToShortDateString())" readonly>
+                                                                <br />
+                                                                <label class="f-600 size-align">Name:</label>
+                                                                <input type="text" name="" class="input-width-1 author-width inputDate inpDisable" value="@(ECF.three[1].UserName)" readonly>
+                                                            </td>
+                                                            <td class="authorize-td comment-box-2" colspan="2" style="padding-left: 10px !important;">
+                                                                <div class="form-group">
+                                                                    <label class="f-600 size-align" for="comment">Remarks:</label>
+                                                                    <textarea class="inpDisable textareawidth photogrphy-textarea" cols="50" rows="7" id="comment" disabled="">@(ECF.three[1].Comment) </textarea>
+                                                                </div>
+                                                            </td>
+
+                                                            <td class="authorize-td" colspan="2" style="word-wrap: break-word;width:25%;">
+                                                                <label class="f-600 size-align">Signature of HOD:</label>
+                                                                <input type="text" name="" class="inpDisable input-width-1 author-width" value="@(ECF.three[1].ApproverStatus != "Pending" ? (ECF.three[1].ApproverStatus + " on " + Convert.ToDateTime(ECF.two[1].Modified).ToShortDateString() + " " + Convert.ToDateTime(ECF.two[1].Modified).ToShortTimeString()):"")">
+                                                                <br />
+                                                                <label class="f-600 size-align">Signature of Payroll Admin:</label>
+                                                                <input type="text" name="" class="inpDisable input-width-1 author-width" value="@(ECF.three[2].ApproverStatus != "Pending" ? (ECF.three[2].ApproverStatus + " on " + Convert.ToDateTime(ECF.two[2].Modified).ToShortDateString() + " " + Convert.ToDateTime(ECF.two[2].Modified).ToShortTimeString()):"")">
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                                @if (!IsValidityCheck && Department == "Payroll")
+                                                {
+                                                    <table class="w-100">
+                                                        <tr class="bg-color-2">
+                                                            <td colspan="6" class="font-bold text-center authorize-container photogrph_header" style="text-align: center !IMPORTANT;">Payroll clearance</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="w-20 allFormLables borderLTB f-600">
+                                                                <label class="f-600">Date of Relieving:</label><br>
+                                                            </td>
+                                                            <td colspan="2" class="borderLTB text-left">
+                                                                <input class="w-100 inputCourier" type="date" id="txtDateOfRelieving" name="txtDateOfRelieving" value="@(ECF.one[0].DateOfRelieving.ToString("yyyy-MM-dd"))">
+                                                            </td>
+                                                            <td class="allFormLables borderLTB f-600 align">
+                                                                <label class="f-600">Resignation given date:</label><br>
+                                                            </td>
+                                                            <td colspan="3" class="borderLTB">
+                                                                <input class="w-100 inputCourier" type="date" id="txtResignationGiven" name="txtResignationGiven">
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="allFormLables borderLTB f-600">
+                                                                <label class="f-600">Notice Period:</label><br>
+                                                            </td>
+                                                            <td colspan="2" class="borderLTB text-left">
+                                                                <select class="w-100 selctTransport" id="drpNoticePeriod" name="drpNoticePeriod">
+                                                                    <option value=-1 selected disabled>Select</option>
+                                                                    <option value="Yes">Yes</option>
+                                                                    <option value="No">No</option>
+                                                                </select>
+                                                            </td>
+                                                            <td class="allFormLables borderLTB f-600 align">
+                                                                <label class="f-600">Applicable days:</label><br>
+                                                            </td>
+                                                            
+                                                            <td><input class="w-100 inputCourier" type="text" id="txtApplicableDays" name="txtApplicableDays" onkeypress="allowNumbersOnly(event)"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="allFormLables borderLTB f-600">
+                                                                <label class="f-600">Eligible for Gratuity:</label><br>
+                                                            </td>
+                                                            <td colspan="2" class="borderLTB text-left">
+                                                                <select class="w-100 selctTransport" id="drpEligibleForGratuity" name="drpEligibleForGratuity">
+                                                                    <option value=-1 selected disabled>Select</option>
+                                                                    <option value="Yes">Yes</option>
+                                                                    <option value="No">No</option>
+                                                                </select>
+                                                            </td>
+                                                            <td class="allFormLables borderLTB f-600 align">
+                                                                <label></label><br>
+                                                            </td>
+                                                            <td colspan="3" class="borderLTB">
+                                                            </td>
+                                                        </tr>
+
+                                                    </table>
+                                                    <table class="table mainTbl table table-bordered table-sm dataTable no-footer bg-color">
+                                                        <tbody>
+
+                                                            <tr class="bg-color-2">
+                                                                <td colspan="1" class="authorize-td">
+                                                                    <label class="f-600 size-align">Date:</label>
+                                                                    <input type="text" name="" class="input-width-1 author-width inputDate" value="@(Convert.ToDateTime(ECF.two[0].FormId.Created).ToShortDateString())" readonly>
+                                                                    <label class="f-600 size-align">Name:</label>
+                                                                    <input type="text" name="" class="input-width-1 author-width inputDate" value="@(ECF.three[2].UserName)" readonly>
+                                                                </td>
+                                                                <td class="authorize-td comment-box-2" colspan="2" style="padding-left: 18px !important;">
+                                                                    <div class="form-group">
+                                                                        <label class="f-600 size-align" for="comment">Remarks:</label>
+                                                                        <textarea class="inpDisable textareawidth photogrphy-textarea" cols="50" rows="7" id="comment" disabled="">@(ECF.three[2].Comment)</textarea>
+                                                                    </div>
+                                                                </td>
+
+                                                                <td class="authorize-td" colspan="2" style="word-wrap: break-word;width:25%;">
+                                                                    <label class="f-600 size-align">Signature:</label><input type="text" name="" class="inpDisable input-width-1 author-width"
+                                                                     value="@(ECF.three[2].ApproverStatus != "Pending" ? (ECF.three[2].UserName + " " + ECF.three[2].ApproverStatus + " on " + Convert.ToDateTime(ECF.two[2].Modified).ToShortDateString() + " " + Convert.ToDateTime(ECF.two[2].Modified).ToShortTimeString()):"")" readonly>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>                                                
+                                                }
+                                                else
+                                                {
+                                                    <table class="table mainTbl table-bordered form-table-container-2 bg-color">
+                                                        <tr class="bg-color-2">
+                                                            <td colspan="6" class="font-bold text-center authorize-container photogrph_header" style="text-align: center !IMPORTANT;">Payroll clearance</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="w-20 allFormLables borderLTB f-600">
+                                                                <label class="f-600">Date of Relieving:</label><br>
+                                                            </td>
+                                                            <td colspan="2" class="borderLTB text-left">
+                                                                <input class="w-100 inputCourier inpDisable" type="text" value="@(ECF.one[0].DateOfRelieving.ToString("dd-MM-yyyy"))">
+                                                            </td>
+                                                            <td class="allFormLables borderLTB f-600 align">
+                                                                <label class="f-600">Resignation given date:</label><br>
+                                                            </td>
+                                                            <td colspan="3" class="borderLTB">
+                                                                <input class="w-100 inputCourier inpDisable" type="text" value="@(!(ECF.one[0].ResignationGiven.Year==1) ? ECF.one[0].ResignationGiven.ToShortDateString():" ")">
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="allFormLables borderLTB f-600">
+                                                                <label class="f-600">Notice Period:</label><br>
+                                                            </td>
+                                                            <td colspan="2" class="borderLTB text-left">
+                                                                <input class="w-100 inputCourier inpDisable" type="text" value="@(ECF.one[0].NoticePeriod)">
+                                                            </td>
+                                                            @if(ECF.one[0].ApplicableDays!=null){
+                                                            <td class="allFormLables borderLTB f-600 align">
+                                                                <label class="f-600">Applicable days:</label><br>
+                                                            </td>
+                                                            <td colspan="3" class="borderLTB">
+                                                                <input class="w-100 inputCourier inpDisable" type="text" value="@(ECF.one[0].ApplicableDays)">
+                                                            </td>
+                                                            }
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="allFormLables borderLTB f-600">
+                                                                <label class="f-600">Eligible for Gratuity:</label><br>
+                                                            </td>
+                                                            <td colspan="2" class="borderLTB text-left">
+                                                                <input class="w-100 inputCourier inpDisable" type="text" value="@(ECF.one[0].EligibleForGratuity)">
+                                                            </td>
+                                                            <td class="allFormLables borderLTB f-600 align">
+                                                                <label></label><br>
+                                                            </td>
+                                                            <td colspan="3" class="borderLTB">
+                                                            </td>
+                                                        </tr>
+
+                                                    </table>
+                                                    <table class="table mainTbl table table-bordered table-sm dataTable no-footer bg-color">
+                                                        <tbody>
+
+                                                            <tr class="bg-color-2">
+                                                                <td colspan="1" class="authorize-td">
+                                                                    <label class="f-600 size-align">Date:</label>
+                                                                    <input type="text" name="" class="input-width-1 author-width inputDate" value="@(Convert.ToDateTime(ECF.two[0].FormId.Created).ToShortDateString())" readonly>
+                                                                    <label class="f-600 size-align">Name:</label>
+                                                                    <input type="text" name="" class="input-width-1 author-width inputDate" value="@(ECF.three[2].UserName)" readonly>
+                                                                </td>
+                                                                <td class="authorize-td comment-box-2" colspan="2" style="padding-left: 18px !important;">
+                                                                    <div class="form-group">
+                                                                        <label class="f-600 size-align" for="comment">Remarks:</label>
+                                                                        <textarea class="inpDisable textareawidth photogrphy-textarea" cols="50" rows="7" id="comment" disabled="">@(ECF.three[2].Comment)</textarea>
+                                                                    </div>
+                                                                </td>
+
+                                                                <td class="authorize-td" colspan="2" style="word-wrap: break-word;width:25%;">
+                                                                    <label class="f-600 size-align">Signature:</label><input type="text" name="" class="inpDisable input-width-1 author-width"
+                                                                                                                             value="@(ECF.three[2].ApproverStatus != "Pending" ? (ECF.three[2].ApproverStatus + " on " + Convert.ToDateTime(ECF.two[2].Modified).ToShortDateString() + " " + Convert.ToDateTime(ECF.two[2].Modified).ToShortTimeString()):"")" readonly>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+
+                                                }
+                                            </td>
+                                        </tr>
+                                    </table>
+
+
+
+                                </div>
+                            </div>
+                           
+                        </div>
+                    }
+                </div>
+
+            </div>
+        </form>
+    </div>
+
+
+
+<div class="modal fade" id="successModel" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header modelHeader">
+                <span class="modal-title modalMsgTitle" id="modalTitle"></span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label id="modalBody" class="lableMsg">  </label>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="submitBomBtn publishBtn" id="modalOkButton">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var IsNew = @Html.Raw(Json.Encode(IsNew));
+    var IsEdit = @Html.Raw(Json.Encode(IsEdit));
+    var ECF = @Html.Raw(Json.Encode(ECF));
+    var appRowId = @Html.Raw(Json.Encode(AppRowId));
+    var approvalType =@Html.Raw(Json.Encode(ApprovalType));
+    var IsValidityCheck = @Html.Raw(Json.Encode(IsValidityCheck));
+    var Department = @Html.Raw(Json.Encode(Department));
+    var FlagRedirect = @Html.Raw(Json.Encode(FlagRedirect));
+
+    pageLoad();
+    function pageLoad() {
+        var data = "";
+        if (!IsNew) {
+            $(".inpDisable").attr("disabled", "disabled");
+        }
+        if (!IsNew) {
+            $(".drpDisable").attr("disabled", "disabled");
+            $('#txtApplicableDays').hide();
+        }
+        if (IsNew) {
+            if (!IsEdit) {
+                $(".inpDisable").attr("disabled", "disabled");
+                GetApprovers();
+            }
+            else {
+                GetApprovers();
+                //func();
+            }
+        }
+    };
+
+    function successModal(txt) {
+        ////
+        $('#modalTitle').html('Success');
+        if (txt == "approve") {
+            $('#modalBody').html('Form has been approved!');
+        }
+        else if (txt == "reject") {
+            $('#modalBody').html('Form has been rejected!');
+        }
+        else if (txt == "enquire") {
+            $('#modalBody').html('Form has been enquired!');
+        }
+        else if (txt == "cancelled") {
+            $('#modalBody').html('Form has been cancelled!');
+        }
+        else {
+            $('#modalBody').html('Your form with ID: ECF' + txt + ' has been submitted! Kindly use this for future reference');
+            FlagRedirect = txt;
+        }
+        //$('#modalBody').html('Your form has been submitted!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    $("#modalOkButton").on('click', function () {
+        ////
+        if (FlagRedirect != null) {
+            window.location = "../Dashboard";
+        }
+    });
+
+    function func() {
+        ////
+        var name = document.getElementById("txtName");
+        var department = document.getElementById("txtDepartment");
+        var txtEmployeeNumber = document.getElementById("txtEmployeeCode");
+
+        name.value = "@currentUser.FirstName" + " " + "@currentUser.LastName";
+        department.value = "@currentUser.Department";
+        txtEmployeeNumber.value = "@currentUser.EmpNumber";
+    }
+
+    function allowNumbersOnly(e) {
+        var code = (e.which) ? e.which : e.keyCode;
+        if (code > 31 && (code < 48 || code > 57)) {
+            e.preventDefault();
+        }
+    }
+
+    function setStartDate() {
+        var today = new Date().toISOString().split('T')[0];
+
+        document.getElementsByName("txtDateOfRelieving")[0].setAttribute("min", today);
+    }
+
+    $("#drpNoticePeriod").change(function () {
+        ////
+        if ($(this).val() == "Yes") {
+            $('#txtApplicableDays').show();
+        }
+        else if ($(this).val() == "No") {
+            $('#txtApplicableDays').hide();
+        }
+    });
+    $("#drpNoticePeriod").trigger("change");
+
+    function failureModal() {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html('Some error occurred!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function requiredModal(text) {
+        $('#modalTitle').html('Required!');
+        $('#modalBody').html(text);
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function mobileLengthModal() {
+        $('#modalTitle').html('Required');
+        $('#modalBody').html('Please enter a 10-Digit Mobile No.!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    $("#txtEmployeeCode").autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                url: "/EmployeeClearance/GetECFEmployeeDetails",
+                dataType: "json",
+                cache: false,
+                async: false,
+                data: {
+                    searchText: $("#txtEmployeeCode").val()
+                },
+                success: function (data) {
+                    ////
+                    response($.map(data, function (item) {
+                        console.log("EmployeeCode");
+                        console.log(data, 'data');
+                        return { label: item.UserId, value: item.UserId, raw: item };
+                    }));
+                }
+            });
+        },
+        search: function (event, ui) {
+            var value = $("#txtEmployeeCode").val();
+            console.log(value);
+            // If less than three chars, cancel the search event
+            if (value.length < 4) {
+                event.preventDefault();
+            }
+        },
+        min_length: 4,
+        delay: 0,
+        select: function (event, ui) {
+            //
+            var empOtherDetails = ui.item['raw'];
+            console.log(empOtherDetails);
+            console.log("select");
+            //Get the other details like Cost Center Code, Employee Number from DB.
+            $.ajax({
+                url: "/EmployeeClearance/GetECFExistingEmployeeDetails",
+                dataType: "json",
+                cache: false,
+                async: false,
+                data: {
+                    otherEmpUserId: empOtherDetails.UserId,
+                },
+                success: function (data) {
+                    console.log("select success");
+                    console.log(data, 'data');
+
+                    $('#txtName').val(data.EmployeeName);
+                    $('#txtDepartment').val(data.Department);
+                    //$('#txtLocation').val(data.Location);
+                    $('#txtEmail').val(data.Email);
+                    //$('#txtDesignation').val(data.DepartmentFrom);
+                    //$('#txtCurrentRoleFrom').val(data.DepartmentFrom);
+                    //$('#txtDivisionFrom').val(data.DepartmentFrom);
+                    //$('#txtDepartmentFrom').val(data.DepartmentFrom);
+                    //$('#txtSubDepartmentFrom').val(data.SubDepartmentFrom);
+                    //$('#txtReportingManagerFrom').val(data.ReportingManagerFrom);
+                    //$('#txtCostCentreFrom').val(data.CostCentreFrom);
+
+                }
+            });
+        }
+    });
+
+    $("#txtHandOver").autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                url: "/EmployeeClearance/GetECFChargeHandOverEmployeeDetails",
+                dataType: "json",
+                cache: false,
+                async: false,
+                data: {
+                    searchText: $("#txtHandOver").val()
+                },
+                success: function (data) {
+                    ////
+                    response($.map(data, function (item) {
+                        console.log("EmployeeCode");
+                        console.log(data, 'data');
+                        return { label: item.UserName, value: item.UserName, raw: item };
+                    }));
+                }
+            });
+        },
+        search: function (event, ui) {
+            var value = $("#txtHandOver").val();
+            console.log(value);
+            // If less than three chars, cancel the search event
+            if (value.length < 4) {
+                event.preventDefault();
+            }
+        },
+        min_length: 4,
+        delay: 0,
+        select: function (event, ui) {
+            //
+            var empOtherDetails = ui.item['raw'];
+            console.log(empOtherDetails);
+            console.log("select");
+            //Get the other details like Cost Center Code, Employee Number from DB.
+            $.ajax({
+                url: "/EmployeeClearance/GetECFChargeHandOverExistingEmployeeDetails",
+                dataType: "json",
+                cache: false,
+                async: false,
+                data: {
+                    otherEmpUserId: empOtherDetails.UserId,
+                },
+                success: function (data) {
+                    console.log("select success");
+                    console.log(data, 'data');
+
+                    //$('#txtName').val(data.EmployeeName);
+                    //$('#txtDepartment').val(data.Department);
+                    //$('#txtLocation').val(data.Location);
+                    //$('#txtEmail').val(data.Email);
+                    //$('#txtDesignation').val(data.DepartmentFrom);
+                    //$('#txtCurrentRoleFrom').val(data.DepartmentFrom);
+                    //$('#txtDivisionFrom').val(data.DepartmentFrom);
+                    //$('#txtDepartmentFrom').val(data.DepartmentFrom);
+                    //$('#txtSubDepartmentFrom').val(data.SubDepartmentFrom);
+                    //$('#txtReportingManagerFrom').val(data.ReportingManagerFrom);
+                    //$('#txtCostCentreFrom').val(data.CostCentreFrom);
+
+                }
+            });
+        }
+    });
+
+    function GetApprovers() {
+        $.ajax({
+            url: '/EmployeeClearance/GetECFSequentialApprovalList',
+            type: 'GET',
+            data: {},
+            dataType: 'JSON',
+            success: (function (data) {
+                ////
+                approverData = data;
+                console.log(data);
+                var row = "";
+                for (var i = 0; i < data.length; i++) {
+                    row += '<input type="hidden" id="hidden' + data[i].Department + 'Approver" name="hidden' + data[i].Department + 'Approver" value="' + data[i].ApproverEmailId + '">';
+                }
+                $("#hiddenApproverInformation").html(row);
+
+            }),
+            error: (function (data) {
+                //code
+            })
+        })
+
+    }
+
+    $("#btnSubmit").on('click', function (e) {
+        //
+
+        var empName = document.getElementById("txtName").value;
+        var empNo = document.getElementById("txtEmployeeCode").value;
+        var empDesignation = document.getElementById("txtDesignation").value;
+        var empDept = document.getElementById("txtDepartment").value;
+        var empLocation = document.getElementById("txtLocation").value;
+        var empSection = document.getElementById("txtSection").value;
+        var empContact = $("#txtPhoneNumber").val().length;
+        var dateofJoining = document.getElementById("txtDateofJoining").value;
+        var dateOfRelieving = document.getElementById("txtDateOfRelieving").value;
+        var email = document.getElementById("txtEmail").value;
+        var handOver = document.getElementById("txtHandOver").value;
+
+        if (empName == "") {
+            requiredModal("Please enter the Employee Name");
+            return false;
+        }
+
+        if (empDept == "") {
+            requiredModal("Please enter the Employee Department");
+            return false;
+        }
+
+        if (empDesignation == "") {
+            requiredModal("Please enter the Employee Designation");
+            return false;
+        }
+
+        if (empLocation == "") {
+            requiredModal("Please enter the Employee Location");
+            return false;
+        }
+
+        if (empNo == "") {
+            requiredModal("Please enter the Employee Code");
+            return false;
+        }
+
+        if (empSection == "") {
+            requiredModal("Please enter the Employee Section");
+            return false;
+        }
+
+        if (empContact < 10 || empContact > 10) {
+            mobileLengthModal();
+            return false;
+        }
+
+        if (dateofJoining == "") {
+            requiredModal("Please enter the Date of Joining");
+            return false;
+        }
+
+        if (dateOfRelieving == "") {
+            requiredModal("Please enter the Date of Relieving");
+            return false;
+        }
+
+        if (email == "") {
+            requiredModal("Please enter the Email");
+            return false;
+        }
+
+        if (handOver == "") {
+            requiredModal("Please enter the Hand Over Information");
+            return false;
+        }
+
+
+        var form = $("#ECFForm").serialize();
+        $.ajax({
+            url: '/EmployeeClearance/SaveECF',
+            type: 'POST',
+            data: form,
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data[0].Value == 1) {
+                    //
+                    successModal(data[1].Value);
+                    $("#ECFForm").trigger("reset");
+                }
+                else {
+                    failureModal();
+                    $("#ECFForm").trigger("reset");
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+                $("#ECFForm").trigger("reset");
+            })
+        })
+    });
+
+    function validityModal(txt, isComment) {
+        //
+        if (txt == 'approve') {
+
+            if (isComment == "") {
+                DisplayAlert('error', 'Warning', 'Please type in the reason for approving the form');
+            }
+            else if (isComment !== "") {
+                DisplayAlert('error', 'Warning', 'Please fill all the required fields');
+            }
+        }
+        //else if (txt == 'reject') {
+        //    DisplayAlert('error', 'Warning', 'Please type in the reason for rejecting the form');
+        //}
+        else if (txt == 'enquire') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for enquiring the form');
+        }
+    }
+
+    function ValidityUpdate() {
+        ////
+        var form = $("#ECFForm").serialize();
+        $.ajax({
+            url: '/EmployeeClearance/ECFValidityUpdate',
+            type: 'POST',
+            data: form,
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data == 1) {
+                    //successModal(text);
+                    $("#ECFForm").trigger("reset");
+                    //setTimeout(FilterMyTasks(0, 0), 8000);
+                    //window.location.reload();
+                    //setTimeout(FilterMyTasks, 8000)
+                    /*setTimeout(ReloadMyTasks, 8000)*/
+                }
+                else {
+                    failureModal();
+                    $("#ECFForm").trigger("reset");
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+                $("#ECFForm").trigger("reset");
+            })
+        })
+
+    }
+
+    function saveResponse(text) {
+        //
+
+        if (!IsValidityCheck) {
+            if (Department == "Immediate Supervisor") {
+                var dateofJoining = document.getElementById("txtDateofJoining").value;
+            }
+            else if (Department == "Payroll") {
+                var dateofJoining = document.getElementById("txtDateofJoining").value
+                var resignationGiven = document.getElementById("txtResignationGiven").value;
+                var eligibleForGratuity = $("#drpEligibleForGratuity option:selected").val();
+                var noticePeriod = $("#drpNoticePeriod option:selected").val();
+
+            }
+        }
+        var status = '', comment = '';
+        comment = $("#comment-" + text).val();
+        switch (text) {
+            case 'approve': {
+                status = 'Approved';
+                if (Department == "Immediate Supervisor") {
+                    if (dateofJoining == "") {
+                        validityModal(text, comment);
+                        return;
+                    }
+                    if (comment == "") {
+                        validityModal(text, comment);
+                        //alert("Please type in the reason for rejecting the form");
+                        return;
+                    }
+                }
+                else if (Department == "Payroll") {
+                    if (dateofJoining == "" || resignationGiven == "" || eligibleForGratuity == -1 || noticePeriod == -1) {
+                        validityModal(text, comment);
+                        return;
+                    }
+                    if (comment == "") {
+                        validityModal(text, comment);
+                        //alert("Please type in the reason for rejecting the form");
+                        return;
+                    }
+                }
+                else {
+                    if (comment == "") {
+                        validityModal(text, comment);
+                        //alert("Please type in the reason for rejecting the form");
+                        return;
+                    }
+                }
+                break;
+            }
+            //case 'reject': {
+            //    status = 'Rejected';
+            //    break;
+            //}
+            case 'enquire': {
+                status = 'Enquired';
+                if (comment == '') {
+                    validityModal(text);
+                    return;
+                }
+                break;
+            }
+        }
+        comment = $("#comment-" + text).val();
+        $.ajax({
+            url: '/List/SaveResponse',
+            type: 'POST',
+            data: { response: status, appRowId: appRowId, comment: comment, approvalType: approvalType },
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data == 1) {
+                    if (!IsValidityCheck) {
+                        ValidityUpdate();
+                    }
+                    successModal(text);
+                    $("#ECFForm").trigger("reset");
+                    setTimeout(FilterMyTasks, 4000);
+                }
+                else {
+                    failureModal();
+                    $("#ECFForm").trigger("reset");
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+                $("#ECFForm").trigger("reset");
+            })
+        })
+    }
+
+</script>

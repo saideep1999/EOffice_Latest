@@ -1,0 +1,476 @@
+﻿@{
+    Layout = "_LayoutWithCss.cshtml";
+}
+<div class="right_col">
+    <div class="container-fluid" id="container-wrapper">
+        <div class="d-sm-flex align-items-center justify-content-between mb-2 mt-2">
+            <div class="col-lg-6 text-right-1">
+                <h1 class="h3 mb-0  text-hdng-info">Suggestion for Order</h1>
+            </div>
+            <div class="col-lg-6 text-center pt-3">
+                <img src="/assets/img/logo.png" alt="logoimage" class="logo-image">
+            </div>
+        </div>
+        <form action="/List/SaveOrder" id="sfoForm" method="post">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card card-1 mb-4 card-1">
+                        <div class="card-body">
+                            <table class="form-group form-container suggestion_form_container">
+                                <tr class="row">
+                                    <td class="col-sm-6 col-md-6 col-lg-6 input-group-bdr pr-0">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">
+                                                    Department:
+                                                </span>
+                                            </div>
+                                            <input type="text" class="form-control  " name="txtDept" value="IT" readonly>
+                                    </td>
+                                    <td class="col-6 col-sm-6 col-md-6 col-lg-6 input-group-bdr pr-0">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">
+                                                    Shopping Cart Number:
+                                                </span>
+                                            </div>
+                                            <input type="text" class="form-control inpDisable" name="txtShopCart" placeholder="" value="asdasd">
+                                    </td>
+                                </tr>
+                                <tr class="row">
+                                    <td class="col-sm-6 col-lg-6 input-group-bdr pr-0">
+                                        <div class=" ">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">
+                                                    Concerned Section / Facility:
+                                                </span>
+                                            </div>
+                                            <input type="text" class="form-control inpDisable" name="txtSection" placeholder="" value="asdasd">
+                                        </div>
+                                    </td>
+                                    <td class="col-sm-6 col-lg-6 input-group-bdr pr-0">
+                                        <div class=" ">
+                                                <span class="input-group-text">
+                                                    Date:
+                                                </span>
+                                            </div>
+                                            <input type="text" class="form-control disabled" name="txtDate" value="02 Dec, 2020" readonly>
+                                    </td>
+                                </tr>
+                                <tr class="row">
+                                    <td class="col-sm-12 col-lg-12 input-group-bdr pr-0">
+                                        <div class=" ">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">
+                                                    Budget:
+                                                </span>
+                                            </div>
+                                            <input type="number" class="form-control validate inpDisable" name="txtBudget" placeholder="" value="3213">
+                                            <select class='form-control ml-2 validate col-lg-2' name="drpCurrency" id="drpCurrency" required>
+                                            </select>
+                                            <input type="number" class="form-control inpDisable" name="txtConvert" placeholder="Conversion rate of selected currency to rupee" value="">
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="row">
+                                    <td class="col-sm-12 col-lg-12 input-group-bdr pr-0">
+                                        <div class=" ">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">
+                                                    Description:
+                                                </span>
+                                            </div>
+                                            <input type="text" class="form-control inpDisable" name="txtDesc" placeholder="" value="asdas">
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12 mb-4">
+                    <!-- Simple Tables -->
+                    <div class="card card-1">
+                        <div class="table-responsive">
+                            <table class="table align-items-center table-flush table-bordered ">
+                                <thead class="thead-light">
+                                    <tr class="table-border-info bdr-right">
+                                        <th>Sr. No.</th>
+                                        <th>
+                                            Available Offers
+                                            <br>
+                                            (Supplier Name)
+                                        </th>
+                                        <th>Technically <br> Acceptance <br> (Ok / Not Ok)</th>
+                                        <th>Offer Price</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody class="sr-no tableSupplier">
+                                    <tr class="bdr-right bg-clr1">
+                                        <td>1</td>
+                                        <td>
+                                                <input type="text" class="form-control inpDisable" name="txtSuppName" value="asd">
+                                        </td>
+                                        <td>
+                                                <input type="text" class="form-control inpDisable" name="txtTechAccept" value="asda">
+                                        </td>
+                                        <td class="offerprice-col">
+                                                <input type="text" class="form-control inpDisable" name="txtPrice" value="2323">
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="card-footer table-footer-para">
+                            <p>
+                                For more offers & details, please refer ANNEXURE -1
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12 mb-4">
+                    <!-- Simple Tables -->
+                    <div class="card card-1">
+                        <div class="table-responsive">
+                            <table class="table align-items-center table-flush table-bordered">
+                                <thead class="thead-light">
+                                </thead>
+                                <tbody class="sr-no">
+                                    <tr class="bdr-right bg-clr1">
+                                        <td class="annexure-text-area">
+                                            Reasons for Technical Disqualification / Not Ok Supplier(s)
+                                        </td>
+                                        <td>NA</td>
+                                        <td>
+                                            <textarea class="form-control inpDisable" rows="2" name="txtTechDisqualify">test 1</textarea>
+                                        </td>
+                                    </tr>
+                                    <tr class="bdr-right bg-clr1">
+                                        <td>
+                                            Suggestion for Order
+                                        </td>
+                                        <td></td>
+                                        <td>
+                                            <textarea class="form-control inpDisable" rows="2" name="txtSuggOrder"></textarea>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12 mb-4">
+                    <!-- Simple Tables -->
+                    <div class="card card-1">
+                        <div class="table-responsive">
+                            <table class="table align-items-center tbl-bdr-1">
+                                <thead>
+                                    <tr>
+                                        <th>Initiator</th>
+                                        <th>
+                                            Head of Section 1
+                                            <br>
+                                            (AGM and Above)
+                                        </th>
+                                        <th>
+                                            Head of Department 2
+                                            <br>
+                                            (GM and Above)**
+                                        </th>
+                                        <th>
+                                            Director and above 3
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="tbl-row-bdr-2 tbl-bdy-border">
+                                        <td>
+                                            <label name="txtInit">Kashmira Wankhede </label>
+                                        </td>
+                                        <td>
+                                            <label name="txtHead1">Gurneet Singh</label>
+                                        </td>
+                                        <td>
+                                            <label name="txtHead2"> Chandrashekhar Upasani</label>
+                                        </td>
+                                        <td>
+                                            <label name="txtHead3"> Sudattakumar SRK. Kamble</label>
+                                        </td>
+                                    </tr>
+                                    <tr class="date-row tbl-row-bdr-2">
+                                        <td class="date-row-info">
+
+                                            <span class="year-info">
+                                                <label name="lblInitDate"> Initiated on 02 Dec, 2020 </label>
+                                            </span>
+                                        </td>
+                                        <td class="date-row-info">
+                                            <span class="year-info">
+                                                <label name="txtHead1Date"> Approved on 07 Dec, 2020 </label>
+                                            </span>
+                                        </td>
+                                        <td class="date-row-info">
+                                            <span class="year-info">
+                                                <label name="txtHead2Date">  </label>
+                                            </span>
+                                        </td>
+                                        <td class="date-row-info">
+                                            <span class="year-info">
+                                                <label name="txtHead3Date">  </label>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-8 col-sm-8">
+                    <h4>Note</h4>
+                    <p>1. Approval Up to INR 10,00,000</p>
+                    <p>2. Approval Above INR 10,00,000</p>
+                    <p>3. Approval Above INR 10,000,000</p>
+                    <p>_**Unless next Hierarchical level is </p>
+                </div>
+                <div class="col-lg-4 col-sm-4 txt-black-clr">
+                    <p class="para-pdng">w.e.f : 01.02.2013</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12 col-sm-12 txt-black-clr">
+                    This is digital form, that can be filled and digitally sign by your PKI card. Please do not take print out.
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- Scroll to top -->
+<a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+</a>
+
+<div class="modal fade" id="successModel" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content sfo_modal_popup">
+            <div class="modal-header modelHeader">
+                <span class="modal-title modalMsgTitle" id="modalTitle"></span>
+                <button type="button" class="close closs-icon-info font-weight-bold" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label id="modalBody" class="lableMsg"></label>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="submitBomBtn publishBtn btn-error-2" id="modalOkButton">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var isNew = false;
+    var order = [{ "Key": "one", "Value": { "__metadata": { "id": "d6756c2c-d515-43cb-9e8b-02bbea450cea", "uri": "http://win-6cgsdmg51od:8080/sites/DCMS/_api/Web/Lists(guid\u0027d5ed6ec8-61ed-4ea7-b46a-6b584a1d0e5d\u0027)/Items(59)", "etag": "\"1\"", "type": "SP.Data.OrderDetailsListItem" }, "Department": "IT", "ShopCartNumber": "asdasd", "Date": "2020-12-02T01:02:03Z", "ConcernSection": "asdasd", "Budget": 3213, "Description": "asdas", "TechDisqualify": "                                                            \r\n     test 1                                                    ", "SuggestOrder": null, "Currency": "Rupee", "ConversionValue": null } }, { "Key": "two", "Value": {} }, { "Key": "three", "Value": {} }, { "Key": "four", "Value": [{ "ApproverId": 11, "ApproverStatus": "Approved", "Comment": "done", "IsActive": 0, "NextApproverId": 2, "Modified": "\/Date(1607339602000)\/", "UserName": "Gurneet Singh", "UserLevel": 1, "InitiatorId": 7, "FormId": { "FormName": null, "Id": 0, "CreatedDate": "\/Date(1606850693000)\/", "ListName": null, "FormStatus": null, "UniqueFormName": null }, "Author": { "Submitter": "Kashmira Wankhede" } }, { "ApproverId": 1, "ApproverStatus": "Pending", "Comment": null, "IsActive": 1, "NextApproverId": 9, "Modified": "\/Date(1608214586000)\/", "UserName": "Chandrashekhar Upasani", "UserLevel": 2, "InitiatorId": 7, "FormId": { "FormName": null, "Id": 0, "CreatedDate": "\/Date(1606850693000)\/", "ListName": null, "FormStatus": null, "UniqueFormName": null }, "Author": { "Submitter": "Kashmira Wankhede" } }, { "ApproverId": 9, "ApproverStatus": "Pending", "Comment": null, "IsActive": 0, "NextApproverId": 7, "Modified": "\/Date(1606850714000)\/", "UserName": "Sudattakumar SRK. Kamble", "UserLevel": 3, "InitiatorId": 7, "FormId": { "FormName": null, "Id": 0, "CreatedDate": "\/Date(1606850693000)\/", "ListName": null, "FormStatus": null, "UniqueFormName": null }, "Author": { "Submitter": "Kashmira Wankhede" } }, { "ApproverId": 7, "ApproverStatus": "Pending", "Comment": null, "IsActive": 0, "NextApproverId": 0, "Modified": "\/Date(1606850717000)\/", "UserName": "Kashmira Wankhede", "UserLevel": 4, "InitiatorId": 7, "FormId": { "FormName": null, "Id": 0, "CreatedDate": "\/Date(1606850693000)\/", "ListName": null, "FormStatus": null, "UniqueFormName": null }, "Author": { "Submitter": "Kashmira Wankhede" } }] }];
+    var appRowId = 94;
+
+    $(document).ready(function () {
+        var data = "";
+        if (!isNew) {
+            var value = order[0].Value["Currency"];
+            data = '<option>Choose currency</option><option' + (value == "Rupee" ? " selected>" : ">") + 'Rupee</option>'
+                + '<option' + (value == "Dollar" ? " selected>" : ">") + 'Dollar</option>'
+                + '<option' + (value == "Euro" ? " selected>" : ">") + 'Euro</option>';
+            $("#drpCurrency").html(data);
+            $("#drpCurrency").prop("disabled", true);
+            $(".inpDisable").attr("disabled", "disabled");
+        }
+        else {
+            data += "<option selected>Choose currency</option><option>Rupee</option><option>Dollar</option><option>Euro</option>";
+            $("#drpCurrency").html(data);
+            $(".inpDisable").removeAttr("disabled");
+        }
+    });
+
+    function successModal() {
+        $('#modalTitle').html('Success');
+        $('#modalBody').html('Your form has been submitted!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function failureModal() {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html('Some error occurred!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function fillFormModal() {
+        $('#modalTitle').html('Error');
+        $('#modalBody').html('Kindly fill all the mandatory fields!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function removeVal() {
+        $('.validate').each(function () {
+            $(this).removeClass('error');
+        });
+        $(".tableSupplier tr").find('input').each(function () {
+            $(this).removeClass('error');
+        });
+    }
+
+    function AddRows() {
+        var oldCount = $('.tableSupplier tr').length;
+        var newCount = oldCount + 1;
+        var row = '<tr class="bdr-right bg-clr1" id="row' + newCount + '"><td class="sNo">' + newCount + '</td> <td><div class="input-group input-pdng"><input type="text"'
+            + ' class="form-control" name="txtSuppName" placeholder=""></div></td>'
+            + ' <td><div class="input-group input-pdng"><input type="text" class="form-control " name="txtTechAccept" placeholder=""></div></td>'
+            + ' <td><div class="input-group input-pdng"><input type="text" class="form-control " name="txtPrice" placeholder=""></div></td>'
+            + '<td style="background-color:white; max-width:60px; border-bottom:none; vertical-align:central;">'
+            + '<div> <input class="remove-btn" type="image" src="/assets/img/remove.png" alt="Remove" onclick="RemoveBtn(' + newCount + ')"'
+            + 'style = "max-width:50%; background-color:white;"> </div> </td> </tr>';
+
+        $(".tableSupplier tr:last").after(row);
+    };
+
+    $("#btnSubmit").on('click', function (e) {
+        //alert('clicked');
+        e.preventDefault();
+        var isEmpty = false;
+        $('.validate').each(function () {
+            if (this.value == '') {
+                isEmpty = true;
+                $(this).addClass('error');
+            }
+        });
+
+        $(".tableSupplier tr:first").find('.inpValidate').each(function () {
+            if (this.value == '') {
+                isEmpty = true;
+                $(this).addClass('error');
+            }
+        });
+
+        var count = 1;
+        $(".tableSupplier tr").each(function () {
+            var drp = "#drpAccept" + count;
+            var ele = $(this).find(drp);
+            var index = ele[0].selectedIndex;
+            var comment = $(this).find('#txtComment' + count).val();
+            if (index == 2 && comment == '') {
+                isEmpty = true;
+            }
+            count++;
+        });
+
+        if (isEmpty == true) {
+            fillFormModal();
+            return false;
+        }
+
+        var form = $("#sfoForm").serialize();
+        $.ajax({
+            url: '/List/SaveOrder',
+            type: 'POST',
+            data: form,
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data == 1) {
+                    successModal();
+                    $("#sfoForm").trigger("reset");
+                    removeVal();
+                }
+                else {
+                    failureModal();
+                    $("#sfoForm").trigger("reset");
+                    removeVal();
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+                $("#sfoForm").trigger("reset");
+                removeVal();
+            })
+        })
+    });
+
+    function RemoveBtn(count) {
+        $('#row' + count).remove();
+        var rowCount = $('.tableSupplier tr').length;
+        for (var i = 1; i <= rowCount; i++) {
+            var x = count + 1;
+            $('#row' + x).attr("id", "row" + count);
+            $('#row' + count + ' .sNo').html(count);
+            count++;
+        }
+    }
+
+    function saveResponse(text) {
+        let status = '', comment = '';
+        switch (text) {
+            case 'approve': {
+                status = 'Approved';
+                break;
+            }
+            case 'reject': {
+                status = 'Rejected';
+                break;
+            }
+            case 'enquire': {
+                status = 'Enquired';
+                break;
+            }
+        }
+        comment = $("#comment-" + text).val();
+        $.ajax({
+            url: '/List/SaveResponse',
+            type: 'POST',
+            data: { response: status, appRowId: appRowId, comment: comment },
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data == 1) {
+                    successModal();
+                    $("#sfoForm").trigger("reset");
+                    removeVal();
+                    setTimeout(ReloadMyTasks, 8000)
+                }
+                else {
+                    failureModal();
+                    $("#sfoForm").trigger("reset");
+                    removeVal();
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+                $("#sfoForm").trigger("reset");
+                removeVal();
+            })
+        })
+    }
+
+    function AcceptComment(i, ele) {
+        var index = ele.selectedIndex;
+        if (index == 2) {
+            $("#txtComment" + i).attr("required");
+            $("#txtComment" + i).addClass('error');
+        }
+        else {
+            $("#txtComment" + i).removeAttr("required");
+            $("#txtComment" + i).removeClass('error');
+        }
+    }
+
+</script>
+
+

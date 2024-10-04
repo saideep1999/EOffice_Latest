@@ -1,0 +1,2571 @@
+﻿@{
+    ViewBag.Title = "IPAF Form";
+    int FormId = 0, AppRowId = 0, ApprovalType = 0; bool IsEdit = true; bool IsNew = true;
+    bool IsNewMode = true, IsEditMode = false, IsViewMode = false;
+    var user = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    var SecurityDesgnString = "Security";
+    Skoda_DCMS.Models.IPAFData IPAF = null;
+    List<Skoda_DCMS.Models.IPAFData> IPAFFormDataList = new List<Skoda_DCMS.Models.IPAFData>();
+    dynamic FlagRedirect = null;
+    var currentUser = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    List<Skoda_DCMS.Models.ApprovalDataModel>
+    appList = new List<Skoda_DCMS.Models.ApprovalDataModel>
+        ();
+    int? tableCount = 0;
+    string disabled = "", slctDisabled = "";
+    var CurrentUserDesgn = "";
+    long? CurrentUserLevel = 0;
+    if (ViewBag != null && !ViewBag.IsNewMode)
+    {
+        IsNew = ViewBag.IsNew;
+        IsEdit = ViewBag.IsEdit;
+        IsNewMode = ViewBag.IsNewMode;
+        IsEditMode = ViewBag.IsEditMode;
+        IsViewMode = ViewBag.IsViewMode;
+        disabled = IsViewMode ? "readonly" : "";
+        slctDisabled = IsViewMode ? "disabled" : "";
+        IPAF = ViewBag.Model.one[0] as Skoda_DCMS.Models.IPAFData;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        appList = ViewBag.Model?.three as List<Skoda_DCMS.Models.ApprovalDataModel>
+    ;
+        CurrentUserDesgn = appList?.Where(x => x.ApproverUserName == currentUser.UserName).Select(x => x.Designation).FirstOrDefault();
+        CurrentUserLevel = appList?.Where(x => x.ApproverUserName == currentUser.UserName && x.ApproverStatus == "Pending").Select(x => x.Level).FirstOrDefault();
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+        if (IsViewMode)
+        {
+            var Ap = appList?.Where(x =>
+            x.ApproverUserName.ToLower() == currentUser.UserName.ToLower()
+            && x.ApproverStatus.ToLower() == "pending"
+            ).FirstOrDefault();
+        }
+        IPAFFormDataList = ViewBag.Model?.Four as List<Skoda_DCMS.Models.IPAFData>;
+
+    }
+}
+<!DOCTYPE html>
+<style>
+
+    .hide {
+        display: none;
+    }
+    /*New design css start here*/
+    .astColor {
+        color: red;
+    }
+
+    .textTrans {
+        width: 100%;
+        max-width: 99%;
+        border-radius: 5px;
+        margin-right: 0px;
+        border: 1px solid !important;
+    }
+
+    .empDetailsBg {
+        background-color: #fffbef;
+    }
+
+    #accordion select {
+        color: #000;
+        width: 100% !important;
+        height: 45px;
+        background-color: #FFFFFF;
+        border: 1px solid #BFBFBF;
+        box-sizing: border-box;
+        border-radius: 5px;
+        background-image: url(data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>);
+        background-repeat: no-repeat;
+        background-position: right .75rem center;
+        background-size: 16px 12px;
+    }
+
+    #accordion input[type='text'] {
+        width: 100% !important;
+        max-width: 100%;
+        height: 45px;
+        background-color: #FFFFFF;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px !important;
+    }
+
+    #accordion input[type='date'] {
+        width: 100% !important;
+        max-width: 100%;
+        height: 45px;
+        background-color: #FFFFFF;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px;
+    }
+
+    #accordion input[type='time'] {
+        height: 45px;
+    }
+
+    #accordion label {
+        font-size: 16px;
+        line-height: 22px;
+        font-weight: 600;
+        color: #201F1F;
+    }
+
+    #accordion table tr td {
+        font-size: 16px;
+        line-height: 19px;
+        color: #201F1F;
+        background-color: white;
+    }
+
+    #accordion label {
+        display: block;
+    }
+
+    #accordion .card-header {
+        background: rgb(4 59 100) !important;
+        border-radius: 5px 5px 0px 0px;
+        position: relative;
+        margin-top: 15px;
+    }
+
+        #accordion .card-header.collapsed h5:after {
+            content: '+';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        #accordion .card-header h5:after {
+            content: '-';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+    #accordion h5 button {
+        font-size: 18px;
+        line-height: 22px;
+        /* identical to box height */
+        padding-left: 0px;
+        display: flex;
+        align-items: center;
+        text-transform: uppercase;
+        /* Text_white */
+
+        color: #FFFFFF;
+    }
+
+        #accordion h5 button:focus {
+            box-shadow: none;
+        }
+
+    .empDetailsFields label {
+        display: block !important;
+        margin-bottom: 0px;
+    }
+
+    .empDetailsFields .row label {
+        display: block;
+        margin-bottom: 0px;
+    }
+
+        .empDetailsFields .row label:nth-child(1) {
+            font-style: normal;
+            font-weight: normal !important;
+            font-size: 12px;
+            line-height: 18px;
+            color: #A9A9A9 !important;
+        }
+
+        .empDetailsFields .row label:nth-child(2) {
+            font-style: normal;
+            font-weight: normal;
+            font-size: 18px;
+            line-height: 22px;
+            color: #201F1F;
+        }
+
+    .firstLastName {
+        font-style: normal;
+        font-weight: normal;
+        font-size: 20px;
+        line-height: 24px;
+        /* identical to box height */
+
+        display: flex;
+        align-items: center;
+        color: #201F1F;
+    }
+
+    .submit-btn {
+        background: #3D3D3D;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #FFFFFF;
+        border-color: transparent !important;
+    }
+
+    .cancl-btn {
+        background: #FAE99B;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        border-color: transparent !important;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #212221;
+        margin-left: 10px;
+    }
+
+
+
+
+    .card-footer {
+        display: flex;
+        background-color: transparent !important;
+    }
+
+    .photo-form {
+        width: 100%;
+    }
+
+    .ui-front {
+        z-index: 9999999 !important;
+    }
+
+    /* NEW UI CSS END*/
+
+
+    .showBorder {
+        border: 1px solid #dee2e6;
+    }
+
+    .multiselect {
+        height: 47px;
+        margin-top: -1px;
+    }
+    /*Animation CSS Starts*/
+
+    div.input-block {
+        position: relative;
+    }
+
+        div.input-block input {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 188px;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block textarea {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 100%;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            background-color: #fff;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block span.placeholder {
+            position: absolute;
+            margin: 17px 0;
+            padding: 0 4px;
+            font-family: Roboto, sans-serif;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            top: -6px;
+            left: 15px;
+            transition: all 0.2s;
+            transform-origin: 0% 0%;
+            background: none;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+    .question_span {
+        width: 116% !important;
+        font-size: 15px !important;
+    }
+
+    div.input-block textarea:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: #fff !important;
+    }
+
+    div.input-block textarea:valid + span.placeholder,
+    div.input-block textarea:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+    }
+
+    div.inputSelect select:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+    }
+
+    div.input-block input:valid + span.placeholder,
+    div.input-block input:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: #fff;
+        /*background-color: rgb(219,238,213);*/
+    }
+
+
+    div.input-block input.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: rgb(219,238,213);
+    }
+
+    div.input-block input:read-only + span.placeholder,
+    div.input-block input:read-only + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: rgb(219,238,213);
+    }
+
+
+    div.inputSelect span.placeholder {
+        position: absolute;
+        margin: 17px 0;
+        padding: 0 4px;
+        font-family: Roboto, sans-serif;
+        color: #000;
+        display: flex;
+        align-items: center;
+        font-size: 1rem;
+        top: -6px;
+        left: 15px;
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+        background: none;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    div.inputSelect select:focus + span.placeholder {
+        transform: scale(0.8) translateY(-30px);
+        background: rgb(219,238,213);
+        z-index: 9;
+    }
+
+    div.inputSelect select:not([value=""]):valid + span.placeholder {
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+    }
+
+
+
+    div.input-block input:focus + span.placeholder {
+        color: #284B63;
+    }
+
+    .breadcrumb {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+        padding: 1rem 1rem 0;
+        margin-bottom: 0;
+        list-style: none;
+        background-color: #FFFFFF;
+        border-radius: .25rem;
+    }
+
+    body.nav-sm .container.body .left_col {
+        width: 63px;
+        padding: 0;
+        position: fixed;
+        height: 100%;
+        z-index: 8;
+    }
+
+    .card {
+        position: relative;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        min-width: 0;
+        word-wrap: break-word;
+        background-color: #fff;
+        background-clip: border-box;
+        border: 0px;
+        border-radius: .25rem;
+    }
+
+    .dropdown-toggle::after {
+        display: none;
+        width: 0;
+        height: 0;
+        margin-left: .255em;
+        vertical-align: .255em;
+        content: "";
+        border-top: .3em solid;
+        border-right: .3em solid transparent;
+        border-bottom: 0;
+        border-left: .3em solid transparent;
+    }
+
+    input.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213);
+    }
+
+    inputSelect.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213) !important;
+    }
+
+    select.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background-color: rgb(219,238,213) !important;
+        z-index: 9;
+    }
+
+    select.spanUpperSideWhite + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background-color: rgb(255,255,255) !important;
+        z-index: 9;
+    }
+
+    textarea.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    .TransView {
+        background-color: white !important;
+    }
+
+    @@media only screen and (min-width: 992px) {
+        div .input-block span.placeholder {
+            font-size: 15px;
+        }
+
+        div.inputSelect span.placeholder {
+            font-size: 1rem;
+        }
+    }
+
+    input[type='date'].spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    .showBorder {
+        border: 1px solid #dee2e6;
+    }
+
+    .wField {
+        width: 233px !important;
+        margin-left: 10px;
+    }
+
+    @@-moz-document url-prefix() {
+        input[type=time]::-ms-clear {
+            display: none;
+        }
+    }
+
+    .datetime-reset-button {
+        display: none !important;
+    }
+
+    .forShoppingCart {
+        margin-left: 14% !important;
+    }
+
+    .btn-group {
+        display: block !important;
+    }
+
+    #accordion label {
+        display: inline-block !important;
+    }
+
+
+    .custom-select:focus {
+        box-shadow: none !important;
+        border-color: none !important;
+    }
+
+    #addSoftwarebtn td {
+        border-top: none !important;
+    }
+
+    #ApplicationCategoryBody select {
+        background-color: #fff !important;
+    }
+
+   /* #loader {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        z-index: 10000;
+    }*/
+
+   
+
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        margin: 0;
+    }
+</style>
+<script type="text/javascript">
+
+    function checkSelect(id) {
+
+
+        if ($('#' + id).val() != '') {
+            $('#' + id).addClass('spanUpperSide');
+        }
+    }
+    /*$('#timedemo').pickatime({ twelvehour: true });*/
+
+</script>
+<style>
+    /*New design css start here*/
+    .astColor {
+        color: red;
+    }
+
+    .astColor1 {
+        color: red;
+    }
+
+    .textTrans {
+        width: 100%;
+        max-width: 99%;
+        border-radius: 5px;
+        margin-right: 0px;
+        border: 1px solid !important;
+    }
+
+    .empDetailsBg {
+        background-color: #fffbef;
+    }
+
+    #accordion select {
+        color: #000;
+        width: 100% !important;
+        max-width: 97%;
+        height: 45px;
+        background-color: #FFFFFF;
+        border: 1px solid #BFBFBF;
+        box-sizing: border-box;
+        border-radius: 5px;
+        background-image: url(data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>);
+        background-repeat: no-repeat;
+        background-position: right .75rem center;
+        background-size: 16px 12px;
+    }
+
+    #accordion input[type='text'] {
+        width: 100% !important;
+        max-width: 97%;
+        height: 45px;
+        /*background-color: #F8F8F8;*/
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px;
+    }
+
+    #accordion input[type='number'] {
+        width: 100% !important;
+        max-width: 97%;
+        height: 45px;
+        /*background-color: #F8F8F8;*/
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px;
+    }
+
+    #accordion input[type='date'] {
+        width: 100% !important;
+        max-width: 97%;
+        height: 45px;
+        background-color: #FFFFFF;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px;
+    }
+
+    #accordion label {
+        font-size: 16px;
+        line-height: 22px;
+        font-weight: 600;
+        color: #201F1F;
+    }
+
+    #accordion table tr td {
+        border: none !important;
+        font-size: 16px;
+        line-height: 19px;
+        color: #201F1F;
+        background-color: white;
+        padding: 10px 0;
+    }
+
+    #accordion label {
+        display: block;
+    }
+
+    #accordion .card-header {
+        background: rgb(4 59 100) !important;
+        border-radius: 5px 5px 0px 0px;
+        position: relative;
+        margin-top: 15px;
+    }
+
+        #accordion .card-header.collapsed h5:after {
+            content: '+';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        #accordion .card-header h5:after {
+            content: '-';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+    #accordion h5 button {
+        font-size: 18px;
+        line-height: 22px;
+        /* identical to box height */
+        padding-left: 0px;
+        display: flex;
+        align-items: center;
+        text-transform: uppercase;
+        /* Text_white */
+
+        color: #FFFFFF;
+    }
+
+        #accordion h5 button:focus {
+            box-shadow: none;
+        }
+
+    .empDetailsFields label {
+        display: block !important;
+        margin-bottom: 0px;
+    }
+
+    .empDetailsFields .row label {
+        display: block;
+        margin-bottom: 0px;
+    }
+
+        .empDetailsFields .row label:nth-child(1) {
+            font-style: normal;
+            font-weight: normal !important;
+            font-size: 12px;
+            line-height: 18px;
+            color: #A9A9A9 !important;
+        }
+
+        .empDetailsFields .row label:nth-child(2) {
+            font-style: normal;
+            font-weight: normal;
+            font-size: 18px;
+            line-height: 22px;
+            color: #201F1F;
+        }
+
+    .firstLastName {
+        font-style: normal;
+        font-weight: normal;
+        font-size: 20px;
+        line-height: 24px;
+        /* identical to box height */
+
+        display: flex;
+        align-items: center;
+        color: #201F1F;
+    }
+
+    .submit-btn {
+        background: #3D3D3D;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #FFFFFF;
+        border-color: transparent !important;
+    }
+
+    .cancl-btn {
+        background: #FAE99B;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        border-color: transparent !important;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #212221;
+        margin-left: 10px;
+    }
+
+
+
+
+    .card-footer {
+        display: flex;
+        background-color: transparent !important;
+    }
+
+    .photo-form {
+        width: 100%;
+    }
+
+    .ui-front {
+        z-index: 9999999 !important;
+    }
+    /*Animation CSS Starts*/
+
+    div.input-block {
+        position: relative;
+    }
+
+        div.input-block input {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 188px;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block textarea {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #495055;
+            width: 100%;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            background-color: #fff;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block span.placeholder {
+            position: absolute;
+            margin: 17px 0;
+            padding: 0 4px;
+            font-family: Roboto, sans-serif;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            top: -6px;
+            left: 15px;
+            transition: all 0.2s;
+            transform-origin: 0% 0%;
+            background: none;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        div.input-block textarea:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: #fff !important;
+        }
+
+        div.input-block textarea:valid + span.placeholder,
+        div.input-block textarea:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px) !important;
+            background: #fff !important;
+        }
+
+        div.input-block input:valid + span.placeholder,
+        div.input-block input:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: rgb(219,238,213);
+        }
+
+
+        div.input-block input.spanUpperSide + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: rgb(219,238,213);
+        }
+
+        div.input-block input:read-only + span.placeholder,
+        div.input-block input:read-only + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background: rgb(219,238,213);
+        }
+
+
+    div.inputSelect span.placeholder {
+        position: absolute;
+        margin: 17px 0;
+        padding: 0 4px;
+        font-family: Roboto, sans-serif;
+        color: #000;
+        display: flex;
+        align-items: center;
+        font-size: 1rem;
+        top: -6px;
+        left: 15px;
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+        background: none;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    div.inputSelect select:focus + span.placeholder {
+        transform: scale(0.8) translateY(-30px);
+        background: rgb(219,238,213);
+        z-index: 9;
+    }
+
+    div.inputSelect select:not([value=""]):valid + span.placeholder {
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+    }
+
+
+
+    div.input-block input:focus + span.placeholder {
+        color: #284B63;
+    }
+
+    .breadcrumb {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+        padding: 1rem 1rem 0;
+        margin-bottom: 0;
+        list-style: none;
+        background-color: #FFFFFF;
+        border-radius: .25rem;
+    }
+
+    body.nav-sm .container.body .left_col {
+        width: 63px;
+        padding: 0;
+        position: fixed;
+        height: 100%;
+        z-index: 8;
+    }
+
+    .card {
+        position: relative;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        min-width: 0;
+        word-wrap: break-word;
+        background-color: #fff;
+        background-clip: border-box;
+        border: 0px;
+        border-radius: .25rem;
+    }
+
+    .dropdown-toggle::after {
+        display: none;
+        width: 0;
+        height: 0;
+        margin-left: .255em;
+        vertical-align: .255em;
+        content: "";
+        border-top: .3em solid;
+        border-right: .3em solid transparent;
+        border-bottom: 0;
+        border-left: .3em solid transparent;
+    }
+
+    input.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213);
+    }
+
+    inputSelect.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213) !important;
+    }
+
+    select.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background-color: rgb(219,238,213) !important;
+        z-index: 9;
+    }
+
+    textarea.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    @@media only screen and (min-width: 992px) {
+        div.input-block span.placeholder {
+            font-size: 15px;
+        }
+
+        div.inputSelect span.placeholder {
+            font-size: 14px;
+        }
+    }
+
+    #add_to_me {
+        text-align: left !important;
+    }
+
+    .TransView {
+        background-color: white !important;
+    }
+
+    .mt06rem {
+        margin-top: 0.6rem;
+    }
+
+    .chkPosition {
+        position: relative;
+        left: -11px;
+    }
+
+    .pl06rem {
+        padding-left: 0.6rem;
+    }
+
+    .mlSpaceChk {
+        margin-left: 2.1rem;
+    }
+
+    .leftSpace {
+        left: 29px !important;
+    }
+
+    .showBorder {
+        border: 1px solid #dee2e6;
+    }
+
+    .forLblWidth {
+        width: 20.5%;
+    }
+
+    .forTdLbl {
+        width: 14.5%;
+    }
+
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        margin: 0;
+    }
+</style>
+<body>
+    <div class="right_col bg-transparent" role="main">
+        <form id="IPAFForm" method="post">
+            <div class="container">
+                <div>
+                    @if (IsEditMode || IsViewMode)
+                    {
+                        <div>
+                            <input type="hidden" id="FormId" name="FormId" value="@(FormId)" />
+                            <input type="hidden" id="FormSrId" name="FormSrId" value="@(IPAF.Id)" />
+                            <input type="hidden" id="AppRowId" name="AppRowId" value="@(ViewBag.Model.one[0].AppRowId)" />
+                            @*<input type="hidden" name="ApplicationCategoryDataCurr" id="ApplicationCategoryDataCurr" value="@(URCF.ApplicationCategoryData.Count)" />*@
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="breadcrumb-container">
+                            <div>
+                                <ol class="breadcrumb">
+                                    <li>
+                                        <a href="/Dashboard?formName=NGCF">
+                                            Dashboard
+                                        </a>
+                                    </li>
+                                    <li>
+                                        IT Production Application Access Form
+                                    </li>
+                                </ol>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="row breadcrumb-container table-bordered  mr-1 ml-1" style="background-color: rgb(219,238,213) !important; ">
+                    <div class="col-md-2 col-lg-2">
+                        @*<span class="placeholder">Date : @(IsViewMode ||IsEditMode ? (Convert.ToDateTime(IPAF.FormID.CreatedDate).ToShortDateString()) : DateTime.Now.ToShortDateString())</span>*@
+                        <span class="placeholder">Date : @(IsViewMode || IsEditMode ? (Convert.ToDateTime(IPAF.CreatedDate).ToShortDateString()) : DateTime.Now.ToShortDateString())</span>
+                    </div>
+                    <div class="col-md-8 col-lg-8 mt-2 mb-1 form-heading" style="text-align:center; margin-top:5px">
+                        <span>IT Production Application Access Form</span>
+                    </div>
+                    <div class="col-md-2 col-lg-2">
+                        @if (IsViewMode || IsEditMode)
+                        {
+                            <span class="placeholder white_space_nowrap"> Form Id : @(IsViewMode || IsEditMode ? ("IPAF" + FormId ?? "") : "" )</span>
+                        }
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="heading d-none" id="headingErr">
+                <h1 id="" class="info-header">Following fields are mandatory. Please fill in information for<br></h1>
+                <div id="add_to_me" class="header-list" style="color:red;"></div>
+            </div>
+            <!-- ACCORDIAN STRUCTURE START HERE-->
+            @* Submitter Section *@
+            @{
+                Html.RenderPartial("_NewSubmitterDetailsWithModel", (ViewBag as object));
+            }
+
+            @* Applicant Section *@
+            @{
+                Html.RenderPartial("_NewApplicantDetailsWithModel", (ViewBag as object));
+
+
+            }
+
+
+            <div id="accordion">
+                <div class="card">
+                    <div class="card-header" id="headingFour" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                        <h5 class="mb-0">
+                            <button type="button" class="btn btn-link" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                                <img src="/assets/img/transactionIcon.svg">Transaction Fields
+                            </button>
+                        </h5>
+                    </div>
+
+                    @if (IsNewMode)
+                    {
+                        <div id="collapseFour" class="collapse show" aria-labelledby="headingFour" style="">
+                            <div class="card-body">
+                                <div class="row w-100">
+                                    <div class="row w-100">
+                                        <div class="form-group col-md-2 d-flex align-items-center col-lg-2 col-12">
+                                            <label id="lblRequestType" class="f-600" name="RequestType" style="margin-left:15px; position: relative; top:10px;">
+                                                Request Type<span class="astColor">*</span>
+                                            </label>
+                                        </div>
+
+                                        <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                            <label class="checkbox-container">
+                                                <label class="f-600">Permanent</label>
+                                                <input type="checkbox" class="" name="RequestType" id="chkPermanent" value="Permanent" onclick="getRequestType()">
+                                                <span class="checkmark"></span>
+                                            </label>
+                                        </div>
+                                        <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                            <label class="checkbox-container">
+                                                <label class="f-600">Temporary</label>
+                                                <input type="checkbox" class="temp-checkbox" name="RequestType" id="chkTemporary" value="Temporary" onclick="getRequestType()">
+                                                <span class="checkmark"></span>
+                                            </label>
+                                        </div>
+                                        <div class="col-md-3 col-lg-3 col-12 d-none" id="TemporaryDateFrom">
+                                            <div class="input-block">
+                                                <input type="date" name="RequestFromDate" class="TransView spanUpperSide" id="txtTempFrom" min="2022-06-23">
+                                                <span class="placeholder TransView" for="TempFrom" id="lblTempFrom" style="font-weight:bolder;">from<span class="astColor">*</span></span>
+                                            </div>
+                                        </div>
+                                        <div class="align col-md-3 col-lg-3 col-12 d-none" id="TemporaryDateTo">
+                                            <div class="ml-4 input-block">
+                                                <input type="date" class="w-90 TransView spanUpperSide" name="RequestToDate" id="txtTempTo" min="2022-06-23">
+                                                <span class="placeholder TransView" for="TempTo" id="lblTempTo" style="font-weight:bolder;">to<span class="astColor">*</span></span>
+                                            </div>
+                                        </div>
+                                        <td>
+                                            <input type="hidden" name="TransferType" id="chkTYActionType" value="">
+                                        </td>
+                                    </div>
+                                    <table class="mainTbl table table-border form-table-container-2">
+                                        <tbody>
+                                            <tr>
+                                                <td class="bt-0 bb-0 pl-0">
+                                                    <table class="w-100 mx-auto table table-border form-border text-center" id="Tblitprodunctondata">
+
+                                                        <thead class="form-head-1" style="margin-left:inherit !important;">
+                                                            <tr>
+                                                                <th>Application Name</th>
+                                                                <th>Application URL</th>
+                                                                <th>Type Of Access</th>
+                                                                <th>Access Group</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody class="form-border tableSoftware" id="softwareBody">
+
+
+                                                            <tr id="row_1" class="tr_input">
+                                                                <td class="text-center">
+                                                                    <input type="text" name="Applicationname" id="txtappName_1">
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <select class="form-control sel_service_category" name="Applicationurl" id="selappURL_1" onchange="GetAcesslink(this),checkSelect('selappURL_1')">
+                                                                        <option value="">Select application URL</option>
+
+                                                                    </select>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <select class="form-control cls_subcategory" name="Applicationaccess" onchange="checkSelect('selaccessType_1')" id="selaccessType_1">
+                                                                        <option value="">Select category name</option>
+
+                                                                    </select>
+                                                                </td>
+                                                                <td class="text-center" style="width: 138px;">
+                                                                    <select class="form-control cls_subcategory" name="Accessgroup" id="selaccessGroup_1" onchange="checkSelect('selaccessGroup_1')">
+                                                                    </select>
+                                                                </td>
+                                                                <td style="border:0;"> </td>
+                                                                <td class="text-center" style="background-color:white; max-width:123px; vertical-align:central;">
+                                                                    <input class="remove-btn remove align-center" type="image" src="/assets/img/remove.png" alt="Remove" id="remove_1" style="max-width: 85%; background-color: white; border:none;">
+                                                                </td>
+                                                            </tr>
+
+                                                        </tbody>
+                                                    </table>
+                                                </td>
+                                            </tr>
+
+                                            <tr align="right" id="addSoftwarebtn">
+                                                <td class="">
+                                                    <button type="button" class="btn btn-sm submit-btn d-flex float-right mb-2 bl-1" onclick="addTableRow12();">
+                                                        + Add
+                                                    </button>
+                                                    <input type="hidden" name="totalrows" id="totalrows">
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td style="padding-right: 0;">
+                                                    <div class="w-100">
+                                                        <div class="per row col-12" style="padding: 0;">
+                                                            <label class="col-md-12 col-lg-12"><b>Business Justification</b></label>
+                                                            <textarea class="form-control col-md-12 col-lg-12" name="BusinessJustification" id="BusinessJustification_1" rows="4"></textarea>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="bt-0 bb-0 pl-0">
+                                                    <button class="btn btn-warning hide" id="geko_upload_btn">Upload GeKo</button>
+                                                    <button class="btn btn-primary hide" id="saga_upload_btn">Upload SAGA/2</button>
+                                                </td>
+                                            </tr>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else if (IsViewMode)
+                    {
+                        <div id="collapseFour" class="collapse show" aria-labelledby="headingFour" style="">
+                            <div class="card-body">
+                                <div class="row w-100">
+                                    <div class="row w-100">
+                                        <div class="form-group col-md-2 d-flex align-items-center col-lg-2 col-12">
+                                            <label id="lblRequestType" class="f-600" style="margin-left:15px; position: relative; top:10px;">
+                                                Request Type<span class="astColor">*</span>
+                                            </label>
+                                        </div>
+
+                                        <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                            <label class="checkbox-container">
+                                                <label class="f-600">Permanent</label>
+                                                <input type="checkbox" class="" name="RequestType" id="chkPermanent" value="Permanent" onclick="getRequestType()" @(IPAF.RequestType == "Permanent" ? "checked" : "") disabled>
+                                                <span class="checkmark"></span>
+                                            </label>
+                                        </div>
+                                        <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                            <label class="checkbox-container">
+                                                <label class="f-600">Temporary</label>
+                                                <input type="checkbox" class="temp-checkbox" name="RequestType" id="chkTemporary" value="Temporary" onclick="getRequestType()" @(IPAF.RequestType == "Temporary" ? "checked" : "") disabled>
+                                                <span class="checkmark"></span>
+                                            </label>
+                                        </div>
+                                        <div class="col-md-3 col-lg-3 col-12 d-none" id="TemporaryDateFrom">
+                                            <div class="input-block">
+                                                <input type="date" name="RequestFromDate" class="TransView spanUpperSide" id="txtTempFrom" value="@(IPAF?.RequestFromDate?.ToString("yyyy-MM-dd") == "0001-01-01" ? "" : IPAF?.RequestFromDate?.ToString("yyyy-MM-dd"))" min="2022-06-23" disabled>
+                                                <span class="placeholder TransView" for="TempFrom" id="lblTempFrom" style="font-weight:bolder;">from<span class="astColor">*</span></span>
+                                            </div>
+                                        </div>
+                                        <div class="align col-md-3 col-lg-3 col-12 d-none" id="TemporaryDateTo">
+                                            <div class="ml-4 input-block">
+                                                <input type="date" class="w-90 TransView spanUpperSide" name="RequestToDate" id="txtTempTo" value="@(IPAF?.RequestToDate?.ToString("yyyy-MM-dd") == "0001-01-01" ? "" : IPAF?.RequestToDate?.ToString("yyyy-MM-dd"))" min="2022-06-23" disabled>
+                                                <span class="placeholder TransView" for="TempTo" id="lblTempTo" style="font-weight:bolder;">to<span class="astColor">*</span></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <table class="mainTbl table table-border form-table-container-2">
+                                        <tbody>
+                                            <tr>
+                                                <td class="bt-0 bb-0 pl-0">
+                                                    <table class="w-100 mx-auto table table-border form-border text-center" id="Tblitprodunctondata">
+
+                                                        <thead class="form-head-1" style="margin-left:inherit !important;">
+                                                            <tr>
+                                                                <th>Application Name</th>
+                                                                <th>Application URL</th>
+                                                                <th>Type Of Access</th>
+                                                                <th>Access Group</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody class="form-border tableSoftware" id="softwareBody">
+                                                            @{
+                                                                int srNo = 0;
+                                                            }
+
+                                                            @foreach (var item in IPAFFormDataList)
+                                                            {
+                                                                srNo++;
+                                                                <tr id="row_@srNo" class="tr_input">
+                                                                    <td class="text-center">
+                                                                        <input type="text" name="Applicationname" value="@(item?.Applicationname)" id="txtappName_@srNo" disabled>
+                                                                    </td>
+                                                                    <td class="text-center">
+                                                                        <select class="form-control sel_service_category" name="Applicationurl" id="selappURL_@srNo" onchange="GetAcesslink(this)" disabled>
+                                                                            <option value="" @(item?.Applicationurl == "" || item?.Applicationurl == null ? "selected" : "")>Select application URL</option>
+
+                                                                        </select>
+                                                                    </td>
+                                                                    <td class="text-center">
+                                                                        <select class="form-control cls_subcategory" name="Applicationaccess" id="selaccessType_@srNo" disabled>
+                                                                            <option value="" @(item?.Applicationaccess == "" || item?.Applicationaccess == null ? "selected" : "")>Select category name</option>
+
+                                                                        </select>
+                                                                    </td>
+                                                                    <td class="text-center" style="width: 138px;">
+                                                                        <select class="form-control cls_subcategory" name="Accessgroup" id="selaccessGroup_@srNo" onchange="checkSelect('selaccessGroup_1')" disabled>
+                                                                        </select>
+                                                                    </td>
+                                                                    <td style="border:0;"> </td>
+                                                                    <td class="text-center" style="background-color:white; max-width:123px; vertical-align:central;">
+                                                                        <input class="remove-btn remove align-center" type="image" src="/assets/img/remove.png" alt="Remove" id="remove_@srNo" style="max-width: 85%; background-color: white; border:none;" disabled>
+                                                                    </td>
+                                                                </tr>
+                                                            }
+                                                        </tbody>
+                                                    </table>
+                                                </td>
+                                            </tr>
+
+                                            <tr align="right" id="addSoftwarebtn">
+                                                <td class="">
+                                                    <button type="button" class="btn btn-sm submit-btn d-flex float-right mb-2 bl-1" onclick="addTableRow12();" disabled>
+                                                        + Add
+                                                    </button>
+                                                    <input type="hidden" name="totalrows" id="totalrows">
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td style="padding-right: 0;">
+                                                    <div class="w-100">
+                                                        <div class="per row col-12" style="padding: 0;">
+                                                            <label class="col-md-12 col-lg-12"><b>Business Justification</b></label>
+                                                            <textarea class="form-control col-md-12 col-lg-12" name="BusinessJustification" id="BusinessJustification_1" rows="4" disabled> @(IPAF.BusinessJustification)</textarea>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="bt-0 bb-0 pl-0">
+                                                    <button class="btn btn-warning hide" id="geko_upload_btn">Upload GeKo</button>
+                                                    <button class="btn btn-primary hide" id="saga_upload_btn">Upload SAGA/2</button>
+                                                </td>
+                                            </tr>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else if (IsEditMode)
+                    {
+                        <div id="collapseFour" class="collapse show" aria-labelledby="headingFour" style="">
+                            <div class="card-body">
+                                <div class="row w-100">
+                                    <div class="row w-100">
+                                        <div class="form-group col-md-2 d-flex align-items-center col-lg-2 col-12">
+                                            <label id="lblRequestType" class="f-600" style="margin-left:15px; position: relative; top:10px;">
+                                                Request Type<span class="astColor">*</span>
+                                            </label>
+                                        </div>
+
+                                        <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                            <label class="checkbox-container">
+                                                <label class="f-600">Permanent</label>
+                                                <input type="checkbox" class="" name="RequestType" id="chkPermanent" value="Permanent" onclick="getRequestType()" @(IPAF.RequestType == "Permanent" ? "checked" : "")>
+                                                <span class="checkmark"></span>
+                                            </label>
+                                        </div>
+                                        <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                            <label class="checkbox-container">
+                                                <label class="f-600">Temporary</label>
+                                                <input type="checkbox" class="temp-checkbox" name="RequestType" id="chkTemporary" value="Temporary" onclick="getRequestType()" @(IPAF.RequestType == "Temporary" ? "checked" : "")>
+                                                <span class="checkmark"></span>
+                                            </label>
+                                        </div>
+                                        <div class="col-md-3 col-lg-3 col-12 d-none" id="TemporaryDateFrom">
+                                            <div class="input-block">
+                                                <input type="date" name="RequestFromDate" class="TransView spanUpperSide" id="txtTempFrom" value="@(IPAF?.RequestFromDate?.ToString("yyyy-MM-dd") == "0001-01-01" ? "" : IPAF?.RequestFromDate?.ToString("yyyy-MM-dd"))" min="2022-06-23">
+                                                <span class="placeholder TransView" for="TempFrom" id="lblTempFrom" style="font-weight:bolder;">from<span class="astColor">*</span></span>
+                                            </div>
+                                        </div>
+                                        <div class="align col-md-3 col-lg-3 col-12 d-none" id="TemporaryDateTo">
+                                            <div class="ml-4 input-block">
+                                                <input type="date" class="w-90 TransView spanUpperSide" name="RequestToDate" id="txtTempTo" value="@(IPAF?.RequestToDate?.ToString("yyyy-MM-dd") == "0001-01-01" ? "" : IPAF?.RequestToDate?.ToString("yyyy-MM-dd"))" min="2022-06-23">
+                                                <span class="placeholder TransView" for="TempTo" id="lblTempTo" style="font-weight:bolder;">to<span class="astColor">*</span></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <table class="mainTbl table table-border form-table-container-2">
+                                        <tbody>
+                                            <tr>
+                                                <td class="bt-0 bb-0 pl-0">
+                                                    <table class="w-100 mx-auto table table-border form-border text-center" id="Tblitprodunctondata">
+
+                                                        <thead class="form-head-1" style="margin-left:inherit !important;">
+                                                            <tr>
+                                                                <th>Application Name</th>
+                                                                <th>Application URL</th>
+                                                                <th>Type Of Access</th>
+                                                                <th>Access Group</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody class="form-border tableSoftware" id="softwareBody">
+                                                            @{
+                                                                int SrNo = 0;
+                                                            }
+                                                            @foreach (var item in IPAFFormDataList)
+
+                                                            {
+                                                                SrNo++;
+                                                                <tr id="row_@SrNo" class="tr_input">
+                                                                    <td class="text-center">
+                                                                        <input type="text" name="Applicationname" value="@(item?.Applicationname)" id="txtappName_@SrNo">
+                                                                    </td>
+                                                                    <td class="text-center">
+                                                                        <select class="form-control sel_service_category" name="Applicationurl" id="selappURL_@SrNo" onchange="GetAcesslink(this)">
+                                                                            <option></option>
+                                                                        </select>
+                                                                    </td>
+                                                                    <td class="text-center">
+                                                                        <select class="form-control cls_subcategory" name="Applicationaccess" id="selaccessType_@SrNo">
+                                                                            <option value="@(item?.Applicationaccess)">@(item?.Applicationaccess)</option>
+
+                                                                        </select>
+                                                                    </td>
+                                                                    <td class="text-center" style="width: 138px;">
+                                                                        <select class="form-control cls_subcategory" name="Accessgroup" id="selaccessGroup_@SrNo" onchange="checkSelect('selaccessGroup_1')">
+                                                                            <option value="@(item?.Accessgroup)"></option>
+
+                                                                        </select>
+                                                                    </td>
+                                                                    <td style="border:0;"> </td>
+                                                                    <td class="text-center" style="background-color:white; max-width:123px; vertical-align:central;">
+                                                                        <input class="remove-btn remove align-center" type="image" src="/assets/img/remove.png" alt="Remove" id="remove_@SrNo" style="max-width: 85%; background-color: white; border:none;">
+                                                                    </td>
+                                                                </tr>
+                                                            }
+                                                        </tbody>
+                                                    </table>
+                                                </td>
+                                            </tr>
+
+                                            <tr align="right" id="addSoftwarebtn">
+                                                <td class="">
+                                                    <button type="button" class="btn btn-sm submit-btn d-flex float-right mb-2 bl-1" onclick="addTableRow12();">
+                                                        + Add
+                                                    </button>
+                                                    <input type="hidden" name="totalrows" id="totalrows">
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td style="padding-right: 0;">
+                                                    <div class="w-100">
+                                                        <div class="per row col-12" style="padding: 0;">
+                                                            <label class="col-md-12 col-lg-12"><b>Business Justification</b></label>
+                                                            <textarea class="form-control col-md-12 col-lg-12" name="BusinessJustification" id="BusinessJustification_1" rows="4"> @(IPAF.BusinessJustification)</textarea>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="bt-0 bb-0 pl-0">
+                                                    <button class="btn btn-warning hide" id="geko_upload_btn">Upload GeKo</button>
+                                                    <button class="btn btn-primary hide" id="saga_upload_btn">Upload SAGA/2</button>
+                                                </td>
+                                            </tr>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+
+
+                @* Approval Section And Action Section *@
+                @if (IsViewMode || IsEditMode)
+                {
+                    //Approval Section
+                    <div id="accordion">
+                        <div class="card">
+                            <div class="card-header collapsed" id="headingFour" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                                <h5 class="mb-0">
+                                    <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                                        <img src="~/assets/img/approvalTracking.svg" width="24" height="24" class="mr-2" />Approval Tracking
+                                    </button>
+                                </h5>
+                            </div>
+                            <div id="collapseFour" class="collapse" aria-labelledby="headingFour">
+                                <div class="card-body">
+                                    <div class="form-row">
+                                        <div class="col-12">
+                                            <table class="table w-100 td-border showBorder">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Name</th>
+                                                        <th>Role</th>
+                                                        <th style="display: @(appList.Any(x => !string.IsNullOrEmpty(x.ExtraDetails)) ? " " : " none")">Content</th>
+                                                        <th>Processed on</th>
+                                                        <th>Status</th>
+                                                        <th class="text-center">Comments</th>
+                                                        <th class="text-center">Approval Level</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @if (IsViewMode || IsEditMode)
+                                                    {
+                                                        Html.RenderPartial("_ApprovalTracking", appList);
+                                                    }
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                }
+
+                @* Buttons *@
+                @if (IsNewMode)
+                {
+                    <div class="card-footer align-content-center">
+                        <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                            Submit
+                        </button>
+                        <button type="reset" class="btn btn-danger btn-sm cancl-btn" id="btnCancel">
+                            Cancel
+                        </button>
+                    </div>
+                }
+                else if (IsEditMode)
+                {
+                    <div class="card-footer align-content-center">
+                        <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                            Re-Submit
+                        </button>
+                        <button type="reset" class="btn btn-danger btn-sm cancl-btn" id="btnCancel">
+                            Cancel
+                        </button>
+                    </div>
+                }
+
+
+                <div>
+                    <p class="text-left f-600">SF_II_024</p>
+                </div>
+        </form>
+
+
+    </div>
+</body>
+
+<div class="modal fade" id="successModel" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header modelHeader">
+                <span class="modal-title modalMsgTitle" id="modalTitle"></span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label id="modalBody" class="lableMsg">  </label>
+                <input type="hidden" id="tab" value="0" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="submitBomBtn publishBtn" id="modalOkButton" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+        var spinner = $('#loader');
+        var currentUserDesgn = @Html.Raw(Json.Encode(CurrentUserDesgn));
+        var IsNew = @Html.Raw(Json.Encode(IsNew));
+        var IsEdit = @Html.Raw(Json.Encode(IsEdit));
+        var IsNewMode = @Html.Raw(Json.Encode(IsNewMode));
+        var IsEditMode = @Html.Raw(Json.Encode(IsEditMode));
+        var IsViewMode = @Html.Raw(Json.Encode(IsViewMode));
+        var IPAF = @Html.Raw(Json.Encode(IPAF));
+        var appRowId = @Html.Raw(Json.Encode(AppRowId));
+        var approvalType =@Html.Raw(Json.Encode(ApprovalType));
+        var SecurityDesgnString = @Html.Raw(Json.Encode(SecurityDesgnString));
+        var FlagRedirect = @Html.Raw(Json.Encode(FlagRedirect));
+        var IPAFFormDataList = @Html.Raw(Json.Encode(IPAFFormDataList));
+        pageLoad();
+        var errorCount = 0;
+        var errors = "";
+        //pageLoad();
+    var globalVariable;
+    $(document).ready(function () {
+       /* getdropdata(this);*/
+        /*//*/
+        if (IsNewMode) {
+            var d = new Date();
+
+            var month = d.getMonth() + 1;
+            var day = d.getDate();
+
+            var output = d.getFullYear() + '-' + (('' + month).length < 2 ? '0' : '') + month + '-' + (('' + day).length < 2 ? '0' : '') + day;
+
+            $("#txtHandoverDate").val(output);
+            $("#txtHandoverDate").prop("disabled", "disabled");
+            $('input[id="chkPermanent"]').prop('checked', true);
+        }
+
+        if (IsViewMode) {
+
+
+
+            if (IPAF.RequestType == "Temporary") {
+                $('input[id="chkTemporary"]').prop('checked', true);
+                $('input[id="chkTemporary"]').prop("disabled", true);
+                $('input[id="chkPermanent"]').prop("disabled", true);
+                $("#chkTYActionType").val('Temporary');
+                $(".temptransfer").show();
+                $("#TemporaryDateFrom").removeClass('d-none');
+                $("#TemporaryDateTo").removeClass('d-none');
+            } else {
+                $('input[id="chkPermanent"]').prop('checked', true);
+                $('input[id="chkPermanent"]').prop("disabled", true);
+                $('input[id="chkTemporary"]').prop("disabled", true);
+                $("#chkTYActionType").val('Permanent');
+                $(".temptransfer").hide();
+                $("#TemporaryDateFrom").addClass('d-none');
+                $("#TemporaryDateTo").addClass('d-none');
+            }
+
+            $("#txtDetails").val(IPAF.Details)
+            $("#txtDetails").prop("disabled", "disabled");
+
+            getRequestType();
+        }
+        if (!IsViewMode) {
+
+            if (IsEditMode) {
+
+                getActionType();
+                if (IPAF.RequestType == "Temporary") {
+                    $('input[id="chkTemporary"]').prop('checked', true);
+                    $("#chkTYActionType").val('Temporary');
+                    $(".temptransfer").show();
+                    $("#TemporaryDateFrom").removeClass('d-none');
+                    $("#TemporaryDateTo").removeClass('d-none');
+                } else {
+                    $('input[id="chkPermanent"]').prop('checked', true);
+                    $("#chkTYActionType").val('Permanent');
+                    $(".temptransfer").hide();
+                    $("#TemporaryDateFrom").addClass('d-none');
+                    $("#TemporaryDateTo").addClass('d-none');
+                }
+                $("#BusinessJustification_1").val(IPAF.BusinessJustification);
+                getRequestType();
+            }
+            if (IsNewMode) {
+
+                $("#externalCompany").hide();
+                $(".inpIsNewDisable").attr("readonly", "readonly");
+            }
+        }
+        var today = new Date().toISOString().slice(0, 16);
+        //ASSIGNddlVALUES();
+    });
+    function ASSIGNddlVALUES() {
+        /*//*/
+        if (IsEditMode || IsViewMode) {
+            var j = 1;
+
+            for (var i = 0; i < IPAFFormDataList.length; i++) {
+
+                getApplicationlink1(j);
+                getdropdata1(j);
+
+                $('#selappURL_' + j +' option[value="' + IPAFFormDataList[i].Applicationurl + '"]').attr("selected", "selected").change();
+                $('#selaccessType_' + j + ' option[value="' + IPAFFormDataList[i].Applicationaccess + '"]').attr("selected", "selected").change();
+                $('#selaccessGroup_' + j + ' option[value="' + IPAFFormDataList[i].Accessgroup + '"]').attr("selected", "selected").change();
+
+
+                j++;
+            }
+
+        }
+    }
+
+    function GetAcesslink(thisVal) {
+
+        var tableIndex = thisVal.id;
+        tableIndex = parseInt(tableIndex.split("_")[1])
+        var url = $("#selappURL_" + tableIndex + " option:selected").text();
+
+
+        if (url != "") {
+            $.ajax({
+                url: '/IPAFForm/UpdateData',
+                data: { ApplicationUrl: url },
+                type: "GET",
+                dataType: 'JSON',
+                async: false,
+                success: function (data) {
+                    var s1 = data.Result.Accessgroup;
+                    var s = '<option value="-1" style="display:none;">Select</option>';
+                    /* var s = '<option value="" style="display:none;"></option>';*/
+                    for (var i = 0; i < data.Result.length; i++) {
+                        s += '<option value="' + data.Result[i].Accessgroup + '">' + data.Result[i].Accessgroup + '</option>';
+                    }
+                    $("#selaccessGroup_" + tableIndex + "").html(s);
+
+
+
+                },
+                error: function () {
+
+                }
+            });
+        }
+        $("#selaccessGroup_" + tableIndex + "").removeClass('spanUpperSide');
+    }
+
+    function getdropdata() {
+
+
+
+            $.ajax({
+                url: '/IPAFForm/GetTypeAcessData',
+                data: {},
+                type: "GET",
+                dataType: 'JSON',
+                async: false,
+                success: function (data) {
+                    var s = '<option value="" selected disabled>Select</option>';
+
+                    for (var i = 0; i < data.Result.length; i++) {
+                        s += '<option value="' + data.Result[i].Applicationaccess + '" DivId="' + data.Result[i].Applicationaccess + '">' + data.Result[i].Applicationaccess + '</option>';
+                    }
+                    /* $("#selaccessType_" + IPAFLIST.length + "").html(s);*/
+                    for (var i = 0; i <= $("#Tblitprodunctondata > tbody > tr").length; i++) {
+                      /*  $("#selappURL_" + i + "").html(s);*/
+                        $("#selaccessType_" + i + "").html(s);
+                    }
+
+
+
+
+                },
+                error: function () {
+
+                }
+            });
+
+     /*   $("#selaccessType_" + tableIndex + "").removeClass('spanUpperSide');*/
+        //ASSIGNddlVALUES();
+    }
+    function getdropdata1(Id) {
+
+
+
+        $.ajax({
+            url: '/IPAFForm/GetTypeAcessData',
+            data: {},
+            type: "GET",
+            dataType: 'JSON',
+            async: false,
+            success: function (data) {
+                var s = '<option value="" selected disabled>Select</option>';
+
+                for (var i = 0; i < data.Result.length; i++) {
+                    s += '<option value="' + data.Result[i].Applicationaccess + '" DivId="' + data.Result[i].Applicationaccess + '">' + data.Result[i].Applicationaccess + '</option>';
+                }
+                /* $("#selaccessType_" + IPAFLIST.length + "").html(s);*/
+                for (var i = 0; i <= $("#Tblitprodunctondata > tbody > tr").length; i++) {
+                    /*  $("#selappURL_" + i + "").html(s);*/
+                    $("#selaccessType_" + Id + "").html(s);
+                }
+
+
+
+
+            },
+            error: function () {
+
+            }
+        });
+
+        /*   $("#selaccessType_" + tableIndex + "").removeClass('spanUpperSide');*/
+        //ASSIGNddlVALUES();
+    }
+    function getApplicationlink() {
+
+
+        $.ajax({
+            url: '/IPAFForm/GetApplicationurldata',
+            data: {},
+            type: "GET",
+            dataType: 'JSON',
+            async: false,
+            success: function (data) {
+
+                var s = '<option value="" selected disabled>Select</option>';
+
+                for (var i = 0; i < data.Result.length; i++) {
+                    s += '<option value="' + data.Result[i].Applicationurl + '" DivId="' + data.Result[i].Applicationurl + '">' + data.Result[i].Applicationurl + '</option>';
+                }
+
+                for (var i = 0; i <= $("#Tblitprodunctondata > tbody > tr").length; i++) {
+                    $("#selappURL_" + i + "").html(s);
+                }
+
+                /* $("#selaccessType_" + tableIndex + "").html(s);*/
+
+
+
+            },
+            error: function () {
+
+            }
+        });
+    }
+    function getApplicationlink1(Id) {
+
+
+        $.ajax({
+            url: '/IPAFForm/GetApplicationurldata',
+            data: {},
+            type: "GET",
+            dataType: 'JSON',
+            async: false,
+            success: function (data) {
+
+                var s = '<option value="" selected disabled>Select</option>';
+
+                for (var i = 0; i < data.Result.length; i++) {
+                    s += '<option value="' + data.Result[i].Applicationurl + '" DivId="' + data.Result[i].Applicationurl + '">' + data.Result[i].Applicationurl + '</option>';
+                }
+
+                //for (var i = 0; i <= $("#Tblitprodunctondata > tbody > tr").length; i++) {
+                $("#selappURL_" + Id + "").html(s);
+                //}
+
+                /* $("#selaccessType_" + tableIndex + "").html(s);*/
+
+
+
+            },
+            error: function () {
+
+
+            }
+        });
+
+
+    }
+    var SrNo = 0;
+    var $tr = $('#row_1');
+
+    //function addTableRow12_Backup() {
+    //    //alert("HELLO KOMAL")
+    //    SrNo = $('#Tblitprodunctondata tr').length - 1;
+    //    SrNo = SrNo + 1;
+    //    var $clone = $tr.clone();
+    //    var rows = SrNo;
+    //    $clone.removeClass('d-none');
+    //    $clone.find('.sNo').html('' + rows);
+    //    $clone.find(':text, textarea, number, select, input[type="date"], date').val('');
+    //    var newRowId = 'row' + rows;
+    //    $('#Module_' + rows).val('');
+    //    $($clone).prop('id', newRowId);
+    //    console.log($clone)
+    //    $('#softwareBody').append($clone);
+    //    var selector = "#" + newRowId + " input[type='text'], " + "#" + newRowId + " textarea, " + "#" + newRowId + " select, " + "#" + newRowId + " input[type='image'], " + "#" + newRowId + " input[type='date']," + "#" + newRowId + " date";
+
+    //    console.log(selector)
+
+    //    $(selector).each(function (i, x) {
+    //        x.id = x.id.replace(/_.*/, "_" + rows);
+    //        x.classList.remove("errorIcon");
+    //        x.classList.remove("errorIconDropDown");
+    //        x.classList.remove("errorIconTextarea");
+    //    });
+
+    //    AddTableElementsEvent();
+    //    $('#UserIdTableRowCount').val(rows);
+    //    getdropdata(newRowId);
+
+    //}
+
+
+    function addTableRow12() {
+
+        SrNo = $('#Tblitprodunctondata tr').length - 1;
+        SrNo = SrNo + 1;
+        var $clone = $tr.clone();
+        var rows = SrNo;
+        $clone.removeClass('d-none');
+        $clone.find('.sNo').html('' + rows);
+        $clone.find(':text, textarea, number, select, input[type="date"]').val('');
+        var newRowId = 'row_' + rows;
+        $('#Module_' + rows).val('');
+        $($clone).prop('id', newRowId);
+        $('#softwareBody').append($clone);
+        var selector = "#" + newRowId + " input[type='text'], " + "#" + newRowId + " textarea, " + "#" + newRowId + " select, " + "#" + newRowId + " input[type='image'], " + "#" + newRowId + " input[type='date']" + "#" + newRowId + " input[type='number']";
+        $(selector).each(function (i, x) {
+            x.id = x.id.replace(/_.*/, "_" + rows);
+            x.classList.remove("errorIcon");
+            x.classList.remove("errorIconDropDown");
+            x.classList.remove("errorIconTextarea");
+        });
+
+        AddTableElementsEvent();
+        $('#UserIdTableRowCount').val(rows);
+        /*getdropdata(newRowId);*/
+    }
+
+
+    function AddTableElementsEvent() {
+        $(".requestType").off('change');
+        $(".module").off('change');
+        $(".requestType").change(function () {
+            var requestType2 = document.querySelectorAll(".requestType");
+            var requestType_arr2 = [];
+            for (var i = 0; i < requestType2.length; i++) {
+                requestType_arr2.push(requestType2[i]['value']);
+            };
+        });
+    }
+
+    $('#softwareBody').on('click', '.remove', function () {
+        //var rows = parseInt($('#UserIdTableRowCount').val());
+        var rows = SrNo;
+        var id = $(this).attr('id');
+
+        var deleteRowNum = parseInt(id.split("_")[1]);
+        $('#row_' + deleteRowNum).remove();
+        var index = deleteRowNum;
+        //Below code will normalise the row number and the ids of the input
+        $('#softwareBody').children().each(function () {
+            var trId = $(this).attr('id');
+            var rowNum = parseInt(trId.replace("row_", ""));
+            if (rowNum > deleteRowNum) {
+                var selector = "#" + trId + " input[type='text'], " + "#" + trId + " textarea, " + "#" + trId + " select, " + "#" + trId + " input[type='image']";
+                $(selector).each(function (i, x) {
+                    x.id = x.id.replace(/_.*/, "_" + index);
+                });
+                $("#" + trId).find('.sNo').html('' + index);
+                $(this).attr('id', 'row_' + index);
+                index++;
+            }
+        });
+        --rows;
+        $('#UserIdTableRowCount').val(rows);
+    });
+
+
+
+
+
+    function getActionType() {
+
+        var z = 0;
+        if (!IsViewMode) {
+            if ($("#chkTemporary").prop("checked") == true) {
+                console.log("Internal");
+                $('input[id="chkTemporary"]').prop('disabled', true);
+                $('input[id="chkPermanent"]').prop('checked', false).change();
+                $('input[id="chkPermanent"]').prop("disabled", false);
+                $("#chkTYActionType").val('Temporary');
+                $(".temptransfer").show();
+            }
+
+            if ($("#chkPermanent").prop("checked") == true) {
+                z = 1;
+                $("#chkTYActionType").val('Permanent');
+                $('input[id="chkPermanent"]').prop('disabled', true);
+                $('input[id="chkTemporary"]').prop("checked", false).change();
+                $('input[id="chkTemporary"]').prop("disabled", false);
+                $(".temptransfer").hide();
+            }
+        }
+
+    }
+
+    function pageLoad() {
+        
+
+        getApplicationlink();
+            getdropdata();
+            spinner.hide();
+            getRequestType();
+        $("#headingErr").addClass('d-none');
+        $("#rdOnBehalfOptionOthersLabel").text('Blue Collar Employee');
+        //if (IsViewMode || IsEditMode) {
+        //    $("#txtAddressofConsignee").addClass('spanUpperSide');
+        //    $("#txtAddressofReceiver").addClass('spanUpperSide');
+        //    $("#txtBusinessNeed").addClass('spanUpperSide');
+
+        //    GetWeightDimension();
+        //}
+        //else if (IsViewMode) {
+        //    $("#divRequestSubmissionFor").addClass('d-none');
+        //}
+        if (IsEditMode || IsViewMode)
+        {
+            ASSIGNddlVALUES();
+        }
+        }
+
+        function allowNumbersOnly(e) {
+        var code = (e.which) ? e.which : e.keyCode;
+        if (code > 31 && (code < 48 || code > 57)) {
+        e.preventDefault();
+        }
+        }
+
+        function successQMCRModal(txt) {
+        //
+        $('#modalTitle').html('Success');
+        if (txt == "approve") {
+        $('#modalBody').html('Form has been approved!');
+        }
+        else if (txt == "reject") {
+        $('#modalBody').html('Form has been rejected!');
+        }
+        else if (txt == "enquire") {
+        $('#modalBody').html('Form has been enquired!');
+        }
+        else if (txt == "cancelled") {
+        $('#modalBody').html('Form has been cancelled!');
+        }
+        else {
+        if (IsEditMode) {
+            $('#modalBody').html('Your form with ID: IPAF' + txt + ' has been re-submitted! Kindly use this for future reference');
+        }
+        else {
+            $('#modalBody').html('Your form with ID: IPAF' + txt + ' has been submitted! Kindly use this for future reference');
+        }
+
+        }
+        FlagRedirect = txt;
+        //$("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+        }
+
+        function failureModal(txt) {
+        if (txt == null) {
+        $('#modalBody').html('Some error occurred!');
+        }
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html(txt);
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+        }
+
+        function permissionModal() {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html('No permssion granted since the device is not SAVWIPL owned!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+        }
+
+        function requiredModal(text) {
+        $('#modalTitle').html('Required!');
+        $('#modalBody').html(text);
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+        }
+
+        function validityModal(txt) {
+        ////
+        if (txt == 'approve') {
+        DisplayAlert('error', 'Error', 'Please select the Type of Car');
+        }
+        else if (txt == 'reject') {
+        DisplayAlert('error', 'Warning', 'Please type in the reason for rejecting the form');
+        }
+        else if (txt == 'enquire') {
+        DisplayAlert('error', 'Warning', 'Please type in the reason for enquiring the form');
+        }
+
+        }
+
+    $("#btnSubmit").on('click', function (e) {
+        $(".full-screen-container").removeClass('invisible');
+        $(".full-screen-container").show();
+        validateSubmitter();
+        validateApplicant();
+        getActionType();
+
+        $("#txtNewOwnEPUS").val('');
+
+        var BusinessJustification = $("#BusinessJustification_1").val();
+        if (BusinessJustification == "") {
+            errors += "<li id='error" + errorCount + "'>" + " Fill BusinessJustification Filed" + "</li>";
+            // AddError("lblTYActionType", '', errorCount);
+            errorCount++;
+        }
+
+        var lblTYActionType = $("#chkTYActionType").val();
+        if (lblTYActionType == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Request Type" + "</li>";
+            // AddError("lblTYActionType", '', errorCount);
+            errorCount++;
+        }
+
+        if (lblTYActionType == "Temporary") {
+            var txtTransferFromDate = $("#txtTempFrom").val();
+            if (txtTransferFromDate == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Request From Date" + "</li>";
+                //  AddError("txtHandoverDate", '', errorCount);
+                errorCount++;
+            }
+            var txtTransferToDate = $("#txtTempTo").val();
+            if (txtTransferToDate == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Request To Date" + "</li>";
+                //  AddError("txtHandoverDate", '', errorCount);
+                errorCount++;
+            }
+        }
+
+        //var txtDetails = document.getElementById("txtDetails").value;
+        //if (txtDetails == "") {
+        //    errors += "<li id='error" + errorCount + "'>" + "Details" + "</li>";
+        //  //  AddError("txtDetails", '', errorCount);
+        //    errorCount++;
+        //}
+
+
+        if (errors.length) {
+            $(".full-screen-container").hide();
+            errors = "<ol id='errorList'>" + errors + "</ol>";
+            $("#headingErr").removeClass('d-none');
+            document.getElementById("add_to_me").innerHTML = errors;
+            errors = "";
+            errorCount = 0;
+            if (IsEditMode) {
+                $("#myModalEdit").scrollTop(0);
+                $("#myModalRequest").scrollTop(0);
+            }
+            else {
+                $(window).scrollTop(0);
+            }
+            return false;
+        }
+
+
+        var n1 = document.getElementById("softwareBody").rows.length;
+        if (n1 == 0) {
+            alert("Fill transaction table data fields.");
+            $('.loader').hide();
+            return false;
+        }
+
+
+        var IPAFFormDataList = [];
+        var RequestType ;
+
+
+        RequestType = $("#chkPermanent").prop('checked') == true ? "Permanent" : "Temporary";
+
+        RequestFromDate = $("#txtTempFrom").val();
+
+        RequestToDate = $("#txtTempTo").val();
+
+        if (RequestType == "Temporary") {
+            if (RequestFromDate == "" || RequestFromDate == undefined || RequestFromDate == null) {
+                alert("Select from date for Request Type  field.");
+                $('.loader').hide();
+                return false;
+            }
+            if (RequestToDate == "" || RequestToDate == undefined || RequestToDate == null) {
+                alert("Select to date for Request Type");
+                $('.loader').hide();
+                return false;
+            }
+
+            if (RequestFromDate != ""  && RequestToDate != "" && (Date.parse(RequestFromDate) > Date.parse(RequestToDate))) {
+                alert("From date is greater than to date for Request Type ");
+                $('.loader').hide();
+                return false;
+            }
+        }
+
+
+        var valuesFormDate = [];
+        $("input[name='RequestFromDate']").each(function () {
+            valuesFormDate.push($(this).val());
+        });
+        var valuesToDate = [];
+        $("input[name='RequestToDate']").each(function () {
+            valuesToDate.push($(this).val());
+        });
+
+        var i = 0, j = 0;
+
+        for (i = 0; i < n1; i++) { // for columns
+
+            var n2 = document.getElementById("softwareBody").rows[i].cells.length;
+            var element = {};
+            for (j = 0; j < n2; j++) { // for Rows
+                var x = document.getElementById("softwareBody").rows[i].cells.item(j).innerHTML;
+                if (j == 0) {
+
+                    element.Applicationname = $("#txtappName_" + (i + 1) + "").val();
+                    if (element.Applicationname == "" || element.Applicationname == "-1" || element.Applicationname == null || element.Applicationname == undefined) {
+                        $("#txtappName_" + (i + 1) + "").focus();
+                        alert("Fill Application Name field.");
+                        $('.loader').hide();
+                        return false;
+                    }
+
+                } else if (j == 1) {
+                    element.Applicationurl = $("#selappURL_" + (i + 1) + "").val();
+                    if (element.Applicationurl == "" || element.Applicationurl == "-1" || element.Applicationurl == null || element.Applicationurl == undefined) {
+                        $("#selappURL_" + (i + 1) + "").focus();
+                        alert("Fill Application Url field.");
+                        $('.loader').hide();
+                        return false;
+                    }
+
+                } else if (j == 2) {
+                    element.Applicationaccess = $("#selaccessType_" + (i + 1) + "").val();
+                    if (element.Applicationaccess == "" || element.Applicationaccess == "-1" || element.Applicationaccess == null || element.Applicationaccess == undefined) {
+                        $("#selaccessType_" + (i + 1) + "").focus();
+                        alert("Fill Application Access  field.");
+                        $('.loader').hide();
+                        return false;
+                    }
+
+                } else if (j == 3) {
+                    element.Accessgroup = $("#selaccessGroup_" + (i + 1) + "").val();
+                    if (element.Accessgroup == "" || element.Accessgroup == "-1" || element.Accessgroup == null || element.Accessgroup == undefined) {
+                        $("#selaccessType_" + (i + 1) + "").focus();
+                        alert("Fill Access Group  field.");
+                        $('.loader').hide();
+                        return false;
+                    }
+
+                }
+                //else if (j == 4) {
+                //    element.RequestType = $("#lblRequestType_" + (i + 1) + "").val();
+                //    if (element.RequestType == "" || element.RequestType == null || element.RequestType == undefined) {
+                //        $("#lblRequestType_" + (i + 1) + "").focus();
+                //        alert("Fill Type field.");
+                //        $('#loader').hide();
+                //        return false;
+                //    }
+                //}
+
+            }
+
+
+
+
+            IPAFFormDataList.push(element);
+        }
+
+
+        $("#headingErr").addClass('d-none');
+        document.getElementById("add_to_me").innerHTML = '';
+        $('#ddEmpDesignation').prop("disabled", false);
+        $('#txtOnBehalfdesignation').prop("disabled", false);
+        $("#pageLoader").removeClass('invisible');
+        $("#btnSubmit").text('Saving');
+        $("#btnSubmit").prop("disabled", true);
+        $("#btnCancel").prop("disabled", true);
+        $("#ddOtherNewEmpDesignation").prop("disabled", false);
+        $("input").prop('disabled', false);
+        var serializedArray = $("#IPAFForm").serializeArray();
+        var form = {
+
+        }
+
+        serializedArray.forEach((x, index) => {
+            form[x.name] = x.value;
+        });
+
+        //form['Applicationname'] = $('#Applicationname').val();
+        //form['Applicationurl'] = $('#Applicationurl').val();
+        //form['Applicationaccess'] = $('#Applicationaccess').val();
+        //form['Accessgroup'] = $('#Accessgroup').val();
+        //form['BusinessJustification'] = $('#BusinessJustification_1').val();
+        //form['RequestFromDate'] = $('#RequestFromDate').val();
+        //form['RequestToDate'] = $('#RequestToDate').val();
+        form['IPAFFormDataList'] = IPAFFormDataList;
+
+        //serializedArray.forEach((x, index) => {
+        //       if (x.value != "") {
+        //           form[x.name] = x.value;
+        //       }
+        //   });
+        console.log(form);
+        //var form = $("#IPAFForm");
+        //var formData = new FormData(form[0]);
+        $.ajax({
+            url: '/IPAFForm/SaveIPAFForm',
+            type: 'POST',
+            dataType: 'JSON',
+            data: form,
+            //enctype: 'multipart/form-data',
+            success: (function (data) {
+                if (data.Status == 200) {
+                    $("#pageLoader").addClass('invisible');
+                    if (IsNew && IsEdit) {
+                        $("#btnSubmit").text('Submit');
+                    }
+                    else {
+                        $("#btnSubmit").text('Re-Submit');
+                    }
+                    $("#btnSubmit").prop("disabled", false);
+                    $("#btnCancel").prop("disabled", false);
+
+                    successQMCRModal(data.Message);
+                }
+                else {
+                    failureModal(data.Message);
+                    if (IsNew && IsEdit) {
+                        $("#btnSubmit").text('Submit');
+                    }
+                    else {
+                        $("#btnSubmit").text('Re-Submit');
+                    }
+                    $("#pageLoader").addClass('invisible');
+                    $("#btnSubmit").prop("disabled", false);
+                    $("#btnCancel").prop("disabled", false);
+                    console.log("failure");
+                }
+                $(".full-screen-container").hide();
+            }),
+            error: (function (data) {
+                failureModal();
+                console.log("error");
+                if (IsNew && IsEdit) {
+                    $("#btnSubmit").text('Submit');
+                }
+                else {
+                    $("#btnSubmit").text('Re-Submit');
+                }
+                $("#pageLoader").addClass('invisible');
+                $("#btnSubmit").prop("disabled", false);
+                $("#btnCancel").prop("disabled", false);
+                $(".full-screen-container").hide();
+            })
+        })
+        $("#tab").val(2);
+
+    });
+
+        $("#btnCancel").on('click', function (e) {
+        window.location = "../Dashboard";
+        });
+
+
+    function getRequestType() {
+        ////
+        $('input:checkbox[id="chkPermanent"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                //console.log("Permanent checked")
+                $("#chkRequestType").val('Permanent');
+                $("#TemporaryDateFrom").addClass('d-none');
+                $("#TemporaryDateTo").addClass('d-none');
+                $('input[id="chkTemporary"]').prop("checked", false).change();
+            }
+            else {
+                $('input[id="chkTemporary"]').attr('disabled', false);
+                $("#chkRequestType").val('');
+            }
+        });
+
+        $('input:checkbox[id="chkTemporary"]').click(function () {
+            if ($(this).prop("checked") == true) {
+
+                //console.log("Temporary checked")
+                var fromDate = $("#txtTempFrom").val();
+                var ToDate = $("#txtTempTo").val();
+                if (fromDate == "1900-01-01" && ToDate == "1900-01-01")
+                {
+                    document.getElementById('txtTempFrom').value = null
+                    document.getElementById('txtTempTo').value = null
+
+                }
+                $("#chkRequestType").val('Temporary');
+                $("#TemporaryDateFrom").removeClass('d-none');
+                $("#TemporaryDateTo").removeClass('d-none');
+                $('input[id="chkPermanent"]').prop("checked", false).change();
+            }
+            else {
+                $('input[id="chkPermanent"]').attr('disabled', false);
+                $("#TemporaryDateFrom").addClass('d-none');
+                $("#TemporaryDateTo").addClass('d-none');
+                $("#chkRequestType").val('');
+            }
+        });
+    }
+
+
+    function saveResponse(text) {
+        $(".full-screen-container").removeClass('invisible');
+        $(".full-screen-container").show();
+        var status = '', comment = '';
+        if (window.matchMedia('(max-width: 425px)').matches) {
+            comment = $("#commentMobile-" + text).val();
+        } else
+            comment = $("#comment-" + text).val();
+        switch (text) {
+        case 'approve': {
+        status = 'Approved';
+
+        FormApproval(status, appRowId, comment, approvalType, text);
+
+        break;
+        }
+        case 'reject': {
+        status = 'Rejected';
+        if (comment == '') {
+        validityModal(text);
+        return;
+        }
+        else {
+        FormApproval(status, appRowId, comment, approvalType, text);
+        }
+        break;
+        }
+        case 'enquire': {
+        status = 'Enquired';
+        if (comment == '') {
+        validityModal(text);
+        return;
+        }
+        else {
+        FormApproval(status, appRowId, comment, approvalType, text);
+        }
+        break;
+        }
+        }
+
+        $("#tab").val(1);
+        }
+
+        function FormApproval(status, appRowId, comment, approvalType, text) {
+        //
+            $(".full-screen-container").removeClass('invisible');
+            $(".full-screen-container").show();
+        spinner.show();
+        $.ajax({
+        url: '/List/SaveResponse',
+        type: 'POST',
+        data: { response: status, appRowId: appRowId, comment: comment, approvalType: approvalType },
+        dataType: 'JSON',
+        success: (function (data) {
+        if (data.Result == 1) {
+        successQMCRModal(text);
+        spinner.hide();
+        //setTimeout(FilterMyTasks, 5000);
+            spinner.hide();
+            //$('.loader').hide();
+        }
+        else {
+        failureModal();
+            spinner.hide();
+            //$('.loader').hide();
+            }
+            $(".full-screen-container").hide();
+        }),
+        error: (function (data) {
+        failureModal();
+            spinner.hide();
+            $(".full-screen-container").hide();
+        })
+        })
+
+        $("#tab").val(1);
+        }
+
+        $('#myModal').modal({ backdrop: 'static', keyboard: false })
+
+        $('#successModel').on('hidden.bs.modal', function () {
+        ////
+        var tab = $("#tab").val();
+        console.log(tab);
+        if (tab == 1) {
+        GetMyTaskTab();
+        }
+        else if (tab == 2) {
+        window.location = "../Dashboard?tab=" + tab;
+        }
+        })
+
+
+
+        $('input:checkbox[id="chkWeight"]').click(function () {
+        if ($(this).prop("checked") == true) {
+        $('input[id="chkWeight"]').prop('disabled', true);
+        $('input[id="chkDimension"]').prop('checked', false);
+        $('input[id="chkDimension"]').prop("disabled", false);
+        $("#chkWD").val('Weight');
+
+        }
+        });
+
+        $('input:checkbox[id="chkDimension"]').click(function () {
+        if ($(this).prop("checked") == true) {
+        $('input[id="chkDimension"]').prop('disabled', true);
+        $('input[id="chkWeight"]').prop("checked", false);
+        $('input[id="chkWeight"]').prop("disabled", false);
+        $("#chkWD").val('Dimension');
+        }
+        });
+
+
+
+    function allowAlphaNumericSpace(thisInput) {
+        var arr = thisInput.value.split('');
+
+        if (arr[0] === ".") {
+            thisInput.value = "";
+        }
+
+        //thisInput.value = thisInput.value.split(/[^e]/).join('');
+    }
+
+
+    function DateValidation() {
+        var FromDate = document.getElementById("txtTransferFromDate").value;
+        var ToDate = document.getElementById("txtTransferToDate").value;
+        var date1 = new Date(FromDate);
+        var date2 = new Date(ToDate);
+        var Today = new Date();
+
+        if (date1 != "" && date2 != "") {
+            if (date1 >= date2) {
+                document.getElementById('txtTransferToDate').style.borderColor = "red";
+                alert('Please enter valid Start Time and End Time');
+                //Swal.fire({
+                //    title: 'Error',
+                //    text: "To Date should not be less than from date ",
+                //    icon: 'error'
+                //})
+                $("#txtTransferToDate").val('');
+                return false;
+
+            } else {
+                document.getElementById('txtTransferToDate').style.borderColor = "Gainsboro";
+            }
+        }
+
+    }
+
+
+
+</script>

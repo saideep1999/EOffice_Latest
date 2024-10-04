@@ -1,0 +1,602 @@
+﻿@*@model IEnumerable<Skoda_DCMS.Models.Delegation>*@
+
+@{
+    ViewBag.Title = "DelegationList";
+    Layout = null;
+    var user = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+}
+
+<style>
+    .ui-autocomplete {
+        z-index: 10000 !important;
+    }
+    .submit-btn {
+        background: #3D3D3D;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 173.7%;
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #FFFFFF;
+        border-color: transparent !important;
+    }
+    /*Animation CSS Starts*/
+
+    div.input-block {
+        position: relative;
+    }
+
+        div.input-block input {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 188px;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 5px !important;
+            border-top-right-radius: 5px !important;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        
+    
+
+        div.input-block span.placeholder {
+            position: absolute;
+            margin: 17px 0;
+            padding: 0 4px;
+            font-family: Roboto, sans-serif;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            top: -6px;
+            left: 15px;
+            transition: all 0.2s;
+            transform-origin: 0% 0%;
+            background: none;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        div.input-block textarea:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: #fff !important;
+        }
+
+        div.input-block textarea:valid + span.placeholder,
+        div.input-block textarea:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px) !important;
+            background: #fff !important;
+        }
+
+        div.input-block input:valid + span.placeholder,
+        div.input-block input:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: rgb(219,238,213);
+        }
+
+
+        div.input-block input.spanUpperSide + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: rgb(219,238,213);
+        }
+
+        div.input-block input:read-only + span.placeholder,
+        div.input-block input:read-only + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background: rgb(219,238,213);
+        }
+    .ui-autocomplete-input {
+        height: 45px;
+    }
+    @*div.input-block input:valid + span.placeholder, div.input-block input:focus + span.placeholder {
+        background-color: rgb(255,255,255);
+    }*@
+    div.input-block input[type='date'] {
+        height: 45px;
+        width:100%;
+    }
+
+    div.input-block span.leftSpaceDelegation {
+        left: 23px !important;
+        background-color: rgb(255,255,255) !important;
+    }
+    .htDeleteDelegation {
+        height: 30px !important;
+        padding: 0 20px 4px 20px !important;
+        font-size: 13px !important;
+        max-width: 100px !important;
+        margin-left: 0;
+    }
+    #delegate-list-table th {
+        padding-left: 10px !important;
+    }
+    .cursPointer {
+        cursor: pointer;
+    }
+</style>
+
+
+
+
+
+
+<!-- .modal -->
+@*<div class="input-group">
+        <div class="form-outline">
+            <input type="search" id="form1" class="form-control" />
+            <label class="form-label" for="form1">Search</label>
+        </div>
+        <button type="button" class="btn btn-primary">
+            <i class="fas fa-search"></i>
+        </button>
+    </div>*@
+
+
+
+@*<input type="text" autocomplete="off" name="Search" id="Search" class="inpSearch" onclick="AutoCompleteSearch();" required spellcheck="false">
+    <span class="placeholder">
+        Search
+    </span>
+    </div>*@
+
+@*<div class="input-block autocomplete-div">
+        <input type="text" class="w-100" name="Search" id="EmployeeID" onkeypress="alphaOnly(event)" required />
+        <span class="placeholder">Search <span class="astColor">*</span></span>
+    </div>*@
+@*<div>
+    <span class="placeholder">From Date</span>
+    <input type="date" id="fromDate" name="fromDate" onchange="date_val(this.value)" class="form-control squareBorder">
+
+</div>
+
+<div>
+    <span class="placeholder">To Date</span>
+    <input type="date" id="DateRange" name="DateRange" class="form-control squareBorder">
+
+</div>*@
+
+
+
+
+
+
+@*<p>
+        @Html.ActionLink("Create New", "Create")
+    </p>*@
+<div id="CreateDiv">
+    @*<h2>User Details</h2>*@
+    <form action="" method="post" id="DelegationForm">
+        <div class="row">
+            <!--<div>
+                <input type="text" placeholder="Search by Name / Employee Number / Email-Id " class="w-100 txtDisable" data-placement="bottom" name="txtempsearch" id="txtempsearch" required />-->
+            @*<span class="placeholder" style="background-color:#fff !important"></span>*@
+
+            <!--</div>-->
+            <div class="col-12 mb-4">
+                <button type="button" class="btn pull-right btn-primary btn-sm submit-btn" id="btnCreate" name="btnCreate"> Create New </button>
+            </div>
+
+            <div class="col-12 mb-4">
+               
+                <table id="tblDelegateTask" class="w-100">
+                    <thead>@*<b>Delegation </b>*@</thead>
+                    <tr>
+                        @*<td>
+                    FromEmployeeID
+                </td>*@
+                        <td>
+                            <input id="txtFromEmployeeID" name="txtFromEmployeeID" type="text" readonly class="notEditable" value="@(user.EmpNumber)" hidden>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <div class="row">
+                                <div class="form-group input-block col-4">
+
+                                    <input id="txtToEmployeeName" name="txtToEmployeeName" type="text" class="w-100" autocomplete="off" required />
+
+                                    <span for="drpInstrument" class="placeholder TransView leftSpaceDelegation spanUpperSide">To Employee</span>
+                                    <input id="txtToEmployeeID" name="txtToEmployeeID" type="hidden" autocomplete="off" required />
+                                </div>
+
+                                <div class="form-group input-block col-4">
+                                    <input type="date" id="fromDate" name="txtStartDate" onchange="date_val(this.value)" class="spanUpperSide form-control squareBorder" required>
+                                    <span for="drpInstrument" class="placeholder TransView leftSpaceDelegation spanUpperSide">From </span>
+                                </div>
+
+                                <div class="form-group input-block col-4">
+                                    <input type="date" id="DateRange" name="txtEndDate" class="form-control spanUpperSide squareBorder" required>
+                                    <span class="placeholder leftSpaceDelegation">To</span>
+                                </div>
+
+
+                            </div>
+
+
+                           
+                        </td>
+                        <td>
+                           
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                           
+                        </td>
+                        <td>
+                            
+                            @*<input id="txtStartDate" name="txtStartDate" type="date" autocomplete="off" />*@
+                            @*<input type="date" id="fromDate" name="fromDate" onchange="date_val(this.value)" class="form-control squareBorder">*@
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                           
+                        </td>
+                        <td>
+                            
+                            @*<input id="txtEndDate" name="txtEndDate" type="date" autocomplete="off" />*@
+                        </td>
+                    </tr>
+
+
+                </table>
+                
+                @*<button type="button" id="btnCreate" name="btnCreate" onclick="creatable()"> Create </button>*@
+                @*<button type="button" id="btnReset" name="btnReset"> Reset </button>*@
+            </div>
+        </div>
+    </form>
+
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <table id="delegate-list-table">
+            <thead>
+                <tr>
+                    <th>
+                        From Employee
+                        @*@Html.DisplayNameFor(model => model.FromEmployeeID)*@
+                    </th>
+                    <th>
+                        To Employee
+                    </th>
+                    <th>
+                        StartDate
+                    </th>
+                    <th>
+                        EndDate
+                    </th>
+                    <th>
+                        Action
+                    </th>
+                    @*<th>
+                        @Html.DisplayNameFor(model => model.IsActive)
+                    </th>*@
+                    <th>
+                    </th>
+
+
+                </tr>
+            </thead>
+
+            @*@foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FromEmployeeID)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ToEmployeeID)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.StartDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.EndDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.IsActive)
+                    </td>
+                 <td>
+                        @Html.ActionLink("Edit", "Edit", new { id = item.ID }) |
+                        @Html.ActionLink("Details", "Details", new { id = item.ID }) |
+                        @Html.ActionLink("Delete", "Delete", new { id = item.ID })
+                    </td>
+                </tr>
+            }*@
+
+
+        </table>
+    </div>
+
+</div>
+
+
+
+<script>
+    $(document).ready(function () {
+        //$("#MydelList").modal('show');
+        //$('#datepicker').datepicker({
+        //    format: "yy-mm-dd",
+        //    startDate: '-1y -1m',
+        //    endDate: '+2m +10d'
+        //});
+
+        //$('#datepicker2').datepicker({
+        //    format: "yy-mm-dd",
+        //    startDate: '-1m',
+        //    endDate: '+10d'
+        //});
+
+        //Search
+        console.log("Calling LoadDelegateList");
+        LoadDelegateList();
+
+    });
+
+
+    //Load Data
+
+    function LoadDelegateList() {
+
+/*        $("#delegate-list-table tbody tr").remove();*/
+        $.ajax({
+            url: "/Dashboard/GetDelegationDetails",
+            dataType: "json",
+            cache: false,
+            async: true,
+            success: function (data) {
+                
+                ////
+                console.log(data);
+                $('#delegate-list-table').dataTable({
+                    data: data,
+                    columns: [
+                        //{data :'Id'},
+                        { data: 'FromEmployeeID' },
+                        { data: 'ToEmployeeID' },
+                        {
+                            data: "StartDate",
+                            //render: function (data, type, row) {
+                            //    console.log(data);
+                            //    var date = new Date(data);
+                            //    console.log(date);
+                            //    var dd = date.getDate();
+                            //    var mm = date.getMonth() + 1;
+
+                            //    var yyyy = date.getFullYear();
+                            //    if (dd < 10) {
+                            //        dd = '0' + dd;
+                            //    }
+                            //    if (mm < 10) {
+                            //        mm = '0' + mm;
+                            //    }
+                            //    var date = dd + '/' + mm + '/' + yyyy;
+                            //    return date;
+                            //}
+                        },
+                        { data: 'EndDate' },
+                        {
+                            render: function (data, type, row, meta) {
+                                console.log(row);
+                                return '<i onclick="deleteDelegate(' + row.ID + ')" id="deletebtn" class="fa fa-trash cursPointer" aria-hidden="true"></i>';
+                               
+                            }
+                        }
+                    ],
+                    destroy: true,
+                    "lengthChange": false,
+                    "searching": true,
+                    "info": false,
+                    "responsive": true,
+                    // "oLanguage": { "sSearch": "" },
+                    "bAutoWidth": false,
+                    //language: {
+                    //    searchPlaceholder: "Search",
+                    //    paginate: {
+                    //        next: '&#8811;', // or '→'
+                    //        previous: '&#8810;' // or '←'
+                    //    }
+                    //columnDefs: [{ type: 'date', 'targets': [5] }],
+                    //order: [[5, 'desc']]
+                 });
+
+            }
+        });
+    }
+
+    //ToEmployeeID search
+    $("#txtToEmployeeName").autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                url: "/List/GetEmployeeDetails",
+                dataType: "json",
+                cache: false,
+                async: true,
+                data: {
+                    searchText: $("#txtToEmployeeName").val()
+                },
+                success: function (data) {
+                    ////
+                    data = data.filter(function (e) {
+                        return e.EmployeeName !== "@user.EmployeeName";
+
+                    });
+
+                    response($.map(data, function (item) {
+                        return { label: item.FirstName, value: item.FullName, raw: item };
+                    }));
+                }
+            });
+        },
+        search: function (event, ui) {
+            var value = $("#txtToEmployeeName").val();
+            // If less than three chars, cancel the search event
+            if (value.length < 4) {
+                event.preventDefault();
+            }
+        },
+        min_length: 4,
+        delay: 0,
+        change: function (event, ui) {
+        },
+
+        select: function (event, ui) {
+            ////
+            var empOtherDetails = ui.item['raw'];
+            //Get the other details like Cost Center Code, Employee Number from DB.
+            if (!empOtherDetails.Email) {
+                document.getElementById('txtEmployeeName').value = '';
+                DisplayAlert('success', 'Info', 'Please select a user with valid Email', 4000);
+                event.preventDefault();
+                return;
+            }
+            $.ajax({
+                url: "/List/GetExistingEmployeeDetails",
+                dataType: "json",
+                cache: false,
+                async: true,
+                data: {
+                    otherEmpUserId: empOtherDetails.Email,
+                },
+                success: function (data) {
+                    ////
+                    $('#txtEmployeeName').val(data.FullName);
+                    $('#txtToEmployeeID').val(data.EmpNumber);
+                    data.EmpNumber == 0 || data.EmpNumber == null ? $('#txtOtherEmployeeCode').val('').prop("readOnly", false) : $('#txtOtherEmployeeCode').val(data.EmpNumber).prop("readOnly", true);
+                }
+            });
+        }
+    });
+
+    $("#txtToEmployeeName").autocomplete("option", "appendTo", ".autocomplete-div");
+
+
+
+
+    //Date
+    function date_val(e) {
+        var week_string = e;
+        console.log(week_string);
+        var parts = week_string.split("-");
+        var date = new Date(parts[0], parts[1] - 1, parts[2]);
+        var min_date = date;
+        min_date.setDate(min_date.getDate() + 1);
+        var initial_date = min_date.toISOString().split('T')[0];
+        document.getElementsByName("txtEndDate")[0].setAttribute("min", initial_date);
+       }
+    //alphaonly
+    function alphaOnly(e) {
+        var key = e.keyCode;
+        if (key > 32 && (key < 65 || key > 122 || key == 91 || key == 92 || key == 93 || key == 94 || key == 95 || key == 96)) {
+            e.preventDefault();
+        }
+    }
+
+    //Create
+    $("#btnCreate").on('click', function (e) {
+        //
+        //var txtempsearch = document.getElementById("txtempsearch").value;
+        //if (txtempsearch == "") {
+        //    alert("Kindly Search Employee Name or Employee Number or Employee Email-Id!");
+        //    return false
+
+        //$("#btnCreate").text('Succesffully Added');
+        $("#btnCreate").prop("disabled", true);
+
+        var form = $("#DelegationForm").serialize();
+        $.ajax({
+            url: '/Dashboard/DelegationList',
+            type: 'POST',
+            data: form,
+            cache: false,
+            dataType: 'JSON',
+            success: (function (data) {
+                console.log(data);
+                $("#btnCreate").prop("disabled", false);
+                $("#DelegationForm").trigger("reset");
+                if (data === "Record inserted successfully")
+                    DisplayAlert('success', 'Info', data);
+                else
+                    DisplayAlert('error', 'Info', data);
+                //if (data == 1) {
+                //    $("#btnCreate").prop("disabled", false);
+                //    /*successModal();*/
+                //    $("#DelegationForm").trigger("reset");
+                //    DisplayAlert('success', 'Info', 'Record added successfully');
+                //    console.log("success");
+                //}
+                //else {
+                //    //failureModal();
+                //    DisplayAlert('error', 'Error', 'Already record exists');
+                //    $("#btnCreate").prop("disabled", false);
+                //    console.log("failure");
+                //}
+                LoadDelegateList();
+            }),
+            error: (function (data) {
+                failureModal();
+                $("#btnCreate").prop("disabled", false);
+                console.log("error");
+
+            })
+        })
+      });
+    
+    //Delete function
+
+    function deleteDelegate(ID) {
+        if (confirm("Are you sure you want to delete this record") == true) {
+            $.ajax({
+            url: '/Dashboard/DeleteDelegation',
+            type: 'POST',
+            data: { ID: ID },
+            cache: false,
+            dataType: 'JSON',
+            success: (function (data) {
+                console.log(data);
+                if (data == 1) {
+                    $("#deletebtn").prop("disabled", false);
+                    /*successModal();*/
+                    $("#DelegationForm").trigger("reset");
+                    /*DisplayAlert('Messagebox', 'Info', 'Are you sure you want to delete this record');*/
+                    DisplayAlert('success', 'Info', 'Record deleted successfully');
+                    /* DisplayAlert('success', 'Info', 'Record deleted successfully');*/
+                    console.log("success");
+                }
+                else {
+                    //failureModal();
+                    DisplayAlert('error', 'Error', 'Error');
+                    $("#deletebtn").prop("disabled", false);
+                    console.log("failure");
+                }
+                LoadDelegateList();
+            }),
+            error: (function (data) {
+                failureModal();
+                $("#deletebtn").prop("disabled", false);
+                console.log("error");
+
+            })
+        });
+        }
+    }
+
+    function failureModal() {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html('Some error occurred!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+</script>

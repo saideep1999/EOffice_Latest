@@ -1,0 +1,67 @@
+﻿@model Skoda_DCMS.Models.DashboardModel
+@{
+    var user = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+}
+
+@{ var count = 1;}
+@if(Model.Data.Forms.Count <= 0)
+{
+    <tr>
+        <td class="text-center" colspan="5">
+            <i> No Tasks </i>
+        </td>
+    </tr>
+}
+else
+{
+    foreach (var item in Model.Data.Forms)
+    {
+        <tr class="my_task_table">
+            <td>@count</td>
+            <td>@(item.FormRelation.UniqueFormName + item.FormRelation.Id)</td>
+            @*<td>@user.UserName</td>*@
+            <td>@item.Author.Submitter</td>
+            @*<td>Design issue</td>*@
+            <td>@item.RecievedDate.ToString("dd MMM, yyyy")</td>
+            <td class="action-btn">
+                <div class="container" style="text-align: center;">
+                    <!-- Trigger the modal with a button -->
+
+                    <button type="button" onclick="GoToViewForm('@item.FormRelation.UniqueFormName', @item.RowId, @item.FormRelation.Id, @item.Id)">
+                        <i class="fa fa-external-link" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+        count++; 
+    }
+}
+
+
+<script>
+
+    function GoToViewForm(formName, rowId, formId, appRowId) {
+        console.log('here');
+        $("#pageLoader").removeClass('invisible');
+        $.ajax({
+            url: '/List/ViewFilledFormNew',
+            type: 'GET',
+            data: { formName: formName, rowId: rowId, formId: formId, appRowId: appRowId },
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data.isValid) {
+                    $("#formView").html(data.view);
+                    $("#myModal5").modal();
+                    $("#pageLoader").addClass('invisible');
+                }
+                else {
+                    $("#pageLoader").addClass('invisible');
+                    alert("There was an issue while opening the form. Please contact your administrator");
+                }
+            }),
+            error: (function (data) {
+                $("#loader").addClass('invisible');
+            })
+        })
+    }
+</script>

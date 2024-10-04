@@ -1,0 +1,210 @@
+﻿@model Skoda_DCMS.Models.Results
+@{
+    bool IsNew = true;
+    dynamic Bei = null;
+    int FormId = 0;
+    dynamic FlagRedirect = null;
+    Layout = ViewBag.Layout;
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IsNew = ViewBag.IsNew;
+        Bei = ViewBag.Model;
+        FormId = ViewBag.FormId;
+    }
+    var currentUser = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    ViewBag.Title = "BEIForm";
+    int count = 1;
+}
+<div class="right_col">
+    <div class="container-fluid dash-table-container">
+        <form action="/List/SaveBei" id="beiForm" method="post">
+            <table class="table align-items-center table-bordered" id="beiTable">
+                <tr>
+                    <td colspan="5">
+                        <p class="text-center"> <strong>BEI PACK CHECK LIST-MEXICO (LHD)</strong></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        <div class="form-inline">
+                            <h4> VIN </h4>
+                            <input type="text" id="txtVin" class="form-control inpDisable" name="txtVin" value="@(!IsNew ? (Bei[0].Vin?? "") : "")" />
+                      
+                        </div>
+                    </td>
+                    <td colspan="2">
+                        <div class="form-inline">
+                            <Label>Date :  </Label>
+                            @*<Label>&nbsp @DateTime.Now.ToString("dd/MMM/yyyy")</Label>*@
+                            <input type="text" name="" class="form-control inpDisable" value="@(!IsNew ? (Bei[0].Created.ToShortDateString() ?? "") : DateTime.Now.ToShortDateString())" readonly>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="table-head-info">
+                    <th>S.No.</th>
+                    <th>Part Description</th>
+                    <th>Quantity</th>
+                    <th>Availability</th>
+                    <th>Remark</th>
+                </tr>
+                @if (IsNew && Bei == null)
+                {
+                    foreach (var item in Model.beiData)
+                    {
+                        <tr class="bg-clr1">
+                            <td>@count</td>
+                            <td class="partName">@item.PartDesc</td>
+                            <td class="quantity">@item.Quantity</td>
+                            <td>
+                                <select class='custom-select' id='avail_@count' name="txtAvail">
+                                    <option value='null' selected> Choose...</option>
+                                    <option value='true'>Yes</option>
+                                    <option value='false'>No</option>
+                                </select>
+                            </td>
+                            <td><input type="text" class="form-control" name="txtRemark" /></td>
+                        </tr>
+                        count = count + 1;
+                    }
+                }
+                else
+                {
+                    foreach (var item in Bei)
+                    {
+                        <tr class="bg-clr1">
+                            <td>@count</td>
+                            <td class="partName">@item.PartDesc</td>
+                            <td class="quantity">@item.Quantity</td>
+                            <td>
+                                <select class="custom-select drpDisable" id='avail_@count' name="txtAvail">
+                                    @*<option @(!IsNew ? "" : "selected" ) value='null'> Choose...</option>*@
+                                    <option @(item.Availability == "true" ? "selected" : "" ) value='Yes'>Yes</option>
+                                    <option @(item.Availability == "false" ? "selected" : "" ) value='No'>No</option>
+                                </select>
+                            </td>
+                            <td><input type="text" class="form-control inpDisable" name="txtRemark" value="@(!IsNew ? item.Remark : " ")" /></td>
+                        </tr>
+                        count = count + 1;
+                    }
+                }
+                <tr>
+                    <td colspan="3" class="text-center">Signature / Seal</td>
+                    <td colspan="3">
+                        <textarea class="form-control inpDisable" rows="2" cols="30" name="comment" form="usrform" readonly>@(!IsNew ? currentUser.UserName:"")  @(!IsNew? ("Submitted On " +Convert.ToDateTime(Bei[0].Created).ToShortDateString()) : "")</textarea>
+                    </td>
+                </tr>
+            </table>
+            @if (IsNew)
+            {
+                <div class="card-footer align-content-center">
+                    <button type="submit" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                        Submit
+                    </button>
+                    <button type="reset" class="btn btn-danger btn-sm cancl-btn">
+                        Cancel
+                    </button>
+                </div>
+            }
+        </form>
+    </div>
+</div>
+<div class="modal fade" id="successModel" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header modelHeader">
+                <span class="modal-title modalMsgTitle" id="modalTitle"></span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label id="modalBody" class="lableMsg">  </label>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="submitBomBtn publishBtn" id="modalOkButton">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var IsNew = @Html.Raw(Json.Encode(IsNew));
+    var FlagRedirect = @Html.Raw(Json.Encode(FlagRedirect));
+    pageLoad();
+    function pageLoad() {
+        var data = "";
+        if (!IsNew) {
+            $(".inpDisable").attr("disabled", "disabled");
+        }
+        if (!IsNew) {
+            $(".drpDisable").attr("disabled", "disabled");
+        }
+        if (IsNew) {
+            $(".inpIsNewDisable").attr("disabled", "disabled");
+        }
+    };
+    function successModal(txt) {
+        $('#modalTitle').html('Success');
+        $('#modalBody').html('Your form with ID: BEI' + txt + ' has been submitted! Kindly use this for future reference');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+        FlagRedirect = txt;
+    }
+    function failureModal() {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html('Some error occured!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+    function checkVinModal() {
+        $('#modalTitle').html('Required');
+        $('#modalBody').html('Please enter a valid VIN number!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+    $("#btnSubmit").on('click', function (e) {
+        e.preventDefault();
+        /*var vin = $("#txtVin").text;*/
+        var vin = document.getElementById("txtVin").value;
+        console.log(vin);
+        if (vin.length < 17) {
+            checkVinModal();
+            return false;
+        }
+        var form = $("#beiForm").serializeArray();
+        var part = [], quant = [];
+        $("#beiTable > tbody > tr:not(:nth-child(1)):not(:nth-child(2)):not(:nth-child(3)):not(:last)").each(function () {
+            part.push($(this).find('.partName').text());
+            quant.push($(this).find('.quantity').text());
+        });
+        form.push({ name: "part", value: part });
+        form.push({ name: "quant", value: quant });
+        $.ajax({
+            url: '/BEI/SaveBei',
+            type: 'POST',
+            data: form,
+            dataType: 'JSON',
+            success: (function (data) {
+                debugger
+                if (data[0].Value == 1) {
+                    successModal(data[1].Value);
+                    $("#beiForm").trigger("reset");
+                }
+                else {
+                    failureModal();
+                    $("#beiForm").trigger("reset");
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+                $("#beiForm").trigger("reset");
+            })
+        })
+    });
+
+    $("#modalOkButton").on('click', function () {
+        //debugger
+        if (FlagRedirect != null) {
+            window.location = "../Dashboard";
+        }
+    });
+</script>

@@ -1,0 +1,327 @@
+﻿
+@{
+    Layout = null;
+    dynamic DNF = null;
+    if (ViewBag != null)
+    {
+        DNF = ViewBag.Model;
+    }
+}
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Page Title</title>
+    <style type="text/css">
+        *:visited, *:focus {
+            box-shadow: none;
+        }
+
+        input, select, input:focus, select:focus, textarea, textarea:focus {
+            border: 1px solid #000;
+        }
+
+        input, textarea {
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <table style="width: 100%; font-size: 14px; color: rgb(110,110,110); font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+        <tr>
+            <td>
+                <table style="width: 100%;" cellspadding="0" cellspacing="0">
+                    <tr>
+
+                        <td colspan="6" width="60%" style="text-align: right;">
+                            <img style="margin:10px; width: 50%;" src='@Server.MapPath("~/assets/img/SAVWIPL_Merger_Logo.JPG")' />
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td style="height: 45px; text-align: center; font-size:20px; font-weight: bold; border-left: 1px solid #000; border-right: 1px solid #000; border-bottom: 1px solid #000;">
+                Deviation note format
+            </td>
+        </tr>
+
+
+        <tr>
+            <td style="padding: 15px;">
+                <table cellspacing="0" cellpadding="0" width="100%">
+                    <tr>
+                        <td>
+                            Supplier
+                        </td>
+                        <td colspan="5" align='left'>
+                            <input type="text" style="height: 25px; width:100%; border-radius: 0; " value="@(DNF.one[0].Supplier ?? " ")" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="height: 15px;">
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            Description
+                        </td>
+                        <td colspan="5" align='left'>
+                            <input type="text" style="height: 25px; width:100%; border-radius: 0; " value="@(DNF.one[0].Description ?? " ")" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="height: 15px;" colspan="6">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-transform: capitalize;">
+                            BUDGET/ CONTRACT/PO VALUE ( EUR/ INR)
+                        </td>
+                        <td colspan="5">
+                            <input type="text" style="height: 25px; width:100%; border-radius: 0; " value="@(DNF.one[0].Budget ?? " ")" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="height: 15px;" colspan="6">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan='2'>
+                            Department
+                        </td>
+                        <td colspan='2'>
+                            <input type="text" style="height: 25px; width:90%; border-radius: 0; " value="@(DNF.one[0].RequestSubmissionFor == "Self" ? DNF.one[0].EmployeeDepartment : DNF.one[0].OtherEmployeeDepartment)" />
+                        </td>
+                        <td colspan='1'>
+                            Brand
+                        </td>
+                        <td colspan='1'>
+                            <input type="text" style="height: 25px; width:100%; border-radius: 0; " value="@(DNF.one[0].Brand ?? " ")" />
+                        </td>
+
+                    </tr>
+
+                    <tr>
+                        <td style="height: 15px;">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan='6'>
+                            Reason For Deviation
+
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td colspan='6'>
+                            <ul>
+
+                                <li>
+                                    <input type="checkbox" id="checkBoxReason1" name="checkBoxReason1" value="Reason1" @(DNF.one[0].Reason1 == "Reason1" ? "checked" : "" ) disabled> Single Sourcing (except the cases referred in “Exception list : Deviation from General purchasing process” dated @if (DNF.one[0].Reason1 == "Reason1")
+                                    {<input style="border: none;" type="text" id="txtDeviationDate" name="txtDeviationDate" class="deviationDate" value="@(DNF.one[0].Reason1 == "Reason1" ? DNF.one[0].DeviationDate : "")" />}).
+                                </li>
+                                <li><input type="checkbox" id="checkBoxReason2" name="checkBoxReason2" value="Reason2" @(DNF.one[0].Reason2 == "Reason2" ? "checked" : "" ) disabled> Regularization of Invoices where ever the Procurement was not involved and no negotiation done.</li>
+
+                                <li> <input type="checkbox" id="checkBoxReason3" name="checkBoxReason3" value="Reason3" @(DNF.one[0].Reason3 == "Reason3" ? "checked" : "" ) disabled> Rendering the services or delivery of Goods without PO (rates are pre-negotiated/approved by Procurement). </li>
+
+                                <li> <input type="checkbox" id="checkBoxReason4" name="checkBoxReason4" value="Reason4" @(DNF.one[0].Reason4 == "Reason4" ? "checked" : "" ) disabled> Late financial /Shopping Cart approval,, An emergency, product change, critical shortage,a safety issue or no time for specifications. </li>
+
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="height: 15px;">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan='6'>
+                            Reason in detail for the deviation
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td colspan='6'>
+                            <textarea type="text" rows="5" value="" style="width: 100%;">@(DNF.one[0].Reason ?? "")</textarea>
+                        </td>
+
+                    </tr>
+
+                    <tr>
+                        <td style="height: 25px;">
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td colspan='6' style="height: 25px;">
+                            Required Signature
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="6">
+
+                            <table border="1" cellpadding="10" cellspacing="0" width="100%">
+                                @if ((DNF.two.Count > 0) || (DNF.three.Count > 0))
+                                {
+                                    var appList = DNF.three as List<Skoda_DCMS.Models.ApprovalDataModel>;
+                                    var maxLevel = appList.Max(x => x.Level);
+
+
+
+                                    <tr>
+                                        <td colspan="2">
+                                            <lable>Requester</lable>
+                                            <div style="margin-bottom: 10px; height: 30px; width:100%; margin-top: 10px;">
+                                            </div>
+                                        </td>
+
+                                        <td colspan="2">
+                                            <lable>Type Name</lable>
+                                            <div style="margin-bottom: 10px; height: 30px; width:100%;; margin-top: 10px;">
+                                                @(DNF.two[0].Author.Title ?? " ")
+                                            </div>
+                                        </td>
+
+                                        <td colspan="2">
+                                            <lable>Date</lable>
+                                            <div style="margin-bottom: 10px; height: 30px; width:100%; margin-top: 10px;">
+                                                @("Submitted on " + Convert.ToDateTime(DNF.two[0].FormId.Created).ToShortDateString() + " "
+                                        + Convert.ToDateTime(DNF.two[0].FormId.Created).ToShortTimeString() ?? "")
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    for (var i = 0; i < maxLevel; i++)
+                                    {
+
+                                        foreach (var item in appList)
+                                        {
+                                            if (item.Level == i + 1)
+                                            {
+                                                <tr>
+                                                    <td colspan="2">
+                                                        <div style="margin-bottom: 10px; height: 30px; width:100%; margin-top: 10px;">
+                                                            @(item.Designation ?? "")
+                                                        </div>
+                                                    </td>
+                                                    <td colspan="2">
+                                                        <div style="margin-bottom: 10px; height: 30px; width:100%; margin-top: 10px;">
+                                                            @(item.UserName ?? "")
+                                                        </div>
+                                                    </td>
+                                                    <td colspan="2">
+                                                        <div style="margin-bottom: 10px; height: 30px; width:100%; margin-top: 10px;">
+                                                            @(item.ApproverStatus!="Pending" ? item.ApproverStatus + " on " + " " + Convert.ToDateTime(item.Modified).ToShortDateString()
+                                                                                    + " " + Convert.ToDateTime(item.Modified).AddHours(5.5).ToShortTimeString():"")
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    }
+
+                                }
+                            </table>
+
+
+                          
+</td>
+
+                    </tr>
+
+                   
+                                    @*<tr>
+                                        <td colspan="2">
+                                            <lable>Head of Department</lable>
+                                            <div style="margin-bottom: 10px; height: 30px; width:100%; margin-top: 10px;">
+
+                                            </div>
+                                        </td>
+
+                                        <td colspan="2">
+                                            <lable>Type Name</lable>
+                                            <div style="margin-bottom: 10px; height: 30px; width:100%; margin-top: 10px;">
+
+                                            </div>
+                                        </td>
+
+                                        <td colspan="2">
+                                            <lable>Date</lable>
+                                            <div style="margin-bottom: 10px; height: 30px; width:100%; margin-top: 10px;">
+
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td colspan="2">
+                                            <lable>Director</lable>
+                                            <div style="margin-bottom: 10px; height: 30px; width:100%; margin-top: 10px;">
+
+                                            </div>
+                                        </td>
+
+                                        <td colspan="2">
+                                            <lable>Type Name</lable>
+                                            <div style="margin-bottom: 10px; height: 30px; width:100%; margin-top: 10px;">
+                                            </div>
+
+                                        </td>
+
+                                        <td colspan="2">
+                                            <lable>Date</lable>
+                                            <div style="margin-bottom: 10px; height: 30px; width:100%; margin-top: 10px;">
+
+                                            </div>
+                                        </td>
+                                    </tr>*@
+
+                                    <tr>
+                                        <td style="height: 25px;">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="6">
+                                            <lable>Note</lable>
+                                            <div style="margin-bottom: 10px; width:100%; margin-top: 10px;">
+                                                <ul>
+                                                    <li>For topic values ≤0.5 Mio INR, Requester, Head of Department and Director of Department are sufficient.</li>
+                                                    <li>For topic values >0.5 Mio INR, Managing Director’s signature are also needed.</li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    @*<tr>
+                                        <td style="height: 25px;">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            <lable>Managin Director</lable>
+                                            <div style="margin-bottom: 10px; height:30px; margin-top: 10px;">
+                                            </div>
+
+                                        </td>
+                                        <td colspan="2">
+                                            <lable>Type Name</lable>
+                                            <div style="margin-bottom: 10px; height:30px; margin-top: 10px;">
+                                            </div>
+
+                                        </td>
+                                        <td colspan="2">
+                                            <lable>Date</lable>
+                                            <div style="margin-bottom: 10px; height:30px; margin-top: 10px;">
+                                            </div>
+                                        </td>
+                                    </tr>*@
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

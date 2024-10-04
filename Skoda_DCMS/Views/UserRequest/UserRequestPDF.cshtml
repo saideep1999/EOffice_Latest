@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+@{
+    ViewBag.Title = "User Creation/ User Deletion/ Password Reset Request Form";
+    int FormId = 0, AppRowId = 0, ApprovalType = 0;
+    bool IsNewMode = true, IsEditMode = false, IsViewMode = false;
+    bool IsNew = true;
+    bool IsEdit = true;
+    var currentUser = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    List<Skoda_DCMS.Models.ApprovalDataModel> appList = new List<Skoda_DCMS.Models.ApprovalDataModel>();
+    string disabled = "";
+    Skoda_DCMS.Models.UserRequestData URCF = null;
+    Skoda_DCMS.Models.UserRequestData model1 = null;
+    var CurrentUserDesgn = "";
+    long? CurrentUserLevel = 0;
+    Layout = ViewBag.Layout;
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IsNew = ViewBag.IsNew;
+        IsEdit = ViewBag.IsEdit;
+        disabled = IsViewMode ? "disabled" : "";
+        URCF = ViewBag.Model.one[0] as Skoda_DCMS.Models.UserRequestData;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        appList = ViewBag.Model?.three as List<Skoda_DCMS.Models.ApprovalDataModel>;
+        CurrentUserDesgn = appList?.Where(x => x.ApproverUserName == currentUser.UserName).Select(x => x.Designation).FirstOrDefault();
+        CurrentUserLevel = appList?.Where(x => x.ApproverUserName == currentUser.UserName && x.ApproverStatus == "Pending").Select(x => x.Level).FirstOrDefault();
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+        if (IsViewMode)
+        {
+            var Ap = appList?.Where(x =>
+                x.ApproverUserName.ToLower() == currentUser.UserName.ToLower()
+                && x.ApproverStatus.ToLower() == "pending"
+            ).FirstOrDefault();
+        }
+    }
+
+    var GekoFile = URCF?.AttachmentFiles?.Attachments?.Count > 0 ? URCF.AttachmentFiles.Attachments.Find(x => Path.GetFileNameWithoutExtension(x.FileName) == "GekoFile") : null;
+    var SAGA2File = URCF?.AttachmentFiles?.Attachments?.Count > 0 ? URCF.AttachmentFiles.Attachments.Find(x => Path.GetFileNameWithoutExtension(x.FileName) == "SAGA2File") : null;
+
+
+    if (IsViewMode || IsEditMode)
+    {
+        //Attachment nullified due to its data serialization issue
+        model1 = URCF?.Clone();
+        model1.AttachmentFiles = null;
+        ViewBag.Model.one[0] = model1;
+    }
+
+}
+<html>
+<head>
+    <title>SAVWIPL - User Creation/ User Deletion/ Password Reset Request Form </title>
+    <style type="text/css">
+        *:visited, *:focus {
+            box-shadow: none;
+        }
+
+        input, select, input:focus, select:focus, textarea, textarea:focus {
+            border: 1px solid #000;
+        }
+
+        input, textarea {
+            padding: 5px;
+        }
+
+        table td {
+            padding: 5px;
+        }
+
+        .mr-2 {
+            margin-right: 10px;
+        }
+
+        .hide {
+            display: none;
+        }
+
+        .row {
+            display: flex;
+        }
+    </style>
+</head>
+<body>
+
+    <table style="width: 100%; font-size: 14px; color: #000; font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+        <tr>
+            <td>
+                <table style="width: 100%;" cellspadding="0" cellspacing="0">
+                    <tr>
+                        <td colspan="6" width="60%" style="text-align: right;">
+                            <img style="width: 50%;" src='@Server.MapPath("~/assets/img/SAVWIPL_Merger_Logo.JPG")'>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td align="center">
+                <h2>User Creation/ User Deletion/ Password Reset Request Form</h2>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 15px;">
+                <table border="1" cellspacing="0" cellpadding="0" width="100%">
+                    @if (URCF.RequestSubmissionFor == "Self")
+                    {
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Employee Name
+                            </td>
+                            <td style="width: 30%" colspan="2" align='left'>
+                                @(URCF.EmployeeName)
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Employee Code
+                            </td>
+                            <td style="width: 30%" colspan="2" align='left'>
+                                @(URCF.EmployeeCode)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Designation
+                            </td>
+                            <td colspan="2" align='left'>
+                                @(URCF.EmployeeDesignation)
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Location
+                            </td>
+                            <td colspan="2" align='left'>
+                                @(URCF.EmployeeLocation)
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Department
+                            </td>
+                            <td colspan="2" align='left'>
+                                @(URCF.EmployeeDepartment)
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Contact Number
+                            </td>
+                            <td colspan="2" align='left'>
+                                @(URCF.EmployeeContactNo)
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Cost Center Number
+                            </td>
+                            <td colspan="2" align='left'>
+                                @(URCF.EmployeeCCCode)
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                User ID
+                            </td>
+                            <td colspan="2" align='left'>
+                                @(URCF.EmployeeUserId)
+                            </td>
+
+                        </tr>
+
+                    }
+                    else
+                    {
+                        if (URCF.OtherEmployeeType == "SAVWIPLEmployee")
+                        {
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Employee Name
+                                </td>
+                                <td style="width: 30%" colspan="2" align='left'>
+                                    @(URCF.OtherEmployeeName)
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Employee Code
+                                </td>
+                                <td style="width: 30%" colspan="2" align='left'>
+                                    @(URCF.OtherEmployeeCode)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Designation
+                                </td>
+                                <td colspan="2" align='left'>
+                                    @(URCF.OtherEmployeeDesignation)
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Location
+                                </td>
+                                <td colspan="2" align='left'>
+                                    @(URCF.OtherEmployeeLocation)
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Department
+                                </td>
+                                <td colspan="2" align='left'>
+                                    @(URCF.OtherEmployeeDepartment)
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Contact Number
+                                </td>
+                                <td colspan="2" align='left'>
+                                    @(URCF.OtherEmployeeContactNo)
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Cost Center Number
+                                </td>
+                                <td colspan="2" align='left'>
+                                    @(URCF.OtherEmployeeCCCode)
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    UserID
+                                </td>
+                                <td colspan="2" align='left'>
+                                    @(URCF.OtherEmployeeUserId)
+                                </td>
+
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Employee Name
+                                </td>
+                                <td style="width: 30%" colspan="2" align='left'>
+                                    @(URCF.OtherNewEmployeeName)
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Employee Code
+                                </td>
+                                <td style="width: 30%" colspan="2" align='left'>
+                                    @(URCF.OtherNewEmployeeCode)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Designation
+                                </td>
+                                <td colspan="2" align='left'>
+                                    @(URCF.OtherNewEmpDesignation)
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Location
+                                </td>
+                                <td colspan="2" align='left'>
+                                    @(URCF.OtherNewEmpLocation)
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Department
+                                </td>
+                                <td colspan="2" align='left'>
+                                    @(URCF.OtherNewDepartment)
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Contact Number
+                                </td>
+                                <td colspan="2" align='left'>
+                                    @(URCF.OtherNewContactNo)
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Cost Center Number
+                                </td>
+                                <td colspan="2" align='left'>
+                                    @(URCF.OtherNewCostcenterCode)
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    UserID
+                                </td>
+                                <td colspan="2" align='left'>
+                                    @(URCF.OtherNewUserId)
+                                </td>
+
+                            </tr>
+                        }
+                    }
+                    <tr>
+                        <td colspan="1" style="width:20%; font-weight: bold;">
+                            Brand
+                        </td>
+                        <td colspan="5" align='left'>
+                            @if (URCF.Brand == "Skoda" || URCF.Brand == "All")
+                            {
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> Skoda </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="skodaCheck" name="brandCheck" checked>
+                            }
+                            else
+                            {
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> Skoda </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="skodaCheck" name="brandCheck">
+                            }
+                            @if (URCF.Brand == "VW" || URCF.Brand == "All")
+                            {
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> VW </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="vwCheck" name="brandCheck" checked>
+                            }
+                            else
+                            {
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> VW </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="vwCheck" name="brandCheck">
+                            }
+                            @if (URCF.Brand == "Audi" || URCF.Brand == "All")
+                            {
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> Audi </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="audiCheck" name="brandCheck" checked>
+                            }
+                            else
+                            {
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> Audi </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="audiCheck" name="brandCheck">
+                            }
+                            @if (URCF.Brand == "Porsche" || URCF.Brand == "All")
+                            {
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> Porche </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="porcheCheck" name="brandCheck" checked>
+                            }
+                            else
+                            {
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> Porche </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="porcheCheck" name="brandCheck">
+                            }
+                            @if (URCF.Brand == "Lamborghini" || URCF.Brand == "All")
+                            {
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> Lamborghini </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="lamborghiniCheck" name="brandCheck" checked>
+                            }
+                            else
+                            {
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> Lamborghini </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="lamborghiniCheck" name="brandCheck">
+                            }
+
+                            @if (URCF.Brand == "All")
+                            {
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> All </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="allCheck" name="brandCheck" checked>
+                            }
+                            else
+                            {
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> All </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="allCheck" name="brandCheck">
+                            }
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td colspan="1" style="width:20%; font-weight: bold;">
+                            Service Type
+                        </td>
+
+                        <td colspan="5" align='left'>
+                            @if (URCF.ServiceType == "Sales & After Sales")
+                            {
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> Sales & After Sales </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="salesCheck" name="serviceType" checked>
+                            }
+                            else
+                            {
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> Sales & After Sales </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="salesCheck" name="serviceType">
+                            }
+                            @if (URCF.ServiceType == "Corporate System")
+                            {
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> Corporate System </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="corporateSystemCheck" name="serviceType" checked>
+                            }
+                            else
+                            {
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> Corporate System </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="corporateSystemCheck" name="serviceType">
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="1" style="width:20%; font-weight: bold;">
+                            Type of Request
+                        </td>
+
+                        <td colspan="5" align='left'>
+                            @if (URCF.TypeofRequest == "User Creation")
+                            {
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> User Creation </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="userCreationCheck" name="requestType" checked>
+                            }
+                            else
+                            {
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> User Creation </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="userCreationCheck" name="requestType">
+                            }
+                            @if (URCF.TypeofRequest == "ID Deletion")
+                            {
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> ID Deletion </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="idDeletionCheck" name="requestType" checked>
+                            }
+                            else
+                            {
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> ID Deletion </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="idDeletionCheck" name="requestType">
+                            }
+                            @if (URCF.TypeofRequest == "ID Deletion")
+                            {
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> Password Reset </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="passwordCheck" name="requestType" che>
+                            }
+                            else
+                            {
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> Password Reset </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="passwordCheck" name="requestType">
+                            }
+                        </td>
+                    </tr>
+                </table>
+                <table border="1" cellspacing="0" cellpadding="0" width="100%">
+                    <tbody>
+                        <tr>
+                            <td class="bt-0 bb-0 pl-0">
+                                <table class="mainTbl table table-border form-table-container-2">
+                                    <tr>
+                                        <td class="bt-0 bb-0 pl-0">
+                                            <table class="w-100 mx-auto table table-border form-border text-center">
+
+                                                <thead class="form-head-1" style="margin-left:inherit !important;">
+                                                    <tr>
+                                                        <th>Sr. No.</th>
+                                                        <th>Service Category</th>
+                                                        <th>Service Sub-Category</th>
+                                                        <th>Roles</th>
+                                                        <th>Access Type</th>
+                                                        <th>Brand</th>
+                                                        <th>Application User ID</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="form-border tableApplicationCategory" id="ApplicationCategoryBody">
+                                                    @{
+                                                        var count = 1;
+                                                        foreach (var item in URCF.ApplicationCategoryData)
+                                                        {
+                                                            <tr id="" class="tr_input">
+                                                                <td class="sNo text-center">@count</td>
+                                                                <td class="text-center">
+                                                                    <input type="text" disabled class="inpDisable" name="drpServiceCategory" id="drpServiceCategory" value="@(item.ServiceCategory)" />
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <input type="text" disabled class="inpDisable" name="drpServiceSubCategory" id="drpServiceSubCategory" value="@(item.ServiceSubCategory)" />
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <input type="text" disabled class="inpDisable" name="drpRole" id="drpRole" value="@(item.Role != ""  ? item.Role : "Select Role")" />
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <input type="text" disabled class="inpDisable" name="drpAccessType" id="drpAccessType" value="@(item.AccessType)" />
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <input type="text" disabled class="inpDisable" name="drpBrand" id="drpBrand" value="@(item.BrandApp)" />
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <input type="text" disabled class="inpDisable" name="txtApplicationUserId" id="txtApplicationUserId" value="@(item.ApplicationUserID)" />
+                                                                </td>
+                                                            </tr>
+                                                            count++;
+                                                        }
+                                                    }
+
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <table border="1" cellspacing="0" cellpadding="0" width="100%">
+                    <tr>
+                        <td colspan="6" align='left'>
+                            <span style=" width: 85%; font-weight: bold; border-radius: 0; ">Business Justification</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="6" align='left' style="height: 25px;">
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(URCF.BusinessNeed)</span>
+                        </td>
+                    </tr>
+                </table>
+
+                <table style="width: 100%; font-size: 14px; color: #000;" cellspacing="0" cellpadding="0">
+                    @if (appList.Count > 0)
+                    {
+                        foreach (var item in appList)
+                        {
+                            if (item.ApproverStatus != "Pending")
+                            {
+                                <tr>
+                                    <td width="5%"></td>
+                                    <td width="40%">
+                                        <table style="width: 100%; font-size: 14px; color: #000;" border="1" cellspacing="0" cellpadding="0">
+                                            <tr>
+                                                <td height="50px" colspan="2" align="center">
+                                                    @item.ApproverStatus
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td width="50%" align="center">
+                                                    @item.UserName
+                                                </td>
+                                                <td width="50%" align="center">
+                                                    @(item.TimeStamp.ToShortDateString() + " " + Convert.ToDateTime(item.TimeStamp).AddHours(5.5).ToShortTimeString())
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td height="50px" colspan="2" align="center">
+                                                    @item.Designation
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td width="10%"></td>
+                                </tr>
+                            }
+                        }
+                    }
+
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

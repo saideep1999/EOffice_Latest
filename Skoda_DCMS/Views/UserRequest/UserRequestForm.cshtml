@@ -1,0 +1,3105 @@
+﻿@{
+    ViewBag.Title = "User Creation/ User Deletion/ Password Reset Request Form";
+    int FormId = 0, AppRowId = 0, ApprovalType = 0;
+    bool IsNewMode = true, IsEditMode = false, IsViewMode = false;
+    var currentUser = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    List<Skoda_DCMS.Models.ApprovalDataModel> appList = new List<Skoda_DCMS.Models.ApprovalDataModel>();
+    int? tableCount = 0;
+    string disabled = "";
+    Skoda_DCMS.Models.UserRequestData URCF = null;
+    Skoda_DCMS.Models.UserRequestData model1 = null;
+    var CurrentUserDesgn = "";
+    long? CurrentUserLevel = 0;
+    if (ViewBag != null && !ViewBag.IsNewMode)
+    {
+        IsNewMode = ViewBag.IsNewMode;
+        IsEditMode = ViewBag.IsEditMode;
+        IsViewMode = ViewBag.IsViewMode;
+        disabled = IsViewMode ? "disabled" : "";
+        URCF = ViewBag.Model.one[0] as Skoda_DCMS.Models.UserRequestData;
+        tableCount = URCF?.ApplicationCategoryData?.Count();
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        appList = ViewBag.Model?.three as List<Skoda_DCMS.Models.ApprovalDataModel>;
+        CurrentUserDesgn = appList?.Where(x => x.ApproverUserName == currentUser.UserName).Select(x => x.Designation).FirstOrDefault();
+        CurrentUserLevel = appList?.Where(x => x.ApproverUserName == currentUser.UserName && x.ApproverStatus == "Pending").Select(x => x.Level).FirstOrDefault();
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+        if (IsViewMode)
+        {
+            var Ap = appList?.Where(x =>
+                x.ApproverUserName.ToLower() == currentUser.UserName.ToLower()
+                && x.ApproverStatus.ToLower() == "pending"
+            ).FirstOrDefault();
+        }
+    }
+
+    var GekoFile = URCF?.AttachmentFiles?.Attachments?.Count > 0 ? URCF.AttachmentFiles.Attachments.Find(x => Path.GetFileNameWithoutExtension(x.FileName) == "GekoFile") : null;
+    var SAGA2File = URCF?.AttachmentFiles?.Attachments?.Count > 0 ? URCF.AttachmentFiles.Attachments.Find(x => Path.GetFileNameWithoutExtension(x.FileName) == "SAGA2File") : null;
+
+
+    if (IsViewMode || IsEditMode)
+    {
+        //Attachment nullified due to its data serialization issue
+        model1 = URCF?.Clone();
+        model1.AttachmentFiles = null;
+        ViewBag.Model.one[0] = model1;
+    }
+
+}
+<style>
+
+    .hide {
+        display: none;
+    }
+    /*New design css start here*/
+    .astColor {
+        color: red;
+    }
+
+    .textTrans {
+        width: 100%;
+        max-width: 99%;
+        border-radius: 5px;
+        margin-right: 0px;
+        border: 1px solid !important;
+    }
+
+    .empDetailsBg {
+        background-color: #fffbef;
+    }
+
+    #accordion select {
+        color: #000;
+        width: 100% !important;
+        height: 45px;
+        background-color: #FFFFFF;
+        border: 1px solid #BFBFBF;
+        box-sizing: border-box;
+        border-radius: 5px;
+        background-image: url(data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>);
+        background-repeat: no-repeat;
+        background-position: right .75rem center;
+        background-size: 16px 12px;
+    }
+
+    #accordion input[type='text'] {
+        width: 100% !important;
+        max-width: 100%;
+        height: 45px;
+        background-color: #FFFFFF;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px !important;
+    }
+
+    #accordion input[type='date'] {
+        width: 100% !important;
+        max-width: 100%;
+        height: 45px;
+        background-color: #FFFFFF;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px;
+    }
+
+    #accordion input[type='time'] {
+        height: 45px;
+    }
+
+    #accordion label {
+        font-size: 16px;
+        line-height: 22px;
+        font-weight: 600;
+        color: #201F1F;
+    }
+
+    #accordion table tr td {
+        font-size: 16px;
+        line-height: 19px;
+        color: #201F1F;
+        background-color: white;
+    }
+
+    #accordion label {
+        display: block;
+    }
+
+    #accordion .card-header {
+        background: rgb(4 59 100) !important;
+        border-radius: 5px 5px 0px 0px;
+        position: relative;
+        margin-top: 15px;
+    }
+
+        #accordion .card-header.collapsed h5:after {
+            content: '+';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        #accordion .card-header h5:after {
+            content: '-';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+    #accordion h5 button {
+        font-size: 18px;
+        line-height: 22px;
+        /* identical to box height */
+        padding-left: 0px;
+        display: flex;
+        align-items: center;
+        text-transform: uppercase;
+        /* Text_white */
+
+        color: #FFFFFF;
+    }
+
+        #accordion h5 button:focus {
+            box-shadow: none;
+        }
+
+    .empDetailsFields label {
+        display: block !important;
+        margin-bottom: 0px;
+    }
+
+    .empDetailsFields .row label {
+        display: block;
+        margin-bottom: 0px;
+    }
+
+        .empDetailsFields .row label:nth-child(1) {
+            font-style: normal;
+            font-weight: normal !important;
+            font-size: 12px;
+            line-height: 18px;
+            color: #A9A9A9 !important;
+        }
+
+        .empDetailsFields .row label:nth-child(2) {
+            font-style: normal;
+            font-weight: normal;
+            font-size: 18px;
+            line-height: 22px;
+            color: #201F1F;
+        }
+
+    .firstLastName {
+        font-style: normal;
+        font-weight: normal;
+        font-size: 20px;
+        line-height: 24px;
+        /* identical to box height */
+
+        display: flex;
+        align-items: center;
+        color: #201F1F;
+    }
+
+    .submit-btn {
+        background: #3D3D3D;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #FFFFFF;
+        border-color: transparent !important;
+    }
+
+    .cancl-btn {
+        background: #FAE99B;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        border-color: transparent !important;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #212221;
+        margin-left: 10px;
+    }
+
+
+
+
+    .card-footer {
+        display: flex;
+        background-color: transparent !important;
+    }
+
+    .photo-form {
+        width: 100%;
+    }
+
+    .ui-front {
+        z-index: 9999999 !important;
+    }
+
+    /* NEW UI CSS END*/
+
+
+    .showBorder {
+        border: 1px solid #dee2e6;
+    }
+
+    .multiselect {
+        height: 47px;
+        margin-top: -1px;
+    }
+    /*Animation CSS Starts*/
+
+    div.input-block {
+        position: relative;
+    }
+
+        div.input-block input {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 188px;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block textarea {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 100%;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            background-color: #fff;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block span.placeholder {
+            position: absolute;
+            margin: 17px 0;
+            padding: 0 4px;
+            font-family: Roboto, sans-serif;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            top: -6px;
+            left: 15px;
+            transition: all 0.2s;
+            transform-origin: 0% 0%;
+            background: none;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+    .question_span {
+        width: 116% !important;
+        font-size: 15px !important;
+    }
+
+    div.input-block textarea:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: #fff !important;
+    }
+
+    div.input-block textarea:valid + span.placeholder,
+    div.input-block textarea:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+    }
+
+    div.inputSelect select:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+    }
+
+    div.input-block input:valid + span.placeholder,
+    div.input-block input:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: rgb(219,238,213);
+    }
+
+
+    div.input-block input.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: rgb(219,238,213);
+    }
+
+    div.input-block input:read-only + span.placeholder,
+    div.input-block input:read-only + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background: rgb(219,238,213);
+    }
+
+
+    div.inputSelect span.placeholder {
+        position: absolute;
+        margin: 17px 0;
+        padding: 0 4px;
+        font-family: Roboto, sans-serif;
+        color: #000;
+        display: flex;
+        align-items: center;
+        font-size: 1rem;
+        top: -6px;
+        left: 15px;
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+        background: none;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    div.inputSelect select:focus + span.placeholder {
+        transform: scale(0.8) translateY(-30px);
+        background: rgb(219,238,213);
+        z-index: 9;
+    }
+
+    div.inputSelect select:not([value=""]):valid + span.placeholder {
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+    }
+
+
+
+    div.input-block input:focus + span.placeholder {
+        color: #284B63;
+    }
+
+    .breadcrumb {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+        padding: 1rem 1rem 0;
+        margin-bottom: 0;
+        list-style: none;
+        background-color: #FFFFFF;
+        border-radius: .25rem;
+    }
+
+    body.nav-sm .container.body .left_col {
+        width: 63px;
+        padding: 0;
+        position: fixed;
+        height: 100%;
+        z-index: 8;
+    }
+
+    .card {
+        position: relative;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        min-width: 0;
+        word-wrap: break-word;
+        background-color: #fff;
+        background-clip: border-box;
+        border: 0px;
+        border-radius: .25rem;
+    }
+
+    .dropdown-toggle::after {
+        display: none;
+        width: 0;
+        height: 0;
+        margin-left: .255em;
+        vertical-align: .255em;
+        content: "";
+        border-top: .3em solid;
+        border-right: .3em solid transparent;
+        border-bottom: 0;
+        border-left: .3em solid transparent;
+    }
+
+    input.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213);
+    }
+
+    inputSelect.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213) !important;
+    }
+
+    select.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background-color: rgb(219,238,213) !important;
+        z-index: 9;
+    }
+
+    select.spanUpperSideWhite + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background-color: rgb(255,255,255) !important;
+        z-index: 9;
+    }
+
+    textarea.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    .TransView {
+        background-color: white !important;
+    }
+
+    @@media only screen and (min-width: 992px) {
+        div .input-block span.placeholder {
+            font-size: 15px;
+        }
+
+        div.inputSelect span.placeholder {
+            font-size: 1rem;
+        }
+    }
+
+    input[type='date'].spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    .showBorder {
+        border: 1px solid #dee2e6;
+    }
+
+    .wField {
+        width: 233px !important;
+        margin-left: 10px;
+    }
+
+    @@-moz-document url-prefix() {
+        input[type=time]::-ms-clear {
+            display: none;
+        }
+    }
+
+    .datetime-reset-button {
+        display: none !important;
+    }
+
+    .forShoppingCart {
+        margin-left: 14% !important;
+    }
+
+    .btn-group {
+        display: block !important;
+    }
+
+    #accordion label {
+        display: inline-block !important;
+    }
+
+
+    .custom-select:focus {
+        box-shadow: none !important;
+        border-color: none !important;
+    }
+
+    #addSoftwarebtn td {
+        border-top: none !important;
+    }
+
+    #ApplicationCategoryBody select {
+        background-color: #fff !important;
+    }
+
+    #loader {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        z-index: 10000;
+    }
+</style>
+<script type="text/javascript">
+    function checkSelectGlobal(id) {
+        if ($('#' + id).val() != '') {
+            $('#' + id).addClass('spanUpperSideWhite');
+        }
+    }
+</script>
+
+<div class="container">
+    <div class="right_col bg-transparent" role="main">
+        <div class="main_container">
+            <form id="URCFForm" method="post">
+                <div>
+                    <div class="breadcrumb-container">
+                        <div>
+                            @if (IsEditMode || IsViewMode)
+                            {
+                                <div>
+                                    <input type="hidden" id="FormId" name="FormId" value="@(FormId)" />
+                                    <input type="hidden" id="FormSrId" name="FormSrId" value="@(URCF.Id)" />
+                                    <input type="hidden" id="AppRowId" name="AppRowId" value="@(AppRowId)" />
+                                    <input type="hidden" name="ApplicationCategoryDataCurr" id="ApplicationCategoryDataCurr" value="@(URCF.ApplicationCategoryData.Count)" />
+                                </div>
+                            }
+                            <ol class="breadcrumb">
+                                <li>
+                                    <a href="/Dashboard?formName=NGCF">
+                                        Dashboard
+                                    </a>
+                                </li>
+                                <li>
+                                    User Creation/ User Deletion/ Password Reset Request Form
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="row breadcrumb-container table-bordered  mr-1 ml-1" style="background-color: rgb(219,238,213) !important; ">
+                        <div class="col-md-2 col-lg-2">
+                            <span class="placeholder">Date : @(IsViewMode || IsEditMode ? (Convert.ToDateTime(appList.FirstOrDefault().FormId.CreatedDate).ToShortDateString()) : DateTime.Now.ToShortDateString())</span>
+                        </div>
+                        <div class="col-md-8 col-lg-8 mt-2 mb-1 form-heading" style="text-align:center; margin-top:5px">
+                            <span>User Creation/ User Deletion/ Password Reset Request Form</span>
+                        </div>
+                        <div class="col-md-2 col-lg-2">
+                            @if (IsViewMode || IsEditMode)
+                            {
+                                <span class="placeholder white_space_nowrap"> Form Id : @(IsViewMode || IsEditMode ? ("URCF" + FormId ?? "") : "" )</span>
+                            }
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="heading d-none" id="headingErr">
+                    <h1 id="" class="info-header">Following fields are mandatory. Please fill in information for<br></h1>
+                    <div id="add_to_me" class="header-list" style="color:red;"></div>
+                </div>
+                <!-- ACCORDIAN STRUCTURE START HERE-->
+                @* Submitter Section *@
+                @{
+                    Html.RenderPartial("_NewSubmitterDetailsWithModel", (ViewBag as object));
+                }
+
+                @* Applicant Section *@
+                @{
+                    Html.RenderPartial("_NewApplicantDetailsWithModel", (ViewBag as object));
+                }
+
+                <div id="accordion">
+                    <div class="card">
+                        <div class="card-header" id="headingFour" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                            <h5 class="mb-0">
+                                <button type="button" class="btn btn-link" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                                    <img src="~/assets/img/transactionIcon.svg" width="24" height="24" class="mr-2">Transaction Fields
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseFour" class="collapse show" aria-labelledby="headingFour" style="">
+                            @if (IsNewMode)
+                            {
+                                <div class="card-body">
+                                    <div class="row w-100">
+                                        <div class="row w-100">
+                                            <div class="form-group col-md-2 d-flex align-items-center col-lg-2 col-12">
+                                                <label id="lblBrand" class="f-600" style="margin-left:15px; position: relative; top:10px;">
+                                                    Brand<span class="astColor">*</span>
+                                                </label>
+                                            </div>
+
+                                            <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                                <label class="checkbox-container">
+                                                    <label class="f-600">Skoda</label>
+                                                    <input type="checkbox" class="brand_names" name="chkSkoda" id="chkSkoda" value="Skoda">
+
+                                                    <span class="checkmark"></span>
+                                                </label>
+                                            </div>
+                                            <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                <label class="checkbox-container">
+                                                    <label class="f-600">VW</label>
+                                                    <input type="checkbox" class="temp-checkbox brand_names" name="chkVW" id="chkVW" value="VW">
+
+                                                    <span class="checkmark"></span>
+                                                </label>
+                                            </div>
+                                            <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                                <label class="checkbox-container">
+                                                    <label class="f-600">Audi</label>
+                                                    <input type="checkbox" class="brand_names" name="chkAudi" id="chkAudi" value="Audi">
+
+                                                    <span class="checkmark"></span>
+                                                </label>
+                                            </div>
+                                            <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                <label class="checkbox-container">
+                                                    <label class="f-600">Porsche</label>
+                                                    <input type="checkbox" class="temp-checkbox brand_names" name="chkPorsche" id="chkPorsche" value="Porsche">
+
+                                                    <span class="checkmark"></span>
+                                                </label>
+                                            </div>
+                                            <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                <label class="checkbox-container">
+                                                    <label class="f-600">Lamborghini</label>
+                                                    <input type="checkbox" class="temp-checkbox brand_names" name="chkLamborghini" id="chkLamborghini" value="Lamborghini">
+
+                                                    <span class="checkmark"></span>
+                                                </label>
+                                            </div>
+                                            <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                <label class="checkbox-container">
+                                                </label>
+                                            </div>
+                                            <div class="col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                <label class="checkbox-container">
+                                                    <label class="f-600">All</label>
+                                                    <input type="checkbox" class="temp-checkbox brand_names" name="chkAll" id="chkAll" value="All">
+
+                                                    <span class="checkmark"></span>
+                                                </label>
+                                            </div>
+                                            <input type="hidden" name="Brand" id="chkBrand" value="">
+                                        </div>
+                                    </div>
+                                    <div class="row w-100">
+                                        <div class="row w-100">
+                                            <div class="form-group col-md-2 d-flex align-items-center col-lg-2 col-12">
+                                                <label id="lblServiceType" class="f-600" style="margin-left:15px; position: relative; top:10px;">
+                                                    Service Type<span class="astColor">*</span>
+                                                </label>
+                                            </div>
+
+                                            <div class="per col-md-3 col-lg-3 d-flex align-items-end col-12">
+                                                <label class="checkbox-container">
+                                                    <label class="f-600">Sales & After Sales</label>
+                                                    <input type="checkbox" class="ServiceType_names" name="chkSales" id="chkSales" value="Sales & After Sales">
+
+                                                    <span class="checkmark"></span>
+                                                </label>
+                                            </div>
+                                            <div class="align col-md-3 d-flex align-items-end col-lg-3 col-12">
+                                                <label class="checkbox-container">
+                                                    <label class="f-600">Corporate System</label>
+                                                    <input type="checkbox" class="temp-checkbox ServiceType_names" name="chkCorporate" id="chkCorporate" value="Corporate System">
+
+                                                    <span class="checkmark"></span>
+                                                </label>
+                                            </div>
+                                            <input type="hidden" name="ServiceType" id="chkServiceType" value="">
+                                        </div>
+                                    </div>
+                                    <div class="row w-100">
+                                        <div class="row w-100">
+                                            <div class="form-group col-md-2 d-flex align-items-center col-lg-2 col-12">
+                                                <label id="lblRequestType" class="f-600" style="margin-left:15px; position: relative; top:10px;">
+                                                    Type of Request<span class="astColor">*</span>
+                                                </label>
+                                            </div>
+
+                                            <div class="per col-md-3 col-lg-3 d-flex align-items-end col-12">
+                                                <label class="checkbox-container">
+                                                    <label class="f-600">User Creation</label>
+                                                    <input type="checkbox" class="clsTypeofRequest" name="chkUserCreation" id="chkUserCreation" value="User Creation">
+
+                                                    <span class="checkmark"></span>
+                                                </label>
+                                            </div>
+                                            <div class="align col-md-3 d-flex align-items-end col-lg-3 col-12">
+                                                <label class="checkbox-container">
+                                                    <label class="f-600">ID Deletion</label>
+                                                    <input type="checkbox" class="temp-checkbox clsTypeofRequest" name="chkIDDeletion" id="chkIDDeletion" value="ID Deletion">
+
+                                                    <span class="checkmark"></span>
+                                                </label>
+                                            </div>
+                                            <div class="per col-md-3 col-lg-3 d-flex align-items-end col-12">
+                                                <label class="checkbox-container">
+                                                    <label class="f-600">Password Reset</label>
+                                                    <input type="checkbox" class="clsTypeofRequest" name="chkPasswordReset" id="chkPasswordReset" value="Password Reset">
+
+                                                    <span class="checkmark"></span>
+                                                </label>
+                                            </div>
+                                            <input type="hidden" name="TypeofRequest" id="chkTypeRequest" value="">
+                                        </div>
+                                    </div>
+                                    <div class="mt-3">
+                                        <label id="lblApplicationCategory">Application Category</label>
+                                    </div>
+                                    <table class="mainTbl table table-border form-table-container-2">
+                                        <tbody>
+                                            <tr>
+                                                <td class="bt-0 bb-0 pl-0">
+                                                    <table class="mainTbl table table-border form-table-container-2">
+                                                        <tr>
+                                                            <td class="bt-0 bb-0 pl-0">
+                                                                <table class="w-100 mx-auto table table-border form-border text-center">
+
+                                                                    <thead class="form-head-1" style="margin-left:inherit !important;">
+                                                                        <tr>
+                                                                            <th>Sr. No.</th>
+                                                                            <th>Service Category</th>
+                                                                            <th>Service Sub-Category</th>
+                                                                            <th>Roles</th>
+                                                                            <th>Access Type</th>
+                                                                            <th>Brand</th>
+                                                                            <th>Application User ID</th>
+                                                                            @if (IsNewMode || IsEditMode)
+                                                                            {
+                                                                                <th></th>
+                                                                            }
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody class="form-border tableApplicationCategory" id="ApplicationCategoryBody">
+                                                                        @if (IsNewMode)
+                                                                        {
+                                                                            for (var i = 1; i < 2; i++)
+                                                                            {
+                                                                                <tr id='@("row" + i)' class="tr_input">
+                                                                                    <td class="sNo text-center">@i</td>
+                                                                                    <td class="text-center">
+                                                                                        <select class="drpServiceCategoryValidate" name="ServiceCategory" id='@("drpServiceCategory" + i)' onchange="getServiceSubCategoryByServiceCategory(this,'@("drpServiceSubCategory" + i)')">
+                                                                                        </select>
+                                                                                    </td>
+                                                                                    <td class="text-center">
+                                                                                        <select class="drpServiceSubCategoryValidate" name="ServiceSubCategory" id='@("drpServiceSubCategory" + i)' onchange="getRoleByServiceSubCategory(this,'@("drpServiceCategory" + i)','@("drpRole" + i)')" disabled>     <option value="-1" style="display:none;" selected>Select Service Sub Category</option></select>
+                                                                                    </td>
+                                                                                    <td class="text-center">
+                                                                                        <select class="drpRoleValidate" name="Role" id='@("drpRole" + i)' disabled>     <option value="Select Role" style="display:none;" selected>Select Role Name</option></select>
+                                                                                    </td>
+                                                                                    <td class="text-center">
+                                                                                        <select class="form-control drpAccessTypeValidate" name="AccessType" id="drpAccessType1">
+                                                                                            <option value="-1">Select Access Type</option>
+                                                                                            <option value="Full Access">Full Access</option>
+                                                                                            <option value="Read Only">Read Only</option>
+                                                                                        </select>
+                                                                                    </td>
+                                                                                    <td class="text-center">
+                                                                                        <select class="form-control drpBrandValidate" name="BrandApp" id="drpBrand1">
+                                                                                            <option value="-1">Select Brand</option>
+                                                                                            <option value="Skoda">Skoda</option>
+                                                                                            <option value="VW">VW</option>
+                                                                                            <option value="Audi">Audi</option>
+                                                                                            <option value="Porsche">Porsche</option>
+                                                                                            <option value="Lamborghini">Lamborghini</option>
+                                                                                        </select>
+                                                                                    </td>
+                                                                                    <td class="text-center" style="background-color:white; max-width:123px; vertical-align:central;"><input type="text" autocomplete="off" name="ApplicationUserId" id="txtApplicationUserId1" class="inpApplicationUserIdValidate"></td>
+                                                                                    <td class="text-center" style="background-color:white; max-width:123px; vertical-align:central;">
+                                                                                        <input class="remove-btn remove align-center" type="image" src="~/assets/img/remove.png"
+                                                                                               alt="Remove" style="max-width: 85%; background-color: white; border:none;">
+                                                                                    </td>
+                                                                                </tr>
+                                                                            }
+                                                                        }
+                                                                    </tbody>
+                                                                </table>
+                                                            </td>
+                                                        </tr>
+                                                        @if (IsNewMode || IsEditMode)
+                                                        {
+
+                                                            <tr align="right" id="addSoftwarebtn">
+                                                                <td class="">
+                                                                    <button type="button" class="btn btn-sm submit-btn d-flex float-right mb-2 bl-1 " onclick="AddRows()">
+                                                                        + Add
+                                                                    </button>
+                                                                    <input type="hidden" name="totalrows" id="totalrows" />
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="w-100">
+
+                                        <tr>
+                                            <td>
+                                                <div class="row w-100 hide" id="trGekoFileUpload">
+                                                    <div class="form-group d-flex align-items-center col-12">
+                                                        <label id="lbldocUpld" class="f-600" style="position: relative; top:10px;">
+                                                            <span class="placeholder" style="background-color: #fff;">Document Upload(GeKo)</span>
+                                                        </label>
+                                                    </div>
+
+                                                    <div class="form-group d-flex align-items-end col-12">
+                                                        <input type="file" name="docUploadGeKo" id="docUploadGeKo">
+                                                    </div>
+                                                    <div>
+                                                        <a download href="~/Doc/Geko form edited_.docx" target="_blank"> <i class="fa-solid fa-file-csv"></i> Download Sample File </a>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="row w-100 hide" id="trSAGA2FileUpload">
+                                                    <div class="form-group d-flex align-items-center col-12">
+                                                        <label id="lbldocUpld" class="f-600" style="position: relative; top:10px;">
+                                                            <span class="placeholder" style="background-color: #fff;">Document Upload(SAGA/2)</span>
+                                                        </label>
+                                                    </div>
+
+                                                    <div class="form-group d-flex align-items-end col-12">
+                                                        <input type="file" name="docUploadSAGA2" id="docUploadSAGA2">
+                                                    </div>
+                                                    <div>
+                                                        <a download href="~/Doc/EN_4_SAGA2_Dealer (14.05.2018).pdf" target="_blank"> <i class="fa-solid fa-file-csv"></i> Download Sample File </a>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2" style="padding-right: 0;">
+                                                <div class="w-100">
+                                                    <div class="per row col-12" style="padding: 0;">
+                                                        <label class="col-md-12 col-lg-12"><b>Business Justification</b></label>
+                                                        <textarea class="form-control col-md-12 col-lg-12" maxlength="500" ols="90" rows="3" name="BusinessNeed" id="txtBusinessNeed"></textarea>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            }
+                            @if (IsViewMode)
+                            {
+                                <div class="card-body">
+                                    <div class="row w-100">
+                                        <div class="row w-100">
+                                            <div class="form-group col-md-2 d-flex align-items-center col-lg-2 col-12">
+                                                <label id="lblBrand" class="f-600" style="margin-left:15px; position: relative; top:10px;">
+                                                    Brand<span class="astColor">*</span>
+                                                </label>
+                                            </div>
+                                            @if (URCF.Brand == "Skoda" || URCF.Brand == "All")
+                                            {
+                                                <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Skoda</label>
+                                                        <input type="checkbox" class="brand_names" name="chkSkoda" id="chkSkoda" value="Skoda" disabled checked>
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Skoda</label>
+                                                        <input type="checkbox" class="brand_names" disabled name="chkSkoda" id="chkSkoda" value="Skoda">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+
+                                            @if (URCF.Brand == "VW" || URCF.Brand == "All")
+                                            {
+                                                <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">VW</label>
+                                                        <input type="checkbox" disabled checked class="temp-checkbox brand_names" name="chkVW" id="chkVW" value="VW">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">VW</label>
+                                                        <input type="checkbox" disabled class="temp-checkbox brand_names" name="chkVW" id="chkVW" value="VW">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+
+                                            @if (URCF.Brand == "Audi" || URCF.Brand == "All")
+                                            {
+                                                <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Audi</label>
+                                                        <input type="checkbox" disabled checked class="brand_names" name="chkAudi" id="chkAudi" value="Audi">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Audi</label>
+                                                        <input type="checkbox" disabled class="brand_names" name="chkAudi" id="chkAudi" value="Audi">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            @if (URCF.Brand == "Porsche" || URCF.Brand == "All")
+                                            {
+                                                <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Porsche</label>
+                                                        <input type="checkbox" disabled checked class="temp-checkbox brand_names" name="chkPorsche" id="chkPorsche" value="Porsche">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Porsche</label>
+                                                        <input type="checkbox" disabled class="temp-checkbox brand_names" name="chkPorsche" id="chkPorsche" value="Porsche">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            @if (URCF.Brand == "Lamborghini" || URCF.Brand == "All")
+                                            {
+                                                <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Lamborghini</label>
+                                                        <input type="checkbox" disabled checked class="temp-checkbox brand_names" name="chkLamborghini" id="chkLamborghini" value="Lamborghini">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Lamborghini</label>
+                                                        <input type="checkbox" disabled class="temp-checkbox brand_names" name="chkLamborghini" id="chkLamborghini" value="Lamborghini">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+
+                                            <div class="col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                <label class="checkbox-container">
+                                                </label>
+                                            </div>
+
+                                            @if (URCF.Brand == "All")
+                                            {
+                                                <div class="col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">All</label>
+                                                        <input type="checkbox" disabled checked class="temp-checkbox brand_names" name="chkAll" id="chkAll" value="All">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">All</label>
+                                                        <input type="checkbox" disabled class="temp-checkbox brand_names" name="chkAll" id="chkAll" value="All">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+
+                                            <input type="hidden" name="Brand" id="chkBrand" value="@URCF.Brand">
+                                        </div>
+                                    </div>
+                                    <div class="row w-100">
+                                        <div class="row w-100">
+                                            <div class="form-group col-md-2 d-flex align-items-center col-lg-2 col-12">
+                                                <label id="lblServiceType" class="f-600" style="margin-left:15px; position: relative; top:10px;">
+                                                    Service Type<span class="astColor">*</span>
+                                                </label>
+                                            </div>
+                                            @if (URCF.ServiceType == "Sales & After Sales")
+                                            {
+                                                <div class="per col-md-3 col-lg-3 d-flex align-items-end col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Sales & After Sales</label>
+                                                        <input type="checkbox" disabled checked class="ServiceType_names" name="chkSales" id="chkSales" value="Sales & After Sales">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="per col-md-3 col-lg-3 d-flex align-items-end col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Sales & After Sales</label>
+                                                        <input type="checkbox" disabled class="ServiceType_names" name="chkSales" id="chkSales" value="Sales & After Sales">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            @if (URCF.ServiceType == "Corporate System")
+                                            {
+                                                <div class="align col-md-3 d-flex align-items-end col-lg-3 col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Corporate System</label>
+                                                        <input type="checkbox" disabled checked class="temp-checkbox ServiceType_names" name="chkCorporate" id="chkCorporate" value="Corporate System">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="align col-md-3 d-flex align-items-end col-lg-3 col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Corporate System</label>
+                                                        <input type="checkbox" disabled class="temp-checkbox ServiceType_names" name="chkCorporate" id="chkCorporate" value="Corporate System">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+
+                                            <input type="hidden" name="ServiceType" id="chkServiceType" value="@URCF.ServiceType">
+                                        </div>
+                                    </div>
+                                    <div class="row w-100">
+                                        <div class="row w-100">
+                                            <div class="form-group col-md-2 d-flex align-items-center col-lg-2 col-12">
+                                                <label id="lblRequestType" class="f-600" style="margin-left:15px; position: relative; top:10px;">
+                                                    Type of Request<span class="astColor">*</span>
+                                                </label>
+                                            </div>
+                                            @if (URCF.TypeofRequest == "User Creation")
+                                            {
+                                                <div class="per col-md-3 col-lg-3 d-flex align-items-end col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">User Creation</label>
+                                                        <input type="checkbox" disabled checked class="clsTypeofRequest" name="chkUserCreation" id="chkUserCreation" value="User Creation">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="per col-md-3 col-lg-3 d-flex align-items-end col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">User Creation</label>
+                                                        <input type="checkbox" disabled class="clsTypeofRequest" name="chkUserCreation" id="chkUserCreation" value="User Creation">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            @if (URCF.TypeofRequest == "ID Deletion")
+                                            {
+                                                <div class="align col-md-3 d-flex align-items-end col-lg-3 col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">ID Deletion</label>
+                                                        <input type="checkbox" disabled checked class="temp-checkbox clsTypeofRequest" name="chkIDDeletion" id="chkIDDeletion" value="ID Deletion">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="align col-md-3 d-flex align-items-end col-lg-3 col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">ID Deletion</label>
+                                                        <input type="checkbox" disabled class="temp-checkbox clsTypeofRequest" name="chkIDDeletion" id="chkIDDeletion" value="ID Deletion">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            @if (URCF.TypeofRequest == "Password Reset")
+                                            {
+                                                <div class="per col-md-3 col-lg-3 d-flex align-items-end col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Password Reset</label>
+                                                        <input type="checkbox" disabled checked class="clsTypeofRequest" name="chkPasswordReset" id="chkPasswordReset" value="Password Reset">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="per col-md-3 col-lg-3 d-flex align-items-end col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Password Reset</label>
+                                                        <input type="checkbox" disabled class="clsTypeofRequest" name="chkPasswordReset" id="chkPasswordReset" value="Password Reset">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+
+                                            <input type="hidden" name="TypeofRequest" id="chkTypeRequest" value="@URCF.TypeofRequest">
+                                        </div>
+                                    </div>
+                                    <div class="mt-3">
+                                        <label id="lblApplicationCategory">Application Category</label>
+                                    </div>
+                                    <table class="mainTbl table table-border form-table-container-2">
+                                        <tbody>
+                                            <tr>
+                                                <td class="bt-0 bb-0 pl-0">
+                                                    <table class="mainTbl table table-border form-table-container-2">
+                                                        <tr>
+                                                            <td class="bt-0 bb-0 pl-0">
+                                                                <table class="w-100 mx-auto table table-border form-border text-center">
+
+                                                                    <thead class="form-head-1" style="margin-left:inherit !important;">
+                                                                        <tr>
+                                                                            <th>Sr. No.</th>
+                                                                            <th>Service Category</th>
+                                                                            <th>Service Sub-Category</th>
+                                                                            <th>Roles</th>
+                                                                            <th>Access Type</th>
+                                                                            <th>Brand</th>
+                                                                            <th>Application User ID</th>
+                                                                            @if (IsNewMode || IsEditMode)
+                                                                            {
+                                                                                <th></th>
+                                                                            }
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody class="form-border tableApplicationCategory" id="ApplicationCategoryBody">
+                                                                        @if (IsViewMode)
+                                                                        {
+                                                                            var count = 1;
+                                                                            foreach (var item in URCF.ApplicationCategoryData)
+                                                                            {
+                                                                                <tr id="" class="tr_input">
+                                                                                    <td class="sNo text-center">@count</td>
+                                                                                    <td class="text-center">
+                                                                                        <input type="text" disabled class="inpDisable" name="drpServiceCategory" id="drpServiceCategory" value="@(item.ServiceCategory)" />
+                                                                                    </td>
+                                                                                    <td class="text-center">
+                                                                                        <input type="text" disabled class="inpDisable" name="drpServiceSubCategory" id="drpServiceSubCategory" value="@(item.ServiceSubCategory)" />
+                                                                                    </td>
+                                                                                    <td class="text-center">
+                                                                                        <input type="text" disabled class="inpDisable" name="drpRole" id="drpRole" value="@(item.Role != ""  ? item.Role : "Select Role")" />
+                                                                                    </td>
+                                                                                    <td class="text-center">
+                                                                                        <input type="text" disabled class="inpDisable" name="drpAccessType" id="drpAccessType" value="@(item.AccessType)" />
+                                                                                    </td>
+                                                                                    <td class="text-center">
+                                                                                        <input type="text" disabled class="inpDisable" name="drpBrand" id="drpBrand" value="@(item.BrandApp)" />
+                                                                                    </td>
+                                                                                    <td class="text-center">
+                                                                                        <input type="text" disabled class="inpDisable" name="txtApplicationUserId" id="txtApplicationUserId" value="@(item.ApplicationUserID)" />
+                                                                                    </td>
+                                                                                </tr>
+                                                                                count++;
+                                                                            }
+
+                                                                        }
+                                                                    </tbody>
+                                                                </table>
+                                                            </td>
+                                                        </tr>
+                                                        @if (IsNewMode || IsEditMode)
+                                                        {
+
+                                                            <tr align="right" id="addSoftwarebtn">
+                                                                <td class="">
+                                                                    <button type="button" class="btn btn-sm submit-btn d-flex float-right mb-2 bl-1 " onclick="AddRows()">
+                                                                        + Add
+                                                                    </button>
+                                                                    <input type="hidden" name="totalrows" id="totalrows" />
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="w-100">
+
+                                        <tr>
+                                            <td>
+                                                <div class="row w-100 hide" id="trGekoFileUpload">
+                                                    <div class="form-group d-flex align-items-center col-12">
+                                                        <label id="lbldocUpld" class="f-600" style="position: relative; top:10px;">
+                                                            <span class="placeholder" style="background-color: #fff;">Document Upload(GeKo)</span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-group d-flex align-items-end col-12">
+
+                                                        @if (GekoFile != null)
+                                                        {
+                                                            <input type="hidden" id="attachedfile" name="attachedfile" value="@System.Configuration.ConfigurationManager.AppSettings["SharepointSiteURL"]@Server.HtmlEncode(GekoFile.ServerRelativeUrl)" />
+                                                            <input type="hidden" id="attachedfileName" name="attachedfileName" value="@GekoFile.FileName" />
+                                                            <a href="@System.Configuration.ConfigurationManager.AppSettings["SharepointSiteURL"]@Server.HtmlEncode(GekoFile.ServerRelativeUrl)" id="attachedfileLink" download=@GekoFile.FileName target="_blank">@GekoFile.FileName </a>
+                                                        }
+                                                    </div>
+                                                    @*<div class="form-group d-flex align-items-end col-12">
+                                                            <input type="file" name="docUploadGeKo" id="docUploadGeKo">
+                                                        </div>
+                                                        <div>
+                                                            <a download href="~/Doc/Geko form edited_.docx" target="_blank"> <i class="fa-solid fa-file-csv"></i> Download Sample File </a>
+                                                        </div>*@
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="row w-100 hide" id="trSAGA2FileUpload">
+                                                    <div class="form-group d-flex align-items-center col-12">
+                                                        <label id="lbldocUpld" class="f-600" style="position: relative; top:10px;">
+                                                            <span class="placeholder" style="background-color: #fff;">Document Upload(SAGA/2)</span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-group d-flex align-items-end col-12">
+
+                                                        @if (SAGA2File != null)
+                                                        {
+                                                            <input type="hidden" id="attachedfile1" name="attachedfile1" value="@System.Configuration.ConfigurationManager.AppSettings["SharepointSiteURL"]@Server.HtmlEncode(GekoFile.ServerRelativeUrl)" />
+                                                            <input type="hidden" id="attachedfileName1" name="attachedfileName1" value="@SAGA2File.FileName" />
+                                                            <a href="@System.Configuration.ConfigurationManager.AppSettings["SharepointSiteURL"]@Server.HtmlEncode(SAGA2File.ServerRelativeUrl)" id="attachedfileLink1" download=@SAGA2File.FileName target="_blank">@SAGA2File.FileName </a>
+                                                        }
+                                                    </div>
+                                                    @*<div class="form-group d-flex align-items-end col-12">
+                                                            <input type="file" name="docUploadSAGA2" id="docUploadSAGA2">
+                                                        </div>
+                                                        <div>
+                                                            <a download href="~/Doc/EN_4_SAGA2_Dealer (14.05.2018).pdf" target="_blank"> <i class="fa-solid fa-file-csv"></i> Download Sample File </a>
+                                                        </div>*@
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2" style="padding-right: 0;">
+                                                <div class="w-100">
+                                                    <div class="per row col-12" style="padding: 0;">
+                                                        <label class="col-md-12 col-lg-12"><b>Business Justification</b></label>
+                                                        <textarea class="form-control col-md-12 col-lg-12" maxlength="500" ols="90" rows="3" name="BusinessNeed" disabled id="txtBusinessNeed">@URCF.BusinessNeed</textarea>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            }
+                            @if (IsEditMode)
+                            {
+                                <div class="card-body">
+                                    <div class="row w-100">
+                                        <div class="row w-100">
+                                            <div class="form-group col-md-2 d-flex align-items-center col-lg-2 col-12">
+                                                <label id="lblBrand" class="f-600" style="margin-left:15px; position: relative; top:10px;">
+                                                    Brand<span class="astColor">*</span>
+                                                </label>
+                                            </div>
+                                            @if (URCF.Brand == "Skoda" || URCF.Brand == "All")
+                                            {
+                                                <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Skoda</label>
+                                                        <input type="checkbox" disabled class="brand_names" name="chkSkoda" id="chkSkoda" value="Skoda" checked>
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Skoda</label>
+                                                        <input type="checkbox" class="brand_names" name="chkSkoda" id="chkSkoda" value="Skoda">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+
+                                            @if (URCF.Brand == "VW" || URCF.Brand == "All")
+                                            {
+                                                <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">VW</label>
+                                                        <input type="checkbox" disabled checked class="temp-checkbox brand_names" name="chkVW" id="chkVW" value="VW">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">VW</label>
+                                                        <input type="checkbox" class="temp-checkbox brand_names" name="chkVW" id="chkVW" value="VW">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+
+                                            @if (URCF.Brand == "Audi" || URCF.Brand == "All")
+                                            {
+                                                <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Audi</label>
+                                                        <input type="checkbox" disabled checked class="brand_names" name="chkAudi" id="chkAudi" value="Audi">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Audi</label>
+                                                        <input type="checkbox" class="brand_names" name="chkAudi" id="chkAudi" value="Audi">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            @if (URCF.Brand == "Porsche" || URCF.Brand == "All")
+                                            {
+                                                <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Porsche</label>
+                                                        <input type="checkbox" disabled checked class="temp-checkbox brand_names" name="chkPorsche" id="chkPorsche" value="Porsche">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Porsche</label>
+                                                        <input type="checkbox" class="temp-checkbox brand_names" name="chkPorsche" id="chkPorsche" value="Porsche">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            @if (URCF.Brand == "Lamborghini" || URCF.Brand == "All")
+                                            {
+                                                <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Lamborghini</label>
+                                                        <input type="checkbox" disabled checked class="temp-checkbox brand_names" name="chkLamborghini" id="chkLamborghini" value="Lamborghini">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Lamborghini</label>
+                                                        <input type="checkbox" class="temp-checkbox brand_names" name="chkLamborghini" id="chkLamborghini" value="Lamborghini">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+
+                                            <div class="col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                <label class="checkbox-container">
+                                                </label>
+                                            </div>
+
+                                            @if (URCF.Brand == "All")
+                                            {
+                                                <div class="col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">All</label>
+                                                        <input type="checkbox" checked class="temp-checkbox brand_names" name="chkAll" id="chkAll" value="All">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">All</label>
+                                                        <input type="checkbox" class="temp-checkbox brand_names" name="chkAll" id="chkAll" value="All">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+
+                                            <input type="hidden" name="Brand" id="chkBrand" value="@URCF.Brand">
+                                        </div>
+                                    </div>
+                                    <div class="row w-100">
+                                        <div class="row w-100">
+                                            <div class="form-group col-md-2 d-flex align-items-center col-lg-2 col-12">
+                                                <label id="lblServiceType" class="f-600" style="margin-left:15px; position: relative; top:10px;">
+                                                    Service Type<span class="astColor">*</span>
+                                                </label>
+                                            </div>
+                                            @if (URCF.ServiceType == "Sales & After Sales")
+                                            {
+                                                <div class="per col-md-3 col-lg-3 d-flex align-items-end col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Sales & After Sales</label>
+                                                        <input type="checkbox" checked class="ServiceType_names" name="chkSales" id="chkSales" value="Sales & After Sales">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="per col-md-3 col-lg-3 d-flex align-items-end col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Sales & After Sales</label>
+                                                        <input type="checkbox" class="ServiceType_names" name="chkSales" id="chkSales" value="Sales & After Sales">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            @if (URCF.ServiceType == "Corporate System")
+                                            {
+                                                <div class="align col-md-3 d-flex align-items-end col-lg-3 col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Corporate System</label>
+                                                        <input type="checkbox" checked class="temp-checkbox ServiceType_names" name="chkCorporate" id="chkCorporate" value="Corporate System">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="align col-md-3 d-flex align-items-end col-lg-3 col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Corporate System</label>
+                                                        <input type="checkbox" class="temp-checkbox ServiceType_names" name="chkCorporate" id="chkCorporate" value="Corporate System">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+
+                                            <input type="hidden" name="ServiceType" id="chkServiceType" value="@URCF.ServiceType">
+                                        </div>
+                                    </div>
+                                    <div class="row w-100">
+                                        <div class="row w-100">
+                                            <div class="form-group col-md-2 d-flex align-items-center col-lg-2 col-12">
+                                                <label id="lblRequestType" class="f-600" style="margin-left:15px; position: relative; top:10px;">
+                                                    Type of Request<span class="astColor">*</span>
+                                                </label>
+                                            </div>
+                                            @if (URCF.TypeofRequest == "User Creation")
+                                            {
+                                                <div class="per col-md-3 col-lg-3 d-flex align-items-end col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">User Creation</label>
+                                                        <input type="checkbox" checked class="clsTypeofRequest" name="chkUserCreation" id="chkUserCreation" value="User Creation">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="per col-md-3 col-lg-3 d-flex align-items-end col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">User Creation</label>
+                                                        <input type="checkbox" class="clsTypeofRequest" name="chkUserCreation" id="chkUserCreation" value="User Creation">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            @if (URCF.TypeofRequest == "ID Deletion")
+                                            {
+                                                <div class="align col-md-3 d-flex align-items-end col-lg-3 col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">ID Deletion</label>
+                                                        <input type="checkbox" checked class="temp-checkbox clsTypeofRequest" name="chkIDDeletion" id="chkIDDeletion" value="ID Deletion">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="align col-md-3 d-flex align-items-end col-lg-3 col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">ID Deletion</label>
+                                                        <input type="checkbox" class="temp-checkbox clsTypeofRequest" name="chkIDDeletion" id="chkIDDeletion" value="ID Deletion">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            @if (URCF.TypeofRequest == "Password Reset")
+                                            {
+                                                <div class="per col-md-3 col-lg-3 d-flex align-items-end col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Password Reset</label>
+                                                        <input type="checkbox" checked class="clsTypeofRequest" name="chkPasswordReset" id="chkPasswordReset" value="Password Reset">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="per col-md-3 col-lg-3 d-flex align-items-end col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Password Reset</label>
+                                                        <input type="checkbox" class="clsTypeofRequest" name="chkPasswordReset" id="chkPasswordReset" value="Password Reset">
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+
+                                            <input type="hidden" name="TypeofRequest" id="chkTypeRequest" value="@URCF.TypeofRequest">
+                                        </div>
+                                    </div>
+                                    <div class="mt-3">
+                                        <label id="lblApplicationCategory">Application Category</label>
+                                    </div>
+                                    <table class="mainTbl table table-border form-table-container-2">
+                                        <tbody>
+                                            <tr>
+                                                <td class="bt-0 bb-0 pl-0">
+                                                    <table class="mainTbl table table-border form-table-container-2">
+                                                        <tr>
+                                                            <td class="bt-0 bb-0 pl-0">
+                                                                <table class="w-100 mx-auto table table-border form-border text-center">
+
+                                                                    <thead class="form-head-1" style="margin-left:inherit !important;">
+                                                                        <tr>
+                                                                            <th>Sr. No.</th>
+                                                                            <th>Service Category</th>
+                                                                            <th>Service Sub-Category</th>
+                                                                            <th>Roles</th>
+                                                                            <th>Access Type</th>
+                                                                            <th>Brand</th>
+                                                                            <th>Application User ID</th>
+                                                                            @if (IsNewMode || IsEditMode)
+                                                                            {
+                                                                                <th></th>
+                                                                            }
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody class="form-border tableApplicationCategory" id="ApplicationCategoryBody">
+                                                                        @if (IsEditMode)
+                                                                        {
+                                                                            var count = 1;
+                                                                            foreach (var item in URCF.ApplicationCategoryData)
+                                                                            {
+                                                                                <tr id='@("row" + count)' class="tr_input">
+                                                                                    <td class="sNo text-center">@count</td>
+                                                                                    <td class="text-center">
+                                                                                        <select class="drpServiceCategoryValidate" name="ServiceCategory" id='@("drpServiceCategory" + count)' onchange="getServiceSubCategoryByServiceCategory(this,'@("drpServiceSubCategory" + count)')">
+                                                                                        </select>
+                                                                                    </td>
+                                                                                    <td class="text-center">
+                                                                                        <select class="drpServiceSubCategoryValidate" name="ServiceSubCategory" id='@("drpServiceSubCategory" + count)' onchange="getRoleByServiceSubCategory(this,'@("drpServiceCategory" + count)','@("drpRole" + count)')">     <option value="Select Role" style="display:none;" selected>Select Service Sub Category</option></select>
+                                                                                    </td>
+                                                                                    <td class="text-center">
+                                                                                        <select class="drpRoleValidate" name="Role" id='@("drpRole" + count)'>     <option value="Select Role" style="display:none;" selected>Select Role Name</option></select>
+                                                                                    </td>
+                                                                                    <td class="text-center">
+                                                                                        <select class="form-control drpAccessTypeValidate" name="AccessType" id='@("drpAccessType" + count)'>
+                                                                                            <option value="-1">Select Access Type</option>
+                                                                                            <option @(item.AccessType == "Full Access" ? "selected" : "" ) value="Full Access">Full Access</option>
+                                                                                            <option @(item.AccessType == "Read Only" ? "selected" : "" ) value="Read Only">Read Only</option>
+                                                                                        </select>
+                                                                                    </td>
+                                                                                    <td class="text-center">
+                                                                                        <select class="form-control drpBrandValidate" name="BrandApp" id='@("drpBrand" + count)'>
+                                                                                            <option value="-1">Select Brand</option>
+                                                                                            <option @(item.BrandApp == "Skoda" ? "selected" : "" ) value="Skoda">Skoda</option>
+                                                                                            <option @(item.BrandApp == "VW" ? "selected" : "" ) value="VW">VW</option>
+                                                                                            <option @(item.BrandApp == "Audi" ? "selected" : "" ) value="Audi">Audi</option>
+                                                                                            <option @(item.BrandApp == "Porsche" ? "selected" : "" ) value="Porsche">Porsche</option>
+                                                                                            <option @(item.BrandApp == "Lamborghini" ? "selected" : "" ) value="Lamborghini">Lamborghini</option>
+                                                                                        </select>
+                                                                                    </td>
+                                                                                    <td class="text-center" style="background-color:white; max-width:123px; vertical-align:central;"><input type="text" name="ApplicationUserId" id='@("txtApplicationUserId" + count)' class="inpApplicationUserIdValidate" value="@item.ApplicationUserID"></td>
+                                                                                    <td class="text-center" style="background-color:white; max-width:123px; vertical-align:central;">
+                                                                                        <input class="remove-btn remove align-center" type="image" src="~/assets/img/remove.png"
+                                                                                               alt="Remove" style="max-width: 85%; background-color: white; border:none;">
+                                                                                    </td>
+                                                                                </tr>
+                                                                                count++;
+                                                                            }
+
+                                                                        }
+                                                                    </tbody>
+                                                                </table>
+                                                            </td>
+                                                        </tr>
+                                                        @if (IsNewMode || IsEditMode)
+                                                        {
+
+                                                            <tr align="right" id="addSoftwarebtn">
+                                                                <td class="">
+                                                                    <button type="button" class="btn btn-sm submit-btn d-flex float-right mb-2 bl-1 " onclick="AddRows()">
+                                                                        + Add
+                                                                    </button>
+                                                                    <input type="hidden" name="totalrows" id="totalrows" />
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="w-100">
+
+                                        <tr>
+                                            <td>
+                                                <div class="row w-100 hide" id="trGekoFileUpload">
+                                                    <div class="form-group d-flex align-items-center col-12">
+                                                        <label id="lbldocUpld" class="f-600" style="position: relative; top:10px;">
+                                                            <span class="placeholder" style="background-color: #fff;">Document Upload(GeKo)</span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-group d-flex align-items-end col-12">
+
+                                                        @if (GekoFile != null)
+                                                        {
+                                                            <input type="hidden" id="attachedfile" name="attachedfile" value="@System.Configuration.ConfigurationManager.AppSettings["SharepointSiteURL"]@Server.HtmlEncode(GekoFile.ServerRelativeUrl)" />
+                                                            <input type="hidden" id="attachedfileName" name="attachedfileName" value="@GekoFile.FileName" />
+                                                            <a href="@System.Configuration.ConfigurationManager.AppSettings["SharepointSiteURL"]@Server.HtmlEncode(GekoFile.ServerRelativeUrl)" id="attachedfileLink" download=@GekoFile.FileName target="_blank">@GekoFile.FileName </a>
+                                                        }
+                                                    </div>
+                                                    <div class="form-group d-flex align-items-end col-12">
+                                                        <input type="file" name="docUploadGeKo" id="docUploadGeKo">
+                                                    </div>
+                                                    @*<div>
+                                                            <a download href="~/Doc/Geko form edited_.docx" target="_blank"> <i class="fa-solid fa-file-csv"></i> Download Sample File </a>
+                                                        </div>*@
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="row w-100 hide" id="trSAGA2FileUpload">
+                                                    <div class="form-group d-flex align-items-center col-12">
+                                                        <label id="lbldocUpld" class="f-600" style="position: relative; top:10px;">
+                                                            <span class="placeholder" style="background-color: #fff;">Document Upload(SAGA/2)</span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-group d-flex align-items-end col-12">
+
+                                                        @if (SAGA2File != null)
+                                                        {
+                                                            <input type="hidden" id="attachedfile1" name="attachedfile1" value="@System.Configuration.ConfigurationManager.AppSettings["SharepointSiteURL"]@Server.HtmlEncode(GekoFile.ServerRelativeUrl)" />
+                                                            <input type="hidden" id="attachedfileName1" name="attachedfileName1" value="@SAGA2File.FileName" />
+                                                            <a href="@System.Configuration.ConfigurationManager.AppSettings["SharepointSiteURL"]@Server.HtmlEncode(SAGA2File.ServerRelativeUrl)" id="attachedfileLink1" download=@SAGA2File.FileName target="_blank">@SAGA2File.FileName </a>
+                                                        }
+                                                    </div>
+                                                    <div class="form-group d-flex align-items-end col-12">
+                                                        <input type="file" name="docUploadSAGA2" id="docUploadSAGA2">
+                                                    </div>
+                                                    @*<div>
+                                                            <a download href="~/Doc/EN_4_SAGA2_Dealer (14.05.2018).pdf" target="_blank"> <i class="fa-solid fa-file-csv"></i> Download Sample File </a>
+                                                        </div>*@
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2" style="padding-right: 0;">
+                                                <div class="w-100">
+                                                    <div class="per row col-12" style="padding: 0;">
+                                                        <label class="col-md-12 col-lg-12"><b>Business Justification</b></label>
+                                                        <textarea class="form-control col-md-12 col-lg-12" maxlength="500" ols="90" rows="3" name="BusinessNeed" id="txtBusinessNeed">@URCF.BusinessNeed</textarea>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                @* Approval Section And Action Section *@
+                @if (IsViewMode || IsEditMode)
+                {
+                    //Approval Section
+                    <div id="accordion">
+                        <div class="card">
+                            <div class="card-header collapsed" id="headingFour" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                                <h5 class="mb-0">
+                                    <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                                        <img src="~/assets/img/approvalTracking.svg" width="24" height="24" class="mr-2" />Approval Tracking
+                                    </button>
+                                </h5>
+                            </div>
+                            <div id="collapseFour" class="collapse" aria-labelledby="headingFour">
+                                <div class="card-body">
+                                    <div class="form-row">
+                                        <div class="col-12">
+                                            <table class="table w-100 td-border showBorder">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Name</th>
+                                                        <th>Role</th>
+                                                        <th style="display: @(appList.Any(x => !string.IsNullOrEmpty(x.ExtraDetails)) ? " " : " none")">Content</th>
+                                                        <th>Processed on</th>
+                                                        <th>Status</th>
+                                                        <th class="text-center">Comments</th>
+                                                        <th class="text-center">Approval Level</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @if (IsViewMode || IsEditMode)
+                                                    {
+                                                        Html.RenderPartial("_ApprovalTracking", appList);
+                                                    }
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                @* Buttons *@
+                @if (IsNewMode)
+                {
+                    <div class="card-footer align-content-center">
+                        <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                            Submit
+                        </button>
+                        <button type="reset" class="btn btn-danger btn-sm cancl-btn" id="btnCancel">
+                            Cancel
+                        </button>
+                    </div>
+                }
+                else if (IsEditMode)
+                {
+                    <div class="card-footer align-content-center">
+                        <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                            Re-Submit
+                        </button>
+                        <button type="reset" class="btn btn-danger btn-sm cancl-btn" id="btnCancel">
+                            Cancel
+                        </button>
+                    </div>
+                }
+
+            </form>
+            <div class="pt-3">
+                <p class="text-left f-600">SF_FI_012</p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="successModel" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header modelHeader">
+                <span class="modal-title modalMsgTitle" id="modalTitle"></span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label id="modalBody" class="lableMsg">  </label>
+                <input type="hidden" id="tab" value="0" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="submitBomBtn publishBtn" id="modalOkButton" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var spinner = $('#loader');
+    var IsNewMode = @Html.Raw(Json.Encode(IsNewMode));
+    var IsEditMode = @Html.Raw(Json.Encode(IsEditMode));
+    var IsViewMode = @Html.Raw(Json.Encode(IsViewMode));
+    var URCF = @Html.Raw(Json.Encode(model1));
+    var appRowId = @Html.Raw(Json.Encode(AppRowId));
+    var formID = @Html.Raw(Json.Encode(FormId));
+    var approvalType =@Html.Raw(Json.Encode(ApprovalType));
+    var currentUserDesgn = @Html.Raw(Json.Encode(CurrentUserDesgn));
+    var currentUserLevel =@Html.Raw(Json.Encode(CurrentUserLevel));
+    var selectedListData = @Html.Raw(Json.Encode(tableCount));
+    var rowIdx = 0;
+    pageLoad();
+    var errorCount = 0;
+    var errors = "";
+
+    var serviceCategoryList = [];
+    var serviceSubCategoryList = [];
+    var appCatList = [];
+    var allData = [];
+    var id = [];
+
+    $(document).ready(function () {
+        pageLoad();
+    });
+
+    function pageLoad() {
+        $("#headingErr").addClass('d-none');
+
+        if (IsNewMode) {
+            getAccessDoorListData();
+            count = 0;
+            rowIdx = 1;
+            $("#txtNumberofUsers").val(rowIdx);
+        }
+        if (IsViewMode) {
+            //
+            var serviceSubCategory = "";
+            var i = 0;
+            for (i = 0; i < selectedListData; i++) {
+                serviceSubCategory = URCF.ApplicationCategoryData[i].ServiceSubCategory;
+                if (serviceSubCategory.includes('GeKo')) {
+                    $("#trGekoFileUpload").removeClass('hide');
+                }
+                else if (serviceSubCategory.includes('SAGA/2')) {
+                    $("#trSAGA2FileUpload").removeClass('hide');
+                }
+                else if (serviceSubCategory.includes('SAGA/2') && serviceSubCategory.includes('GeKo')) {
+                    $("#trSAGA2FileUpload").removeClass('hide');
+                    $("#trGekoFileUpload").removeClass('hide');
+                }
+            }
+
+            var appCatTotal = parseInt(document.getElementById("ApplicationCategoryDataCurr").value);
+            console.log(appCatTotal);
+            rowIdx = appCatTotal;
+            count = appCatTotal;
+            $("#txtNumberofUsers").val(count);
+        }
+        if (IsEditMode) {
+            //
+            getAccessDoorListData();
+            var serviceSubCategory = "";
+            var i = 0;
+            for (i = 0; i < selectedListData; i++) {
+                serviceSubCategory = URCF.ApplicationCategoryData[i].ServiceSubCategory;
+                if (serviceSubCategory.includes('GeKo')) {
+                    $("#trGekoFileUpload").removeClass('hide');
+                }
+                else if (serviceSubCategory.includes('SAGA/2')) {
+                    $("#trSAGA2FileUpload").removeClass('hide');
+                }
+                else if (serviceSubCategory.includes('SAGA/2') && serviceSubCategory.includes('GeKo')) {
+                    $("#trSAGA2FileUpload").removeClass('hide');
+                    $("#trGekoFileUpload").removeClass('hide');
+                }
+            }
+
+            //Brand Show Hide
+            if (URCF.Brand == "Skoda") {
+                $(".drpBrandValidate option[value='VW']").hide();
+                $(".drpBrandValidate option[value='Audi']").hide();
+                $(".drpBrandValidate option[value='Porsche']").hide();
+                $(".drpBrandValidate option[value='Lamborghini']").hide();
+                $(".drpBrandValidate option[value='Skoda']").show();
+            }
+            else if (URCF.Brand == "VW") {
+                $(".drpBrandValidate option[value='Skoda']").hide();
+                $(".drpBrandValidate option[value='Audi']").hide();
+                $(".drpBrandValidate option[value='Porsche']").hide();
+                $(".drpBrandValidate option[value='Lamborghini']").hide();
+                $(".drpBrandValidate option[value='VW']").show();
+            }
+            else if (URCF.Brand == "Audi") {
+                $(".drpBrandValidate option[value='Skoda']").hide();
+                $(".drpBrandValidate option[value='VW']").hide();
+                $(".drpBrandValidate option[value='Porsche']").hide();
+                $(".drpBrandValidate option[value='Lamborghini']").hide();
+                $(".drpBrandValidate option[value='Audi']").show();
+            }
+            else if (URCF.Brand == "Porsche") {
+                $(".drpBrandValidate option[value='Skoda']").hide();
+                $(".drpBrandValidate option[value='Audi']").hide();
+                $(".drpBrandValidate option[value='Porsche']").hide();
+                $(".drpBrandValidate option[value='Lamborghini']").hide();
+                $(".drpBrandValidate option[value='Porsche']").show();
+            }
+            else if (URCF.Brand == "Lamborghini") {
+                $(".drpBrandValidate option[value='Skoda']").hide();
+                $(".drpBrandValidate option[value='Audi']").hide();
+                $(".drpBrandValidate option[value='Porsche']").hide();
+                $(".drpBrandValidate option[value='VW']").hide();
+                $(".drpBrandValidate option[value='Lamborghini']").show();
+            }
+            else if (URCF.Brand == "All") {
+                $(".drpBrandValidate option[value='Skoda']").show();
+                $(".drpBrandValidate option[value='Audi']").show();
+                $(".drpBrandValidate option[value='Porsche']").show();
+                $(".drpBrandValidate option[value='VW']").show();
+                $(".drpBrandValidate option[value='Lamborghini']").show();
+            }
+
+            
+            var chkTypeRequest = URCF.TypeofRequest;
+            if (chkTypeRequest == "User Creation") {
+                $("input.inpApplicationUserIdValidate").attr("readOnly", true);
+                
+            }
+        }
+    }
+
+    $("#btnSubmit").on('click', function (e) {
+        //
+        errors = "";
+        validateSubmitter();
+        validateApplicant();
+
+        if ($('.brand_names:checkbox:checked').length == 0) {
+            errors += "<li id='error" + errorCount + "'>" + "Brand" + "</li>";
+            $("#chkSkoda").addClass('removeBrand');
+            $("#chkVW").addClass('removeBrand');
+            $("#chkAudi").addClass('removeBrand');
+            $("#chkPorsche").addClass('removeBrand');
+            $("#chkLamborghini").addClass('removeBrand');
+            $("#chkAll").addClass('removeBrand');
+            AddError("lblBrand", 'removeBrand', errorCount);
+            errorCount++;
+        }
+        else {
+            RemoveError("lblBrand");
+        }
+
+        if ($('.ServiceType_names:checkbox:checked').length == 0) {
+            errors += "<li id='error" + errorCount + "'>" + "Service Type" + "</li>";
+            $("#chkSales").addClass('removeServiceType');
+            $("#chkCorporate").addClass('removeServiceType');
+            AddError("lblServiceType", 'removeServiceType', errorCount);
+            errorCount++;
+        }
+        else {
+            RemoveError("lblServiceType");
+        }
+
+        if ($('.clsTypeofRequest:checkbox:checked').length == 0) {
+            errors += "<li id='error" + errorCount + "'>" + "Type of Request" + "</li>";
+            $("#chkUserCreation").addClass('removeTypeofRequest');
+            $("#chkIDDeletion").addClass('removeTypeofRequest');
+            $("#chkPasswordReset").addClass('removeTypeofRequest');
+            AddError("lblRequestType", 'removeTypeofRequest', errorCount);
+            errorCount++;
+        }
+        else {
+            RemoveError("lblRequestType");
+        }
+
+        var txtBusinessNeed = document.getElementById("txtBusinessNeed").value;
+        if (txtBusinessNeed == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Business Justification" + "</li>";
+            AddError("txtBusinessNeed", '', errorCount);
+            errorCount++;
+        }
+        else {
+            RemoveError("txtBusinessNeed");
+        }
+
+
+        //
+        let tblCount = $(".tableApplicationCategory").length;
+        var chkTypeRequest = $("#chkTypeRequest").val();
+
+        if (tblCount > 0) {
+            // //
+            let rowCount = 1;
+
+            $(".tableApplicationCategory").find('tr').each(function () {
+                let currentTr = $(this);
+                let currServiceCategory = $(currentTr).find(".drpServiceCategoryValidate").val();
+                let currServiceSubCategory = $(currentTr).find(".drpServiceSubCategoryValidate").val();
+                let currRole = $(currentTr).find(".drpRoleValidate").val();
+                let currAccessType = $(currentTr).find(".drpAccessTypeValidate").val();
+                let currBrand = $(currentTr).find(".drpBrandValidate").val();
+                let currApplicationUserId = $(currentTr).find(".inpApplicationUserIdValidate").val();
+
+                if (currServiceCategory == "-1" && currServiceSubCategory == "-1" && currRole == "-1" && currAccessType == "-1" && currBrand=="-1") {
+                    errors += "<li id='error" + errorCount + "'>" + "Enter data in row " + rowCount + " in Application Category Details." + "</li>";
+                    $("#lblApplicationCategory").addClass('removeAppCatDet');
+                    AddError("lblApplicationCategory", 'removeAppCatDet', errorCount);
+                    errorCount++;
+                }
+                if (currServiceCategory != "-1" && currServiceSubCategory != "-1" && currRole != "-1" && currAccessType == "-1" && currBrand == "-1") {
+                    RemoveError("lblApplicationCategory");
+                }
+
+                else if (currServiceCategory != "-1" || currServiceSubCategory != "-1" || currRole != "-1") {
+
+                    if (currServiceCategory == "-1") {
+                        errors += "<li id='error" + errorCount + "'>" + "Service Category in Row " + rowCount + "</li>";
+                        $("#lblApplicationCategory").addClass('removeAppCatDet');
+                        AddError("lblApplicationCategory", 'removeAppCatDet', errorCount);
+                        errorCount++;
+                    }
+                    else {
+                        RemoveError("lblApplicationCategory");
+                    }
+
+                    if (currServiceSubCategory == "-1") {
+
+                        errors += "<li id='error" + errorCount + "'>" + "Service Sub Category in Row " + rowCount + "</li>";
+                        $("#lblApplicationCategory").addClass('removeAppCatDet');
+                        AddError("lblApplicationCategory", 'removeAppCatDet', errorCount);
+                        errorCount++;
+                    }
+                    else {
+                        RemoveError("lblApplicationCategory");
+                    }
+
+                    if (currServiceCategory == 'HOAS') {
+                        if (currRole == "-1") {
+                            errors += "<li id='error" + errorCount + "'>" + "Role in Row " + rowCount + "</li>";
+                            $("#lblApplicationCategory").addClass('removeAppCatDet');
+                            AddError("lblApplicationCategory", 'removeAppCatDet', errorCount);
+                            errorCount++;
+                        }
+                        else {
+                            RemoveError("lblApplicationCategory");
+                        }
+                    }
+                    if (currAccessType == "-1") {
+                        errors += "<li id='error" + errorCount + "'>" + "Access Type in Row " + rowCount + "</li>";
+                        $("#lblApplicationCategory").addClass('removeAppCatDet');
+                        AddError("lblApplicationCategory", 'removeAppCatDet', errorCount);
+                        errorCount++;
+                    }
+                    else {
+                        RemoveError("lblApplicationCategory");
+                    }
+                    if (currBrand == "-1") {
+                        errors += "<li id='error" + errorCount + "'>" + "Brand in Row " + rowCount + "</li>";
+                        $("#lblApplicationCategory").addClass('removeAppCatDet');
+                        AddError("lblApplicationCategory", 'removeAppCatDet', errorCount);
+                        errorCount++;
+                    }
+                    else {
+                        RemoveError("lblApplicationCategory");
+                    }
+
+                    if (chkTypeRequest == "ID Deletion" || chkTypeRequest == "Password Reset") {
+                        if (currApplicationUserId == "") {
+                            errors += "<li id='error" + errorCount + "'>" + "Application User ID in Row " + rowCount + "</li>";
+                            $("#lblApplicationCategory").addClass('removeAppCatDet');
+                            AddError("lblApplicationCategory", 'removeAppCatDet', errorCount);
+                            errorCount++;
+                        }
+                        else {
+                            RemoveError("lblApplicationCategory");
+                        }
+                    }
+                }
+
+
+                rowCount++;
+            });
+        }
+        else {
+            RemoveError("lblApplicationCategory");
+            errors += "<li id='error" + errorCount + "'>" + "Fill data for atleast 1 Application Category Details" + "</li>";
+            $("#lblApplicationCategory").addClass('removeDet');
+            AddError("lblApplicationCategory", 'removeDet', errorCount);
+            errorCount++;
+        }
+
+
+        if (errors.length) {
+            errors = "<ol id='errorList'>" + errors + "</ol>";
+            $("#headingErr").removeClass('d-none');
+            document.getElementById("add_to_me").innerHTML = errors;
+            if (IsEditMode) {
+                $("#myModalRequest").scrollTop(0);
+            }
+            else {
+                $(window).scrollTop(0);
+            }
+            return false;
+        }
+        $("#headingErr").addClass('d-none');
+        document.getElementById("add_to_me").innerHTML = '';
+        $('#ddEmpDesignation').prop("disabled", false);
+        $('#txtOnBehalfdesignation').prop("disabled", false);
+        $("#pageLoader").removeClass('invisible');
+        $("#btnSubmit").text('Saving');
+        $("#btnSubmit").prop("disabled", true);
+        $("#btnCancel").prop("disabled", true);
+        $("#totalrows").val(selectedListData);
+        var form = $('#URCFForm');
+        var formData = new FormData(form[0]);
+
+        //Document Upload
+        var docUploadSAGA2 = $("#docUploadSAGA2").get(0);
+        var files = docUploadSAGA2.files;
+        for (var i = 0; i < files.length; i++) {
+            formData.append(files[i].name, files[i]);
+        }
+
+        var docUploadGeKo = $("#docUploadGeKo").get(0);
+        var files1 = docUploadGeKo.files;
+        if (files1.length == 1) {
+            for (var i = 0; i < files1.length; i++) {
+                formData.append(files1[i].name, files1[i]);
+            }
+        }
+
+        $('.drpRoleValidate').prop("disabled", false);
+
+        //Application List
+
+        var serializedArray = $("#URCFForm").serializeArray();
+
+        let k = 0;
+        let inserted = 0;
+        var chkTypeRequest = $("#chkTypeRequest").val();
+        if (chkTypeRequest != "User Creation") {
+            let tableData = new Set(['ServiceCategory', 'ServiceSubCategory', 'Role', 'AccessType', 'BrandApp', 'ApplicationUserId']);
+            serializedArray.forEach((x, index) => {
+                if (tableData.has(x.name)) {
+                    formData.append('ApplicationCategoryData[' + k + '].' + x.name, x.value);
+                    inserted++;
+                }
+                if (inserted === tableData.size) {
+                    k++;
+                    inserted = 0;
+                }
+            });
+        }
+        else {
+            let tableData = new Set(['ServiceCategory', 'ServiceSubCategory', 'Role', 'AccessType', 'BrandApp']);
+            serializedArray.forEach((x, index) => {
+                if (tableData.has(x.name)) {
+                    formData.append('ApplicationCategoryData[' + k + '].' + x.name, x.value);
+                    inserted++;
+                }
+                if (inserted === tableData.size) {
+                    k++;
+                    inserted = 0;
+                }
+            });
+        }
+
+        $.ajax({
+            url: '/UserRequest/SaveData',
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            dataType: 'JSON',
+            data: formData,
+            enctype: 'multipart/form-data',
+            success: (function (data) {
+                if (data.Status == 200) {
+                    $("#pageLoader").addClass('invisible');
+                    if (IsNewMode) {
+                        $("#btnSubmit").text('Submit');
+                    }
+                    else {
+                        $("#btnSubmit").text('Re-Submit');
+                    }
+                    $("#btnSubmit").prop("disabled", false);
+                    $("#btnCancel").prop("disabled", false);
+                    successURCFFModal(data.Message);
+                }
+                else {
+                    failureModal(data.Message);
+                    if (IsNewMode) {
+                        $("#btnSubmit").text('Submit');
+                    }
+                    else {
+                        $("#btnSubmit").text('Re-Submit');
+                    }
+                    $("#pageLoader").addClass('invisible');
+                    $("#btnSubmit").prop("disabled", false);
+                    $("#btnCancel").prop("disabled", false);
+                }
+            }),
+            error: (function (data) {
+                failureModal(data.Message);
+                if (IsNewMode && IsEditMode) {
+                    $("#btnSubmit").text('Submit');
+                }
+                else {
+                    $("#btnSubmit").text('Re-Submit');
+                }
+                $("#pageLoader").addClass('invisible');
+                $("#btnSubmit").prop("disabled", false);
+                $("#btnCancel").prop("disabled", false);
+            })
+        })
+        $("#tab").val(2);
+
+    });
+
+    $("#btnCancel").on('click', function (e) {
+        $("#headingErr").addClass('d-none');
+        document.getElementById("add_to_me").innerHTML = '';
+        if ($('#myModalRequest').hasClass('show'))
+            $('#myModalRequest').modal('hide');
+        else
+            $('#myModalEdit').modal('hide');
+        if (IsNewMode) {
+            window.location = "../Dashboard";
+        }
+    });
+
+    function saveResponse(text) {
+        //
+        var status = '', comment = '';
+        comment = $("#comment-" + text).val();
+        switch (text) {
+            case 'approve': {
+                status = 'Approved';
+                FormApproval(status, appRowId, comment, approvalType, text);
+                break;
+            }
+            case 'reject': {
+                status = 'Rejected';
+                if (comment == '') {
+                    validityModal(text);
+                    return;
+                }
+                else {
+                    FormApproval(status, appRowId, comment, approvalType, text);
+                }
+                break;
+            }
+            case 'enquire': {
+                status = 'Enquired';
+                if (comment == '') {
+                    validityModal(text);
+                    return;
+                }
+                else {
+                    FormApproval(status, appRowId, comment, approvalType, text);
+                }
+                break;
+            }
+        }
+
+        $("#tab").val(1);
+    }
+
+    function FormApproval(status, appRowId, comment, approvalType, text) {
+        ////
+        spinner.show();
+        $.ajax({
+            url: '/List/SaveResponse',
+            type: 'POST',
+            data: { response: status, appRowId: appRowId, comment: comment, approvalType: approvalType },
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data.Result == 1) {
+                    successURCFFModal(text);
+                    spinner.hide();
+                }
+                else {
+                    failureModal();
+                    spinner.hide();
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+                spinner.hide();
+            })
+        })
+
+        $("#tab").val(1);
+    }
+
+    function successURCFFModal(txt) {
+        ////
+        $('#modalTitle').html('Success');
+        if (txt == "approve") {
+            $('#modalBody').html('Form has been approved!');
+        }
+        else if (txt == "reject") {
+            $('#modalBody').html('Form has been rejected!');
+        }
+        else if (txt == "enquire") {
+            $('#modalBody').html('Form has been enquired!');
+        }
+        else if (txt == "cancelled") {
+            $('#modalBody').html('Form has been cancelled!');
+        }
+        else {
+            if (IsEditMode) {
+                $('#modalBody').html('Your form with ID: URCF' + txt + ' has been re-submitted! Kindly use this for future reference');
+            }
+            else {
+                $('#modalBody').html('Your form with ID: URCF' + txt + ' has been submitted! Kindly use this for future reference');
+            }
+
+        }
+        FlagRedirect = txt;
+
+        $("#successModel").modal('show');
+    }
+
+    //Brand Checkbox
+    $('input:checkbox[id="chkSkoda"]').click(function () {
+        if ($(this).prop("checked") == true) {
+            $('input[id="chkVW"]').prop('checked', false);
+            $('input[id="chkAudi"]').prop('checked', false);
+            $('input[id="chkPorsche"]').prop('checked', false);
+            $('input[id="chkLamborghini"]').prop('checked', false);
+            $('input[id="chkAll"]').prop('checked', false);
+
+            $('input[id="chkSkoda"]').prop('checked', true).change();
+            $('input[id="chkSkoda"]').prop('disabled', true);
+
+            $('input[id="chkVW"]').prop("disabled", false);
+            $('input[id="chkAudi"]').prop("disabled", false);
+            $('input[id="chkPorsche"]').prop("disabled", false);
+            $('input[id="chkLamborghini"]').prop("disabled", false);
+            $('input[id="chkAll"]').prop("disabled", false);
+
+            $("#chkBrand").val('Skoda');
+
+            $(".drpBrandValidate option[value='VW']").hide();
+            $(".drpBrandValidate option[value='Audi']").hide();
+            $(".drpBrandValidate option[value='Porsche']").hide();
+            $(".drpBrandValidate option[value='Lamborghini']").hide();
+
+            $(".drpBrandValidate option[value='Skoda']").show();
+
+        }
+    });
+
+    $('input:checkbox[id="chkVW"]').click(function () {
+        if ($(this).prop("checked") == true) {
+            $('input[id="chkSkoda"]').prop('checked', false);
+            $('input[id="chkAudi"]').prop('checked', false);
+            $('input[id="chkPorsche"]').prop('checked', false);
+            $('input[id="chkLamborghini"]').prop('checked', false);
+            $('input[id="chkAll"]').prop('checked', false);
+
+            $('input[id="chkVW"]').prop('checked', true).change();
+            $('input[id="chkVW"]').prop('disabled', true);
+
+            $('input[id="chkSkoda"]').prop("disabled", false);
+            $('input[id="chkAudi"]').prop("disabled", false);
+            $('input[id="chkPorsche"]').prop("disabled", false);
+            $('input[id="chkLamborghini"]').prop("disabled", false);
+            $('input[id="chkAll"]').prop("disabled", false);
+
+            $("#chkBrand").val('VW');
+
+            $(".drpBrandValidate option[value='Skoda']").hide();
+            $(".drpBrandValidate option[value='Audi']").hide();
+            $(".drpBrandValidate option[value='Porsche']").hide();
+            $(".drpBrandValidate option[value='Lamborghini']").hide();
+
+            $(".drpBrandValidate option[value='VW']").show();
+        }
+    });
+
+    $('input:checkbox[id="chkAudi"]').click(function () {
+        if ($(this).prop("checked") == true) {
+            $('input[id="chkSkoda"]').prop('checked', false);
+            $('input[id="chkVW"]').prop('checked', false);
+            $('input[id="chkPorsche"]').prop('checked', false);
+            $('input[id="chkLamborghini"]').prop('checked', false);
+            $('input[id="chkAll"]').prop('checked', false);
+
+            $('input[id="chkAudi"]').prop('checked', true).change();
+            $('input[id="chkAudi"]').prop('disabled', true);
+
+            $('input[id="chkVW"]').prop("disabled", false);
+            $('input[id="chkSkoda"]').prop("disabled", false);
+            $('input[id="chkPorsche"]').prop("disabled", false);
+            $('input[id="chkLamborghini"]').prop("disabled", false);
+            $('input[id="chkAll"]').prop("disabled", false);
+
+            $("#chkBrand").val('Audi');
+
+            $(".drpBrandValidate option[value='Skoda']").hide();
+            $(".drpBrandValidate option[value='VW']").hide();
+            $(".drpBrandValidate option[value='Porsche']").hide();
+            $(".drpBrandValidate option[value='Lamborghini']").hide();
+
+            $(".drpBrandValidate option[value='Audi']").show();
+
+        }
+    });
+
+    $('input:checkbox[id="chkPorsche"]').click(function () {
+        if ($(this).prop("checked") == true) {
+            $('input[id="chkSkoda"]').prop('checked', false);
+            $('input[id="chkAudi"]').prop('checked', false);
+            $('input[id="chkVW"]').prop('checked', false);
+            $('input[id="chkLamborghini"]').prop('checked', false);
+            $('input[id="chkAll"]').prop('checked', false);
+
+            $('input[id="chkPorsche"]').prop('checked', true).change();
+            $('input[id="chkPorsche"]').prop('disabled', true);
+
+            $('input[id="chkSkoda"]').prop("disabled", false);
+            $('input[id="chkAudi"]').prop("disabled", false);
+            $('input[id="chkVW"]').prop("disabled", false);
+            $('input[id="chkLamborghini"]').prop("disabled", false);
+            $('input[id="chkAll"]').prop("disabled", false);
+
+            $("#chkBrand").val('Porsche');
+
+            $(".drpBrandValidate option[value='Skoda']").hide();
+            $(".drpBrandValidate option[value='Audi']").hide();
+            $(".drpBrandValidate option[value='Porsche']").hide();
+            $(".drpBrandValidate option[value='Lamborghini']").hide();
+
+            $(".drpBrandValidate option[value='Porsche']").show();
+        }
+    });
+
+    $('input:checkbox[id="chkLamborghini"]').click(function () {
+        if ($(this).prop("checked") == true) {
+            $('input[id="chkVW"]').prop('checked', false);
+            $('input[id="chkAudi"]').prop('checked', false);
+            $('input[id="chkPorsche"]').prop('checked', false);
+            $('input[id="chkSkoda"]').prop('checked', false);
+            $('input[id="chkAll"]').prop('checked', false);
+
+            $('input[id="chkLamborghini"]').prop('checked', true).change();
+            $('input[id="chkLamborghini"]').prop('disabled', true);
+
+            $('input[id="chkVW"]').prop("disabled", false);
+            $('input[id="chkAudi"]').prop("disabled", false);
+            $('input[id="chkPorsche"]').prop("disabled", false);
+            $('input[id="chkSkoda"]').prop("disabled", false);
+            $('input[id="chkAll"]').prop("disabled", false);
+
+            $("#chkBrand").val('Lamborghini');
+
+            $(".drpBrandValidate option[value='Skoda']").hide();
+            $(".drpBrandValidate option[value='Audi']").hide();
+            $(".drpBrandValidate option[value='Porsche']").hide();
+            $(".drpBrandValidate option[value='VW']").hide();
+
+            $(".drpBrandValidate option[value='Lamborghini']").show();
+
+        }
+    });
+
+    $('input:checkbox[id="chkAll"]').click(function () {
+        if ($(this).prop("checked") == true) {
+            $('input[id="chkVW"]').prop('checked', true);
+            $('input[id="chkAudi"]').prop('checked', true);
+            $('input[id="chkPorsche"]').prop('checked', true);
+            $('input[id="chkSkoda"]').prop('checked', true);
+            $('input[id="chkLamborghini"]').prop('checked', true);
+
+            $('input[id="chkAll"]').prop('checked', true).change();
+            $('input[id="chkAll"]').prop('disabled', false);
+
+            $('input[id="chkVW"]').prop("disabled", true);
+            $('input[id="chkAudi"]').prop("disabled", true);
+            $('input[id="chkPorsche"]').prop("disabled", true);
+            $('input[id="chkSkoda"]').prop("disabled", true);
+            $('input[id="chkLamborghini"]').prop("disabled", true);
+
+            $("#chkBrand").val('All');
+
+            $(".drpBrandValidate option[value='Skoda']").show();
+            $(".drpBrandValidate option[value='Audi']").show();
+            $(".drpBrandValidate option[value='Porsche']").show();
+            $(".drpBrandValidate option[value='VW']").show();
+            $(".drpBrandValidate option[value='Lamborghini']").show();
+
+        }
+        else {
+            $('input[id="chkVW"]').prop("disabled", false);
+            $('input[id="chkAudi"]').prop("disabled", false);
+            $('input[id="chkPorsche"]').prop("disabled", false);
+            $('input[id="chkSkoda"]').prop("disabled", false);
+            $('input[id="chkLamborghini"]').prop("disabled", false);
+
+            $('input[id="chkVW"]').prop('checked', false);
+            $('input[id="chkAudi"]').prop('checked', false);
+            $('input[id="chkPorsche"]').prop('checked', false);
+            $('input[id="chkSkoda"]').prop('checked', false);
+            $('input[id="chkLamborghini"]').prop('checked', false);
+            $('input[id="chkAll"]').prop('checked', false);
+
+            $("#chkBrand").val('');
+        }
+    });
+
+    //Service Type Checkbox
+    $('input:checkbox[id="chkSales"]').click(function () {
+        if ($(this).prop("checked") == true) {
+            $('input[id="chkCorporate"]').prop('checked', false);
+
+            $('input[id="chkSales"]').prop('checked', true).change();
+            $('input[id="chkSales"]').prop('disabled', true);
+
+            $('input[id="chkCorporate"]').prop("disabled", false);
+
+            $("#chkServiceType").val('Sales & After Sales');
+
+        }
+    });
+
+    $('input:checkbox[id="chkCorporate"]').click(function () {
+        if ($(this).prop("checked") == true) {
+            $('input[id="chkSales"]').prop('checked', false);
+
+            $('input[id="chkCorporate"]').prop('checked', true).change();
+            $('input[id="chkCorporate"]').prop('disabled', true);
+
+            $('input[id="chkSales"]').prop("disabled", false); chkSales
+            $("#chkServiceType").val('Corporate System');
+
+        }
+    });
+
+    //Type of Request Checkbox
+    $('input:checkbox[id="chkUserCreation"]').click(function () {
+        if ($(this).prop("checked") == true) {
+            $('input[id="chkIDDeletion"]').prop('checked', false);
+            $('input[id="chkPasswordReset"]').prop('checked', false);
+
+            $('input[id="chkUserCreation"]').prop('checked', true).change();
+            $('input[id="chkUserCreation"]').prop('disabled', true);
+
+            $('input[id="chkIDDeletion"]').prop("disabled", false);
+            $('input[id="chkPasswordReset"]').prop("disabled", false);
+
+            $("#chkTypeRequest").val('User Creation');
+
+        }
+    });
+
+    $('input:checkbox[id="chkIDDeletion"]').click(function () {
+        if ($(this).prop("checked") == true) {
+            $('input[id="chkUserCreation"]').prop('checked', false);
+            $('input[id="chkPasswordReset"]').prop('checked', false);
+
+            $('input[id="chkIDDeletion"]').prop('checked', true).change();
+            $('input[id="chkIDDeletion"]').prop('disabled', true);
+
+            $('input[id="chkUserCreation"]').prop("disabled", false);
+            $('input[id="chkPasswordReset"]').prop("disabled", false);
+
+            $("#chkTypeRequest").val('ID Deletion');
+
+        }
+    });
+
+    $('input:checkbox[id="chkPasswordReset"]').click(function () {
+        if ($(this).prop("checked") == true) {
+            $('input[id="chkUserCreation"]').prop('checked', false);
+            $('input[id="chkIDDeletion"]').prop('checked', false);
+
+            $('input[id="chkPasswordReset"]').prop('checked', true).change();
+            $('input[id="chkPasswordReset"]').prop('disabled', true);
+
+            $('input[id="chkUserCreation"]').prop("disabled", false);
+            $('input[id="chkIDDeletion"]').prop("disabled", false);
+
+            $("#chkTypeRequest").val('Password Reset');
+
+        }
+    });
+
+    function LoadSelectedAppCatData(allData) {
+        //
+        console.log("allData = " + allData);
+
+        var serviceCategoryArray = allData.map(function (el) { return el.ServiceCategory; });
+        serviceCategoryList = [...new Set(serviceCategoryArray)];
+        var serviceSubCategoryArray = allData.map(function (el) { return el.ServiceSubCategory; });
+        serviceSubCategoryList = [...new Set(serviceSubCategoryArray)];
+
+        selectedListData = URCF.ApplicationCategoryData;
+        var value = JSON.stringify(selectedListData);
+        console.log("value=" + value);
+        var value_1 = JSON.parse(value);
+        console.log("value_1=" + value_1);
+        var len = value_1.length;
+        rowIdx = len;
+
+        var a = '<option value="-1" style="display:none;"></option>';
+        var b = '<option value="-1" style="display:none;"></option>';
+        var c = '<option value="-1" style="display:none;"></option>';
+
+        for (var i = 0; i < serviceCategoryList.length; i++) {
+            a += '<option value="' + serviceCategoryList[i] + '">' + serviceCategoryList[i] + '</option>';
+        }
+
+        for (var i = 0; i < serviceSubCategoryList.length; i++) {
+            b += '<option value="' + serviceSubCategoryList[i] + '">' + serviceSubCategoryList[i] + '</option>';
+        }
+
+        for (var i = 0; i < allData.length; i++) {
+            c += '<option value="' + allData[i].Role + '">' + allData[i].Role + '</option>';
+        }
+
+        for (var j = 0; j < len; j++) {
+
+            $('#drpServiceCategory' + (j + 1)).html(a);
+            $("#drpServiceCategory" + (j + 1) + " option[value='" + value_1[j].ServiceCategory + "']").prop('selected', 'selected');
+
+            $('#drpServiceSubCategory' + (j + 1)).html(b);
+            $("#drpServiceSubCategory" + (j + 1) + " option[value='" + value_1[j].ServiceSubCategory + "']").prop('selected', 'selected');
+
+            if (value_1[j].Role !="Select Role") {
+                $('#drpRole' + (j + 1)).html(c);
+                $("#drpRole" + (j + 1) + " option[value='" + value_1[j].Role + "']").prop('selected', 'selected');
+            }
+
+        }
+    }
+
+    function getAccessDoorListData() {
+         //
+        $.ajax({
+            url: '/UserRequest/GetApplicationCategoryData',
+            type: 'GET',
+            data: {},
+            contentType: "application/json; charset=utf-8",
+            datatype: 'json',
+            success: (function (data) {
+                allData = data;
+                var serviceCategoryArray = data.map(function (el) { return el.ServiceCategory; });
+                serviceCategoryList = [...new Set(serviceCategoryArray)];
+                getServiceCategory('drpServiceCategory1');
+                if (IsEditMode) {
+                    LoadSelectedAppCatData(allData);
+                }
+            }),
+            error: (function (data) {
+                return "error";
+            })
+        })
+    }
+
+    function getServiceCategory(elementId) {
+        //
+        var s = '<option value="-1" style="display:none;" selected>Select Service Category</option>';
+        for (var i = 0; i < serviceCategoryList.length; i++) {
+            s += '<option value="' + serviceCategoryList[i] + '">' + serviceCategoryList[i] + '</option>';
+        }
+        $('#' + elementId).html(s);
+
+    }
+
+    function getAccessType(elementId) {
+        //
+        var s = '<option value="-1" style="display:none;" selected>Select Access Type</option>';
+        s += '<option value="' + "Full Access" + '">' + "Full Access" + '</option>';
+        s += '<option value="' + "Read Only" + '">' + "Read Only" + '</option>';
+        $('#' + elementId).html(s);
+    }
+
+    function getBrand(elementId) {
+        //
+        var s = '<option value="-1" style="display:none;" selected>Select Brand</option>';
+        s += '<option value="' + "Skoda" + '">' + "Skoda" + '</option>';
+        s += '<option value="' + "VW" + '">' + "VW" + '</option>';
+        s += '<option value="' + "Audi" + '">' + "Audi" + '</option>';
+        s += '<option value="' + "Porsche" + '">' + "Porsche" + '</option>';
+        s += '<option value="' + "Lamborghini" + '">' + "Lamborghini" + '</option>';
+        $('#' + elementId).html(s);
+    }
+
+    function getServiceSubCategoryByServiceCategory(locationElem, deptElemId, serviceCategory = '', selectedDept = '') {
+        //
+        $('#' + deptElemId).prop("disabled", false);
+        let deptList = [];
+        let distinctDept = [];
+        var locationElemId = locationElem.id;
+        if (serviceCategory == '') {
+            var selectedLoctxt = $('#' + locationElemId).find("option:selected").text();
+            console.log("selectedLoctxt=" + selectedLoctxt);
+            serviceCategory = selectedLoctxt;
+        }
+        deptList = allData.filter(function (item) { return (item.ServiceCategory == serviceCategory); });
+        distinctDept = [...new Set(deptList.map(item => item.ServiceSubCategory))];
+        //console.log("distinctDept=" + distinctDept);
+        let s = '<option value="-1" style="display:none;" selected>Select Service Sub Category</option>';
+        for (var i = 0; i < distinctDept.length; i++) {
+            s += '<option value="' + distinctDept[i] + '">' + distinctDept[i] + '</option>';
+        }
+        $('#' + deptElemId).html(s);
+
+
+    }
+
+    function getRoleByServiceSubCategory(deptElem, locationElemId, doorElemId, serviceCategory = '', ServiceSubCategory = '') {
+        //
+
+        $('#' + doorElemId).prop("disabled", false);
+        let deptId = deptElem.id;
+        if (serviceCategory == '') {
+            var selectedLoctxt = $('#' + locationElemId).find("option:selected").text();
+            //console.log("selectedLoctxt=" + selectedLoctxt);
+            serviceCategory = selectedLoctxt;
+        }
+        if (ServiceSubCategory == '') {
+            var selectedDepttxt = $('#' + deptId).find("option:selected").text();
+            //console.log("selectedDepttxt=" + selectedDepttxt);
+            ServiceSubCategory = selectedDepttxt;
+        }
+        let roleList = [];
+
+        roleList = allData.filter(function (item) { return (item.ServiceCategory == serviceCategory && item.ServiceSubCategory == ServiceSubCategory); });
+        let s = '';
+        if (serviceCategory == 'HOAS') {
+            s = '<option value="-1" style="display:none;" selected>Select Role Name</option>';
+            for (var i = 0; i < roleList.length; i++) {
+                s += '<option value="' + roleList[i].Role + '">' + roleList[i].Role + '</option>';
+            }
+            $('#' + doorElemId).html(s);
+        }
+        else {
+            $('#' + doorElemId).prop("disabled", true);
+        }
+
+        FileUploadShowHide();
+    }
+
+    function AddRows() {
+        //
+        var newCount = rowIdx + 1;
+        if (newCount <= 5) {
+        var row = '<tr id="row' + newCount + '" class="tr_input text-center">   <td class="sNo text-center" >' + newCount + '</td>'
+            + '<td><select class="drpServiceCategoryValidate" name="ServiceCategory" id = "drpServiceCategory' + newCount + '" onchange="getServiceSubCategoryByServiceCategory(this, \'drpServiceSubCategory' + newCount + '\')"></select></td>'
+            + '<td><select class="drpServiceSubCategoryValidate" name="ServiceSubCategory" id = "drpServiceSubCategory' + newCount + '" onchange="getRoleByServiceSubCategory(this, \'drpServiceCategory' + newCount + '\',\'drpRole' + newCount + '\')" disabled>     <option value="-1" style="display:none;" selected>Select Service Sub-Category</option></select></td>'
+            + '<td><select class="drpRoleValidate" name="Role" id = "drpRole' + newCount + '" disabled><option value="Select Role" style="display:none;" selected>Select Role Name</option></select></td>'
+            + '<td><select class="drpAccessTypeValidate" name="AccessType" id = "drpAccessType' + newCount + '"><option value="-1" style="display:none;" selected>Select Access Type</option></select></td>'
+            + '<td><select class="drpBrandValidate" name="BrandApp" id = "drpBrand' + newCount + '"><option value="-1" style="display:none;" selected>Select Brand</option></select></td>'
+            + '<td><input type="text" class="inpApplicationUserIdValidate" autocomplete="off" name="ApplicationUserId" id = "txtApplicationUserId' + newCount + '"></input></td>'
+            + '<td style="background-color:white; max-width:70px; vertical-align:central;">'
+            + '<input class="remove-btn remove" type="image" src="/assets/img/remove.png" alt="Remove" style="max-width: 85%; background-color: white;">'
+            + '</td></tr>';
+
+        if (newCount == 1) {
+            $('.tableApplicationCategory').prepend(row);
+        }
+        else {
+            $(".tableApplicationCategory tr:last").after(row);
+        }
+
+        getServiceCategory("drpServiceCategory" + newCount);
+        getAccessType("drpAccessType" + newCount);
+        getBrand("drpBrand" + newCount);
+        rowIdx++;
+        }
+        else {
+              alert('Maximum 5 Application Category can be added.');
+        }
+
+        //$("#txtNumberofUsers").val(count);
+
+        TypeRequestEnable();
+        BrandShowHide();
+
+    }
+
+    $(document).ready(function () {
+
+        $('#ApplicationCategoryBody').on('click', '.remove', function () {
+            //
+            var delRow = $(this).closest('tr').attr('id');
+            console.log(delRow + " a");
+            var delRowNo = parseInt(delRow.substring(3));
+            console.log(delRowNo + " b");
+            var rowCount = $('#ApplicationCategoryBody tr').length;
+
+            var child = $(this).closest('tr').nextAll();
+            console.log(child);
+            child.each(function () {
+                //////
+                // Getting <tr> id.
+                var id = $(this).attr('id');
+                console.log(id);
+
+                //  Getting the <p> inside the .row-index class.
+                var idx = $(this).children('.row-index').children('p');
+                console.log(idx);
+
+                // Gets the row number from <tr> id.
+                var dig = parseInt(id.substring(3));
+                console.log(dig);
+
+                // Modifying row index.
+                idx.html(`row${dig - 1}`);
+
+                // Modifying row id.
+                $(this).attr('id', `row${dig - 1}`);
+
+                //assigning updated serial number
+                //////
+                updatedDig = dig - 1;
+                console.log(updatedDig);
+                $('#row' + updatedDig + ' .sNo').html(updatedDig);
+
+            });
+
+            // Removing the current row.
+            $(this).closest('tr').remove();
+            // Decreasing total number of rows by 1.
+            rowIdx--;
+            //console.log(rowIdx);
+            //}
+            $("#txtNumberofUsers").val(count);
+        });
+    });
+
+    $('input:checkbox[id="chkUserCreation"]').click(function () {
+        var chkTypeRequest = $("#chkTypeRequest").val();
+        if (chkTypeRequest == "User Creation") {
+            $('input[name="ApplicationUserId"]').val('');
+            $('input[name="ApplicationUserId"]').prop("disabled", true);
+        }
+        else {
+            $('input[name="ApplicationUserId"]').prop("disabled", false);
+        }
+    });
+    $('input:checkbox[id="chkIDDeletion"]').click(function () {
+        var chkTypeRequest = $("#chkTypeRequest").val();
+        if (chkTypeRequest == "ID Deletion") {
+            $('input[name="ApplicationUserId"]').prop("disabled", false);
+        }
+        else {
+            $('input[name="ApplicationUserId"]').val('');
+            $('input[name="ApplicationUserId"]').prop("disabled", true);
+        }
+    });
+    $('input:checkbox[id="chkPasswordReset"]').click(function () {
+        var chkTypeRequest = $("#chkTypeRequest").val();
+        if (chkTypeRequest == "Password Reset") {
+            $('input[name="ApplicationUserId"]').prop("disabled", false);
+        }
+        else {
+            $('input[name="ApplicationUserId"]').val('');
+            $('input[name="ApplicationUserId"]').prop("disabled", true);
+        }
+    });
+
+    $('#successModel').on('hide.bs.modal', function () {
+        ////
+        var tab = $("#tab").val();
+        if (tab == 1) {
+            GetMyTaskTab();
+        }
+        else if (tab == 2) {
+            window.location = "../Dashboard?tab=" + tab;
+        }
+    })
+    $('#myModal').modal({ backdrop: 'static', keyboard: false })
+
+    function requiredModal(text) {
+        $('#modalTitle').html('Required!');
+        $('#modalBody').html(text);
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function successURCFModal(txt) {
+        //////
+        $('#modalTitle').html('Success');
+        if (txt == "approve") {
+            $('#modalBody').html('Form has been approved!');
+        }
+        else if (txt == "reject") {
+            $('#modalBody').html('Form has been rejected!');
+        }
+        else if (txt == "enquire") {
+            $('#modalBody').html('Form has been enquired!');
+        }
+        else if (txt == "cancelled") {
+            $('#modalBody').html('Form has been cancelled!');
+        }
+        else {
+            if (IsEditMode) {
+                $('#modalBody').html('Your form with ID: GAIF' + txt + ' has been re-submitted! Kindly use this for future reference');
+            }
+            else {
+                $('#modalBody').html('Your form with ID: GAIF' + txt + ' has been submitted! Kindly use this for future reference');
+            }
+        }
+
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function failureModal(msg) {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html(msg);
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function permissionModal() {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html('No permssion granted since the device is not SAVWIPL owned!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    $('#docUploadGeKo').change(function (e) {
+        ////
+        $("#attachedfile").val('');
+        $("#attachedfileName").val('');
+        $('#attachedfileLink').remove();
+    });
+
+    $('#docUploadSAGA2').change(function (e) {
+        ////
+        $("#attachedfile1").val('');
+        $("#attachedfileName1").val('');
+        $('#attachedfileLink1').remove();
+    });
+
+    function BrandShowHide() {
+        //
+        var chkBrand = $("#chkBrand").val();
+        //Brand Show Hide
+        if (chkBrand == "Skoda") {
+            $(".drpBrandValidate option[value='VW']").hide();
+            $(".drpBrandValidate option[value='Audi']").hide();
+            $(".drpBrandValidate option[value='Porsche']").hide();
+            $(".drpBrandValidate option[value='Lamborghini']").hide();
+            $(".drpBrandValidate option[value='Skoda']").show();
+        }
+        else if (chkBrand == "VW") {
+            $(".drpBrandValidate option[value='Skoda']").hide();
+            $(".drpBrandValidate option[value='Audi']").hide();
+            $(".drpBrandValidate option[value='Porsche']").hide();
+            $(".drpBrandValidate option[value='Lamborghini']").hide();
+            $(".drpBrandValidate option[value='VW']").show();
+        }
+        else if (chkBrand == "Audi") {
+            $(".drpBrandValidate option[value='Skoda']").hide();
+            $(".drpBrandValidate option[value='VW']").hide();
+            $(".drpBrandValidate option[value='Porsche']").hide();
+            $(".drpBrandValidate option[value='Lamborghini']").hide();
+            $(".drpBrandValidate option[value='Audi']").show();
+        }
+        else if (chkBrand == "Porsche") {
+            $(".drpBrandValidate option[value='Skoda']").hide();
+            $(".drpBrandValidate option[value='Audi']").hide();
+            $(".drpBrandValidate option[value='Porsche']").hide();
+            $(".drpBrandValidate option[value='Lamborghini']").hide();
+            $(".drpBrandValidate option[value='Porsche']").show();
+        }
+        else if (chkBrand == "Lamborghini") {
+            $(".drpBrandValidate option[value='Skoda']").hide();
+            $(".drpBrandValidate option[value='Audi']").hide();
+            $(".drpBrandValidate option[value='Porsche']").hide();
+            $(".drpBrandValidate option[value='VW']").hide();
+            $(".drpBrandValidate option[value='Lamborghini']").show();
+        }
+        else if (chkBrand == "All") {
+            $(".drpBrandValidate option[value='Skoda']").show();
+            $(".drpBrandValidate option[value='Audi']").show();
+            $(".drpBrandValidate option[value='Porsche']").show();
+            $(".drpBrandValidate option[value='VW']").show();
+            $(".drpBrandValidate option[value='Lamborghini']").show();
+        }
+    }
+
+    function TypeRequestEnable() {
+        var chkTypeRequest = $("#chkTypeRequest").val();
+        if (chkTypeRequest != "User Creation") {
+            $('input[name="ApplicationUserId"]').prop("disabled", false);
+        }
+        else {
+            $('input[name="ApplicationUserId"]').val('');
+            $('input[name="ApplicationUserId"]').prop("disabled", true);
+        }
+    }
+
+    function FileUploadShowHide() {
+        //
+
+        var isGeKo = $(".tableApplicationCategory tr").toArray().some(function (x) {
+            let currServiceSubCategory = $(x).find(".drpServiceSubCategoryValidate").val();
+            var out = currServiceSubCategory.includes('GeKo');
+            return out;
+        });
+
+        var isSaga = $(".tableApplicationCategory tr").toArray().some(function (x) {
+            let currServiceSubCategory = $(x).find(".drpServiceSubCategoryValidate").val();
+            var out = currServiceSubCategory.includes('SAGA/2');
+            return out;
+        });
+
+        //console.log(isGeKo);
+
+        if (isGeKo) {
+            $("#trGekoFileUpload").removeClass('hide');
+        }
+        else {
+            $("#trGekoFileUpload").addClass('hide');
+        }
+
+        if (isSaga) {
+            $("#trSAGA2FileUpload").removeClass('hide');
+        }
+        else {
+            $("#trSAGA2FileUpload").addClass('hide');
+        }
+
+    }
+
+</script>
+
+

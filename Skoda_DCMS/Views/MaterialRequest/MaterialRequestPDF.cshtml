@@ -1,0 +1,371 @@
+﻿@{
+    Layout = null;
+    dynamic Material = null;
+    List<Skoda_DCMS.Models.MaterialDetailsData> MaterialDetails = new List<Skoda_DCMS.Models.MaterialDetailsData>();
+    if (ViewBag != null)
+    {
+        Material = ViewBag.Model;
+        MaterialDetails = ViewBag.Model?.two as List<Skoda_DCMS.Models.MaterialDetailsData>;
+    }
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MaterialRequestPDF</title>
+    <style type="text/css">
+        *:visited, *:focus {
+            box-shadow: none;
+        }
+
+        input, select, input:focus, select:focus, textarea, textarea:focus {
+            border: 1px solid #000;
+        }
+
+        input, textarea {
+            padding: 5px;
+        }
+
+        table td {
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <table style="width: 100%; font-size: 14px; color: #000; font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+        <tr>
+            <td>
+                <table style="width: 100%;" cellspadding="0" cellspacing="0">
+                    <tr>
+                        <td colspan="2" width="33%" style="text-align: right;">
+                            MobiNext Technologies <br/>
+                            India Private Limited
+                        </td>
+                        <td colspan="2" width="33%" style="text-align: center;">
+                            <h2 style="margin: 0"> Material Request Form </h2>
+                        </td>
+                        <td colspan="2" width="33%" style="text-align: right;">
+                            Format no :SF_PLP_029 <br/>
+                            Revision no: 00 <br/>
+                            Issue date: 25.06.2021
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+
+        <tr>
+            <td style="padding: 15px;">
+                <table cellspacing="0" cellpadding="0" width="100%">
+
+
+                    <tr>
+                        <td style="width:20%" colspan="1">
+                            Request No.
+                        </td>
+                        <td style="font-weight: normal;" align='left' colspan="5">
+                            @(Material.one[0].RequestNumber ?? "")
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="" colspan="1">
+                            To
+                        </td>
+                        <td style="font-weight: normal;" align='left' colspan="5">
+                            @(Material.one[0].RequestTo ?? "")
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td style="" colspan="1">
+                            From
+                        </td>
+                        <td style="font-weight: normal;" align='left' colspan="5">
+                            @(Material.one[0].RequestFrom ?? "")
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="height: 15px;" colspan="6">
+                        </td>
+                    </tr>
+
+
+
+                    <tr>
+                        <td style="" colspan="6">
+                            <div style="margin-bottom: 15px;"> Dear Sir, </div>
+                            <div>Please issue the following parts on Returnable / Non-returnable basis. </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="6">
+                            <table cellpadding='0' cellspacing='0' width='100%' border="1">
+                                <tr>
+                                    <th style="width:10%; padding: 5px;">
+                                        Sr.No.
+                                    </th>
+                                    <th style="width:21%; padding: 5px; ">
+                                        Part No.
+                                    </th>
+
+                                    <th style="width:21%; padding: 5px;">
+                                        Part Description
+                                    </th>
+                                    <th style="width:21%; padding: 5px;">
+                                        Quantity
+                                    </th>
+                                    <th style="width:21%; padding: 5px;">
+                                        Remark
+                                    </th>
+                                </tr>
+                                @if (true)
+                                {
+                                    var count = 1;
+                                    foreach (var item in MaterialDetails)
+                                    {
+
+                                        <tr>
+                                            <td style="vertical-align: middle; width: 10%; text-align: center;">@count</td>
+                                            <td style='width: 40%; text-align: center; vertical-align: top; font-weight: normal;'>
+                                                @item.PartNumber
+                                            </td>
+                                            <td style='width: 20%; text-align: center; vertical-align: top; font-weight: normal;'>
+                                                @item.PartDescription
+                                            </td>
+                                            <td style='width: 20%; text-align: center; vertical-align: top; font-weight: normal;'>
+                                                @item.Quantity
+                                            </td>
+                                            <td style='width: 20%; text-align: center; vertical-align: top; font-weight: normal;'>
+                                                @item.Remarks
+                                            </td>
+                                        </tr>
+                                        count++;
+                                    }
+                                }
+                            </table>
+
+                            @*<table cellspacing="0" cellpadding="0" width="100%" border="1">
+                    <tr>
+                        <th style="width:10%; padding: 5px;">
+                            Sr.No.
+                        </th>
+                        <th style="width:21%; padding: 5px; ">
+                            Part No.
+                        </th>
+
+                        <th style="width:21%; padding: 5px;">
+                            Part Description
+                        </th>
+                        <th style="width:21%; padding: 5px;">
+                            Quantity
+                        </th>
+                        <th style="width:21%; padding: 5px;">
+                            Remark
+                        </th>
+                    </tr>
+                    <tr style="font-weight: normal;">
+                        <td>
+                            1
+                        </td>
+                        <td>
+                            1234567
+                        </td>
+
+                        <td>
+                            Testing done by sunil
+                        </td>
+                        <td>
+                            4
+                        </td>
+                        <td>
+                            Remark Testing
+                        </td>
+                    </tr>
+                    <tr style="font-weight: normal;">
+                        <td>
+                            2
+                        </td>
+                        <td>
+                            1234567
+                        </td>
+
+                        <td>
+                            Testing done by sunil
+                        </td>
+                        <td>
+                            4
+                        </td>
+                        <td>
+                            Remark Testing
+                        </td>
+                    </tr>
+                    <tr style="font-weight: normal;">
+                        <td>
+                            3
+                        </td>
+                        <td>
+                            1234567
+                        </td>
+
+                        <td>
+                            Testing done by sunil
+                        </td>
+                        <td>
+                            4
+                        </td>
+                        <td>
+                            Remark Testing
+                        </td>
+                    </tr>
+                    <tr style="font-weight: normal;">
+                        <td>
+                            4
+                        </td>
+                        <td>
+                            1234567
+                        </td>
+
+                        <td>
+                            Testing done by sunil
+                        </td>
+                        <td>
+                            4
+                        </td>
+                        <td>
+                            Remark Testing
+                        </td>
+                    </tr>
+                    <tr style="font-weight: normal;">
+                        <td>
+                            5
+                        </td>
+                        <td>
+                            1234567
+                        </td>
+
+                        <td>
+                            Testing done by sunil
+                        </td>
+                        <td>
+                            4
+                        </td>
+                        <td>
+                            Remark Testing
+                        </td>
+                    </tr>
+
+                </table>*@
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="6">
+                            <table cellspacing="0" cellpadding="0" width="100%" class="signature-table">
+                                <thead>
+                                    <tr style="font-weight: 600;" class="form_lbl">
+                                        <td width="20%">Requesting Name</td>
+                                        <td width="33%">Disposition Team/Planning Team</td>
+                                        <td width="33%">Outbound Team</td>
+                                        <td width="33%">Disposition/ Logistics- Team Head</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if ((Material.three.Count > 0) || (Material.four.Count > 0))
+                                    {
+                                        var appList = Material.four as List<Skoda_DCMS.Models.ApprovalDataModel>;
+                                        var maxLevel = appList.Max(x => x.Level);
+
+                                        <tr>
+                                            <td>
+                                                @(Material.one[0].RequestSubmissionFor == "Self" ? Material.one[0].EmployeeName : Material.one[0].OtherEmployeeName) 
+                                            </td>
+
+                                            @for (var i = 0; i < maxLevel; i++)
+                                            {
+                                                <td>
+                                                    @foreach (var item in appList)
+                                                    {
+                                                        if (item.Level == i + 1 && item.ApproverStatus != "Pending")
+                                                        {
+                                                            @(item.UserName ?? "");
+                                                        }
+
+                                                    }
+
+
+                                                </td>
+                                            }
+
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                Dept : @(Material.one[0].RequestSubmissionFor == "Self" ? Material.one[0].EmployeeDepartment : Material.one[0].OtherEmployeeDepartment)
+                                            </td>
+                                            @for (var i = 0; i < maxLevel; i++)
+                                            {
+                                                <td>
+                                                    @foreach (var item in appList)
+                                                    {
+                                                        if (item.Level == i + 1 && item.ApproverStatus != "Pending")
+                                                        {
+                                                            @(item.ApproverStatus + " on " + " " + Convert.ToDateTime(item.Modified).ToShortDateString()
+                                                        + " " + Convert.ToDateTime(item.Modified).AddHours(5.5).ToShortTimeString())
+                                                        }
+                                                    }
+                                                </td>
+                                            }
+                                        </tr>
+
+                                  
+                                    }
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+
+                    @*<tr>
+                        <td style="width:20%" colspan="2">
+                            <div style="margin-bottom: 20px;">
+                                Requesting Name & Dept
+                            </div>
+                            <div> @(Material.one[0].RequestSubmissionFor == "Self" ? Material.one[0].EmployeeName : Material.one[0].OtherEmployeeName)</div>
+                        </td>
+                        <td style="width: 20%; font-weight: normal;" colspan="2">
+                            <div style="margin-bottom: 20px;">
+                                Verified By
+                            </div>
+                            <div>
+                                @foreach (var item in Material.four)
+                                {
+                                    if (item.)
+                                                      }
+                            </div>
+                        </td>
+                        <td style="font-weight: normal;" align='left' colspan="2">
+                            <div style="margin-bottom: 20px;">
+                                Approved By
+                            </div>
+                            <div>  </div>
+                        </td>
+                        <td style="font-weight: normal;" align='left' colspan="2">
+                            <div style="margin-bottom: 20px;">
+                                Approved By
+                            </div>
+                            <div>  </div>
+                        </td>
+                    </tr>*@
+
+
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+

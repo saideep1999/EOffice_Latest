@@ -1,0 +1,2002 @@
+﻿@{
+    ViewBag.Title = "Server & Laptop/Desktop Local Admin Form";
+    int FormId = 0, AppRowId = 0, ApprovalType = 0; bool IsEdit = true; bool IsNew = true;
+    bool IsNewMode = true, IsEditMode = false, IsViewMode = false;
+    var SecurityDesgnString = "Security";
+    Skoda_DCMS.Models.DLADFormModel DLAD = null;
+    List<Skoda_DCMS.Models.DLADFormModel> UserDataList = new List<Skoda_DCMS.Models.DLADFormModel>();
+    dynamic FlagRedirect = null;
+    var currentUser = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    List<Skoda_DCMS.Models.ApprovalDataModel>
+    appList = new List<Skoda_DCMS.Models.ApprovalDataModel>();
+
+    var IsOnBehalfSAVWIPLEmployee = false;
+    var IsOnBehalfOthers = false;
+    string slctDisabled = "";
+    int? tableCount = 0;
+    string disabled = "";
+    var CurrentUserDesgn = "";
+    long? CurrentUserLevel = 0;
+
+    if (ViewBag != null && !ViewBag.IsNewMode)
+    {
+        IsNew = ViewBag.IsNew;
+        IsEdit = ViewBag.IsEdit;
+        IsNewMode = ViewBag.IsNewMode;
+        IsEditMode = ViewBag.IsEditMode;
+        IsViewMode = ViewBag.IsViewMode;
+        disabled = IsViewMode ? "disabled" : "";
+        DLAD = ViewBag.Model.one[0] as Skoda_DCMS.Models.DLADFormModel;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        disabled = IsViewMode ? "readonly" : "";
+        slctDisabled = IsViewMode ? "disabled" : "";
+        appList = ViewBag.Model?.three as List<Skoda_DCMS.Models.ApprovalDataModel>;
+        CurrentUserDesgn = appList?.Where(x => x.ApproverUserName == currentUser.UserName).Select(x => x.Designation).FirstOrDefault();
+        CurrentUserLevel = appList?.Where(x => x.ApproverUserName == currentUser.UserName && x.ApproverStatus == "Pending").Select(x => x.Level).FirstOrDefault();
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+        IsOnBehalfSAVWIPLEmployee = Model?.RequestSubmissionFor == "OnBehalf" && Model?.OnBehalfOption == "SAVWIPLEmployee";
+        IsOnBehalfOthers = Model?.RequestSubmissionFor == "OnBehalf" && Model?.OnBehalfOption == "Others";
+        if (IsViewMode)
+        {
+            var Ap = appList?.Where(x =>
+            x.ApproverUserName.ToLower() == currentUser.UserName.ToLower()
+            && x.ApproverStatus.ToLower() == "pending"
+            ).FirstOrDefault();
+        }
+
+        UserDataList = ViewBag.Model?.Four as List<Skoda_DCMS.Models.DLADFormModel>;
+    }
+}
+
+<script src="~/assets/js/jszip.js"></script>
+<script src="~/assets/js/xlsx.js"></script>
+<script src="~/Scripts/Validation.js"></script>
+<style>
+
+    .hide {
+        display: none;
+    }
+    /*New design css start here*/
+    .astColor {
+        color: red;
+    }
+
+    .textTrans {
+        width: 100%;
+        max-width: 99%;
+        border-radius: 5px;
+        margin-right: 0px;
+        border: 1px solid !important;
+    }
+
+    .empDetailsBg {
+        background-color: #fffbef;
+    }
+
+    #accordion select {
+        color: #000;
+        width: 100% !important;
+        height: 45px;
+        background-color: #FFFFFF;
+        border: 1px solid #BFBFBF;
+        box-sizing: border-box;
+        border-radius: 5px;
+        background-image: url(data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>);
+        background-repeat: no-repeat;
+        background-position: right .75rem center;
+        background-size: 16px 12px;
+    }
+
+    #accordion input[type='text'] {
+        width: 100% !important;
+        max-width: 100%;
+        height: 45px;
+        background-color: #FFFFFF;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px !important;
+    }
+
+    #accordion input[type='date'] {
+        width: 100% !important;
+        max-width: 100%;
+        height: 45px;
+        background-color: #FFFFFF;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px;
+    }
+
+    #accordion input[type='time'] {
+        height: 45px;
+    }
+
+    #accordion label {
+        font-size: 16px;
+        line-height: 22px;
+        font-weight: 600;
+        color: #201F1F;
+    }
+
+    #accordion table tr td {
+        font-size: 16px;
+        line-height: 19px;
+        color: #201F1F;
+        background-color: white;
+    }
+
+    #accordion label {
+        display: block;
+    }
+
+    #accordion .card-header {
+        background: rgb(4 59 100) !important;
+        border-radius: 5px 5px 0px 0px;
+        position: relative;
+        margin-top: 15px;
+    }
+
+        #accordion .card-header.collapsed h5:after {
+            content: '+';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        #accordion .card-header h5:after {
+            content: '-';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+    #accordion h5 button {
+        font-size: 18px;
+        line-height: 22px;
+        /* identical to box height */
+        padding-left: 0px;
+        display: flex;
+        align-items: center;
+        text-transform: uppercase;
+        /* Text_white */
+
+        color: #FFFFFF;
+    }
+
+        #accordion h5 button:focus {
+            box-shadow: none;
+        }
+
+    .empDetailsFields label {
+        display: block !important;
+        margin-bottom: 0px;
+    }
+
+    .empDetailsFields .row label {
+        display: block;
+        margin-bottom: 0px;
+    }
+
+        .empDetailsFields .row label:nth-child(1) {
+            font-style: normal;
+            font-weight: normal !important;
+            font-size: 12px;
+            line-height: 18px;
+            color: #A9A9A9 !important;
+        }
+
+        .empDetailsFields .row label:nth-child(2) {
+            font-style: normal;
+            font-weight: normal;
+            font-size: 18px;
+            line-height: 22px;
+            color: #201F1F;
+        }
+
+    .firstLastName {
+        font-style: normal;
+        font-weight: normal;
+        font-size: 20px;
+        line-height: 24px;
+        /* identical to box height */
+
+        display: flex;
+        align-items: center;
+        color: #201F1F;
+    }
+
+    .submit-btn {
+        background: #3D3D3D;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #FFFFFF;
+        border-color: transparent !important;
+    }
+
+    .cancl-btn {
+        background: #FAE99B;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        border-color: transparent !important;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #212221;
+        margin-left: 10px;
+    }
+
+
+
+
+    .card-footer {
+        display: flex;
+        background-color: transparent !important;
+    }
+
+    .photo-form {
+        width: 100%;
+    }
+
+    .ui-front {
+        z-index: 9999999 !important;
+    }
+
+    /* NEW UI CSS END*/
+
+
+    .showBorder {
+        border: 1px solid #dee2e6;
+    }
+
+    .multiselect {
+        height: 47px;
+        margin-top: -1px;
+    }
+    /*Animation CSS Starts*/
+
+    div.input-block {
+        position: relative;
+    }
+
+        div.input-block input {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 188px;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block textarea {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 100%;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            background-color: #fff;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block span.placeholder {
+            position: absolute;
+            margin: 17px 0;
+            padding: 0 4px;
+            font-family: Roboto, sans-serif;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            top: -6px;
+            left: 15px;
+            transition: all 0.2s;
+            transform-origin: 0% 0%;
+            background: none;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+    .question_span {
+        width: 116% !important;
+        font-size: 15px !important;
+    }
+
+    div.input-block textarea:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: #fff !important;
+    }
+
+    div.input-block textarea:valid + span.placeholder,
+    div.input-block textarea:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+    }
+
+    div.inputSelect select:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+    }
+
+    div.input-block input:valid + span.placeholder,
+    div.input-block input:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: #fff;
+        /*background-color: rgb(219,238,213);*/
+    }
+
+
+    div.input-block input.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: rgb(219,238,213);
+    }
+
+    div.input-block input:read-only + span.placeholder,
+    div.input-block input:read-only + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: rgb(219,238,213);
+    }
+
+
+    div.inputSelect span.placeholder {
+        position: absolute;
+        margin: 17px 0;
+        padding: 0 4px;
+        font-family: Roboto, sans-serif;
+        color: #000;
+        display: flex;
+        align-items: center;
+        font-size: 1rem;
+        top: -6px;
+        left: 15px;
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+        background: none;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    div.inputSelect select:focus + span.placeholder {
+        transform: scale(0.8) translateY(-30px);
+        background: rgb(219,238,213);
+        z-index: 9;
+    }
+
+    div.inputSelect select:not([value=""]):valid + span.placeholder {
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+    }
+
+
+
+    div.input-block input:focus + span.placeholder {
+        color: #284B63;
+    }
+
+    .breadcrumb {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+        padding: 1rem 1rem 0;
+        margin-bottom: 0;
+        list-style: none;
+        background-color: #FFFFFF;
+        border-radius: .25rem;
+    }
+
+    body.nav-sm .container.body .left_col {
+        width: 63px;
+        padding: 0;
+        position: fixed;
+        height: 100%;
+        z-index: 8;
+    }
+
+    .card {
+        position: relative;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        min-width: 0;
+        word-wrap: break-word;
+        background-color: #fff;
+        background-clip: border-box;
+        border: 0px;
+        border-radius: .25rem;
+    }
+
+    .dropdown-toggle::after {
+        display: none;
+        width: 0;
+        height: 0;
+        margin-left: .255em;
+        vertical-align: .255em;
+        content: "";
+        border-top: .3em solid;
+        border-right: .3em solid transparent;
+        border-bottom: 0;
+        border-left: .3em solid transparent;
+    }
+
+    input.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213);
+    }
+
+    inputSelect.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213) !important;
+    }
+
+    select.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background-color: rgb(219,238,213) !important;
+        z-index: 9;
+    }
+
+    select.spanUpperSideWhite + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background-color: rgb(255,255,255) !important;
+        z-index: 9;
+    }
+
+    textarea.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    .TransView {
+        background-color: white !important;
+    }
+
+    @@media only screen and (min-width: 992px) {
+        div .input-block span.placeholder {
+            font-size: 15px;
+        }
+
+        div.inputSelect span.placeholder {
+            font-size: 1rem;
+        }
+    }
+
+    input[type='date'].spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    .showBorder {
+        border: 1px solid #dee2e6;
+    }
+
+    .wField {
+        width: 233px !important;
+        margin-left: 10px;
+    }
+
+    @@-moz-document url-prefix() {
+        input[type=time]::-ms-clear {
+            display: none;
+        }
+    }
+
+    .datetime-reset-button {
+        display: none !important;
+    }
+
+    .forShoppingCart {
+        margin-left: 14% !important;
+    }
+
+    .btn-group {
+        display: block !important;
+    }
+
+    #accordion label {
+        display: inline-block !important;
+    }
+
+
+    .custom-select:focus {
+        box-shadow: none !important;
+        border-color: none !important;
+    }
+
+    #addSoftwarebtn td {
+        border-top: none !important;
+    }
+
+    #ApplicationCategoryBody select {
+        background-color: #fff !important;
+    }
+
+    #loader {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        z-index: 10000;
+    }
+
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        margin: 0;
+    }
+</style>
+<style>
+    .w-100 {
+        width: 100% !important;
+    }
+    .row {
+        margin-right: -10px;
+        margin-left: -10px;
+    }
+</style>
+<script type="text/javascript">
+    function checkSelectGlobal(id) {
+        if ($('#' + id).val() != '') {
+            $('#' + id).addClass('spanUpperSideWhite');
+        }
+    }</script>
+<div class="container">
+    <div class="right_col bg-transparent" role="main">
+        <div class="main_container">
+            <form id="DLADForm" method="post">
+                <!-- ACCORDIAN STRUCTURE START HERE-->
+                @* Submitter Section *@
+
+                <table style="width: 100%; font-size: 14px; color: #000; font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td>
+                            <table style="width: 100%;" cellspadding="0" cellspacing="0">
+                                <tr>
+                                    <td colspan="6" width="60%" style="text-align: right;">
+                                        <img style="width: 50%;" src='@Server.MapPath("~/assets/img/SAVWIPL_Merger_Logo.JPG")'>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="6" align="center">
+                            <h2 style="font-weight:bold"> DLAD  </h2>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding: 15px;">
+                            <table cellspacing="0" border="" cellpadding="0" width="100%">
+                                @if (DLAD.RequestSubmissionFor == "Self")
+                                {
+                                    <tr>
+                                        <td colspan="6" align='left'>
+                                            <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Submitter Details</u></b></h6>
+                                        </td>
+                                    </tr>
+                                    <tr style="margin-top:5px;">
+                                        <td style="width:20%; font-weight: bold;">
+                                            Employee Name
+                                        </td>
+                                        <td style="width: 30%; font-weight: normal;" colspan="2" align='left'>
+                                            <span style="height: 25px; width:85%; border-radius: 0; "> @(DLAD.EmployeeName)  </span>
+                                        </td>
+                                        <td style="width:20%; font-weight: bold;">
+                                            Employee Code
+                                        </td>
+                                        <td style="width: 30%; font-weight: normal;" colspan="2" align='left'>
+                                            <span style="height: 25px; width:85%; border-radius: 0; "> @(DLAD.EmployeeCode) </span>
+                                        </td>
+
+                                    </tr>
+                                    <tr style="margin-top:5px;">
+                                        <td style="width:20%; font-weight: bold;">
+                                            Designation
+                                        </td>
+                                        <td colspan="2" align='left'>
+                                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(DLAD.EmployeeDesignation) </span>
+                                        </td>
+                                        <td style="width:20%; font-weight: bold;">
+                                            Location
+                                        </td>
+                                        <td colspan="2" align='left'>
+                                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(DLAD.EmployeeLocation) </span>
+                                        </td>
+
+                                    </tr>
+                                    <tr style="margin-top:5px;">
+                                        <td style="width:20%; font-weight: bold;">
+                                            Department
+                                        </td>
+                                        <td colspan="2" align='left'>
+                                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(DLAD.EmployeeDepartment) </span>
+                                        </td>
+                                        <td style="width:20%; font-weight: bold;">
+                                            Contact Number
+                                        </td>
+                                        <td colspan="2" align='left'>
+                                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(DLAD.EmployeeContactNo) </span>
+                                        </td>
+
+                                    </tr>
+                                    <tr style="margin-top:5px;">
+                                        <td style="width:20%; font-weight: bold;">
+                                            Cost Center Number
+                                        </td>
+                                        <td colspan="2" align='left'>
+                                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(DLAD.EmployeeCCCode)  </span>
+                                        </td>
+                                        <td style="width:20%; font-weight: bold;">
+                                            UserID
+                                        </td>
+                                        <td colspan="2" align='left'>
+                                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(DLAD.EmployeeUserId)  </span>
+                                        </td>
+
+                                    </tr>
+                                }
+                                else
+                                {
+                                    if (DLAD.EmployeeType == "SAVWIPLEmployee")
+                                    {
+                                        <tr>
+                                            <td colspan="6" align='left'>
+                                                <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Submitter Details</u></b></h6>
+                                            </td>
+                                        </tr>
+                                        <tr>
+
+                                            <td style="width:20%; font-weight: bold;">
+                                                Employee Name
+                                            </td>
+                                            <td style="width: 30%" colspan="2" align='left'>
+                                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(DLAD.OtherEmployeeName)  </span>
+                                            </td>
+                                            <td style="width:20%; font-weight: bold;">
+                                                Employee Code
+                                            </td>
+                                            <td style="width: 30%" colspan="2" align='left'>
+                                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(DLAD.OtherEmployeeCode) </span>
+                                            </td>
+
+                                        </tr>
+                                        <tr>
+                                            <td style="width:20%; font-weight: bold;">
+                                                Designation
+                                            </td>
+                                            <td colspan="2" align='left'>
+                                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(DLAD.OtherEmployeeDesignation) </span>
+                                            </td>
+                                            <td style="width:20%; font-weight: bold;">
+                                                Location
+                                            </td>
+                                            <td colspan="2" align='left'>
+                                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(DLAD.OtherEmployeeLocation) </span>
+                                            </td>
+
+                                        </tr>
+                                        <tr>
+                                            <td style="width:20%; font-weight: bold;">
+                                                Department
+                                            </td>
+                                            <td colspan="2" align='left'>
+                                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(DLAD.OtherEmployeeDepartment) </span>
+                                            </td>
+                                            <td style="width:20%; font-weight: bold;">
+                                                Contact Number
+                                            </td>
+                                            <td colspan="2" align='left'>
+                                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(DLAD.OtherEmployeeContactNo) </span>
+                                            </td>
+
+                                        </tr>
+                                        <tr>
+                                            <td style="width:20%; font-weight: bold;">
+                                                Cost Center Number
+                                            </td>
+                                            <td colspan="2" align='left'>
+                                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(DLAD.OtherEmployeeCCCode)  </span>
+                                            </td>
+                                            <td style="width:20%; font-weight: bold;">
+                                                UserID
+                                            </td>
+                                            <td colspan="2" align='left'>
+                                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(DLAD.OtherEmployeeUserId)  </span>
+                                            </td>
+
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="6" align='left'>
+                                                <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Submitter Details</u></b></h6>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width:20%; font-weight: bold;">
+                                                Employee Name
+                                            </td>
+                                            <td style="width: 30%" colspan="2" align='left'>
+                                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(DLAD.OtherEmployeeName)  </span>
+                                            </td>
+                                            <td style="width:20%; font-weight: bold;">
+                                                Employee Code
+                                            </td>
+                                            <td style="width: 30%" colspan="2" align='left'>
+                                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(DLAD.OtherEmployeeCode) </span>
+                                            </td>
+
+                                        </tr>
+                                        <tr>
+                                            <td style="width:20%; font-weight: bold;">
+                                                Designation
+                                            </td>
+                                            <td colspan="2" align='left'>
+                                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(DLAD.OtherEmployeeDesignation) </span>
+                                            </td>
+                                            <td style="width:20%; font-weight: bold;">
+                                                Location
+                                            </td>
+                                            <td colspan="2" align='left'>
+                                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(DLAD.OtherEmployeeLocation) </span>
+                                            </td>
+
+                                        </tr>
+                                        <tr>
+                                            <td style="width:20%; font-weight: bold;">
+                                                Department
+                                            </td>
+                                            <td colspan="2" align='left'>
+                                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(DLAD.OtherEmployeeDepartment) </span>
+                                            </td>
+                                            <td style="width:20%; font-weight: bold;">
+                                                Contact Number
+                                            </td>
+                                            <td colspan="2" align='left'>
+                                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(DLAD.OtherEmployeeContactNo) </span>
+                                            </td>
+
+                                        </tr>
+                                        <tr>
+                                            <td style="width:20%; font-weight: bold;">
+                                                Cost Center Number
+                                            </td>
+                                            <td colspan="2" align='left'>
+                                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(DLAD.OtherEmployeeCCCode)  </span>
+                                            </td>
+                                            <td style="width:20%; font-weight: bold;">
+                                                UserID
+                                            </td>
+                                            <td colspan="2" align='left'>
+                                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(DLAD.OtherEmployeeUserId)  </span>
+                                            </td>
+
+                                        </tr>
+                                    }
+
+                                }
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+                @if (IsViewMode)
+                {
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row w-100">
+                                <div class="row w-100" style="margin-left: -2px;">
+                                    <div class="form-group col-md-2 d-flex align-items-center col-lg-2 col-12">
+                                        <label id="lblRequestType" class="f-600" style="margin-left:15px; position: relative; top:10px;">
+                                            Location<span class="astColor">*</span>
+                                        </label>
+                                    </div>
+                                    <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                        <select class="location_names form-control" name="Location" disabled>
+                                            <option @(DLAD.Location == "pune" ? "selected" : "" ) value="pune">Pune</option>
+                                            <option @(DLAD.Location == "mumbai" ? "selected" : "" ) value="mumbai">Mumbai</option>
+                                            <option @(DLAD.Location == "aurangabad" ? "selected" : "" ) value="aurangabad">Aurangabad</option>
+                                        </select>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                            <div class="dlda_sec" style="margin-left: 20px;">
+                                <div class="row w-100">
+                                    <div class="row w-100">
+                                        <div class="mt-3 col-md-12 d-flex align-items-center col-lg-12 col-12">
+                                            <div class="per col-md-12 col-lg-12 d-flex align-items-end col-12" style="margin-left: -8px;">
+                                                <label class="checkbox-container">
+                                                    <label class="f-600">New DLAD Admin Account Creation for Server Access</label>&nbsp;&nbsp;&nbsp;<span class="astColor">(Note- If you already have DLAD account the no need to check this option)</span>
+                                                    <input type="checkbox" @(DLAD.ServiceType == 1 ? "checked" : "" ) class="" name="chkServiceType" id="chkServiceType" value="New DLAD Admin Account Creation" disabled>
+                                                    <span class="checkmark"></span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row w-100">
+                                    <div class="row w-100" style="margin-left: -23px;">
+                                        <div class="form-group col-md-2 d-flex align-items-center col-lg-2 col-12">
+                                            <label id="lblRequestType" class="f-600" style="margin-left:15px; position: relative; top:10px;">
+                                                Duration Type<span class="astColor">*</span>
+                                            </label>
+                                        </div>
+                                        <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                            <select class="dlda_duration_type form-control" id="chkdldaPermanent" name="DurationType" disabled>
+                                                <option @(DLAD.DurationType == "permanent" ? "selected" : "" ) value="permanent">Permanent</option>
+                                                <option @(DLAD.DurationType == "temporary" ? "selected" : "" ) value="temporary">Temporary</option>
+                                            </select>
+                                        </div>
+                                        <div class="dlda_dates align col-md-6 align-items-end col-lg-6 col-12 hide">
+                                            <div id="TemporaryDateFrom" class="col-md-6 col-lg-6 col-12">
+                                                <div class="input-block">
+                                                    <input type="date" name="TemporaryDateFrom" class="TransView spanUpperSide" id="txtTemporaryDateFrom" onchange="date_val()" value="@(DLAD?.TemporaryDateFrom.ToString("yyyy-MM-dd")  != "0001-01-01" ? DLAD?.TemporaryDateFrom.ToString("yyyy-MM-dd") : "")" min="2022-06-23" disabled>
+                                                    <span class="placeholder TransView" for="TempFrom" id="lblTempFrom" style="font-weight:bolder;">from<span class="astColor">*</span></span>
+                                                </div>
+                                            </div>
+                                            <div class="align col-md-6 col-lg-6 col-12" id="TemporaryDateTo">
+                                                <div class="ml-4 input-block">
+                                                    <input type="date" class="w-90 TransView spanUpperSide" name="TemporaryDateTo" id="txtTemporaryDateTo" value="@(DLAD?.TemporaryDateTo.ToString("yyyy-MM-dd") != "0001-01-01" ? DLAD?.TemporaryDateTo.ToString("yyyy-MM-dd") : "" )" min="2022-06-23" disabled>
+                                                    <span class="placeholder TransView" for="TempTo" id="lblTempTo" style="font-weight:bolder;">to<span class="astColor">*</span></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><br>
+
+                            <div class="col-md-4 col-lg-4 col-12"></div>
+                            <div class="col-md-12 col-lg-12 col-12" id="DLAD_tbl">
+                                <table class="w-100 mx-auto table table-border form-border text-center" id="maintable" style="table-layout: fixed;">
+                                    <thead class="form-head-1" style="margin-left:inherit !important;">
+                                        <tr>
+                                            <th style="width: 50px !important;">Check Box</th>
+                                            <th style="width: 122px !important;">Name</th>
+                                            <th style="width: 100px !important;">DLAD<span class="astColor">*</span></th>
+                                            <th style="width: 100px !important;">Access Type</th>
+                                            <th style="width: 114px !important;">Duration</th>
+                                            @if (DLAD.Duration_Admin.ToLower() == "temporary" || DLAD.Duration_Individual.ToLower() == "temporary" || DLAD.Duration_LD.ToLower() == "temporary")
+                                            {
+                                                <th class="temp_from" style="width: 129px !important;">From</th>
+                                                <th class="temp_to" style="width: 129px !important;">To</th>
+                                            }
+
+                                        </tr>
+                                    </thead>
+                                    <tbody class="form-border tableSoftware" id="softwareBody">
+                                        <tr id="row1" class="tr_input">
+                                            <td class="text-center">
+                                                <input type="checkbox" name="chk1" id="chk1" value="IndividualServer" @(DLAD.FormType.Contains("IndividualServer") ? "checked" : "" ) disabled>
+                                            </td>
+                                            <td class="text-center">
+                                                <label>Individual Server Access</label>
+                                            </td>
+                                            <td class="text-center">
+                                                <input type="text" name="DLAD_Individual" placeholder="Please Enter DLAD" id="DLAD_Individual" value="@(DLAD.DLAD_Individual)" disabled>
+                                            </td>
+                                            <td class="text-center">
+                                                <input type="text" name="AccessType_Individual" placeholder="Please Enter DLAD" id="AccessType_Individual" value="@(DLAD.AccessType_Individual)" disabled>
+                                                @*<select class="form-control" name="AccessType_Individual" id="AccessType_Individual" disabled>
+                                                    <option @(DLAD.AccessType_Individual == "Admin" ? "selected" : "" ) value="Admin">Admin</option>
+                                                    <option @(DLAD.AccessType_Individual == "Read Only" ? "selected" : "" ) value="Read Only">Read Only</option>
+                                                </select>*@
+                                            </td>
+                                            <td class="text-center">
+                                                <input type="text" name="Duration_Individual" placeholder="Please Enter DLAD" id="Duration_Individual" value="@(DLAD.Duration_Individual)" disabled>
+                                                @*<select class="form-control requestType" id="Duration_Individual" name="Duration_Individual" disabled>
+                                                    <option @(DLAD.Duration_Individual == "Permanent" ? "selected" : "" ) value="Permanent">Permanent</option>
+                                                    <option @(DLAD.Duration_Individual == "Temporary" ? "selected" : "" ) value="Temporary">Temporary</option>
+                                                </select>*@
+                                            </td>
+                                            @if (DLAD.Duration_Admin.ToLower() == "temporary" || DLAD.Duration_Individual.ToLower() == "temporary" || DLAD.Duration_LD.ToLower() == "temporary")
+                                            {
+                                                <td class="text-center txt_replacement temp_from">
+                                                    <input type="date" name="FromDate_Individual" value="@(DLAD?.FromDate_Individual.ToString("yyyy-MM-dd") != "0001-01-01" ? DLAD?.FromDate_Individual.ToString("yyyy-MM-dd") : "")" id="FromDate_Individual" class="temp_from_input" disabled>
+                                                </td>
+                                                <td class="text-center txt_replacement temp_to">
+                                                    <input type="date" name="ToDate_Individual" value="@(DLAD?.ToDate_Individual.ToString("yyyy-MM-dd") != "0001-01-01" ? DLAD?.ToDate_Individual.ToString("yyyy-MM-dd") : "")" id="ToDate_Individual" class="temp_to_input" disabled>
+                                                </td>
+                                            }
+                                        </tr>
+
+                                        <tr id="row2" class="tr_input">
+                                            <td class="text-center">
+                                                <input type="checkbox" name="chk2" id="chk2" value="AdminServer" @(DLAD.FormType.Contains("AdminServer") ? "checked" : "" ) disabled>
+                                            </td>
+                                            <td class="text-center">
+                                                <label>Server Admin Access (Only For Server Administrator)</label>
+                                            </td>
+                                            <td class="text-center">
+                                                <input type="text" name="DLAD_Admin" placeholder="Please Enter DLAD" id="DLAD_Admin" value="@(DLAD.DLAD_Admin)" disabled>
+                                            </td>
+                                            <td class="text-center">
+                                                <input type="text" name="AccessType_Admin" placeholder="Please Enter DLAD" id="AccessType_Admin" value="@(DLAD.AccessType_Admin)" disabled>
+                                                @*<select class="form-control" name="AccessType_Admin" id="AccessType_Admin" disabled>
+                                                    <option @(DLAD.AccessType_Admin == "Admin" ? "selected" : "" ) value="Admin">Admin</option>
+                                                    <option @(DLAD.AccessType_Admin == "Read Only" ? "selected" : "" ) value="Read Only">Read Only</option>
+                                                </select>*@
+                                            </td>
+                                            <td class="text-center">
+                                                <input type="text" name="Duration_Admin" placeholder="Please Enter DLAD" id="Duration_Admin" value="@(DLAD.Duration_Admin)" disabled>
+                                                @*<select class="form-control requestType" id="Duration_Admin" name="Duration_Admin" disabled>
+                                                    <option @(DLAD.Duration_Admin == "Permanent" ? "selected" : "" ) value="Permanent">Permanent</option>
+                                                    <option @(DLAD.Duration_Admin == "Temporary" ? "selected" : "" ) value="Temporary">Temporary</option>
+                                                </select>*@
+                                            </td>
+                                            @if (DLAD.Duration_Admin.ToLower() == "temporary" || DLAD.Duration_Individual.ToLower() == "temporary" || DLAD.Duration_LD.ToLower() == "temporary")
+                                            {
+                                                <td class="text-center txt_replacement temp_from">
+                                                    <input type="date" name="FromDate_Admin" value="@(DLAD?.FromDate_Admin.ToString("yyyy-MM-dd") != "0001-01-01" ? DLAD?.FromDate_Admin.ToString("yyyy-MM-dd") : "")" id="FromDate_Admin" class="temp_from_input" disabled>
+                                                </td>
+                                                <td class="text-center txt_replacement temp_to">
+                                                    <input type="date" name="ToDate_Admin" value="@(DLAD?.ToDate_Admin.ToString("yyyy-MM-dd") != "0001-01-01" ? DLAD?.ToDate_Admin.ToString("yyyy-MM-dd") : "")" id="ToDate_Admin" class="temp_from_input" disabled>
+                                                </td>
+                                            }
+                                        </tr>
+                                        <tr id="row3" class="tr_input">
+                                            <td class="text-center">
+                                                <input type="checkbox" name="chk3" id="chk3" value="DeskTopLaptopServer" @(DLAD.FormType.Contains("DeskTopLaptopServer") ? "checked" : "" ) disabled>
+                                            </td>
+                                            <td class="text-center">
+                                                <label>Laptop / Desktop Local Admin Access</label>
+                                            </td>
+                                            <td class="text-center">
+                                                <input type="text" name="DLAD_LD" placeholder="Please Enter DVID" id="DLAD_LD" value="@(DLAD.DLAD_LD)" disabled>
+                                            </td>
+                                            <td class="text-center">
+                                                <input type="text" name="AccessType_LD" placeholder="Please Enter DLAD" id="AccessType_LD" value="@(DLAD.AccessType_LD)" disabled>
+                                                @*<select class="form-control" name="AccessType_LD" disabled>
+                                                    <option @(DLAD.AccessType_LD == "Admin" ? "selected" : "" ) value="Admin">Admin</option>
+                                                    <option @(DLAD.AccessType_LD == "Read Only" ? "selected" : "" ) value="Read Only">Read Only</option>
+                                                </select>*@
+                                            </td>
+                                            <td class="text-center">
+                                                <input type="text" name="Duration_LD" placeholder="Please Enter DLAD" id="Duration_LD" value="@(DLAD.Duration_LD)" disabled>
+                                                @*<select class="form-control requestType" id="Duration_LD" name="Duration_LD" disabled>
+                                                    <option @(DLAD.Duration_LD == "Permanent" ? "selected" : "" ) value="Permanent">Permanent</option>
+                                                    <option @(DLAD.Duration_LD == "Temporary" ? "selected" : "" ) value="Temporary">Temporary</option>
+                                                </select>*@
+                                            </td>
+                                            @if (DLAD.Duration_Admin.ToLower() == "temporary" || DLAD.Duration_Individual.ToLower() == "temporary" || DLAD.Duration_LD.ToLower() == "temporary")
+                                            {
+                                                <td class="text-center txt_replacement temp_from">
+                                                    <input type="date" name="FromDate_LD" id="FromDate_LD" value="@(DLAD?.FromDate_LD.ToString("yyyy-MM-dd") != "0001-01-01" ? DLAD?.FromDate_LD.ToString("yyyy-MM-dd") : "")" class="temp_from_input" disabled>
+                                                </td>
+                                                <td class="text-center txt_replacement temp_to">
+                                                    <input type="date" name="ToDate_LD" id="ToDate_LD" value="@(DLAD?.ToDate_LD.ToString("yyyy-MM-dd") != "0001-01-01" ? DLAD?.ToDate_LD.ToString("yyyy-MM-dd") : "")" class="temp_from_input" disabled>
+                                                </td>
+                                            }
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="individual_server">
+
+                                <table class="apply_section" id="tbl_individual_server">
+
+                                    <tr align="top" id="ind_server" class="tr_input apply_tr">
+                                        <td class="row w-100 f1 text-center" style="width: 50px;">
+                                            <label id="lblRequestType" class="f-600" style="width: 50px;">
+                                                Sr No.
+                                            </label>
+                                            <!-- <input type="text" class="application_name" value="1"> -->
+                                            <p class="w-100" style="padding-top: 15px;">1</p>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="row w-100 f1">
+                                                <label id="lblRequestType" class="f-600" style="margin-left:35px;">
+                                                    Application Name / Role<span class="astColor">*</span>
+                                                </label>
+                                                <input type="text" class="application_name" id="ApplicationName_1" name="ApplicationName_1">
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="row w-100 f1">
+                                                <label id="lblRequestType" class="f-600" style="margin-left:35px; position: relative; top:0px;">
+                                                    Server Host Name<span class="astColor">*</span>
+                                                </label>
+                                                <input type="text" class="server_host_name" id="ServerHostName_1" name="ServerHostName_1">
+                                            </div>
+                                        </td>
+
+                                        <td class="text-center">
+                                            <div class="row w-100 f1">
+
+                                                <label id="lblRequestType" class="f-600" style="margin-left:35px; position: relative; top:0px;">
+                                                    Server IP Address<span class="astColor">*</span>
+                                                </label>
+                                                <input type="text" class="server_IP_Address" id="ServerIP_1" name="ServerIP_1">
+
+
+                                            </div>
+                                        </td>
+
+                                    </tr>
+                                </table>
+                            </div>
+
+
+
+                            <div class="server_admin_access">
+
+                                <table class="apply_section" id="server_a">
+
+                                    <tr id="server_admin_row" class="tr_input server_s_tr">
+                                        <td class="text-center">
+                                            <div class="row w-100 f1" style="width: 50px;">
+                                                <label id="lblRequestType" class="f-600" style="width: 50px;">
+                                                    Sr No.
+                                                </label>
+                                                <p class="w-100" style="padding-top: 15px;">1</p>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="row w-100 f1">
+                                                <label id="lblRequestType" class="f-600" style="margin-left:35px;">
+                                                    Application Name / Role<span class="astColor">*</span>
+                                                </label>
+                                                <input type="text" class="application_name" id="ServerApplicationName_1" name="ServerApplicationName_1">
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="row w-100 f1">
+                                                <label id="lblRequestType" class="f-600" style="margin-left:35px; position: relative; top:0px;">
+                                                    Server Host Name<span class="astColor">*</span>
+                                                </label>
+                                                <input type="text" class="server_host_name" id="ServerServerHostName_1" name="ServerServerHostName_1">
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="row w-100 f1">
+
+                                                <label id="lblRequestType" class="f-600" style="margin-left:35px; position: relative; top:0px;">
+                                                    Server IP Address<span class="astColor">*</span>
+                                                </label>
+                                                <input type="text" class="server_IP_Address" id="ServerServerIP_1" name="ServerServerIP_1">
+
+                                            </div>
+                                        </td>
+
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="laptop_admin_access">
+                                <div class="w-100 mt-2">
+                                    <label class="col-md-12 col-lg-12" style="margin-left: 5px;margin-top: 10px;"><b>Requested User Personal Asset Detail: </b></label>
+                                    <div class="row w-100">
+                                        <div class="form-group col-md-2 d-flex align-items-center col-lg-2 col-12">
+                                            <label id="lblRequestType" class="f-600" style="margin-left:15px; position: relative; top:10px;">
+                                                Asset Type<span class="astColor">*</span>
+                                            </label>
+                                        </div>
+                                        <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                            <label class="checkbox-container">
+                                                <label class="f-600">Laptop</label>
+                                                <input type="radio" class="access_type" name="AssetType" id="chkAccessType_L" value="Laptop" @(DLAD.AssetType == "Laptop" ? "checked" : "" ) disabled>
+
+                                                <span class="checkmark"></span>
+                                            </label>
+                                        </div>
+                                        <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                            <label class="checkbox-container">
+                                                <label class="f-600">Desktop</label>
+                                                <input type="radio" class="temp-checkbox access_type" name="AssetType" id="chkAccessType_D" value="Desktop" @(DLAD.AssetType == "Desktop" ? "checked" : "" ) disabled>
+
+                                                <span class="checkmark"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="w-100 mt-2">
+                                    <div class="row w-100">
+                                        <div class="form-group col-md-2 d-flex align-items-center col-lg-2 col-12">
+                                            <label id="lblRequestType" class="f-600" style="margin-left:15px; position: relative; top:10px;">
+                                                HostName<span class="astColor">*</span>
+                                            </label>
+                                        </div>
+
+                                        <div class="per col-md-4 col-lg-4 d-flex align-items-end col-12">
+                                            <input type="text" class="hostname" id="HostName" name="HostName" value="@(DLAD.HostName)" disabled>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row w-100 mt-2">
+                                <div class="row w-100">
+                                    <div class="form-group col-md-12 d-flex align-items-center col-lg-12 col-12">
+                                        <label id="lblRequestType" class="f-600" style="margin-left:23px; position: relative; top:10px;">
+                                            Business Reason<span class="astColor">*</span>
+                                        </label>
+                                    </div>
+
+                                    <div class="form-group col-md-12 col-lg-12 d-flex align-items-end col-12">
+                                        <textarea class="form-group" rows="4" name="BusinessReason" id="BusinessReason" style="margin-left: 20px;" disabled>@DLAD.BusinessReason</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                }
+            </form>
+            <div>
+                <p class="text-left f-600">SF_II_024</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+    //This is for live
+    //var CCNosArray = [2165100, 2165200, 2165300, 2165400, 2165500];
+    var CCNosArray = [512100,515600,515800];
+    var spinner = $('#loader');
+    var isNew = true;
+    var srf = null;
+
+
+    var isEdit = true;
+
+    var formID = 0;
+    var RowId = 0;
+    var OtherSoftwareCount = 0;
+    var OtherEmpOrg = "";
+    var currentUserDesgn = @Html.Raw(Json.Encode(CurrentUserDesgn));
+    var IsNew = @Html.Raw(Json.Encode(IsNew));
+    var IsEdit = @Html.Raw(Json.Encode(IsEdit));
+    var IsNewMode = @Html.Raw(Json.Encode(IsNewMode));
+    var IsEditMode = @Html.Raw(Json.Encode(IsEditMode));
+    var IsViewMode = @Html.Raw(Json.Encode(IsViewMode));
+    var appRowId = @Html.Raw(Json.Encode(AppRowId));
+    var approvalType =@Html.Raw(Json.Encode(ApprovalType));
+    var FlagRedirect = @Html.Raw(Json.Encode(FlagRedirect));
+    var SecurityDesgnString = @Html.Raw(Json.Encode(SecurityDesgnString));
+    var CurrentUserLevelForDLAD =  @Html.Raw(Json.Encode(CurrentUserLevel));
+    var DLADFormType =  @Html.Raw(Json.Encode(DLAD?.FormType));
+    var DurationType =  @Html.Raw(Json.Encode(DLAD?.DurationType));
+    var TemporaryDateFrom =  @Html.Raw(Json.Encode(DLAD?.TemporaryDateFrom.ToString("yyyy-MM-dd")));
+    var TemporaryDateTo =  @Html.Raw(Json.Encode(DLAD?.TemporaryDateTo.ToString("yyyy-MM-dd")));
+    var ServiceTypeForDLAD  = @Html.Raw(Json.Encode(DLAD?.ServiceType));
+    var errorCount = 0;
+    var errors = "";
+
+    $(document).ready(function () {
+        //pageLoad();
+        loadisViewEditMode();
+        applyCCCodeValidation();
+
+        if (isNew) {
+            if (!isEdit) {
+                date_val();
+            }
+        }
+        $('#chkdldaPermanent').change(function () {
+            if ($('#chkdldaPermanent').val() == "permanent") {
+                $('.dlda_dates').hide();
+            }
+            else {
+                $('.dlda_dates').show();
+            }
+
+        });
+
+        $('#chkserverAdminPermanent').change(function () {
+            if ($('#chkserverAdminPermanent').val() == "permanent") {
+                $('.chkserverAdminDates').hide();
+            }
+            else {
+                $('.chkserverAdminDates').show();
+            }
+        });
+
+
+        $('#chkIndividualServerPermanent').change(function () {
+            if ($('#chkIndividualServerPermanent').val() == "permanent") {
+                $('.individualServerDates').hide();
+            }
+            else {
+                $('.individualServerDates').show();
+            }
+        });
+
+        $('#chkLaptopPermanent').change(function () {
+            if ($('#chkLaptopPermanent').val() == "permanent") {
+                $('.laptopDates').hide();
+            }
+            else {
+                $('.laptopDates').show();
+            }
+        });
+
+    })
+
+    function applyCCCodeValidation() {
+        if (IsNew) {
+
+            var CCNo = parseInt($("#txtCostcenterCode").val());
+
+            if (CCNosArray.includes(CCNo) == false) {
+                //successDLADModal("invalidCC");
+                window.location = "../Dashboard";
+                $("#tab").val(1);
+            }
+        }
+    }
+
+
+    $('#successModel').on('hidden.bs.modal', function () {
+        // //debugger
+        var tab = $("#tab").val();
+        //console.log(tab);
+        if (tab == 1) {
+            GetMyTaskTab();
+        }
+        else if (tab == 2) {
+            window.location = "../Dashboard?tab=" + tab;
+        }
+    })
+
+
+    function getEmployeeType() {
+        var extdesignation = "Team Member";
+        var z = 0;
+        $('input:checkbox[id="chkInternal"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                //console.log("Internal");
+                $('input[id="chkInternal"]').prop('disabled', true);
+                $('input[id="chkExternal"]').prop('checked', false).change();
+                $('input[id="chkExternal"]').prop("disabled", false);
+                $("#chkEmployeeType").val('Internal');
+                $('#divExtOrg').addClass('d-none');
+                $('#divExtOtherOrg').addClass('d-none');
+                $('#ddExternalOrganizationName').prop("selectedIndex", 0).val();
+                $('#txtExternalOtherOrganizationName').val('');
+                //console.log("internal z=" + z);
+                if (z == 1) {
+                    $("#ddEmpDesignation").prop("disabled", false);
+                    $("#ddEmpDesignation").prop("selectedIndex", 0);
+                    $('#ddEmpDesignation').removeClass("spanUpperSide");
+                }
+            }
+        });
+
+        $('input:checkbox[id="chkExternal"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                z = 1;
+                $("#chkEmployeeType").val('External');
+                $('input[id="chkExternal"]').prop('disabled', true);
+                $('input[id="chkInternal"]').prop("checked", false).change();
+                $('input[id="chkInternal"]').prop("disabled", false);
+                $('#divExtOrg').removeClass('d-none');
+                $("#ddEmpDesignation option[value='" + extdesignation + "']").prop('selected', 'selected');
+                $('#ddEmpDesignation').addClass("spanUpperSide");
+                $('#ddEmpDesignation').prop("disabled", true);
+            }
+        });
+    }
+
+    function getOtherEmployeeType() {
+        var extdesignation = "Team Member";
+        var y = 0;
+        $('input:checkbox[id="chkOtherInternal"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                //console.log("other Internal");
+                $('input[id="chkOtherInternal"]').prop('disabled', true);
+                $('input[id="chkOtherExternal"]').prop('checked', false).change();
+                $('input[id="chkOtherExternal"]').prop("disabled", false);
+                $('#chkOtherEmployeeType').val('Internal');
+                //console.log("other internal y=" + y);
+                if (y == 1) {
+                    $("#ddOtherEmpDesignation").prop("disabled", false);
+                    $("#ddOtherEmpDesignation").prop("selectedIndex", 0);
+                    $('#ddOtherEmpDesignation').removeClass("spanUpperSide");
+                }
+
+                $('#divOtherExtOtherOrg').addClass('d-none');
+
+
+                $('#txtOtherExternalOtherOrganizationName').val('');
+
+            }
+        });
+
+        $('input:checkbox[id="chkOtherExternal"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                //console.log("other External");
+                y = 1;
+                //console.log("other external y=" + y);
+                $('#chkOtherEmployeeType').val('External');
+                $('input[id="chkOtherExternal"]').prop('disabled', true);
+                $('input[id="chkOtherInternal"]').prop("checked", false).change();
+                $('input[id="chkOtherInternal"]').prop("disabled", false);
+                $('#divOtherExtOtherOrg').removeClass('d-none');
+                $("#ddOtherEmpDesignation option[value='" + extdesignation + "']").prop('selected', 'selected');
+                $('#ddOtherEmpDesignation').addClass("spanUpperSide");
+                $('#ddOtherEmpDesignation').prop("disabled", true);
+            }
+        });
+    }
+
+
+
+    function successModal(txt) {
+
+        $('#modalTitle').html('Success');
+        if (txt == "approve") {
+            $('#modalBody').html('Form has been approved!');
+            FlagRedirect = txt;
+        }
+        else if (txt == "reject") {
+            $('#modalBody').html('Form has been rejected!');
+        }
+        else if (txt == "enquire") {
+            $('#modalBody').html('Form has been enquired!');
+        }
+        else if (txt == "cancelled") {
+            $('#modalBody').html('Form has been cancelled!');
+        }
+        else {
+            if (!isEdit) {
+                $('#modalBody').html('Your form with ID: SRF' + txt + ' has been re-submitted! Kindly use this for future reference');
+            }
+            else {
+                $('#modalBody').html('Your form with ID: SRF' + txt + ' has been submitted! Kindly use this for future reference');
+            }
+            FlagRedirect = txt;
+        }
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function failureModal() {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html('Some error occurred!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function fillFormModal() {
+        $('#modalTitle').html('Required');
+        $('#modalBody').html('<font color="red">Kindly fill the complete Software Details!</font>');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function requiredModal() {
+        $('#modalTitle').html('Required');
+        $('#modalBody').html('At Least 1 software details are mandatory!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+
+    function validateFormData() {
+        var IndividualServerCheckbox = $('#chk1').is(':checked');
+        var AdminServerCheckbox = $('#chk2').is(':checked');
+        var DesktopLaptopCheckbox = $('#chk3').is(':checked');
+        if (!IndividualServerCheckbox && !AdminServerCheckbox && !DesktopLaptopCheckbox) {
+            errors += "<li id='error" + errorCount + "'>" + "Tick access type check box" + "</li>";
+            errorCount++;
+        }
+        if (IndividualServerCheckbox) {
+            if ($("#DLAD_Individual").val() == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Fill DLAD field for Individual Server Access" + "</li>";
+                errorCount++;
+            }
+            if ($("#Duration_Individual").val() == "Temporary") {
+                if ($("#FromDate_Individual").val() == "" ) {
+                    errors += "<li id='error" + errorCount + "'>" + "Fill From date field for Individual Server Access" + "</li>";
+                    errorCount++;
+                }
+                if ($("#ToDate_Individual").val() == "") {
+                    errors += "<li id='error" + errorCount + "'>" + "Fill To date field for Individual Server Access" + "</li>";
+                    errorCount++;
+                }
+            }
+        }
+
+        if (AdminServerCheckbox) {
+            if ($("#DLAD_Admin").val() == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Fill DLAD field for Server Admin Access" + "</li>";
+                errorCount++;
+            }
+            if ($("#Duration_Admin").val() == "Temporary") {
+                if ($("#FromDate_Admin").val() == "") {
+                    errors += "<li id='error" + errorCount + "'>" + "Fill From date field for Server Admin Access" + "</li>";
+                    errorCount++;
+                }
+                if ($("#ToDate_Admin").val() == "") {
+                    errors += "<li id='error" + errorCount + "'>" + "Fill To date field for Server Admin Access" + "</li>";
+                    errorCount++;
+                }
+            }
+        }
+
+        if (DesktopLaptopCheckbox) {
+            if ($("#DLAD_LD").val() == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Fill DLAD field for Laptop / Desktop Local Admin Access" + "</li>";
+                errorCount++;
+            }
+            if ($("#Duration_LD").val() == "Temporary") {
+                if ($("#FromDate_LD").val() == "") {
+                    errors += "<li id='error" + errorCount + "'>" + "Fill From date field for Laptop / Desktop Local Admin Access" + "</li>";
+                    errorCount++;
+                }
+                if ($("#ToDate_LD").val() == "") {
+                    errors += "<li id='error" + errorCount + "'>" + "Fill To date field for Laptop / Desktop Local Admin Access" + "</li>";
+                    errorCount++;
+                }
+            }
+        }
+
+        var chkAccessType_L = $("#chkAccessType_L").is(':checked');
+        var chkAccessType_D = $("#chkAccessType_D").is(':checked');
+
+
+        if (!chkAccessType_D && !chkAccessType_L) {
+            errors += "<li id='error" + errorCount + "'>" + "Tick Asset Type" + "</li>";
+            errorCount++;
+        }
+
+        if ($("#HostName").val() == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Fill Host Name" + "</li>";
+            errorCount++;
+        }
+        if ($("#BusinessReason").val() == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Fill Business Reason" + "</li>";
+            errorCount++;
+        }
+    }
+
+
+    function getDesignations() {
+        $.ajax({
+            type: "POST",
+            url: "/List/GetDesignations",
+            contentType: "application/json; charset=utf-8",
+            datatype: 'json',
+            cache: false,
+            async: false,
+            success: function (data) {
+                //console.log(data);
+                var s = '<option value=""></option>';
+
+                for (var i = 0; i < data.length; i++) {
+                    s += '<option value="' + data[i].JobTitle + '">' + data[i].JobTitle + '</option>';
+                }
+                $("#ddEmpDesignation").html(s);
+                $("#ddOtherEmpDesignation").html(s);
+                $("#ddOtherNewEmpDesignation").html(s);
+            },
+            error: function (data) {
+                //code
+            }
+        });
+    }
+
+    function getServiceDeskLocations() {
+
+        $.ajax({
+            type: "GET",
+            url: "/List/GetServiceDeskLocations",
+            contentType: "application/json; charset=utf-8",
+            datatype: 'json',
+            cache: false,
+            async: false,
+            success: function (data) {
+                //console.log("Hi=" + data);
+                var s = '<option value=""></option>';
+
+                for (var i = 0; i < data.length; i++) {
+                    s += '<option value="' + data[i].LocationName + '">' + data[i].LocationName + '</option>';
+                }
+                $("#ddEmpLocation").html(s);
+                $("#ddOtherEmpLocation").html(s);
+                $("#ddOtherNewEmpLocation").html(s);
+            },
+            error: function () {
+
+            }
+        });
+    }
+
+    function getExternalOrganization() {
+        $.ajax({
+            type: "GET",
+            url: "/List/GetExternalOrganization",
+            contentType: "application/json; charset=utf-8",
+            datatype: 'json',
+            cache: false,
+            async: false,
+            success: function (data) {
+                console.log(data);
+                var s = '<option value=""></option>';
+                for (var i = 0; i < data.length; i++) {
+                    s += '<option value="' + data[i].Organization + '">' + data[i].Organization + '</option>';
+                }
+                $("#ddExternalOrganizationName").html(s);
+                $("#ddOtherExternalOrganizationName").html(s);
+                $("#ddOtherNewExternalOrganizationName").html(s);
+            },
+            error: function () {
+
+            }
+        });
+    }
+
+
+    function List() {
+        //Initialize the list
+        // this.listSize = 0;  //track size of the list
+        //this.pos = 0;       //track current position in the list
+        this.items = [];    //hold items
+
+        //other methods goes here
+    }
+
+
+    function getRequestType() {
+        ////debugger
+        $('input:checkbox[id="chkPermanent"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                //console.log("Permanent checked")
+                $("#chkRequestType").val('Permanent');
+                $("#TemporaryDateFrom").addClass('d-none');
+                $("#TemporaryDateTo").addClass('d-none');
+                $('input[id="chkTemporary"]').prop("checked", false).change();
+            }
+            else {
+                $('input[id="chkTemporary"]').attr('disabled', false);
+                $("#chkRequestType").val('');
+            }
+        });
+
+        $('input:checkbox[id="chkTemporary"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                //console.log("Temporary checked")
+                $("#chkRequestType").val('Temporary');
+                $("#TemporaryDateFrom").removeClass('d-none');
+                $("#TemporaryDateTo").removeClass('d-none');
+                $('input[id="chkPermanent"]').prop("checked", false).change();
+            }
+            else {
+                $('input[id="chkPermanent"]').attr('disabled', false);
+                $("#TemporaryDateFrom").addClass('d-none');
+                $("#TemporaryDateTo").addClass('d-none');
+                $("#chkRequestType").val('');
+            }
+        });
+    }
+
+
+    function allowNumbersOnly(e) {
+        var code = (e.which) ? e.which : e.keyCode;
+        if (code > 31 && (code < 48 || code > 57)) {
+            e.preventDefault();
+        }
+    }
+
+    function alphaOnly(e) {
+        var key = e.keyCode;
+        if (key > 32 && (key < 65 || key > 122 || key == 91 || key == 92 || key == 93 || key == 94 || key == 95 || key == 96)) {
+            e.preventDefault();
+        }
+    }
+
+    function allowNumbersAndDecimalsOnly(e) {
+        var charCode = (e.which) ? e.which : e.keyCode
+        if (charCode != 46 && charCode > 31
+            && (charCode < 48 || charCode > 57)) {
+            e.preventDefault();
+        }
+    }
+
+    function avoidSpecialSymbols(e) {
+        var keyCode = e.keyCode;
+        //console.log("keyCode=" + keyCode);
+        if ((keyCode >= 33 && keyCode <= 44) || (keyCode >= 58 && keyCode <= 64) || (keyCode >= 91 && keyCode <= 96) || (keyCode >= 123 && keyCode <= 126)) { e.preventDefault(); }
+
+    }
+
+    function redirectUser() {
+        window.location = '/Dashboard';
+    }
+
+    function date_val() {
+        var week_string = document.getElementsByName("TemporaryDateFrom")[0].value;
+        var parts = week_string.split("-");
+        var date = new Date(parts[0], parts[1] - 1, parts[2]);
+
+        if (isValidDate(date)) {
+            var min_date = date;
+            min_date.setDate(min_date.getDate() + 1);
+            var initial_date = min_date.toISOString().split('T')[0];
+            //console.log(initial_date);
+            document.getElementsByName("txtTemporaryDateTo")[0].setAttribute("min", initial_date);
+        }
+    }
+
+    function isValidDate(d) {
+        return d instanceof Date && !isNaN(d);
+    }
+
+    function getDate() {
+
+        txtTemporaryDateFrom.min = new Date().toISOString().split("T")[0];
+        txtTemporaryDateTo.min = new Date().toISOString().split("T")[0];
+
+    }
+
+    $("input[type='date']").keydown(function (event) {
+        event.preventDefault();
+    });
+
+
+    function checkSelect(id) {
+
+        if ($('#' + id).val() != '') {
+            $('#' + id).addClass('spanUpperSide');
+        }
+    }
+
+    var DomainID = [];
+    function getDomainIDs() {
+        $.ajax
+            ({
+                type: "POST",
+                url: "/List/GetDomainIDs",
+                contentType: "application/json; charset=utf-8",
+                datatype: 'json',
+                cache: false,
+                async: true,
+                success: function (data) {
+                    DomainID = data;
+                    //console.log("DomainIDs=" + DomainID);
+                },
+                error: function (data) {
+                    //code
+                }
+            });
+    }
+
+
+
+</script>
+<script>
+
+    $(document).ajaxComplete(function (event, res, settings) {
+        if (res.getResponseHeader('REQUIRES_AUTH') === '1') {
+            window.location.href = "/Login/Index";
+        }
+    });
+
+    function DisplayAlert(alertType = 'info', title = 'Info', message = '', timeInMs = 8000) {
+        var defaultClass = 'toast-header toast-header-';
+
+        if (alertType == 'warning') {
+            $("#toastHeaderDiv").attr('class', defaultClass + 'warning');
+        }
+        else if (alertType == 'error') {
+            $("#toastHeaderDiv").attr('class', defaultClass + 'error')
+        }
+        else if (alertType == 'info') {
+            $("#toastHeaderDiv").attr('class', defaultClass + 'info')
+        }
+        else if (alertType == 'success') {
+            $("#toastHeaderDiv").attr('class', defaultClass + 'success')
+        }
+        else if (alertType == 'failure') {
+            $("#toastHeaderDiv").attr('class', defaultClass + 'failure')
+        }
+
+        $("#toastTitle").text(title);
+        $("#toastMsg").text(message);
+        $('#toast').toast({
+            delay: timeInMs
+        });
+        /* $('#toast').toast('show');*/
+
+        $('#toast').toast('hide').css("z-index", "auto");
+        /*$('#toast').removeClass('d-none');*/
+        $('#toast').toast('show').css("z-index", "99999");
+    }
+
+
+</script>
+<script>
+    $('input[type="checkbox"]').on('change', function () {
+        $('input[name="' + this.name + '"]').not(this).prop('checked', false);
+    });
+
+    $(".individual_server").hide();
+    $(".server_admin_access").hide();
+    $(".laptop_admin_access").hide();
+   function AddSoftwareRows() {
+
+        SrNo = $('#tbl_individual_server tr').length;
+        SrNo = SrNo + 1;
+
+        var row = '<tr align="top" style="text-align: center;" id="ind_Server_' + SrNo + '" class="tr_input apply_tr"><td>' + SrNo + '</td><td><label class="f-600" style="width:219px;" class="text-center">Application Name / Role<span class="astColor">*</span></label><input type="text" class="application_name" id="ApplicationName_' + SrNo + '" name="ApplicationName_' + SrNo + '"></td><td class="text-center"><label id="lblRequestType" class="f-600" style="width:175px;">Server Host Name<span class="astColor">*</span></label><input type="text" class="server_host_name" id="ServerHostName_' + SrNo + '" name="ServerHostName_' + SrNo + '"></td><td class="text-center"><label id="lblRequestType" class="f-600" style="width:175px;">Server IP Address<span class="astColor">*</span></label><input type="text" class="server_IP_Address" id="ServerIP_' + SrNo + '" name="ServerIP_' + SrNo + '"></td><td class="text-center"><a href="javascript:void(0);"><label style="width:203px;margin-top: 25px;"><img src="/assets/img/remove.png" width="20" height="20" class="remove-btn remove_first"></label></a></td></tr>';
+
+        $(".apply_tr:last-child").after(row);
+    }
+
+
+    function AddSoftwareRows2() {
+        // var newCount2 = rowIdx + 1;
+        SrNo2 = $('#server_a tr').length;
+        SrNo2 = SrNo2 + 1;
+
+        var row2 = '<tr align="top" style="text-align: center;" class="tr_input server_s_tr"><td>' + SrNo2 + '</td><td><label  class="f-600 text-center" style="width:219px;">Application Name / Role<span class="astColor">*</span></label><input type="text" class="application_name" id="ServerApplicationName_' + SrNo2 + '" name="ServerApplicationName_' + SrNo2 + '"></td><td class="text-center"><label id="lblRequestType" class="f-600" style="width:175px;">Server Host Name<span class="astColor">*</span></label><input type="text" class="server_host_name" id="ServerServerHostName_' + SrNo2 + '" name="ServerServerHostName_' + SrNo2 + '"></td><td class="text-center"><label id="lblRequestType" class="f-600" style="width:175px;">Server IP Address<span class="astColor">*</span></label><input type="text" class="server_IP_Address" id="ServerServerIP_' + SrNo2 + '" name="ServerServerIP_' + SrNo2 + '"></td><td class="text-center"><a href="javascript:void(0);"><label style="width:203px;margin-top: 25px;"><img src="/assets/img/remove.png" width="20" height="20" class="remove-btn remove_second"></label></a></td></tr>';
+
+        $(".server_s_tr:last-child").after(row2);
+
+    }
+
+        function successDLADModal(txt) {
+        //debugger
+        $('#modalTitle').html('Success');
+        if (txt == "approve") {
+            $('#modalBody').html('Form has been approved!');
+        }
+        else if (txt == "reject") {
+            $('#modalBody').html('Form has been rejected!');
+        }
+        else if (txt == "enquire") {
+            $('#modalBody').html('Form has been enquired!');
+        }
+        else if (txt == "cancelled") {
+            $('#modalBody').html('Form has been cancelled!');
+        } else if (txt == "invalidCC") {
+            $('#modalBody').html('Form has invalid.');
+        }
+        else {
+            if (IsEditMode) {
+                $('#modalBody').html('Your form with ID: DLAD' + txt + ' has been re-submitted! Kindly use this for future reference');
+            }
+            else {
+                $('#modalBody').html('Your form with ID: DLAD' + txt + ' has been submitted! Kindly use this for future reference');
+            }
+
+        }
+        FlagRedirect = txt;
+        //$("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+
+    }
+
+        function loadisViewEditMode() {
+           
+
+            if (CurrentUserLevelForDLAD>0) {
+
+                if (((CurrentUserLevelForDLAD == "4") || (CurrentUserLevelForDLAD == "3" && DLADFormType != "IndividualServer"))) {
+
+                    $('#txtticketNumber').prop("disabled", false);
+                } else {
+                    $('#txtticketNumber').prop("disabled", true);
+                }
+
+
+                if (CurrentUserLevelForDLAD == "5" && DLADFormType == "IndividualServer") {
+                    $('#txtActionDLAD').prop("disabled", false);
+                } else {
+                    $("#txtActionDLAD").prop("disabled", true);
+                }
+            }
+            if (IsViewMode) {
+           var IndividualAdminServerList = @Html.Raw(Json.Encode(UserDataList));
+                if (ServiceTypeForDLAD) {
+                    $('.dlda_sec').hide();
+                    $('.server_sec').show();
+                } else {
+                    $('.dlda_sec').show();
+                    $('.server_sec').hide();
+                }
+                    $("#drpRequestSubmissionFor").addClass("spanUpperSide");
+                //Hide/Unhide Temporary date fields
+
+
+                    if ($('#chkdldaPermanent').val() == "permanent") {
+                        $('.dlda_dates').hide();
+                    }
+                    else {
+                        $("#txtTemporaryDateFrom").val(TemporaryDateFrom);
+                        $("#txtTemporaryDateTo").val(TemporaryDateTo);
+                        $('.dlda_dates').show();
+
+                    }
+
+
+
+                if (DLADFormType == "IndividualServer" || DLADFormType == "AdminServer") {
+                $(".individual_server").show();
+                $(".server_admin_access").hide();
+                $(".laptop_admin_access").show();
+
+               if (IndividualAdminServerList != null && IndividualAdminServerList != undefined) {
+
+                   console.log(IndividualAdminServerList);
+                   console.log(IndividualAdminServerList[0]["ApplicationNameRole"]);
+                   for (var i = 0; i < IndividualAdminServerList.length; i++) {
+                       if (i == 0) {
+                           $("#ApplicationName_1").val(IndividualAdminServerList[i]["ApplicationNameRole"]);
+                           $("#ServerHostName_1").val(IndividualAdminServerList[i]["ServerHostName"]);
+                           $("#ServerIP_1").val(IndividualAdminServerList[i]["ServerIPAddress"]);
+                           $("#ApplicationName_1").prop('disabled', true);
+                           $("#ServerHostName_1").prop('disabled', true);
+                           $("#ServerIP_1").prop('disabled', true);
+                       } else {
+                           var row = '<tr align="top" style="text-align: center;" id="ind_Server_' + (i + 1) + '" class="tr_input apply_tr"><td>' + (i + 1) + '</td><td><label class="f-600" style="width:219px;" class="text-center">Application Name / Role<span class="astColor">*</span></label>';
+                           row = row + '<input type="text" class="application_name" id="ApplicationName_' + (i + 1) + '" name="ApplicationName_' + (i + 1) + '" value="' + IndividualAdminServerList[i]["ApplicationNameRole"] + '" disabled></td><td class="text-center"><label id="lblRequestType" class="f-600" style="width:175px;">Server Host Name<span class="astColor">*</span></label>';
+                           row = row + '<input type="text" class="server_host_name" id="ServerHostName_' + (i + 1) + '" name="ServerHostName_' + (i + 1) + '" value="' + IndividualAdminServerList[i]["ServerHostName"] + '" disabled></td><td class="text-center"><label id="lblRequestType" class="f-600" style="width:175px;">Server IP Address<span class="astColor">*</span></label>'
+                           row = row + '<input type="text" class="server_IP_Address" id="ServerIP_' + (i + 1) + '" name="ServerIP_' + (i + 1) + '" value="' + IndividualAdminServerList[i]["ServerIPAddress"] + '" disabled></td></tr>';
+
+                           $(".apply_tr:last-child").after(row);
+                       }
+                   }
+               }
+            }
+
+            if (DLADFormType == "DeskTopLaptopServer") {
+                $(".laptop_admin_access").show();
+                $(".individual_server").hide();
+                $(".server_admin_access").hide();
+            }
+
+                var request_type = document.querySelectorAll(".requestType");
+                var requestType_arr = [];
+
+                console.log("request_type : " + request_type);
+                for (var i = 0; i < request_type.length; i++) {
+                    requestType_arr.push(request_type[i]['value']);
+                };
+                console.log("requestType_arr : " + requestType_arr);
+                if (requestType_arr.includes("Temporary")) {
+                    $(".temp_from").removeClass('hide');
+                    $(".temp_to").removeClass('hide');
+                    $(".requestType").each(function (index) {
+                        if ($(this).val() == 'Permanent') {
+                            $(this).parent().parent().find('.txt_replacement input').attr('disabled', 'disabled');
+                            $(this).parent().parent().find('.txt_replacement input').attr('disabled', 'disabled');
+                        }
+                        else {
+                            $(this).parent().parent().find('.temp_from_input').removeAttr('disabled', 'disabled');
+                            $(this).parent().parent().find('.temp_to_input').removeAttr('disabled', 'disabled');
+                        }
+                    });
+                }
+                else {
+                    $(".temp_from").addClass('hide');
+                    $(".temp_to").addClass('hide');
+                }
+        }
+
+    }
+
+
+    function addRemainingData(status, appRowId, comment, approvalType, text) {
+        debugger;
+        var ticketNumber = $("#txtticketNumber").val();
+        var ActionDLAD = $("#txtActionDLAD").val();
+
+
+        if (CurrentUserLevelForDLAD == "4" || CurrentUserLevelForDLAD == "3") {
+                    if (ticketNumber == "") {
+                        errors += "<li id='error" + errorCount + "'>" + "Ticket number" + "</li>";
+                        errorCount++;
+                    }
+                }
+                if (CurrentUserLevelForDLAD == "5" && DLADFormType == "IndividualServer") {
+                    if (ActionDLAD == "") {
+                        errors += "<li id='error" + errorCount + "'>" + "Action DLAD" + "</li>";
+                        errorCount++;
+                    }
+                }
+        if (errors.length) {
+            errors = "<ol id='errorList'>" + errors + "</ol>";
+            $("#headingErr").removeClass('d-none');
+            document.getElementById("add_to_me").innerHTML = errors;
+            errors = "";
+            errorCount = 0;
+            if (IsEditMode) {
+                $("#myModalEdit").scrollTop(0);
+                $("#myModalRequest").scrollTop(0);
+            }
+            else {
+                $(window).scrollTop(0);
+            }
+            return false;
+        }
+        $("#txtticketNumber").prop("disabled", false);
+        $("#txtActionDLAD").prop("disabled", false);
+        var form = $("#DLADForm");
+        var formData = new FormData(form[0]);
+        $("#txtticketNumber").prop("disabled", false);
+        $("#txtActionDLAD").prop("disabled", false);
+        $.ajax({
+            url: '/DLAD/UpdateData',
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            dataType: 'JSON',
+            data: formData,
+            enctype: 'multipart/form-data',
+            success: (function (data) {
+
+                if (data.Status == 200) {
+                    FormApproval(status, appRowId, comment, approvalType, text);
+                }
+                else {
+                    failureModal(data.Message);
+                    console.log("failure");
+                }
+
+            }),
+            error: (function (data) {
+                failureModal();
+            })
+        })
+    }
+
+    function serviceTypeValidation() {
+        if ($('#chkServiceType').is(':checked')) {
+            $("#chk3").prop("disabled", true);
+            $("#DLAD_LD").prop("disabled", true);
+            $("#AccessType_LD").prop("disabled", true);
+            $("#Duration_LD").prop("disabled", true);
+
+        } else {
+            $("#chk3").prop("disabled", false);
+            $("#DLAD_LD").prop("disabled", false);
+            $("#AccessType_LD").prop("disabled", false);
+            $("#Duration_LD").prop("disabled", false);
+        }
+    }
+</script>

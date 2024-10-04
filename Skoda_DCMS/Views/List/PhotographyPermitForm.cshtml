@@ -1,0 +1,2792 @@
+﻿@model dynamic
+@{
+    bool IsNew = true;
+    bool IsEdit = true;
+    bool IsValidityCheck = true;
+    dynamic FlagRedirect = null;
+    dynamic PPF = null;
+    int FormId = 0, AppRowId = 0, ApprovalType = 0;
+    int FormSrId = 0;
+    Layout = ViewBag.Layout;
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IsNew = ViewBag.IsNew;
+        IsEdit = ViewBag.IsEdit;
+        PPF = ViewBag.Model;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        IsValidityCheck = ViewBag.IsValidityCheck != null ? (bool)ViewBag.IsValidityCheck : false;
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+        FormSrId = PPF.one[0].Id;
+
+    }
+    var currentUser = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    ViewBag.Title = "Photography Authorization Form";
+}
+
+<style>
+    .form-table-container-2 tr td select.voice {
+        border: 1px solid rgb(75,168,46) !important;
+        width: 30% !important;
+        padding: 5px;        
+    }
+    .form-table-container-2 tr td select.voice_create {
+        border: 1px solid rgb(75,168,46) !important;
+        width: 42% !important;
+        padding: 5px;
+    }
+    .form-table-container-2 tr td input.model {
+        border: 1px solid rgb(75,168,46) !important;
+        width: 75% !important;
+    }
+    .form-table-container-2 tr td input.model-create {
+        border: 1px solid rgb(75,168,46) !important;
+        width: 74% !important;
+    }
+    .form-table-container-2 tr td input.start {
+        border: 1px solid rgb(75,168,46) !important;
+        width: 52% !important;        
+    }
+    .form-table-container-2 tr td input.start_create {
+        border: 1px solid rgb(75,168,46) !important;
+        width: 62% !important;
+    }
+    .align {
+        padding-left: 0% !important;
+        text-align: left;
+    }
+
+    .bg-color td, .bg-color th {
+        border: 1px solid #dee2e6;
+        background-color: rgb(219,238,213) !important;
+    }
+
+    .bg-color-2 td {
+        background-color: rgba(75,168,46,0.4) !important;
+        border: 1px solid rgba(75,168,46,0.1) !important;
+    }
+
+    .bg-color-2 th {
+        background-color: rgba(75,168,46,0.4) !important;
+        border: 1px solid rgba(75,168,46,0.1) !important;
+    }
+
+    .bg-color-3 td {
+        background-color: rgba(75,168,46,0.2) !important;
+        border: 1px solid rgba(75,168,46,0.1) !important;
+        border-bottom: 1px solid rgba(75,168,46,0.1) !important;
+    }
+
+    table.dataTable thead td, table.dataTable.no-footer {
+        border-top: 1px solid rgba(75,168,46,0.1) !important;
+    }
+
+    .ui-front {
+        z-index: 9999999 !important;
+    }
+
+    #OtherEmpName #txtOtherEmpname {
+        max-width: 96%;
+        border-radius: 0;
+        height: 20%;
+        font-size: 12px;
+    }
+    @@media only screen and (min-width: 320px) and (max-width: 374px) {
+    .form-table-container-2 tr td input.surname {
+        width: 100px !important;
+        padding: 3px;
+    }
+
+    .form-table-container-2 tr td input.firstname {
+        width: 75px !important;
+        padding: 3px;
+    }
+
+    .form-table-container-2 tr td.checkbox {
+        display: flex;
+    }
+
+    .form-table-container-2 tr:nth-child(5) td:nth-child(2) input {
+        width: 50% !important;
+    }
+    .start {
+        width: 100%;
+    }
+    .f-600 {
+        font-weight: 600 !important;
+        font-size: 10px;
+    }
+    .form-table-container-2 tr td select {
+        border: 1px solid rgb(75,168,46) !important;
+        width: 50% !important;
+        padding: 3px;
+        font-size:10px;
+    }
+    .form-table-container-2 tr td input {
+        border: 1px solid rgb(75,168,46) !important;
+        width: 50% !important;
+        padding: 3px;
+        font-size: 10px;
+    }
+    .form-heading span {
+        font-weight: bold;
+        font-size: 12px;
+        text-align: !important;
+    }
+    .form-heading-1 span {
+        font-weight: bold;
+        font-size: 10px;
+        text-align: center !important;
+    }
+}
+
+@@media only screen and (min-width: 375px) and (max-width: 424px) {
+    .form-table-container-2 tr td input.surname {
+        width: 108px !important;
+        padding: 3px;
+    }
+
+    .form-table-container-2 tr td input.firstname {
+        width: 88px !important;
+        padding: 3px;
+    }
+
+    .form-table-container-2 tr td.checkbox {
+        display: flex;
+    }
+    .form-table-container-2 tr:nth-child(5) td:nth-child(2) input {
+        width: 50% !important;
+    }
+    .start {
+        width: 100%;
+    }
+    .f-600 {
+        font-weight: 600 !important;
+        font-size: 10px;
+    }
+
+    .form-table-container-2 tr td select {
+        border: 1px solid rgb(75,168,46) !important;
+        width: 50% !important;
+        padding: 3px;
+        font-size: 10px;
+    }
+
+    .form-table-container-2 tr td input {
+        border: 1px solid rgb(75,168,46) !important;
+        width: 50% !important;
+        padding: 3px;
+        font-size: 10px;
+    }
+
+    .form-heading span {
+        font-weight: bold;
+        font-size: 12px;
+        text-align: !important;
+    }
+
+    .form-heading-1 span {
+        font-weight: bold;
+        font-size: 10px;
+        text-align: center !important;
+    }
+
+}
+
+@@media only screen and (min-width: 425px) and (max-width: 575px) {
+    .form-table-container-2 tr td input.surname {
+        width: 100% !important;
+        padding: 3px;
+    }
+
+    .form-table-container-2 tr td input.firstname {
+        width: 100% !important;
+        padding: 3px;
+    }
+
+    .form-table-container-2 tr td.checkbox {
+        display: flex;
+    }
+    .form-table-container-2 tr:nth-child(5) td:nth-child(2) input {
+        width: 50% !important;
+
+    }
+    .f-600 {
+        font-weight: 600 !important;
+        font-size: 10px;
+    }
+    .model {
+        width: 68%;
+    }
+    .start {
+        width: 100%;
+    }
+    .f-600 {
+        font-weight: 600 !important;
+        font-size: 12px;
+    }
+
+    .form-table-container-2 tr td select {
+        border: 1px solid rgb(75,168,46) !important;
+        width: 50% !important;
+        padding: 4px;
+        font-size: 8px;
+    }
+
+    .form-table-container-2 tr td input {
+        border: 1px solid rgb(75,168,46) !important;
+        width: 50% !important;
+        padding: 4px;
+        font-size: 11px;
+    }
+
+    .form-heading span {
+        font-weight: bold;
+        font-size: 15px;
+        text-align: !important;
+    }
+
+    .form-heading-1 span {
+        font-weight: bold;
+        font-size: 13px;
+        text-align: center !important;
+    }
+
+}
+
+@@media only screen and (min-width: 576px) and (max-width: 768px) {
+    .form-table-container-2 tr td input.surname {
+        width: 240px !important;
+        padding: 3px;
+    }
+    .form-table-container-2 tr td input.firstname {
+        width: 240px !important;
+        padding: 3px;
+    }
+
+    .form-table-container-2 tr td.checkbox {
+        display: flex;
+    }
+    .model {
+        width: 68%;
+    }
+
+    .voice {
+        width: 100%;
+    }
+
+    .start {
+        width: 100%;
+    }
+    .f-600 {
+        font-weight: 600 !important;
+        font-size: 14px;
+    }
+
+    .form-table-container-2 tr td select {
+        border: 1px solid rgb(75,168,46) !important;
+        width: 50% !important;
+        padding: 4px;
+        font-size: 12px;
+    }
+
+    .form-table-container-2 tr td input {
+        border: 1px solid rgb(75,168,46) !important;
+        width: 50% !important;
+        padding: 4px;
+        font-size: 12px;
+    }
+    .form-table-container-2 tr:nth-child(5) td:nth-child(2) input {
+        width: 50% !important;
+    }
+
+    .form-heading span {
+        font-weight: bold;
+        font-size: 17px;
+        text-align: !important;
+    }
+
+    .form-heading-1 span {
+        font-weight: bold;
+        font-size: 15px;
+        text-align: center !important;
+    }
+
+}
+
+@@media only screen and (min-width: 769px) and (max-width: 1024px) {
+
+    .form-table-container-2 tr td input.surname {
+        width: 280px !important;
+        padding: 3px;
+    }
+    .form-table-container-2 tr td input.firstname {
+        width: 280px !important;
+        padding: 3px;
+    }
+    .form-table-container-2 tr td.checkbox {
+        display: flex;
+    }
+    .model {
+        width: 68%;
+    }
+
+    .voice {
+        width: 100%;
+    }
+
+    .start {
+        width: 100%;
+    }
+    .f-600 {
+        font-weight: 600 !important;
+        font-size: 14px;
+    }
+
+    .form-table-container-2 tr td select {
+        border: 1px solid rgb(75,168,46) !important;
+        width: 100% !important;
+        padding: 5px;
+        font-size: 12px;
+    }
+
+    .form-table-container-2 tr td input {
+        border: 1px solid rgb(75,168,46) !important;
+        width: 100% !important;
+        padding: 5px;
+        font-size: 12px;
+    }
+
+    .form-heading span {
+        font-weight: bold;
+        font-size: 17px;
+        text-align: !important;
+    }
+
+    .form-heading-1 span {
+        font-weight: bold;
+        font-size: 15px;
+        text-align: center !important;
+    }
+
+}
+
+@@media only screen and (min-width: 1025px) and (max-width: 1440px) {
+   .model {
+        width: 61%;
+    }
+    .voice {
+        width: 33%;
+    }
+    .start {
+        width: 64%;
+    }
+    .f-600 {
+        font-weight: 600 !important;
+        font-size: 16px;
+    }
+
+}
+@@media only screen and (min-width: 1441px) and (max-width: 1920px) {
+    .model {
+        width: 79%;
+    }
+    .start {
+        width: 64%;
+    }
+
+
+}
+</style>
+<div class="right_col bg-color">
+    @*class for hiding left menu*@
+    <form action="/List/SavePPF" id="PPFForm" method="post">
+        @if (IsNew)
+        {
+            if (!IsEdit)
+            {
+                <div>
+                    <input type="hidden" id="FormSrId" name="FormSrId" value="@(PPF.one[0].Id)" />
+                    <input type="hidden" id="FormId" name="FormId" value="@(FormId)" />
+                    <input type="hidden" id="AppRowId" name="AppRowId" value="@(AppRowId)" />
+                </div>
+            }
+            else
+            {
+                <div class="breadcrumb-container">
+                    <div>
+                        <ol class="breadcrumb">
+                            <li>
+                                <a href="/Dashboard?formName=PPF">
+                                    Dashboard
+                                </a>
+                            </li>
+                            <li>
+                                Photography Authorization Form
+                            </li>
+
+                        </ol>
+                    </div>
+                </div>
+                <div class="form-main-container margin_space">
+                    <div class="row topContent">
+                        <div class="col-lg-9 col-md-7 padd_space">
+
+                            Photography Authorization Form
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        <div class="table photoform_table">
+            <table class="photo-form">
+                <tr>
+                    <td class="border-none skoda-auto">
+                        <table class="table mainTbl table-bordered form-table-container bg-color">
+                            <tr>
+                                <td colspan="6" class="heading form-heading">
+                                    <span> ŠKODA AUTO Volkswagen India Private Limited</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="6" class="heading form-heading-1">
+                                    <span> Photography Authorization Form</span>
+                                </td>
+
+
+                            </tr>
+                            <tr>
+                                <td colspan="7" class="heading form-heading-1">
+                                    <span>Media - Capturing/enabled camera/video camera</span>
+                                </td>
+
+                                @if (!IsNew || !IsEdit)
+                                {
+                                    @*<td rowspan="1" class="pl-10 pl-none">
+                        <span class="pl-10">Form Id:</span>
+
+                        <input type="text" name="txtFormId" class="inpDisable" value="@(!IsNew ||!IsEdit ? ("PAF"+PPF.three[0].FormId.Id ?? "" ) : "" )" readonly>
+                    </td>*@
+                                }
+                                else
+                                {
+                                    <td rowspan="1" class="pl-10 pl-none"></td>
+                                }
+                            </tr>
+                        </table>
+                        <table class="table mainTbl table-bordered form-table-container-2 bg-color">
+
+
+                            <tr>
+                                <td class="allFormLables borderLTB f-600">
+                                    <label class="f-600">Date:</label><br />
+                                </td>
+                                <td colspan="2" class="borderLTB text-left">
+                                    <input type="text" name="txtDate" placeholder="/ /" class="inpDisable" value="@(!IsNew ||!IsEdit ? (Convert.ToDateTime(PPF.two[0].FormId.Created).ToShortDateString()+" " +Convert.ToDateTime(PPF.two[0].FormId.Created).ToShortTimeString()) : DateTime.Now.ToShortDateString()+" "+DateTime.Now.ToShortTimeString())" readonly>
+                                </td>
+                                <td class="allFormLables borderLTB f-600 align">
+                                    <label class="f-600">Form Id:</label><br />
+                                </td>
+                                <td colspan="3" class="borderLTB">
+                                    <input type="text" name="txtFormId" class="inpDisable" value="@(!IsNew ||!IsEdit ? ("PAF"+PPF.three[0].FormId.Id ?? "" ) : "" )" readonly>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="w-20 allFormLables borderLTB f-600 photogrph_header align">
+                                    <label class="f-600">Applicant details</label><br />
+                                </td>
+                                <td colspan="5" class="borderLTB">
+                                </td>
+
+                            </tr>
+
+                            @if (IsNew)
+                            {
+                                if (!IsEdit)
+                                {
+                                    foreach (var item in PPF.one)
+                                    {
+                                        <tr>
+                                            <td class="w-20 allFormLables borderLTB f-600">
+                                                <label class="f-600">Request Submission For:</label><br />
+                                            </td>
+                                            <td colspan="2" class="borderLTB">
+                                            </td>
+                                            <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                <label class="f-600">Request Submission Type:</label><br />
+                                            </td>
+                                            <td class="borderLTB text-left" colspan="2">
+                                                <select name="drpRequestSubType" id="drpRequestSubType" class="" onchange="RequestSubmission()">
+                                                    <option @(item.SelfOnBehalf == "Self" ? "selected" : "" ) value="Self">Self</option>
+                                                    <option @(item.SelfOnBehalf == "OnBehalf" ? "selected" : "" ) value="OnBehalf">On Behalf</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+
+                                        <tr id="OtherEmpName">
+                                            <td>
+                                                <label id="lblOtherEmpName" class="control-label f-600">Name (Type at least 4 letters for faster results)</label>
+                                                <input type="hidden" id="hiddentxtEmail" name="hiddentxtEmail" value="" />
+                                            </td>
+                                            <td>
+                                                <input type="text" name="txtOtherEmpname" class="form-control" id="txtOtherEmpname" required="required">
+                                                @* <input type="text" name="txtOtherEmpname" id="txtOtherEmpname" class="form-control" required="required">*@
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+
+                                        </tr>
+                                        <tr>
+                                            <td class="allFormLables borderLTB f-600">
+                                                <label class="f-600">First Name:</label><br />
+                                            </td>
+                                            <td colspan="2" class="borderLTB">
+                                                <input type="text" name="txtFirstName" class="inpText" id="txtFirstName" value="@(!IsNew ||!IsEdit ? (PPF.one[0].FirstName ?? "") : "")">
+                                            <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                <label class="f-600">Applicant Type:</label><br />
+                                            </td>
+                                            <td class="borderLTB text-left" colspan="2">
+                                                <select name="drpApplicantType" id="drpApplicantType" class="" onchange="">
+                                                    <option @(item.ApplicantType == "Internal Employee" ? "selected" : "" ) value="Internal Employee">Internal Employee</option>
+                                                    <option @(item.ApplicantType == "External Agency" ? "selected" : "" ) value="External Agency">External Agency</option>
+                                                    <option @(item.ApplicantType == "Partner Employee" ? "selected" : "" ) value="Partner Employee">Partner Employee</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+
+
+
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td class="w-20 allFormLables borderLTB f-600">
+                                            <label class="f-600">Request Submission For:</label><br />
+                                        </td>
+                                        <td colspan="2" class="borderLTB">
+                                        </td>
+                                        <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                            <label class="f-600">Request Submission Type:*</label><br />
+                                        </td>
+                                        <td class="borderLTB text-left" colspan="2">
+                                            <select name="drpRequestSubType" id="drpRequestSubType" class="" onchange="RequestSubmission()">
+                                                <option value="null" selected>Choose..</option>
+                                                <option value="Self">Self</option>
+                                                <option value="OnBehalf">On Behalf</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr id="OtherEmpName">
+                                        <td>
+                                            <label id="lblOtherEmpName" class="control-label f-600">Name (Type at least 4 letters for faster results)*</label>
+                                        </td>
+                                        <td><input type="text" name="txtOtherEmpname" id="txtOtherEmpname" class="form-control" required="required"></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="allFormLables borderLTB f-600">
+                                            <label class="f-600">First Name:*</label><br />
+                                        </td>
+                                        <td colspan="2" class="borderLTB">
+                                            <input type="text" name="txtFirstName" class="inpDisable inpText" id="txtFirstName" value="@(!IsNew ||!IsEdit ? (PPF.one[0].FirstName ?? "") : "")">
+                                        </td>
+                                        <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                            <label class="f-600">Applicant Type:*</label><br />
+                                        </td>
+                                        <td class="borderLTB text-left" colspan="2">
+                                            <select name="drpApplicantType" id="drpApplicantType" class="" onchange="func()">
+                                                <option value="null" selected>Choose..</option>
+                                                <option value="Internal Employee">Internal Employee</option>
+                                                <option value="External Agency">External Agency</option>
+                                                <option value="Partner Employee">Partner Employee</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td class="allFormLables borderLTB f-600">
+                                        <label class="f-600">First Name:</label><br />
+                                    </td>
+                                    <td colspan="2" class="borderLTB">
+                                        <input type="text" name="txtFirstName" class="inpDisable inpText" id="txtFirstName" value="@(!IsNew ||!IsEdit ? (PPF.one[0].FirstName ?? "") : "")">
+                                    </td>
+                                    <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                        <label class="f-600">Applicant Type:</label><br />
+                                    </td>
+                                    <td class="borderLTB text-left" colspan="2">
+                                        <input type="text" name="drpApplicantType" id="drpApplicantType" class="inpDisable" value="@(!IsNew ? (PPF.one[0].ApplicantType ?? "") : "")">
+                                    </td>
+                                </tr>
+                            }
+
+                            <tr>
+                                <td class="allFormLables borderLTB f-600">
+                                    <label class="f-600">Surname:*</label><br />
+                                </td>
+                                <td colspan="2" class="borderLTB">
+                                    <input type="text" name="txtSurname" class="inpDisable inpText" id="txtSurname" value="@(!IsNew||!IsEdit ? (PPF.one[0].Surname ?? "") : "")">
+                                </td>
+                                <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                    <label class="f-600">Telephone (office):</label><br />
+                                </td>
+                                <td class="borderLTB text-left" colspan="2">
+                                    <input type="text" name="txtTelephone" id="txtTelephone" class="inpDisable" value="@((!IsNew && PPF.one[0].Telephone!=0)||(!IsEdit && PPF.one[0].Telephone!=0) ? (PPF.one[0].Telephone ?? "") : "")" onkeypress="allowNumbersOnly(event)">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="allFormLables borderLTB f-600">
+                                    <label class="f-600">Employee ID No:*</label><br />
+                                </td>
+                                <td colspan="2" class="borderLTB">
+                                    <input type="text" name="txtEmpId" class="inpDisable inpText" id="txtEmpId" value="@(!IsNew ||!IsEdit ? (PPF.one[0].EmpId ?? "") : "")" onkeypress="allowNumbersOnly(event)">
+                                </td>
+
+                                <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                    <label class="f-600">Department:*</label><br />
+                                </td>
+                                <td class="borderLTB text-left" colspan="2">
+                                    <input type="text" name="txtDepartment" class="inpDisable inpText" id="txtDepartment" value="@(!IsNew||!IsEdit ? (PPF.one[0].Department ?? "") : "")">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="allFormLables borderLTB f-600">
+                                    <label class="f-600">Partner Employee Company:*</label><br />
+                                </td>
+                                <td colspan="2" class="borderLTB">
+                                    <input type="text" name="txtPartnerEmpCompany" class="inpDisable" id="txtPartnerEmpCompany" value="@(!IsNew ||!IsEdit ? (PPF.one[0].PartnerEmpCompany ?? "") : "")">
+                                </td>
+                                <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                    <label class="f-600">Mobile:*</label><br />
+                                </td>
+                                <td class="borderLTB text-left" colspan="2">
+                                    <input type="text" name="txtMobile" id="txtMobile" class="inpDisable" value="@(!IsNew||!IsEdit ? (PPF.one[0].Mobile ?? "") : "")" onkeypress="allowNumbersOnly(event)">
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td colspan="7" class="allFormLables borderLTB f-600">
+                                    This certifies that the above mentioned person is the designated user of the media recording device (picture, video, sound, etc.) as detailed below:
+                                </td>
+
+                            </tr>
+                            @if (IsNew)
+                            {
+                                if (!IsEdit)
+                                {
+                                    foreach (var item in PPF.one)
+                                    {
+                                        <tr>
+                                            <td colspan="2" class="allFormLables borderLTB f-600">
+                                                <label class="f-600">Video camera / camera / mobile / tablet (please tick)</label><br />
+                                            </td>
+                                            <td class="borderLTB" style="padding-left: 57px !IMPORTANT;">
+                                                <select name="drpInstrument" id="drpInstrument" style=" width: 92% !important;">
+                                                    <option @(item.Instrument == "Camera" ? "selected" : "" ) value="Camera">Camera</option>
+                                                    <option @(item.Instrument == "Mobile" ? "selected" : "" ) value="Mobile">Mobile</option>
+                                                    <option @(item.Instrument == "Tablet" ? "selected" : "" ) value="Tablet">Tablet</option>
+                                                </select>
+                                            </td>
+                                            <td colspan="2" class="allFormLables borderLTB f-600 align photogrph_header">
+                                                <label class="f-600">Device details</label><br />
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="2" class="allFormLables borderLTB f-600">
+                                            <label class="f-600">Video camera / camera / mobile / tablet (please tick)</label><br />
+                                        </td>
+                                        <td class="borderLTB" style="padding-left: 57px !IMPORTANT;">
+                                            <select name="drpInstrument" id="drpInstrument" style="width: 92% !important;">
+                                                <option value="" selected>Choose</option>
+                                                <option value="Camera">Camera</option>
+                                                <option value="Mobile">Mobile</option>
+                                                <option value="Tablet">Tablet</option>
+                                            </select>
+                                        </td>
+                                        <td colspan="2" class="allFormLables borderLTB f-600 align photogrph_header">
+                                            <label class="f-600">Device details</label><br />
+                                        </td>
+                                        <td id="hiddenApproverInformation"></td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="2" class="allFormLables borderLTB f-600">
+                                        <label class="f-600">Video camera / camera / mobile / tablet (please tick)</label><br />
+                                    </td>
+                                    <td class="borderLTB" style=" padding-left: 57px !IMPORTANT;">
+                                        <input type="text" name="drpInstrument" id="drpInstrument" style=" width: 97% !important;" value="@(!IsNew ? (PPF.one[0].Instrument ?? "") : "")">
+                                    </td>
+                                    <td colspan="2" class="allFormLables borderLTB f-600 align photogrph_header">
+                                        <label class="f-600">Device details</label><br />
+                                    </td>
+                                    <td></td>
+                                </tr>
+                            }
+                            <tr>
+                                <td class="allFormLables borderLTB f-600">
+                                    <label class="f-600">Make:*</label><br />
+                                </td>
+                                <td class="borderLTB">
+                                    <input type="text" name="txtMake" class="inpDisable" value="@(!IsNew||!IsEdit ? (PPF.one[0].Make ?? "") : "")">
+                                </td>
+                                <td class="allFormLables borderLTB f-600 align">
+                                    <label class="f-600">Model:*</label><input type="text" name="txtModel" class="model-create inpDisable" value="@(!IsNew||!IsEdit ? (PPF.one[0].Model ?? "") : "")">
+                                </td>
+                                <td colspan="2" class="allFormLables borderLTB f-600 align clr-1">
+                                    <label class="f-600">Serial/IMEI No:*</label><br />
+                                </td>
+                                <td class="borderLTB text-left">
+                                    <input type="text" name="txtSerialNo" class="inpDisable" value="@(!IsNew||!IsEdit ? (PPF.one[0].SerialNo ?? "") : "")">
+                                </td>
+                            </tr>
+                            @if (IsNew)
+                            {
+                                if (!IsEdit)
+                                {
+                                    foreach (var item in PPF.one)
+                                    {
+                                        <tr>
+                                            <td class="w-20 allFormLables borderLTB f-600">
+                                                <label class="f-600">SAVWIPL owned?</label><br />
+                                            </td>
+                                            <td class="borderLTB">
+                                                <select name="drpSAVWIPL" id="drpSAVWIPL" class="">
+                                                    <option @(item.SAVWIPL == "true" ? "selected" : "" ) value="true">Yes</option>
+                                                    <option @(item.SAVWIPL == "false" ? "selected" : "" ) value="false">No</option>
+                                                </select>
+                                            </td>
+                                            <td class="allFormLables borderLTB f-600 align">
+                                                <label class="f-600">Yes</label>
+                                            </td>
+                                            <td colspan="3" class="allFormLables borderLTB f-600 align">
+                                                <label class="f-600">If ‘No’ (no permission granted)</label><br />
+                                            </td>
+
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td class="w-20 allFormLables borderLTB f-600">
+                                            <label class="f-600">SAVWIPL owned?*</label><br />
+                                        </td>
+                                        <td class="borderLTB">
+                                            <select name="drpSAVWIPL" id="drpSAVWIPL" class="">
+                                                <option value="null" selected>Choose..</option>
+                                                <option value="true">Yes</option>
+                                                <option value="false">No</option>
+                                            </select>
+                                        </td>
+                                        <td class="allFormLables borderLTB f-600 align">
+                                            <label class="f-600">Yes</label>
+                                        </td>
+                                        <td colspan="3" class="allFormLables borderLTB f-600 align">
+                                            <label class="f-600">If ‘No’ (no permission granted)</label><br />
+                                        </td>
+
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                foreach (var item in PPF.one)
+                                {
+                                    <tr>
+                                        <td class="w-20 allFormLables borderLTB f-600">
+                                            <label class="f-600">SAVWIPL owned?</label><br />
+                                        </td>
+                                        <td class="borderLTB">
+                                            <select name="drpSAVWIPL" id="drpSAVWIPL" class="drpDisable">
+                                                <option @(item.SAVWIPL == "true" ? "selected" : "" ) value="Yes">Yes</option>
+                                                <option @(item.SAVWIPL == "false" ? "selected" : "" ) value="No">No</option>
+                                            </select>
+                                        </td>
+                                        <td class="allFormLables borderLTB f-600 align">
+                                            <label class="f-600">Yes</label>
+                                        </td>
+                                        <td colspan="3" class="allFormLables borderLTB f-600 align">
+                                            <label class="f-600">If ‘No’ (no permission granted)</label><br />
+                                        </td>
+
+                                    </tr>
+                                }
+                            }
+                            @if (IsNew)
+                            {
+                                if (!IsEdit)
+                                {
+                                    foreach (var item in PPF.one)
+                                    {
+                                        <tr>
+                                            <td class="w-50 allFormLables borderLTB f-600">
+                                                <label class="f-600">Extra functionality:</label><br />
+                                            </td>
+                                            <td class="borderLTB">
+                                            </td>
+                                            <td class="w-40 allFormLables borderLTB f-600 align">
+                                                <label class="f-600">Capture voice/Sound:</label>
+                                                <select name="drpExtraFunctionality1" id="drpExtraFunctionality1" class="voice drpDisable">
+                                                    <option @(item.ExtraFunctionality1 == "true" ? "selected" : "" ) value="true">Yes</option>
+                                                    <option @(item.ExtraFunctionality1 == "false" ? "selected" : "" ) value="false">No</option>
+                                                </select>
+                                            </td>
+                                            <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                <label class="f-600">Capture Images:</label><br />
+                                            </td>
+                                            <td class="borderLTB text-left">
+                                                <select name="drpExtraFunctionality2" id="drpExtraFunctionality2" class="drpDisable">
+                                                    <option @(item.ExtraFunctionality2 == "true" ? "selected" : "" ) value="true">Yes</option>
+                                                    <option @(item.ExtraFunctionality2 == "false" ? "selected" : "" ) value="false">No</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td class="w-50 allFormLables borderLTB f-600">
+                                            <label class="f-600">Extra functionality:</label><br />
+                                        </td>
+                                        <td class="borderLTB">
+                                        </td>
+                                        <td class="w-40 allFormLables borderLTB f-600 align">
+                                            <label class="f-600">Capture voice/Sound:*</label>
+                                            <select name="drpExtraFunctionality1" id="drpExtraFunctionality1" class="voice_create">
+                                                <option value="null" selected>Choose</option>
+                                                <option value="true">Yes</option>
+                                                <option value="false">No</option>
+                                            </select>
+                                        </td>
+                                        <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                            <label class="f-600">Capture Images:*</label><br />
+                                        </td>
+                                        <td class="borderLTB text-left">
+                                            <select name="drpExtraFunctionality2" id="drpExtraFunctionality2">
+                                                <option value="null" selected>Choose</option>
+                                                <option value="true">Yes</option>
+                                                <option value="false">No</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                foreach (var item in PPF.one)
+                                {
+                                    <tr>
+                                        <td class="w-50 allFormLables borderLTB f-600">
+                                            <label class="f-600">Extra functionality:</label><br />
+                                        </td>
+                                        <td class="borderLTB">
+                                        </td>
+                                        <td class="w-40 allFormLables borderLTB f-600 align">
+                                            <label class="f-600">Capture voice/Sound:</label>
+                                            <select name="drpExtraFunctionality1" id="drpExtraFunctionality1" class="voice drpDisable">
+                                                <option @(item.ExtraFunctionality1 == "true" ? "selected" : "" ) value="Yes">Yes</option>
+                                                <option @(item.ExtraFunctionality1 == "false" ? "selected" : "" ) value="No">No</option>
+                                            </select>
+                                        </td>
+                                        <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                            <label class="f-600">Capture Images:</label><br />
+                                        </td>
+                                        <td class="borderLTB text-left">
+                                            <select name="drpExtraFunctionality2" id="drpExtraFunctionality2" class="drpDisable">
+                                                <option @(item.ExtraFunctionality2 == "true" ? "selected" : "" ) value="Yes">Yes</option>
+                                                <option @(item.ExtraFunctionality2 == "false" ? "selected" : "" ) value="No">No</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            @if (IsNew)
+                            {
+                                if (!IsEdit)
+                                {
+                                    foreach (var item in PPF.one)
+                                    {
+                                        <tr>
+                                            <td class="allFormLables borderLTB f-600">
+                                                <label class="f-600">Capture video:</label><br />
+                                            </td>
+                                            <td class="borderLTB">
+                                                <select name="drpExtraFunctionality3" id="drpExtraFunctionality3" class="drpDisable">
+                                                    <option @(item.ExtraFunctionality3 == "true" ? "selected" : "" ) value="true">Yes</option>
+                                                    <option @(item.ExtraFunctionality3 == "false" ? "selected" : "" ) value="false">No</option>
+                                                </select>
+                                            </td>
+                                            <td class="allFormLables borderLTB f-600">
+                                            </td>
+                                            <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                <label class="f-600">Bluetooth/Wireless:</label><br />
+                                            </td>
+                                            <td class="borderLTB text-left">
+                                                <select name="drpExtraFunctionality4" id="drpExtraFunctionality4" class="drpDisable">
+                                                    <option @(item.ExtraFunctionality4 == "true" ? "selected" : "" ) value="true">Yes</option>
+                                                    <option @(item.ExtraFunctionality4 == "false" ? "selected" : "" ) value="false">No</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td class="allFormLables borderLTB f-600">
+                                            <label class="f-600">Capture video:*</label><br />
+                                        </td>
+                                        <td class="borderLTB">
+                                            <select name="drpExtraFunctionality3" id="drpExtraFunctionality3" class="">
+                                                <option value="null" selected>Choose..</option>
+                                                <option value="true">Yes</option>
+                                                <option value="false">No</option>
+                                            </select>
+                                        </td>
+                                        <td class="allFormLables borderLTB f-600">
+                                        </td>
+                                        <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                            <label class="f-600">Bluetooth/Wireless:*</label><br />
+                                        </td>
+                                        <td class="borderLTB text-left">
+                                            <select name="drpExtraFunctionality4" id="drpExtraFunctionality4" class="">
+                                                <option value="null" selected>Choose..</option>
+                                                <option value="true">Yes</option>
+                                                <option value="false">No</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                foreach (var item in PPF.one)
+                                {
+                                    <tr>
+                                        <td class="allFormLables borderLTB f-600">
+                                            <label class="f-600">Capture video:</label><br />
+                                        </td>
+                                        <td class="borderLTB">
+                                            <select name="drpExtraFunctionality3" id="drpExtraFunctionality3" class="drpDisable">
+                                                <option @(item.ExtraFunctionality3 == "true" ? "selected" : "" ) value="Yes">Yes</option>
+                                                <option @(item.ExtraFunctionality3 == "false" ? "selected" : "" ) value="No">No</option>
+                                            </select>
+                                        </td>
+                                        <td class="allFormLables borderLTB f-600">
+                                        </td>
+                                        <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                            <label class="f-600">Bluetooth/Wireless:</label><br />
+                                        </td>
+                                        <td class="borderLTB text-left">
+                                            <select name="drpExtraFunctionality4" id="drpExtraFunctionality4" class="drpDisable">
+                                                <option @(item.ExtraFunctionality4 == "true" ? "selected" : "" ) value="Yes">Yes</option>
+                                                <option @(item.ExtraFunctionality4 == "false" ? "selected" : "" ) value="No">No</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            @if (IsNew)
+                            {
+                                if (!IsEdit)
+                                {
+
+
+                                    <tr>
+                                        <td class="allFormLables borderLTB f-600">
+                                            <label class="f-600">Activity Validity:</label><br />
+                                        </td>
+                                        <td class="borderLTB">
+                                        </td>
+                                        <td class="w-50 allFormLables borderLTB f-600">
+                                            <label class="f-600 align">Activity Start:</label><input type="date" name="txtActivityStart" class="start" onclick="date_val(); onChangeActivityStart()" onchange="setInternalYear()" value="@(PPF.one[0].ActivityStart.ToString("yyyy-MM-dd"))" />
+                                        </td>
+                                        <td colspan="2" class="allFormLables borderLTB f-600 align" id="dateInput">
+                                            <label class="f-600 ">Activity End:</label><br />
+                                        </td>
+                                        <td class="borderLTB text-left">
+                                            <select name="drpActivityEnd" id="drpActivityEnd" onclick="date_val_end()" onchange="date_val_end()"></select>
+                                            <input type="hidden" name="txtInternalActivityEnd" id="txtInternalActivityEnd" value="@(PPF.one[0].ActivityEnd.ToString("yyyy-MM-dd"))" />
+                                            <input type="date" name="txtActivityEnd" id="txtActivityEnd" onclick="date_val_end()" onchange="date_val_end()" value="@(PPF.one[0].ActivityEnd.ToString("yyyy-MM-dd"))" />
+                                        </td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td class="allFormLables borderLTB f-600">
+                                            <label class="f-600">Activity Validity:</label><br>
+                                        </td>
+                                        <td class="borderLTB">
+                                        </td>
+                                        <td class="w-50 allFormLables borderLTB f-600 align">
+                                            <label class="f-600 align">Activity Start:*</label><input type="date" class="start_create" name="txtActivityStart" id="txtActivityStart" onclick="date_val(); onChangeActivityStart()" onchange="setInternalYear()" />
+                                        </td>
+                                        <td colspan="2" class="allFormLables borderLTB f-600 align" id="dateInput">
+                                            <label class="f-600 align">Activity End:*</label>
+                                        </td>
+                                        <td class="borderLTB text-left">
+                                            <input type="date" name="txtActivityEnd" id="txtActivityEnd" onclick="date_val_end()" onchange="date_val_end()" value="" />
+                                            <select name="drpActivityEnd" id="drpActivityEnd" onclick="date_val_end()" onchange="date_val_end()"></select>
+                                            <input type="hidden" name="txtInternalActivityEnd" id="txtInternalActivityEnd" value="" />
+                                        </td>
+                                    </tr>
+
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td class="allFormLables borderLTB f-600">
+                                        <label class="f-600">Activity Validity:</label><br />
+                                    </td>
+                                    <td class="borderLTB">
+                                    </td>
+                                    <td class="w-50 allFormLables borderLTB f-600 align">
+                                        <label style="padding-right: 7px;" class="f-600 align">Activity Start:</label><input type="text" name="txtActivityStart" class="start inpDisable" value="@(!IsNew ? (PPF.one[0].ActivityStart.ToShortDateString() ?? "") : "")">
+                                    </td>
+                                    @if (PPF.one[0].ApplicantType == "Internal Employee")
+                                    {
+                                        <td colspan="2" class="allFormLables borderLTB f-600 align" id="dateInput">
+                                            <label class="f-600">Activity End:</label><br />
+                                        </td>
+                                        <td class="borderLTB text-left">
+                                            <input type="text" name="drpActivityEnd" id="drpActivityEnd" class="inpDisable" value="@(!IsNew ? (PPF.one[0].ActivityEnd.Year ?? "") : "")" />
+                                        </td>
+                                    }
+                                    else
+                                    {
+                                        <td>
+                                            <label class="f-600 align">Activity End:</label>
+                                            <input type="text" name="txtActivityEnd" class="inpDisable" value="@(!IsNew ? (PPF.one[0].ActivityEnd.ToShortDateString() ?? "") : "")">
+                                        </td>
+                                    }
+                                </tr>
+
+                            }
+
+                            <tr>
+                                <td colspan="7" class="allFormLables borderLTB f-600">
+                                    The designated user understands:
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td colspan="7" class="allFormLables borderLTB f-600">
+                                    <label class="photography-para"> • That he/she will refrain from making use of any video-capturing and/or picture-capturing facilities of the video camera/camera detailed above, for personal or any other usage other than authorized, within the premises of  ŠKODA AUTO Volkswagen India Private Limited  unless explicit authorization is granted by the Head of Department.</label>
+
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td colspan="7" class="allFormLables borderLTB f-600">
+                                    <label class="photography-para">• That he/she will, without resistance, allow applicable authorities (Security Department) at ŠKODA AUTO Volkswagen India Private Limited to perform an audit on the above mentioned video camera/ camera at any time while within the company premises.</label>
+
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td colspan="7" class="allFormLables borderLTB f-600">
+                                    <label class="photography-para">• That this form relates only to ŠKODA AUTO Volkswagen India Private Limited premises and has no equity or influence within other companies in the Volkswagen Group.</label>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td colspan="7" class="allFormLables borderLTB f-600">
+                                    <label class="photography-para">• That failing to comply with the above could result in disciplinary action, which may lead to dismissal in accordance with the merits of the case.</label>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td colspan="7" class="allFormLables borderLTB f-600">
+                                    <label class="photography-para">• That in respect of non- ŠKODA AUTO Volkswagen India Private Limited persons, should any breach of these provisions be identified.  SAVWIPL shall be entitled to prevent access of such persons to the SAVWIPL premises in future and reserves the right to initiate civil proceedings against such persons, in accordance with the merits of the transgression.</label>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td colspan="7" class="allFormLables borderLTB f-600">
+                                    Please note: This from is only applicable to the above mentioned devices and for the stipulated period.
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td colspan="7" class="allFormLables borderLTB f-600">
+                                    Declaration
+                                </td>
+
+                            </tr>
+                            @if (IsNew || !IsEdit)
+                            {
+                                <tr>
+                                    <td colspan="7"><input type="checkbox" id="termsAndConditions" name="termsAndConditions" value=""><label class="f-600">I declare that I have read above mentioned instructions and will abide by it & will wear a photo ‘jacket’ in Red & Orange zone.</label></td>
+                                </tr>
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="7"><input type="checkbox" id="termsAndConditions" name="termsAndConditions" value="" class="f-600" checked disabled><label class="f-600" style="margin: 5px 5px;">I declare that I have read above mentioned instructions and will abide by it & will wear a photo ‘jacket’ in Red & Orange zone.</label> </td>
+                                </tr>
+                            }
+                            <tr>
+                                <td class="allFormLables borderLTB f-600">
+                                    <label class="f-600">Requester Name:</label><br />
+                                </td>
+                                <td class="borderLTB">
+                                    <input type="text" name="txtRequestorName" class="inpDisable inpText ml-2" value="@(!IsNew ? (PPF.two[0].Author.Title ?? " "): currentUser.UserName)" readonly>
+                                </td>
+                                <td colspan="4">@*Signature: <input style="width:100%;" class="inpDisable"  type="text" name="" value="@(!IsNew ?("Initiated on " +  Convert.ToDateTime(PPF.two[0].FormId.Created).ToShortDateString()+" " +Convert.ToDateTime(PPF.two[0].FormId.Created).ToShortTimeString()): " ")" readonly>*@</td>
+
+                            </tr>
+                            <tr class="bg-color-3">
+                                <td colspan="1" class="borderLTB">
+                                    <label class="f-600">Dept. & Location of photography</label><br />
+                                </td>
+
+                                <td colspan="2" class="allFormLables borderLTB f-600 pl-5">
+                                    <label class="f-600">Details of Photograph required</label><br />
+                                </td>
+
+                                <td colspan="3" class="allFormLables borderLTB f-600 align">
+                                    <label class="f-600">Purpose</label><br />
+                                </td>
+                            </tr>
+
+
+
+                        </table>
+
+                        <table class="table mainTbl table table-bordered table-sm dataTable no-footer bg-color">
+                            <tr class="bg-color-2">
+                                @if (IsNew)
+                                {
+                                    if (!IsEdit)
+                                    {
+
+                                        <td class="authorize-td" colspan="2">
+                                            <label class="f-600">Location:</label>
+
+                                            <select class="drpDisable" name="drpLocation" id="drpLocation" onchange="getZoneByArea()"></select>
+                                            <input type="hidden" id="emailId" name="emailId" value="">
+                                        </td>
+                                    }
+                                    else
+                                    {
+                                        <td class="authorize-td">
+                                            <label class="f-600">Location:*</label>
+                                            <select style="height: 27.5px !important; border: 1px solid rgb(75,168,46) !important;" class="drpDisable" name="drpLocation" id="drpLocation" onchange="getZoneByArea()"></select>
+                                            <input style="width:93%;" type="hidden" id="emailId" name="emailId" value="">
+                                        </td>
+
+
+                                    }
+                                }
+                                else
+                                {
+                                    <td class="authorize-td">
+                                        <label class="f-600">Location:</label>
+                                        <input style="width:93%;" type="text" id="drpLocation" name="drpLocation" class="inpDisable" value="@(!IsNew ? (PPF.one[0].Location ?? ""): "")">
+                                    </td>
+                                }
+                                <td class="w-25">
+                                    <table class="table mainTbl table table-bordered table-sm dataTable no-footer border-none">
+                                        @if (IsNew)
+                                        {
+                                            if (!IsEdit)
+                                            {
+                                                <tr>
+                                                    <td class="border-none clr-1 photography-zone">
+                                                        <label class="f-600"> Zone:</label><input type="text" name="txtZone" id="txtZone" class="" value="@(!IsEdit ? (PPF.one[0].Zone ?? " ") : " ")" readonly>
+                                                    </td>
+                                                </tr>
+                                                foreach (var item in PPF.one)
+                                                {
+                                                    <tr>
+                                                        <td class="border-none clr-1 align photography-zone">
+                                                            <label class="f-600">Pre-series car / part?</label>
+                                                            <select name="drpPreSeriesCarOrPart" id="drpPreSeriesCarOrPart" class="drpDisable select-border">
+                                                                <option @(item.PreSeriesCarOrPart == "true" ? "selected" : "" ) value="true">Yes</option>
+                                                                <option @(item.PreSeriesCarOrPart == "false" ? "selected" : "" ) value="false">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <tr>
+                                                    <td class="border-none clr-1 align photography-zone">
+                                                        <label><b>Zone:</b></label><input type="text" name="txtZone" id="txtZone" class="" value="" readonly>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="border-none clr-1 align photography-zone">
+                                                        <label style="padding-right: 26px;"><b>Pre-series car / part?*</b></label>
+                                                        <select name="drpPreSeriesCarOrPart" id="drpPreSeriesCarOrPart" class="drpDisable select-border pl-0">
+                                                            <option value="null" selected>Choose</option>
+                                                            <option value="true">Yes</option>
+                                                            <option value="false">No</option>
+                                                        </select>
+                                                    </td>
+                                                </tr>
+
+                                            }
+                                        }
+                                        else
+                                        {
+                                            foreach (var item in PPF.one)
+                                            {
+                                                <tr>
+                                                    <td class="border-none clr-1 align photography-zone">
+                                                        <label><b>Zone:</b></label><input type="text" name="txtZone" class="" value="@(!IsNew ? (PPF.one[0].Zone ?? " ") : " ")" readonly>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="border-none clr-1 align photography-zone">
+                                                        <label style="padding-right: 45px;"><b>Pre-series car / part?</b></label>
+                                                        <select name="drpPreSeriesCarOrPart" id="drpPreSeriesCarOrPart" class="drpDisable select-border">
+                                                            <option @(item.PreSeriesCarOrPart == "true" ? "selected" : "" ) value="Yes">Yes</option>
+                                                            <option @(item.PreSeriesCarOrPart == "false" ? "selected" : "" ) value="No">No</option>
+                                                        </select>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                        <tr>
+                                            <td class="border-none font-bold align photography-zone"> <label>Other:</label>  <input type="text" name="txtOthers" class="inpDisable" value="@(!IsNew||!IsEdit ? (PPF.one[0].Others ?? " ") : " ")"></td>
+                                        </tr>
+                                    </table>
+                                </td>
+                                <td class="authorize-td comment-box-2" colspan="2">
+                                    <textarea name="txtPurpose" class="bt-none inpDisable textareawidth photogrphy-textarea" id="txtPurpose" rows="6" cols="200">@(!IsNew||!IsEdit ? (PPF.one[0].Purpose ?? "") : "")</textarea>
+                                </td>
+                            </tr>
+                        </table>
+                        <table class="table mainTbl table table-bordered table-sm dataTable no-footer bg-color">
+
+                            @if (!IsNew || !IsEdit)
+                            {
+
+                                <tr class="bg-color-2">
+                                    <td colspan="6" class="font-bold text-center authorize-container photogrph_header">Authorization by immediate superior</td>
+                                </tr>
+                                <tr class="bg-color-2">
+                                    <td colspan="1" class="w-25 authorize-td">
+                                        <label class="f-600">Name:</label>
+                                        <input type="text" name="" class="input-width-1 author-width" value="@(!IsNew||!IsEdit ? (PPF.three[0].UserName ?? ""): "")" disabled>
+                                    </td>
+                                    <td class="authorize-td comment-box-2" colspan="2">
+                                        <div class="form-group">
+                                            <label class="f-600 align" for="comment">Approver Comment:</label>
+                                            <textarea class="form-control textareawidth photogrphy-textarea" rows="2" id="comment" disabled>@(!IsNew||!IsEdit ? (PPF.three[0].Comment ?? " "): " ")</textarea>
+                                        </div>
+                                    </td>
+
+                                    <td class="authorize-td" colspan="2" style="word-wrap: break-word;width:25%;"><label class="f-600">Signature:</label><input type="text" name="" class="inpDisable input-width-1 author-width" value="@((!IsNew && PPF.three[0].ApproverStatus != "Pending")||(!IsEdit && PPF.three[0].ApproverStatus != "Pending") ? (PPF.three[0].ApproverStatus + " on " + Convert.ToDateTime(PPF.two[0].Modified).ToShortDateString() + " " + Convert.ToDateTime(PPF.two[0].Modified).ToShortTimeString()): "" )" disabled></td>
+                                </tr>
+
+                            }
+                            @if ((!IsNew && PPF.one[0].Zone == "Red") || (!IsEdit && PPF.one[0].Zone == "Red"))
+                            {
+                                <tr class="bg-color-2">
+                                    <td colspan="6" class="font-bold text-center authorize-container photogrph_header">HOD of the restricted regime/zone</td>
+                                    <td class="display-none"></td>
+                                    <td class="display-none"></td>
+                                </tr>
+                                <tr class="bg-color-2">
+                                    <td colspan="1" class="authorize-td">
+                                        <label class="f-600">Name:</label>
+                                        <input type="text" name="" class="inpDisable input-width-1 author-width" value="@(!IsNew||!IsEdit ? (PPF.three[1].UserName ?? " "): " ")" disabled>
+                                    </td>
+                                    <td class="authorize-td comment-box-2" colspan="2">
+                                        <div class="form-group">
+                                            <label class="f-600 align" for="comment">Approver Comment:</label>
+                                            <textarea class="form-control textareawidth photogrphy-textarea" rows="2" id="comment" disabled>@(!IsNew||!IsEdit ? (PPF.three[1].Comment ?? " "): " ")</textarea>
+                                        </div>
+                                    </td>
+
+                                    <td class="authorize-td" style="word-wrap: break-word;width:25%;"><label class="f-600">Signature:</label> <input type="text" name="" class="inpDisable input-width-1 author-width" value="@((!IsNew && PPF.three[1].ApproverStatus != "Pending")||(!IsEdit && PPF.three[1].ApproverStatus != "Pending") ? (PPF.three[1].ApproverStatus + " on " + Convert.ToDateTime(PPF.two[1].Modified).ToShortDateString() + " " + Convert.ToDateTime(PPF.two[1].Modified).ToShortTimeString()) : "" )" disabled></td>
+                                </tr>
+                            }
+                            @if (!IsNew)
+                            {
+                                if (!IsValidityCheck)
+                                {
+                                    <tr class="bg-color-2">
+                                        <td colspan="3" class="bb-none align authorize-td">
+                                            <label class="f-600 pr-2 text-capitalize">Valid from:</label>
+                                            <input type="date" name="txtValidFrom" id="txtValidFrom" class="author-width-validfrom" value="@(!IsNew ? (PPF.one[0].ValidFrom.ToShortDateString() ?? " ") : " ")" min="@(PPF.one[0].ActivityStart.ToString("yyyy-MM-dd"))" max="@(PPF.one[0].ActivityEnd.ToString("yyyy-MM-dd"))">
+                                        </td>
+                                        <input type="hidden" id="FormSrId" name="FormSrId" value="@(PPF.one[0].Id)" />
+                                        <td colspan="2" class="bb-none align authorize-td"><label class="f-600 pr-2 text-capitalize">Valid to:</label><input type="date" name="txtValidTo" id="txtValidTo" class="author-width" value="@(!IsNew ? (PPF.one[0].ValidTo.ToShortDateString() ?? " ") : " ")" min="@(PPF.one[0].ActivityStart.ToString("yyyy-MM-dd"))" max="@(PPF.one[0].ActivityEnd.ToString("yyyy-MM-dd"))"></td>
+                                        <td class="display-none"></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" class="style_size clr-2 f-12 align span-pl">
+                                            <span class="style_size clr-2 f-12 span-pl">(Validity: maximum 01 year for pre-series related photography, for other, 5 yrs for SAVWIPL employees )</span>
+                                        </td>
+                                        <td class="display-none"></td>
+                                        <td class="display-none"></td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    <tr class="bg-color-2">
+                                        <td colspan="3" class="bb-none align authorize-td">
+                                            <label class="f-600 pr-2 text-capitalize">Valid from:</label><input type="text" name="txtValidFrom" class="author-width-validfrom" value="@(!(PPF.one[0].ValidFrom.Year==1) ? (PPF.one[0].ValidFrom.ToShortDateString() ?? "") : "")" readonly>
+                                        </td>
+
+                                        <td colspan="2" class="bb-none align authorize-td "><label class="f-600 pr-2 text-capitalize">Valid to:</label><input type="text" name="txtValidTo" class="author-width" value="@(!(PPF.one[0].ValidTo.Year==1) ? (PPF.one[0].ValidTo.ToShortDateString() ?? "") : "")" readonly></td>
+                                        <td class="display-none"></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4" class="style_size clr-2 f-12 align span-pl">
+                                            <span class="style_size clr-2 f-12 span-pl">(Validity: maximum 01 year for pre-series related photography, for other, 5 yrs for SAVWIPL employees )</span>
+                                        </td>
+                                        <td class="display-none"></td>
+                                        <td class="display-none"></td>
+                                    </tr>
+                                }
+                            }
+                            @if ((!IsNew && PPF.one[0].ApplicantType == "External Agency") || (!IsEdit && PPF.one[0].ApplicantType == "External Agency"))
+                            {
+                                if (PPF.one[0].Zone == "Red")
+                                {
+                                    <tr class="bg-color-2">
+                                        <td colspan="3" class="font-bold">Authorization from Security Department (only in case of external agency like media etc. involved)</td>
+                                        <td class="display-none"></td>
+                                        <td class="display-none"></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="1" class="authorize-td">
+                                            <label class="f-600">Name:</label>
+                                            <input type="text" name="" class="inpDisable author-width" value="@(!IsNew||!IsEdit ? (PPF.three[2].UserName ?? " ") : " ")" disabled>
+                                        </td>
+                                        <td class="display-none authorize-td"></td>
+                                        <td class="authorize-td comment-box-2" colspan="2">
+                                            <div class="form-group">
+                                                <label class="f-600 align" for="comment">Approver Comment:</label>
+                                                <textarea class="form-control textareawidth photogrphy-textarea" rows="2" id="comment" disabled>@(!IsNew||!IsEdit ? (PPF.three[2].Comment ?? " "): " ")</textarea>
+                                            </div>
+                                        </td>
+                                        <td class="authorize-td" style="word-wrap: break-word;width:25%;"><label class="f-600">Signature:</label> <input type="text" name="" disabled class="inpDisable author-width" value="@((!IsNew && PPF.three[2].ApproverStatus != "Pending")||(!IsEdit && PPF.three[2].ApproverStatus != "Pending") ? (PPF.three[2].ApproverStatus + " on " + Convert.ToDateTime(PPF.two[2].Modified).ToShortDateString() + " " + Convert.ToDateTime(PPF.two[2].Modified).ToShortTimeString()) : "" )"></td>
+                                    </tr>
+                                }
+                                else if (PPF.one[0].Zone == "Green" || PPF.one[0].Zone == "Orange")
+                                {
+                                    <tr>
+                                        <td colspan="6" class="font-bold align">Authorization from Security Department (only in case of external agency like media etc. involved)</td>
+                                        <td class="display-none"></td>
+                                        <td class="display-none"></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="1" class="authorize-td">
+                                            <label class="f-600">Name:</label><input type="text" name="" class="inpDisable author-width" disabled value="@(!IsNew||!IsEdit ? (PPF.three[1].UserName ?? " ") : " ")">
+                                        </td>
+                                        <td class="authorize-td comment-box-2" colspan="2">
+                                            <div class="form-group">
+                                                <label class="f-600 align" for="comment">Approver Comment:</label>
+                                                <textarea class="form-control textareawidth photogrphy-textarea" rows="2" id="comment" disabled>@(!IsNew||!IsEdit ? (PPF.three[1].Comment ?? " "): " ")</textarea>
+                                            </div>
+                                        </td>
+                                        <td class="display-none"></td>
+                                        <td class="authorize-td" style="word-wrap: break-word;width:25%;"><label class="f-600">Signature:</label> <input type="text" name="" disabled class="inpDisable author-width" value="@((!IsNew && PPF.three[1].ApproverStatus != "Pending")||(!IsEdit && PPF.three[1].ApproverStatus != "Pending") ? (PPF.three[1].ApproverStatus + " on " + Convert.ToDateTime(PPF.two[1].Modified).ToShortDateString() + " " + Convert.ToDateTime(PPF.two[1].Modified).ToShortTimeString()) : "" )"></td>
+                                    </tr>
+                                }
+                            }
+                            @if (IsNew)
+                            {
+                                if (!IsEdit)
+                                {
+                                    foreach (var item in PPF.one)
+                                    {
+                                        <tr>
+                                            <td colspan="3" class="w-40 clr-1 br-none align span-pl">
+                                                <span class="span-pl"><b>Exceptional Photo?</b></span>
+                                                <span class="clr-2 f-12 style_size">(Pre-series Full Car/Partial car with characteristics/ Cockpit) </span>
+                                            </td>
+                                            <td class="br-none auto-p-2">
+                                                <span>
+                                                    <select name="drpExceptionalPhoto" id="drpExceptionalPhoto" class="drpDisable select-border pl-1">
+                                                        <option @(item.ExceptionalPhoto == "true" ? "selected" : "" ) value="true">Yes</option>
+                                                        <option @(item.ExceptionalPhoto == "false" ? "selected" : "" ) value="false">No</option>
+                                                    </select>
+                                                </span><span>If Yes, Contact Comm’n & SO Dept.</span>
+                                            </td>
+
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="3" class="clr-1 br-none align span-pl">
+                                            <span class="span-pl"><b>Exceptional Photo?*</b></span>
+                                            <span class="clr-2 f-12 style_size">(Pre-series Full Car/Partial car with characteristics/ Cockpit) </span>
+                                        </td>
+                                        <td class="br-none auto-p-2">
+                                            <span>
+                                                <select name="drpExceptionalPhoto" id="drpExceptionalPhoto" class="drpDisable select-border pl-1">
+                                                    <option value="null" selected>Choose..</option>
+                                                    <option value="true">Yes</option>
+                                                    <option value="false">No</option>
+                                                </select>
+                                            </span><span>If Yes, Contact Comm’n & SO Dept.</span>
+                                        </td>
+
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                foreach (var item in PPF.one)
+                                {
+                                    <tr>
+                                        <td colspan="3" class="clr-1 br-none align span-pl">
+                                            <span class="span-pl"><b>Exceptional Photo?</b></span>
+                                            <span class="clr-2 f-12 style_size">(Pre-series Full Car/Partial car with characteristics/ Cockpit) </span>
+                                        </td>
+                                        <td class="br-none auto-p-2">
+                                            <span>
+                                                <select name="drpExceptionalPhoto" id="drpExceptionalPhoto" class="drpDisable select-border pl-1">
+                                                    <option @(item.ExceptionalPhoto == "true" ? "selected" : "" ) value="true">Yes</option>
+                                                    <option @(item.ExceptionalPhoto == "false" ? "selected" : "" ) value="false">No</option>
+                                                </select>
+                                            </span><span>If Yes, Contact Comm’n & SO Dept.</span>
+                                        </td>
+
+                                    </tr>
+                                }
+                            }
+                            <tr>
+                                <td colspan="2" class="align span-pl">
+                                    <span class="span-pl">Email address</span>
+                                    <span class="clr-2 style_size">(Whom to share ‘exceptional photo’ of pre-series Car): </span>
+                                </td>
+                                <td colspan="2"></td>
+                                <td class="display-none"></td>
+                            </tr>
+                        </table>
+                        <table>
+                            <tr>
+                                <td class="font-bold pl-10 pt-10 span-pl ">SF_SO/1_015.02 <span class="clr-1 font-light">In case of exceptional photo, comm’n dept will take picture  & fwd. to SO.</span> <span class="clr-1 font-light pl-10"> HOD: please keep a copy of this permit as a record</span><span class="clr-1 font-light pl-10"> Hard copy of the form is mandatory for security verification</span></td>
+                            </tr>
+                        </table>
+
+                        @*<button class="submit-btn auto-btn pr-5">Submit</button>
+        <button class="cancel-btn auto-btn">Cancel</button>*@
+                    </td>
+                </tr>
+            </table>
+        </div>
+        @if (IsNew)
+        {
+            if (!IsEdit)
+            {
+                <div class="card-footer align-content-center">
+                    <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnReSubmit">
+                        Re-Submit
+                    </button>
+                    <button type="reset" class="btn btn-danger btn-sm cancl-btn">
+                        Cancel
+                    </button>
+                </div>
+            }
+            else
+            {
+                <div class="card-footer align-content-center">
+                    <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                        Submit
+                    </button>
+                    <button type="reset" class="btn btn-danger btn-sm cancl-btn">
+                        Cancel
+                    </button>
+                </div>
+            }
+        }
+    </form>
+</div>
+<div class="modal fade" id="successModel" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header modelHeader">
+                <span class="modal-title modalMsgTitle" id="modalTitle"></span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label id="modalBody" class="lableMsg">  </label>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="submitBomBtn publishBtn" id="modalOkButton">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    var IsNew = @Html.Raw(Json.Encode(IsNew));
+    var PPF = @Html.Raw(Json.Encode(PPF));
+    var appRowId = @Html.Raw(Json.Encode(AppRowId));
+    var IsEdit = @Html.Raw(Json.Encode(IsEdit));
+    var approvalType = @Html.Raw(Json.Encode(ApprovalType));
+    var IsValidityCheck = @Html.Raw(Json.Encode(IsValidityCheck));
+    var FlagRedirect = @Html.Raw(Json.Encode(FlagRedirect));
+    //var formSrId= @Html.Raw(Json.Encode(FormSrId));
+    //$("#FormSrId").val(formSrId);
+    pageLoad();
+    function pageLoad() {
+        //console.log(PPF)
+        var data = "";
+        if (!IsNew) {
+            $("#OtherEmpName").hide();
+            $(".inpDisable").attr("disabled", "disabled");
+        }
+        if (!IsNew) {
+            $(".drpDisable").attr("disabled", "disabled");
+        }
+        //if (IsNew) {
+        //    $(".inpIsNewDisable").attr("disabled", "disabled");
+        //}
+        if (!IsEdit) {
+            getArea();
+            GetApprovers();
+            //debugger
+            //getZoneByArea();
+            if (document.getElementById("drpApplicantType").value == "Internal Employee") {
+                setInternalYear();
+            }
+        }
+        if (IsNew) {
+            if (!IsEdit) {
+                //console.log();
+            }
+            else {
+                getArea();
+                GetApprovers();
+                $("#OtherEmpName").hide();
+            }
+        }
+    };
+
+    /*function successModal() {
+        $('#modalTitle').html('Success');
+        if (1 == "approved") {
+            $('#modalBody').html('Your form has been approved!');
+        }
+        else if (1 == "rejected") {
+            $('#modalBody').html('Your form has been rejected!');
+        }
+        else if (1 == "enquired") {
+            $('#modalBody').html('Your form has been enquired!');
+        }
+        else if (1 == "cancelled") {
+            $('#modalBody').html('Your form has been cancelled!');
+        }
+        else {
+            $('#modalBody').html('Your form has been submitted!');
+        }
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }*/
+
+    function successModal(txt) {
+        //debugger
+        $('#modalTitle').html('Success');
+        if (txt == "approve") {
+            $('#modalBody').html('Form has been approved!');
+        }
+        else if (txt == "reject") {
+            $('#modalBody').html('Form has been rejected!');
+        }
+        else if (txt == "enquire") {
+            $('#modalBody').html('Form has been enquired!');
+        }
+        else if (txt == "cancelled") {
+            $('#modalBody').html('Form has been cancelled!');
+        }
+        else {
+            if (!IsEdit) {
+                $('#modalBody').html('Your form with ID: PAF' + txt + ' has been re-submitted! Kindly use this for future reference');
+            }
+            else {
+                $('#modalBody').html('Your form with ID: PAF' + txt + ' has been submitted! Kindly use this for future reference');
+                FlagRedirect = txt;
+            }
+        }
+        //$('#modalBody').html('Your form has been submitted!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function failureModal() {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html('Some error occured!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function permissionModal() {
+        $('#modalTitle').html('Required');
+        $('#modalBody').html('No permssion granted since the device is not SAVWIPL owned!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function termsAndConditionsModal() {
+        $('#modalTitle').html('Required');
+        $('#modalBody').html('Declaration Checkbox not checked!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function mobileLengthModal() {
+        $('#modalTitle').html('Required');
+        $('#modalBody').html('Please enter a 10-Digit Mobile No.!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function telephoneLengthModal() {
+        $('#modalTitle').html('Required');
+        $('#modalBody').html('Please enter a 8-Digit Telephone No.!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function GetApprovers() {
+        $.ajax({
+            url: '/List/GetPhotographyFormApprovalList',
+            type: 'GET',
+            data: {},
+            dataType: 'JSON',
+            success: (function (data) {
+                //debugger
+                approverData = data;
+                console.log(data);
+                var row = "";
+                for (var i = 0; i < data.length; i++) {
+                    row += '<input type="hidden" id="hidden' + data[i].Department + 'Approver" name="hidden' + data[i].Department + 'Approver" value="' + data[i].ApproverEmailId + '">';
+                }
+                $("#hiddenApproverInformation").html(row);
+
+            }),
+            error: (function (data) {
+                //code
+            })
+        })
+
+    }
+
+    function getZoneByArea() {
+        //var zone = document.getElementById("txtZone");
+        //var area = e.options[e.selectedIndex].value;
+        //debugger
+
+        //console.log(area);
+        //console.log(costCenter);
+        var dropdown = document.getElementById("drpLocation");
+        //console.log(dropdown.value);
+        //console.log(dropdown.selectedIndex);
+        var emailId = dropdown.options[dropdown.selectedIndex].id;
+        //console.log(emailId)
+        $("#emailId").val(emailId);
+        getZone();
+    }
+
+    function func() {
+        //debugger
+        var dropdown = document.getElementById("drpApplicantType");
+        var selection = dropdown.value;
+        var dropdown1 = document.getElementById("drpRequestSubType");
+        var selection1 = dropdown1.value;
+
+        if (selection1 != "OnBehalf") {
+            if (selection == "Internal Employee") {
+                var firstName = document.getElementById("txtFirstName");
+                var lastName = document.getElementById("txtSurname");
+                var department = document.getElementById("txtDepartment");
+                var empId = document.getElementById("txtEmpId");
+                var activityEnd = document.getElementById("txtActivityEnd");
+                firstName.value = "@currentUser.FirstName";
+                lastName.value = "@currentUser.LastName";
+                department.value = "@currentUser.Department";
+                empId.value = "@currentUser.EmpNumber";
+                //document.getElementById("txtFirstName").readOnly = true;
+                //document.getElementById("txtSurname").readOnly = true;
+                //document.getElementById("txtDepartment").readOnly = true;
+                //document.getElementById("txtEmpId").readOnly = true;
+                activityEnd.value = "";
+
+            }
+            else if (selection == "External Agency") {
+                var firstName = document.getElementById("txtFirstName");
+                var lastName = document.getElementById("txtSurname");
+                var department = document.getElementById("txtDepartment");
+                var empId = document.getElementById("txtEmpId");
+                var activityEnd = document.getElementById("txtActivityEnd");
+                console.log(activityEnd);
+                firstName.value = "";
+                lastName.value = "";
+                department.value = "";
+                empId.value = "";
+                activityEnd.value = "";
+            }
+            else if (selection == "Partner Employee") {
+                var firstName = document.getElementById("txtFirstName");
+                var lastName = document.getElementById("txtSurname");
+                var department = document.getElementById("txtDepartment");
+                var empId = document.getElementById("txtEmpId");
+                var activityEnd = document.getElementById("txtActivityEnd");
+                firstName.value = "";
+                lastName.value = "";
+                department.value = "";
+                empId.value = "";
+                activityEnd.value = "";
+            }
+        }
+    }
+
+    function onChangeActivityStart() {
+        var activityEnd = document.getElementById("txtActivityEnd");
+        console.log(activityEnd);
+        activityEnd.value = "";
+    }
+
+    function date_val() {
+        var dropdownVal = document.getElementById("drpApplicantType").value;
+        if (dropdownVal == "Internal Employee") {
+            var today = new Date().toISOString().split('T')[0];
+            document.getElementsByName("txtActivityStart")[0].setAttribute("min", today);
+            //console.log(today);
+            //document.getElementsByName("txtValidFrom")[0].setAttribute("min", today);
+
+        }
+        else if (dropdownVal == "External Agency") {
+            var today = new Date().toISOString().split('T')[0];
+            document.getElementsByName("txtActivityStart")[0].setAttribute("min", today);
+            //document.getElementsByName("txtValidFrom")[0].setAttribute("min", today);
+
+        }
+        else if (dropdownVal == "Partner Employee") {
+            var today = new Date().toISOString().split('T')[0];
+            document.getElementsByName("txtActivityStart")[0].setAttribute("min", today);
+            //document.getElementsByName("txtValidFrom")[0].setAttribute("min", today);
+        }
+    }
+
+    function setInternalYear() {
+        //debugger
+        if (!IsEdit) {
+            var value = JSON.stringify(PPF[0]);
+            var value_1 = JSON.parse(value);
+            var activityEndDate = value_1.Value[0].ActivityEnd;
+            var regExp = /\(([^)]+)\)/;
+            var valueNumber = regExp.exec(activityEndDate);
+            var x = parseInt(valueNumber[1]);
+            var valueNumberDate = new Date(x);
+            var valueNumberDateYear = valueNumberDate.getFullYear();
+
+            var year_string = document.getElementsByName("txtActivityStart")[0].value;
+            var parts = year_string.split("-");
+            var year = new Date(parts[0], parts[1] - 1, parts[2]);
+            var min_year = year;
+            let initial_year = parseInt(parts[0]);
+            let final_year = parseInt(parts[0]) + 5;
+            var s = '<option value="-1">Choose End Year</option>';
+            for (i = initial_year + 1; i <= final_year; i++) {
+                if (i == valueNumberDateYear) {
+                    s += '<option value="' + i + '" selected>' + i + '</option>';
+                }
+                else {
+                    s += '<option value="' + i + '">' + i + '</option>';
+                }
+            }
+            $("#drpActivityEnd").html(s);
+        }
+        else {
+            var year_string = document.getElementsByName("txtActivityStart")[0].value;
+            var parts = year_string.split("-");
+            var year = new Date(parts[0], parts[1] - 1, parts[2]);
+            var min_year = year;
+            let initial_year = min_year.getFullYear();
+            let final_year = min_year.getFullYear() + 5;
+            var s = '<option value="-1">Choose End Year</option>';;
+            for (i = initial_year + 1; i <= final_year; i++) {
+                //$('#drpActivityEnd').append($('<option />').id(i).html(i));
+                s += '<option value=" ' + i + ' ">' + i + '</option>';
+            }
+            $("#drpActivityEnd").html(s);
+        }
+
+    }
+
+    function date_val_end() {
+        debugger
+        //console.log(document.getElementsByName("txtActivityStart")[0].value);
+        var dropdownValEnd = document.getElementById("drpApplicantType").value;
+        if (dropdownValEnd == "Internal Employee") {
+            //debugger;
+            var year_string = document.getElementsByName("txtActivityStart")[0].value;
+            var parts = year_string.split("-");
+            var year = new Date(parts[0], parts[1] - 1, parts[2]);
+            var min_year = year;
+            min_year.setDate(min_year.getDate() + 1);
+            //var initial_year = min_year.toISOString().split('T')[0];
+            var yearInternal = document.getElementById("drpActivityEnd").value;
+            console.log(yearInternal);
+            var max_year = year;
+            max_year.setFullYear(yearInternal);
+            max_year.setDate(max_year.getDate() - 1);
+            var final_year = max_year.toISOString().split('T')[0];
+            console.log(final_year);
+            document.getElementById("txtInternalActivityEnd").value = final_year;
+            //document.getElementsByName("txtActivityEnd")[0].setAttribute("min", initial_year);
+            //document.getElementsByName("txtActivityEnd")[0].setAttribute("max", final_year);
+        }
+
+        else if (dropdownValEnd == "External Agency") {
+            var week_string = document.getElementsByName("txtActivityStart")[0].value;
+            var parts = week_string.split("-");
+            var date = new Date(parts[0], parts[1] - 1, parts[2]);
+            var min_date = date;
+            min_date.setDate(min_date.getDate() + 1);
+            var initial_date = min_date.toISOString().split('T')[0];
+            var max_date = date;
+            max_date.setDate(max_date.getDate() + 6);
+            var final_date = max_date.toISOString().split('T')[0];
+            document.getElementsByName("txtActivityEnd")[0].setAttribute("min", initial_date);
+            document.getElementsByName("txtActivityEnd")[0].setAttribute("max", final_date);
+        }
+        else if (dropdownValEnd == "Partner Employee") {
+            var year_string = document.getElementsByName("txtActivityStart")[0].value;
+            var parts = year_string.split("-");
+            var year = new Date(parts[0], parts[1] - 1, parts[2]);
+            var min_year = year;
+            min_year.setDate(min_year.getDate() + 1);
+            var initial_year = min_year.toISOString().split('T')[0];
+            console.log(initial_year);
+            var max_year = year;
+            max_year.setFullYear(max_year.getFullYear() + 1);
+            max_year.setDate(max_year.getDate() - 1);
+            var final_year = max_year.toISOString().split('T')[0];
+            console.log(final_year);
+            document.getElementsByName("txtActivityEnd")[0].setAttribute("min", initial_year);
+            document.getElementsByName("txtActivityEnd")[0].setAttribute("max", final_year);
+        }
+    }
+
+    /*function date_valid_from() {
+        var dropdownVal = document.getElementById("drpApplicantType").value;
+        if (dropdownVal == "Internal") {
+            //var today = new Date().toISOString().split('T')[0];
+            var info = document.getElementById("txtValidFrom");
+            console.log(info);
+        }
+        else if (dropdownVal == "External") {
+            var today = new Date().toISOString().split('T')[0];
+            document.getElementsByName("txtValidFrom")[0].setAttribute("min", today);
+        }
+        else if (dropdownVal == "Partner Employee") {
+            var today = new Date().toISOString().split('T')[0];
+            document.getElementsByName("txtValidFrom")[0].setAttribute("min", today);
+        }
+    }
+    function date_valid_to() {
+        var dropdownValEnd = document.getElementById("drpApplicantType").value;
+        if (dropdownValEnd == "Internal") {
+            //debugger;
+            var year_string = document.getElementById("txtValidFrom").value;
+            var parts = year_string.split("-");
+            var year = new Date(parts[0], parts[1] - 1, parts[2]);
+            var min_year = year;
+            min_year.setDate(min_year.getDate() + 1);
+            var initial_year = min_year.toISOString().split('T')[0];
+            console.log(initial_year);
+            var max_year = year;
+            max_year.setFullYear(max_year.getFullYear() + 5);
+            max_year.setDate(max_year.getDate() - 1);
+            var final_year = max_year.toISOString().split('T')[0];
+            console.log(final_year);
+            document.getElementsByName("txtValidTo")[0].setAttribute("min", initial_year);
+            document.getElementsByName("txtValidTo")[0].setAttribute("max", final_year);
+        }
+        else if (dropdownValEnd == "External") {
+            var week_string = document.getElementById("txtValidFrom").value;
+            var parts = week_string.split("-");
+            var date = new Date(parts[0], parts[1] - 1, parts[2]);
+            var min_date = date;
+            min_date.setDate(min_date.getDate() + 1);
+            var initial_date = min_date.toISOString().split('T')[0];
+            var max_date = date;
+            max_date.setDate(max_date.getDate() + 6);
+            var final_date = max_date.toISOString().split('T')[0];
+            document.getElementsByName("txtValidTo")[0].setAttribute("min", initial_date);
+            document.getElementsByName("txtValidTo")[0].setAttribute("max", final_date);
+        }
+        else if (dropdownValEnd == "Partner Employee") {
+            var year_string = document.getElementById("txtValidFrom").value;
+            var parts = year_string.split("-");
+            var year = new Date(parts[0], parts[1] - 1, parts[2]);
+            var min_year = year;
+            min_year.setDate(min_year.getDate() + 1);
+            var initial_year = min_year.toISOString().split('T')[0];
+            console.log(initial_year);
+            var max_year = year;
+            max_year.setFullYear(max_year.getFullYear() + 1);
+            max_year.setDate(max_year.getDate() - 1);
+            var final_year = max_year.toISOString().split('T')[0];
+            console.log(final_year);
+            document.getElementsByName("txtValidTo")[0].setAttribute("min", initial_year);
+            document.getElementsByName("txtValidTo")[0].setAttribute("max", final_year);
+        }
+    }*/
+
+    function allowNumbersOnly(e) {
+        var code = (e.which) ? e.which : e.keyCode;
+        if (code > 31 && (code < 48 || code > 57)) {
+            e.preventDefault();
+        }
+    }
+
+    $("#drpApplicantType").change(function () {
+        //debugger
+        if ($(this).val() == "Partner Employee") {
+            $('#drpActivityEnd').hide();
+            $('#txtPartnerEmpCompany').show();
+            $('#txtActivityEnd').show();
+            if (!IsEdit) {
+                return true;
+                console.log("Edit Mode")
+            }
+            else if (!IsNew) {
+                return true;
+                console.log("View Mode")
+            }
+            else {
+                func();
+            }
+            //$('#labelPartnerEmpCompany').show();
+        } else if ($(this).val() == "External Agency") {
+            $('#txtPartnerEmpCompany').hide();
+            $('#drpActivityEnd').hide();
+            $('#txtActivityEnd').show();
+            if (!IsEdit) {
+                return true;
+                console.log("Edit Mode")
+            }
+            else if (!IsNew) {
+                return true;
+                console.log("View Mode")
+            }
+            else {
+                func();
+            }
+            //$('#labelPartnerEmpCompany').hide();
+        }
+        else if ($(this).val() == "Internal Employee") {
+            $('#txtActivityEnd').hide();
+            $('#txtPartnerEmpCompany').hide();
+            $('#drpActivityEnd').show();
+            if (!IsEdit) {
+                return true;
+                console.log("Edit Mode")
+            }
+            else if (!IsNew) {
+                return true;
+                console.log("View Mode")
+            }
+            else {
+                func();
+            }
+            //$('#labelPartnerEmpCompany').hide();
+        }
+        else {
+            $('#txtPartnerEmpCompany').hide();
+            $('#drpActivityEnd').hide();
+            $('#txtActivityEnd').hide();
+        }
+    });
+    $("#drpApplicantType").trigger("change");
+
+    function getArea() {
+        if (IsNew) {
+            if (!IsEdit) {
+                var value = JSON.stringify(PPF[0]);
+                var value_1 = JSON.parse(value);
+                var selectedLocation = value_1.Value[0].Location;
+                console.log(selectedLocation);
+
+                $.ajax({
+                    url: '/List/Areas',
+                    type: 'GET',
+                    data: {},
+                    dataType: 'JSON',
+                    success: (function (data) {
+                        locdata = data;
+
+                        console.log(data);
+                        var s = '<option value="-1">Please Select a Area</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            if (data[i].Location == selectedLocation) {
+                                s += '<option value="' + data[i].Location + '" id="' + data[i].EmailId + '" selected>' + data[i].Location + '</option>';
+                            }
+                            else {
+                                s += '<option value="' + data[i].Location + '" id="' + data[i].EmailId + '">' + data[i].Location + '</option>';
+                            }
+                        }
+                        $("#drpLocation").html(s);
+                    }),
+                    error: (function (data) {
+                        //code
+                    })
+                })
+            }
+            else {
+                $.ajax({
+                    url: '/List/Areas',
+                    type: 'GET',
+                    data: {},
+                    dataType: 'JSON',
+                    success: (function (data) {
+                        locdata = data;
+
+                        console.log(data);
+                        var s = '<option value="-1">Please Select a Area</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            s += '<option value="' + data[i].Location + '" id="' + data[i].EmailId + '">' + data[i].Location + '</option>';
+                        }
+                        $("#drpLocation").html(s);
+
+
+                    }),
+                    error: (function (data) {
+                        //code
+                    })
+                })
+            }
+        }
+    }
+
+    function getZone() {
+        debugger
+        $.ajax({
+            url: '/List/Areas',
+            type: 'GET',
+            data: {},
+            dataType: 'JSON',
+            success: (function (data) {
+                locdata = data;
+                //console.log(data);
+                var selection = $("#drpLocation").val();
+                //console.log(selection);
+                for (var i = 0; i < data.length; i++) {
+                    if (data[i].Location == selection) {
+                        //console.log(data[i].Location);
+                        //console.log(data[i].Zone);
+                        var zone = data[i].Zone;
+                        //console.log(zone);
+                        $("#txtZone").val(zone);
+                    }
+                    else if (-1 == selection) {
+                        var emptyValue = "";
+                        $("#txtZone").val(emptyValue)
+                    }
+                }
+            }),
+            error: (function (data) {
+                //code
+            })
+        })
+    }
+
+    $("#btnSubmit").on('click', function (e) {
+        e.preventDefault();
+        var index = document.getElementById("drpApplicantType").selectedIndex;
+        //console.log(index);
+        if (index == 0) {
+            requiredModal("Please fill Applicant Details");
+            return false;
+        }
+
+        var dropdown = document.getElementById("drpApplicantType").selectedIndex;
+
+        var surname = document.getElementById("txtSurname").value;
+        var firstname = document.getElementById("txtFirstName").value;
+        var empid = document.getElementById("txtEmpId").value;
+        var dept = document.getElementById("txtDepartment").value;
+        if ((dropdown == 2) || (dropdown == 3)) {
+            $(".inpText").attr("disabled", false);
+            if (surname == "") {
+                requiredModal("Please enter the Surname of the applicant");
+                return false;
+            }
+            if (firstname == "") {
+                requiredModal("Please enter the First Name of the applicant");
+                return false;
+            }
+            if (empid == "") {
+                requiredModal("Please enter the Employee Id of the applicant");
+                return false;
+            }
+            if (dept == "") {
+                requiredModal("Please enter the Department of the applicant");
+                return false;
+            }
+        }
+
+        var mobileLen = $("#txtMobile").val().length;
+        if (mobileLen < 10 || mobileLen > 10) {
+            mobileLengthModal();
+            return false;
+        }
+        //var telephoneLen = $("#txtTelephone").val().length;
+        //if (telephoneLen < 8 || telephoneLen > 8) {
+        //    telephoneLengthModal();
+        //    return false;
+        //}
+        var a = document.getElementById("drpInstrument").selectedIndex;
+        if (a == 0) {
+            requiredModal("Please select the Device Details");
+            return false;
+        }
+
+        //var make = document.getElementById("txtMake").value;
+        //if (make == "") {
+        //    requiredModal("Please enter make");
+        //    return false;
+        //}
+
+        var make = document.forms["PPFForm"]["txtMake"].value;
+        if (make == "") {
+            requiredModal("Please enter Make");
+            return false;
+        }
+
+        var model = document.forms["PPFForm"]["txtModel"].value;
+        if (model == "") {
+            requiredModal("Please enter Model");
+            return false;
+        }
+        var serialno = document.forms["PPFForm"]["txtSerialNo"].value;
+        if (serialno == "") {
+            requiredModal("Please enter Serial Number");
+            return false;
+        }
+
+        var b = document.getElementById("drpSAVWIPL").selectedIndex;
+        if (b == 0) {
+            requiredModal("Please select SAVWIPL?");
+            return false;
+        }
+
+        var c = document.getElementById("drpExtraFunctionality1").selectedIndex;
+        var d = document.getElementById("drpExtraFunctionality2").selectedIndex;
+        var e = document.getElementById("drpExtraFunctionality3").selectedIndex;
+        var f = document.getElementById("drpExtraFunctionality4").selectedIndex;
+        if ((c == 0) || (d == 0) || (e == 0) || (f == 0)) {
+            requiredModal("Please select Extra Functionalities");
+            return false;
+        }
+        var activitystart = document.getElementById("txtActivityStart").value;
+
+        if (activitystart == "") {
+            requiredModal("Please select Activity Start");
+            return false;
+
+        }
+
+        var txtActivityEnd = document.getElementById("txtActivityEnd").value;
+        var drpActivityEnd = document.getElementById("drpActivityEnd").value;
+        var dropdownActivityEnd = document.getElementById("drpApplicantType");
+        var selection = dropdownActivityEnd.value;
+        if (selection == "Internal Employee" && drpActivityEnd == -1) {
+            requiredModal("Please select Activity End");
+            return false;
+        }
+        else if (selection == "Partner Employee" && txtActivityEnd == "") {
+            requiredModal("Please select Activity End");
+            return false;
+        }
+
+        else if (selection == "External Agency" && txtActivityEnd == "") {
+            requiredModal("Please select Activity End");
+            return false;
+        }
+
+        var dropdownPartnerEmp = document.getElementById("drpApplicantType").value;
+        var txtPartnerEmpCompany = document.getElementById("txtPartnerEmpCompany").value;
+        if (dropdownPartnerEmp == "Partner Employee" && txtPartnerEmpCompany == "") {
+            requiredModal("Please Enter Partner Employee Company");
+            return false;
+        }
+
+
+        //var activity = document.forms["PPFForm"]["txtActivityEnd"].value;
+        //console.log(activity);
+        //var activity = document.getElementById("txtActivityEnd").value;
+        //if (activity == "") {
+        //    var activityend = document.getElementById("drpActivityEnd").selectedIndex;
+        //    if (activityend == 0) {
+        //        requiredModal("Please select Activity End");
+        //        return false;
+        //    }
+        //}
+
+        //console.log(activityend+"hi");
+        //if ((activityend == 0) || (activity == "")) {
+        //    requiredModal("Please select Activity End");
+        //    return false;
+        //}
+
+        var loc = document.getElementById("drpLocation").selectedIndex;
+        if (loc == 0) {
+            requiredModal("Please select Location for photography");
+            return false;
+        }
+        var purpose = document.getElementById("txtPurpose").value;
+        if (purpose == "") {
+            requiredModal("Please mention the purpose of the photography");
+            return false;
+        }
+        var exceptionalphoto = document.getElementById("drpExceptionalPhoto").selectedIndex;
+        if (exceptionalphoto == 0) {
+            requiredModal("Please select Exceptional Photo option for photography");
+            return false;
+        }
+        var SAVWIPL = $("#drpSAVWIPL option:selected").text();
+        if (SAVWIPL == "No") {
+            permissionModal();
+            return false;
+        }
+        var n = document.getElementById("termsAndConditions").checked;
+        if (n == false) {
+            termsAndConditionsModal();
+            return false;
+        }
+
+        var form = $("#PPFForm").serialize();
+        $.ajax({
+            url: '/List/SavePPF',
+            type: 'POST',
+            data: form,
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data[0].Value == 1) {
+                    successModal(data[1].Value);
+                    $("#PPFForm").trigger("reset");
+                }
+                else {
+                    failureModal();
+                    $("#PPFForm").trigger("reset");
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+                $("#PPFForm").trigger("reset");
+            })
+        })
+    });
+    function validityModal(txt) {
+        //debugger
+        if (txt == 'approve') {
+            DisplayAlert('error', 'Warning', 'Please choose both validity dates');
+        }
+        else if (txt == 'reject') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for rejecting the form');
+        }
+        else if (txt == 'enquire') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for enquiring the form');
+        }
+        //$('#modalTitle').html('Failure');
+        //$('#modalBody').html('Please choose both validity dates');
+        ////$("#modalOkButton").attr('data-dismiss', 'modal');
+        //$("#successModel").modal('show');
+    }
+    /*$("#modalOkButton").click(function () {
+        //debugger
+        // window.location.href = '@Url.Action("Index", "Dashboard")';
+        // $('#successModel').modal('hide');
+        $('#successModel').modal('toggle');
+        return false;
+    });*/
+    function saveResponse(text) {
+        debugger
+        if (!IsValidityCheck) {
+            var validFrom = document.getElementById("txtValidFrom").value;
+            var validTo = document.getElementById("txtValidTo").value;
+        }
+        /*if (validFrom == "" || validTo == "" && text == "approve") {
+            validityModal();
+        }
+            else {
+        if (text == "approve") {
+            if (validFrom == "" || validTo == "") {
+                validityModal();
+            }
+        }*/
+
+        var status = '', comment = '';
+        comment = $("#comment-" + text).val();
+        switch (text) {
+            case 'approve': {
+                status = 'Approved';
+                if (validFrom == "" || validTo == "") {
+                    validityModal(text);
+                    return;
+                }
+                break;
+            }
+            case 'reject': {
+                status = 'Rejected';
+                if (comment == '') {
+                    validityModal(text);
+                    //alert("Please type in the reason for rejecting the form");
+                    return;
+                }
+                break;
+            }
+            case 'enquire': {
+                status = 'Enquired';
+                if (comment == '') {
+                    validityModal(text);
+                    return;
+                }
+                break;
+            }
+        }
+
+        $.ajax({
+            url: '/List/SaveResponse',
+            type: 'POST',
+            data: { response: status, appRowId: appRowId, comment: comment, approvalType: approvalType},
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data == 1) {
+                    successModal(text);
+                    if (!IsValidityCheck) {
+                        ValidityUpdate();
+                    }
+                    $("#PPFForm").trigger("reset");
+                    //FilterMyTasks(0, 0);
+                    setTimeout(FilterMyTasks, 5000)
+                    //setTimeout(ReloadMyTasks, 8000)
+                }
+                else {
+                    failureModal();
+                    //$("#PPFForm").trigger("reset");
+                }
+                //debugger
+                //setTimeout(FilterMyTasks(0, 0), 8000);
+                //window.location.reload();
+            }),
+            error: (function (data) {
+                failureModal();
+                //$("#PPFForm").trigger("reset");
+            })
+        })
+
+        return false;
+
+    }
+
+    $("#btnReSubmit").on('click', function (e) {
+        debugger
+        e.preventDefault();
+        /*var index = document.getElementById("drpApplicantType").selectedIndex;
+        //console.log(index);
+        if (index == 0) {
+            requiredModal("Please fill Applicant Details");
+            return false;
+        }*/
+
+        var dropdown = document.getElementById("drpApplicantType").selectedIndex;
+
+        var surname = document.getElementById("txtSurname").value;
+        var firstname = document.getElementById("txtFirstName").value;
+        var empid = document.getElementById("txtEmpId").value;
+        var dept = document.getElementById("txtDepartment").value;
+        if ((dropdown == 2) || (dropdown == 3)) {
+            $(".inpText").attr("disabled", false);
+            if (surname == "") {
+                requiredModal("Please enter the Surname of the applicant");
+                return false;
+            }
+            if (firstname == "") {
+                requiredModal("Please enter the First Name of the applicant");
+                return false;
+            }
+            if (empid == "") {
+                requiredModal("Please enter the Employee Id of the applicant");
+                return false;
+            }
+            if (dept == "") {
+                requiredModal("Please enter the Department of the applicant");
+                return false;
+            }
+        }
+
+        var mobileLen = $("#txtMobile").val().length;
+        if (mobileLen < 10 || mobileLen > 10) {
+            mobileLengthModal();
+            return false;
+        }
+        //var telephoneLen = $("#txtTelephone").val().length;
+        //if (telephoneLen < 8 || telephoneLen > 8) {
+        //    telephoneLengthModal();
+        //    return false;
+        //}
+        /*var a = document.getElementById("drpInstrument").selectedIndex;
+        if (a == 0) {
+            requiredModal("Please select the Device Details");
+            return false;
+        }*/
+
+        //var make = document.getElementById("txtMake").value;
+        //if (make == "") {
+        //    requiredModal("Please enter make");
+        //    return false;
+        //}
+
+        var make = document.forms["PPFForm"]["txtMake"].value;
+        if (make == "") {
+            requiredModal("Please enter Make");
+            return false;
+        }
+
+        var model = document.forms["PPFForm"]["txtModel"].value;
+        if (model == "") {
+            requiredModal("Please enter Model");
+            return false;
+        }
+        var serialno = document.forms["PPFForm"]["txtSerialNo"].value;
+        if (serialno == "") {
+            requiredModal("Please enter Serial Number");
+            return false;
+        }
+
+        //var b = document.getElementById("drpSAVWIPL").selectedIndex;
+        //if (b == 0) {
+        //    requiredModal("Please select SAVWIPL?");
+        //    return false;
+        //}
+
+        //var c = document.getElementById("drpExtraFunctionality1").selectedIndex;
+        //var d = document.getElementById("drpExtraFunctionality2").selectedIndex;
+        //var e = document.getElementById("drpExtraFunctionality3").selectedIndex;
+        //var f = document.getElementById("drpExtraFunctionality4").selectedIndex;
+        //if ((c == 0) || (d == 0) || (e == 0) || (f == 0)) {
+        //    requiredModal("Please select Extra Functionalities");
+        //    return false;
+        //}
+        var activitystart = document.getElementsByName("txtActivityStart")[0].value;
+        if (activitystart == "") {
+            requiredModal("Please select Activity Start");
+            return false;
+
+        }
+        debugger
+        var txtActivityEnd = document.getElementsByName("txtActivityEnd")[0].value;
+        var drpActivityEnd = document.getElementById("drpActivityEnd").value;
+        var dropdownActivityEnd = document.getElementById("drpApplicantType");
+        var selection = dropdownActivityEnd.value;
+        if (selection == "Internal Employee" && drpActivityEnd == -1) {
+            requiredModal("Please select Activity End");
+            return false;
+        }
+        else if (selection == "Partner Employee" && txtActivityEnd == "") {
+            requiredModal("Please select Activity End");
+            return false;
+        }
+
+        else if (selection == "External Agency" && txtActivityEnd == "") {
+            requiredModal("Please select Activity End");
+            return false;
+        }
+
+        var dropdownPartnerEmp = document.getElementById("drpApplicantType").value;
+        var txtPartnerEmpCompany = document.getElementById("txtPartnerEmpCompany").value;
+        if (dropdownPartnerEmp == "Partner Employee" && txtPartnerEmpCompany == "") {
+            requiredModal("Please Enter Partner Employee Company");
+            return false;
+        }
+
+
+        //var activity = document.forms["PPFForm"]["txtActivityEnd"].value;
+        //console.log(activity);
+        //var activity = document.getElementById("txtActivityEnd").value;
+        //if (activity == "") {
+        //    var activityend = document.getElementById("drpActivityEnd").selectedIndex;
+        //    if (activityend == 0) {
+        //        requiredModal("Please select Activity End");
+        //        return false;
+        //    }
+        //}
+
+        //console.log(activityend+"hi");
+        //if ((activityend == 0) || (activity == "")) {
+        //    requiredModal("Please select Activity End");
+        //    return false;
+        //}
+
+        var loc = document.getElementById("drpLocation").selectedIndex;
+        if (loc == 0) {
+            requiredModal("Please select Location for photography");
+            return false;
+        }
+        var purpose = document.getElementById("txtPurpose").value;
+        if (purpose == "") {
+            requiredModal("Please mention the purpose of the photography");
+            return false;
+        }
+        //var exceptionalphoto = document.getElementById("drpExceptionalPhoto").selectedIndex;
+        //if (exceptionalphoto == 0) {
+        //    requiredModal("Please select Exceptional Photo option for photography");
+        //    return false;
+        //}
+        var SAVWIPL = $("#drpSAVWIPL option:selected").text();
+        if (SAVWIPL == "No") {
+            permissionModal();
+            return false;
+        }
+        var n = document.getElementById("termsAndConditions").checked;
+        if (n == false) {
+            termsAndConditionsModal();
+            return false;
+        }
+        getZoneByArea();
+        var form = $("#PPFForm").serialize();
+        $.ajax({
+            url: '/List/SavePPF',
+            type: 'POST',
+            data: form,
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data[0].Value == 1) {
+                    successModal(data[1].Value);
+                    setTimeout(function () {// wait for 5 secs(2)
+                        location.reload(); // then reload the page.(3)
+                    }, 4000);
+                    //$("#PPFForm").trigger("reset");
+                }
+                else {
+                    failureModal();
+                    //$("#PPFForm").trigger("reset");
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+                //$("#PPFForm").trigger("reset");
+            })
+        })
+    });
+
+    function ValidityUpdate() {
+        //debugger
+        var form = $("#PPFForm").serialize();
+        $.ajax({
+            url: '/List/ValidityUpdate',
+            type: 'POST',
+            data: form,
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data == 1) {
+                    //successModal(text);
+                    $("#PPFForm").trigger("reset");
+                    //setTimeout(FilterMyTasks(0, 0), 8000);
+                    //window.location.reload();
+                    //setTimeout(FilterMyTasks, 8000)
+                    /*setTimeout(ReloadMyTasks, 8000)*/
+                }
+                else {
+                    failureModal();
+                    //$("#PPFForm").trigger("reset");
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+                //$("#PPFForm").trigger("reset");
+            })
+        })
+
+    }
+    function requiredModal(text) {
+        $('#modalTitle').html('Required');
+        $('#modalBody').html(text+'!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    //function Validation() {
+    //    var dropdown = document.getElementById("drpApplicantType").value;
+    //    var surname = document.getElementById("txtSurname").value;
+    //    var firstname = document.getElementById("txtFirstName").value;
+    //    var empid = document.getElementById("txtEmpId").value;
+    //    if ((dropdown == "External Agency") || (dropdown == "Partner Employee")) {
+    //        if (surname == "") {
+    //            requiredModal("Please enter the surname of the applicant");
+    //            return false;
+    //        }
+    //        if (firstname == "") {
+    //            requiredModal("Please enter the first name of the applicant");
+    //            return false;
+    //        }
+    //        if (empid == "") {
+    //            requiredModal("Please enter the employee id of the applicant");
+    //            return false;
+    //        }
+    //    }
+
+
+
+    //    var x = document.getElementById("drpInstrument").selectedIndex;
+    //    console.log(x);
+    //    if (x == 0) {
+    //        requiredModal("Please select the device details");
+    //        return false;
+    //    }
+
+    //}
+
+
+
+
+    //function FilterMyTasks() {
+    //    var Filter = 0;
+    //    var Checked = 0;
+    //    $("#myTaskView").html("");
+    //    $('#taskTable').dataTable().fnDestroy();
+    //    $.ajax({
+    //        url: '/Dashboard/GetMyTasks',
+    //        type: 'GET',
+    //        dataType: 'html',
+    //        data: { Checked: Checked, Filter: Filter },
+    //        success: (function (data) {
+    //            $('#taskTable').dataTable().fnDestroy();
+    //            $("#myTaskView").html(data);
+    //            MyTaskTable();
+    //        }),
+    //        error: (function (data) {
+    //            console.log("There was an issue while refreshing tasks. Please reload the page");
+    //        })
+    //    })
+    //}
+
+    //Other Existing Employee Name textbox Autocomplete
+    $("#txtOtherEmpname").autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                url: "/List/GetPAFEmployeeDetails",
+                dataType: "json",
+                cache: false,
+                async: false,
+                data: {
+                    searchText: $("#txtOtherEmpname").val()
+                },
+                success: function (data) {
+                    //debugger;
+                    response($.map(data, function (item) {
+                        console.log(data, 'data');
+                        return { label: item.UserName, value: item.UserName, raw: item };
+                    }));
+                }
+            });
+        },
+        search: function (event, ui) {
+            var value = $("#txtOtherEmpname").val();
+            // If less than three chars, cancel the search event
+            if (value.length < 4) {
+                event.preventDefault();
+            }
+        },
+        min_length: 4,
+        delay: 0,
+        select: function (event, ui) {
+            //debugger;
+            var empOtherDetails = ui.item['raw'];
+            //$('#txtOtherUserId').val(empOtherDetails.UserID);
+            //$('#txtOtherEmpDept').val(empOtherDetails.EmployeeDept);
+            //$('#txtOtherEmpEmailId').val(empOtherDetails.Email);
+            //Get the other details like Cost Center Code, Employee Number from DB.
+            $.ajax({
+                url: "/List/GetPAFExistingEmployeeDetails",
+                dataType: "json",
+                cache: false,
+                async: false,
+                data: {
+                    otherEmpUserId: empOtherDetails.UserId,
+                    //otherEmpEmail: empOtherDetails.Email
+                },
+                success: function (data) {
+                    console.log(data, 'data');
+                    //$('#txtOtherEmpCCCode').val(data.CostCenter);
+                    $('#txtEmpId').val(data.EmpNumber);
+                    $('#txtDepartment').val(data.Department);
+                    $('#txtFirstName').val(data.FirstName);
+                    $('#txtSurname').val(data.LastName);
+                    /*$('#txtTelephone').val(data.PhoneNumber);*/
+
+                }
+            });
+        }
+    });
+
+
+    function RequestSubmission() {
+        //debugger
+        var drpRequestSubType = $("#drpRequestSubType").val();
+        if (drpRequestSubType == "OnBehalf") {
+            $("#OtherEmpName").show();
+            $("#txtOtherEmpname").val('');
+            $('#drpApplicantType').val("null");
+            $('#txtSurname').val('');
+            $('#txtFirstName').val('');
+            $('#txtEmpId').val('');
+            $('#txtDepartment').val('');
+        }
+        else if (drpRequestSubType == "Self") {
+            $('#drpApplicantType').val("Internal Employee");
+            $('#txtOtherEmpname').val('');
+            $("#OtherEmpName").hide();
+            func();
+            $('#drpApplicantType').trigger('change');
+        }
+        else {
+            $('#drpApplicantType').val("null");
+            $("#OtherEmpName").hide();
+            $('#txtSurname').val('');
+            $('#txtFirstName').val('');
+            $('#txtEmpId').val('');
+            $('#txtDepartment').val('');
+        }
+
+    }
+
+    $("#modalOkButton").on('click', function () {
+        //debugger
+        if (FlagRedirect != null) {
+            window.location = "../Dashboard";
+        }
+    });
+</script>

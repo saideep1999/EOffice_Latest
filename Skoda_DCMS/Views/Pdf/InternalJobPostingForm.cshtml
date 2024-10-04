@@ -1,0 +1,1535 @@
+﻿@model dynamic
+@{
+    ViewBag.Title = "Internal Job Posting Form";
+    var user = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    bool IsNew = true;
+    bool IsEdit = true;
+    dynamic FlagRedirect = null;
+    dynamic IJPF = null;
+    Layout = ViewBag.Layout;
+    int RowId = 0, FormId = 0, AppRowId = 0, ApprovalType = 0;
+    int FormSrId = 0;
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IsNew = ViewBag.IsNew;
+        IsEdit = ViewBag.IsEdit;
+        IJPF = ViewBag.Model;
+        RowId = ViewBag.RowId;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+        FormSrId = IJPF.one[0].Id;
+    }
+}
+<style>
+    .ui-front {
+        z-index: 9999999 !important;
+    }
+</style>
+@*Loader*@
+<style type="text/css">
+    #loader {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        
+        z-index: 10000;
+    }
+</style>
+
+@*Loader*@
+<body>
+    <div class="right_col bg-transparent" role="main">
+        <div class="container">
+            <form id="IJPForm" method="post">
+                @if (IsNew)
+                {
+                    if (!IsEdit)
+                    {
+                        foreach (var item in IJPF.one)
+                        {
+                            <div>
+                                <input type="hidden" id="FormSrId" name="FormSrId" value="@(IJPF.one[0].Id)" />
+                                <input type="hidden" id="FormId" name="FormId" value="@(FormId)" />
+                                <input type="hidden" id="AppRowId" name="AppRowId" value="@(AppRowId)" />
+                            </div>
+                            <div class="container form-container">
+                                <div class="card-header pb-4 pt-4">
+                                    <div class="alignRight">
+                                        @*<img class="skodaImg" src="img/skodalogo.png">*@
+                                    </div>
+                                    <table class="w-95 m-auto">
+                                        <tr>
+                                            <td id="hiddenApproverInformation"></td>
+                                            <td>
+                                                <table class="w-100 form-border">
+                                                    <tr>
+                                                        <td class="bb-0 topheaderCouries">MobiNext Technologies India Private Limited</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="bt-0 topheaderCouriesBorder"><h4>Internal Job Posting Form</h4></td>
+                                                    </tr>
+                                                </table>
+                                                <table class="w-100 form-border">
+                                                    <tr class="br-1">
+                                                        <td class="br-0">IJP Ref.</td>
+                                                        <td class="bl-0 br-0">:<input class="inpDisable" type="text" id="IJPReference" name="IJPReference" value="@(!IsNew ||!IsEdit ? (item.IJPReference ?? "") : "")"></td>
+                                                        <td class="br-0 bl-0">MPR No.</td>
+                                                        <td class="bl-0">:<input class="inpDisable" type="text" id="MPRReference" name="MPRReference" value="@(!IsNew ||!IsEdit ? (item.MPRReference ?? "") : "")"></td>
+                                                        <td class="br-0 bl-0">Department:</td>
+                                                        <td class="bl-0">:<input class="inpDisable" type="text" name="txtDepartment" id="txtDepartment" value="@(!IsNew ||!IsEdit ? (item.Department ?? "") : "")"></td>
+                                                    </tr>
+
+                                                </table>
+                                                <table class="w-100 form-border">
+                                                    <tr>
+                                                        <td class="allFormLables borderLTB f-600">
+                                                            <label class="f-600">Date:</label>
+                                                        </td>
+                                                        <td colspan="2" class="borderLTB text-left">
+                                                            @*<input type="text" name="txtDate" placeholder="/ /" class="" value="@(!IsNew || !IsEdit ? (Convert.ToDateTime(item.FormID.CreatedDate).ToShortDateString()) : DateTime.Now.ToShortDateString())" readonly>*@
+                                                        </td>
+                                                        @if (!IsNew || !IsEdit)
+                                                        {
+                                                            <td class="allFormLables borderLTB f-600 align" colspan="2">
+                                                                <label class="f-600">Form Id:</label>
+                                                            </td>
+                                                            <td colspan="2" class="borderLTB text-right">
+                                                                @*<input type="text" name="txtFormId" class="" value="@(!IsNew || !IsEdit ? ("IJPF" + item.FormID.Id ?? "") : "" )" readonly>*@
+                                                            </td>
+                                                        }
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="br-0"><b>Employee Details:</b></td>
+                                                    </tr>
+                                                    <tr class="br-1">
+                                                        <td class="br-0">Employee Name</td>
+                                                        <td class="bl-0">:<input class="inpDisable" type="text" name="txtEmployeeName" id="txtEmployeeName" value="@(!IsNew ||!IsEdit ? (item.EmployeeName ?? "") : "")"></td>
+                                                        <td class="br-0">Employee Number</td>
+                                                        <td class="bl-0">:<input class="inpDisable" type="text" name="txtEmployeeNumber" id="txtEmployeeNumber" value="@(!IsNew ||!IsEdit ? (item.EmployeeNumber ?? "") : "")"></td>
+                                                    </tr>
+                                                    <tr class="br-1">
+                                                        <td class="br-0">Date of Joining</td>
+                                                        <td class="bl-0">:<input class="inpDisable" type="date" name="txtDateOfJoining" id="txtDateOfJoining" value="@(!IsNew ||!IsEdit ? (item.DateOfJoining.ToString("yyyy-MM-dd") ?? "") : "")"></td>
+                                                        <td class="br-0">Qualification</td>
+                                                        <td class="bl-0">:<textarea class="inpDisable" type="text" name="txtQualification" cols="5" rows="10" id="txtQualification">@(!IsNew ||!IsEdit ? (item.Qualification ?? "") : "")</textarea></td>
+                                                    </tr>
+                                                    <tr class="br-1">
+                                                        <td class="br-0">Telephone number</td>
+                                                        <td class="bl-0">:<input class="inpDisable" type="tel" name="txtTelephoneNumber" id="txtTelephoneNumber" value="@(!IsNew ||!IsEdit ? (item.TelephoneNumber ?? "") : "")"></td>
+                                                        <td class="br-0">Level</td>
+                                                        <td class="bl-0">:<input class="inpDisable" type="text" name="txtLevel" id="txtLevel" value="@(!IsNew ||!IsEdit ? (item.Level ?? "") : "")"></td>
+                                                    </tr>
+                                                    <tr class="br-1">
+                                                        <td class="br-0">Current role</td>
+                                                        <td class="bl-0">:<input class="inpDisable" type="text" name="txtCurrentRole" id="txtCurrentRole" value="@(!IsNew ||!IsEdit ? (item.CurrentRole ?? "") : "")"></td>
+                                                        <td class="br-0">How long you have been in current department?</td>
+                                                        <td class="bl-0">:<textarea class="inpDisable" type="text" name="txtCurrentDepartmentDuration" cols="5" rows="10" id="txtCurrentDepartmentDuration">@(!IsNew ||!IsEdit ? (item.CurrentDepartmentDuration ?? "") : "")</textarea></td>
+                                                    </tr>
+                                                    <tr class="br-1">
+                                                        <td class="br-0">How long you have been in current role?</td>
+                                                        <td class="bl-0">:<textarea class="inpDisable" type="text" name="txtCurrentRoleDuration" cols="5" rows="10" id="txtCurrentRoleDuration">@(!IsNew ||!IsEdit ? (item.CurrentRoleDuration ?? "") : "")</textarea></td>
+                                                        <td class="br-0">Name of current reporting manager</td>
+                                                        <td class="bl-0">:<textarea class="inpDisable" type="text" name="txtCurrentReportingManagerName" cols="5" rows="10" id="txtCurrentReportingManagerName">@(!IsNew ||!IsEdit ? (item.CurrentReportingManagerName ?? "") : "")</textarea></td>
+                                                    </tr>
+                                                </table>
+                                                <table class="w-100 form-border">
+                                                    <tr>
+                                                        <td class="bb-0"><b>Employment Details:</b></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="bt-0 bb-0">(Include the details of all the positions starting with the current job and experience outside. Please do mention if you have held other positions within Volkswagen Group (VWIPL, SAIPL and VWGSIPL) as a Separate line item)</td>
+                                                    </tr>
+
+                                                </table>
+                                                <table class="w-100 form-border">
+                                                    <tr>
+                                                        <td class="bt-0 bb-0">
+                                                            <table class="w-95 mx-auto form-border">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th></th>
+                                                                        <th>Organisation</th>
+                                                                        <th>Designation</th>
+                                                                        <th>From</th>
+                                                                        <th>To</th>
+                                                                        <th>Main Responsibilities</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody class="tableEmployeeDetails" id="tbody">
+                                                                    @foreach (var EmpList in IJPF.four)
+                                                                    {
+                                                                        var count = 1;
+                                                                        <tr id='@("row"+count)' class="tr_input">
+                                                                            <td class="sNo">@count</td>
+                                                                            <td><input class="inpDisable" type="text" name="txtOrganisation" id="txtOrganisation" value=@EmpList.Organisation></td>
+                                                                            <td><input class="inpDisable" type="text" name="txtDesignation" id="txtDesignation" value="@EmpList.Designation"></td>
+                                                                            <td><input class="inpDisable" type="date" name="txtFromDate" id="txtFromDate" value="@EmpList.FromDate.ToString("yyyy-MM-dd")"></td>
+                                                                            <td><input class="inpDisable" type="date" name="txtToDate" id="txtToDate" value="@EmpList.ToDate.ToString("yyyy-MM-dd")"></td>
+                                                                            <td><textarea class="inpDisable" type="text" cols="5" rows="10" name="txtMainResponsibilites" id="txtMainResponsibilities">@EmpList.MainResponsibilities</textarea></td>
+                                                                        </tr>
+                                                                        count++;
+                                                                    }
+                                                                    @*@for (var i = 1; i < IJPF.four.Count; i++)
+                                                                        {
+                                                                            <tr id='@("row"+i)' class="tr_input">
+                                                                                <td class="sNo">@i</td>
+                                                                                <td><input class="inpDisable" type="text" name="txtOrganisation" id="txtOrganisation" value=@IJPF.four[0].Organisation></td>
+                                                                                <td><input class="inpDisable" type="text" name="txtDesignation" id="txtDesignation">@IJPF.four[0].Designation</td>
+                                                                                <td><input class="inpDisable" type="date" name="txtFromDate" id="txtFromDate"></td>
+                                                                                <td><input class="inpDisable" type="date" name="txtToDate" id="txtToDate"></td>
+                                                                                <td><textarea class="inpDisable" type="text" name="txtMainResponsibilites" id="txtMainResponsibilities"></textarea></td>
+                                                                            </tr>
+                                                                        }*@
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                    @if (IsNew || !IsEdit)
+                                                    {
+                                                        <tr align="right">
+                                                            <td class="">
+                                                                <button type="button" class="btn btn-sm btn-success submit-btn d-flex float-right mb-2 bl-1 " onclick="AddRows()">
+                                                                    + Add Rows
+                                                                </button>
+                                                                <input type="hidden" name="totalRows" id="totalRows" />
+                                                            </td>
+                                                        </tr>
+                                                    }
+
+                                                </table>
+                                                <table class="w-100 form-border">
+                                                    <tr>
+                                                        <td class="w-20">Position and Department Applied for:</td>
+                                                        <td><textarea class="inpDisable" cols="90" rows="10" class="" type="text" name="txtPositionAndDepartmentAppliedFor" id="txtPositionAndDepartmentAppliedFor">@(!IsNew ||!IsEdit ? (item.PositionAndDepartmentAppliedFor ?? "") : "")</textarea></td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <table class="detail-sec-p">
+                                        <tr>
+                                            <td class="text-center">SF_S_29</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="container form-container">
+                                <div class="card-header pb-4 pt-4">
+                                    <div class="alignRight">
+                                        @*<img class="skodaImg" src="img/skodalogoimg.png">*@
+                                    </div>
+                                    <table class="w-100">
+                                        <tr>
+                                            <td>Why would you like to change your profile?</td>
+                                        </tr>
+                                        <tr>
+                                            <td><textarea class="inpDisable" cols="90" rows="10" name="txtReasonForChangingJobProfile" id="txtReasonForChangingJobProfile">@(!IsNew ||!IsEdit ? (item.ReasonForChangingJobProfile ?? "") : "")</textarea></td>
+                                        </tr>
+                                        <tr>
+                                            <td>What have been some of your significant achievements in the current job profile?</td>
+                                        </tr>
+                                        <tr>
+                                            <td><textarea class="inpDisable" cols="90" rows="10" name="txtAchievements" id="txtAchievements">@(!IsNew ||!IsEdit ? (item.Achievements ?? "") : "")</textarea></td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                What is your understanding of the role of that you are applying for? What are some of the challenges you will face in that role and how will you deal with them? (Please attach an extra sheet if required)
+                                                @if (IJPF.one[0].attachmentIJPFlist.attachmentIJPFData.Count != 0)
+                                                {
+                                                    foreach (var attachment in IJPF.one[0].attachmentIJPFlist.attachmentIJPFData)
+                                                    {
+                                                        <input type="file" id="fileToUpload" name="fileToUpload" />
+                                                        <input type="hidden" id="attachedfile" name="attachedfile" value="@System.Configuration.ConfigurationManager.AppSettings["SharepointSiteURL"]@attachment.ServerRelativeUrl" />
+                                                        <input type="hidden" id="attachedfileName" name="attachedfileName" value="@attachment.FileName" />
+                                                        <a href=@System.Configuration.ConfigurationManager.AppSettings["SharepointSiteURL"]@attachment.ServerRelativeUrl download=@attachment.FileName target="_blank">@attachment.FileName </a>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    @*<input type="text" id="fileToUpload" name="fileToUpload" disabled />*@
+                                                }
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td><textarea class="inpDisable" cols="90" rows="10" name="txtAboutRoleAppliedFor" id="txtAboutRoleAppliedFor">@(!IsNew ||!IsEdit ? (item.AboutRoleAppliedFor ?? "") : "")</textarea></td>
+                                        </tr>
+                                        @*<tr>
+                                                <td>Agreement with Supervisor and HoD:</td>
+                                            </tr>
+                                            <tr class="border-2px">
+                                                <td>
+                                                    <table class="w-100 form-border">
+                                                        <tr class="">
+                                                            <td><label>Agreed to make application for IJP and release the employee within 90 days if selected</label></td>
+                                                        </tr>
+                                                        <tr class="">
+                                                            <td><label>Supervisor Name & Signature</label></td>
+                                                            <td><label>HOD Name & Signature</label></td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>*@
+                                    </table>
+                                    <!-- <div class="hodSign">
+                                        <p>Agreed to make application for IJP and release the employee within 90 days if selected</p>
+                                        <br>
+                                        <div class="row">
+                                            <div class="col-lg-9 col-sm-6 col-md-6">
+                                                Supervisor Name & Signature
+                                            </div>
+                                            <div class="col-lg-3 col-sm-6 col-sm-6">
+                                                HoD Name & Signature
+                                            </div>
+                                        </div>
+                                    </div> -->
+                                    <table class="w-100 detail-sec-p">
+                                        <tr>
+                                            <td>
+                                                <label class="checkbox-container">
+                                                    <label class="f-600"><b>I declare that the information provided above is true to the best of my knowledge and I will be responsible for the consequences rising out of any misrepresentation of the same.</b></label>
+                                                    <input type="checkbox" name="chkDeclaration" id="chkDeclaration" checked disabled />
+                                                    <span class="checkmark"></span>
+                                                </label>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                    </table>
+                                    <table class="detail-sec-p">
+                                        <tr>
+                                            <td class="text-center">SF_S_29</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="container form-container">
+                                <div class="card-header pb-4 pt-4">
+                                    <div class="alignRight">
+                                        @*<img class="skodaImg" src="img/skodalogoimg.png">*@
+                                    </div>
+                                    <table class="w-95 m-auto">
+                                        @if (!IsNew)
+                                        {
+                                            <tr>
+                                                <td colspan="3" class="f-600">Authorization by RC </td>
+                                                <td class="display-none"></td>
+                                                <td class="display-none"></td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2">
+                                                    Name: <input type="text" name="" class="inpDisable inpIsNewDisable input-width-1" value="@(!IsNew ||!IsEdit ? (IJPF.three[0].UserName ?? ""): "")">
+                                                </td>
+                                                <td>
+                                                    <div class="form-group">
+                                                        <label for="comment" class="">Approver Comment:</label>
+                                                        <textarea class="form-control mx-auto" cols="5" rows="10" id="comment" disabled>@(!IsNew ||!IsEdit ? (IJPF.three[0].Comment ?? ""): "")</textarea>
+                                                    </div>
+                                                </td>
+                                                <td class="display-none"></td>
+                                                <td style="word-wrap: break-word;width:25%;">Signature: <input type="text" name="" class="inpDisable inpIsNewDisable input-width-1" value="@(!IsNew ||!IsEdit && IJPF.three[0].ApproverStatus != "Pending" ? (IJPF.three[0].ApproverStatus + " on " + Convert.ToDateTime(IJPF.two[0].Modified).ToShortDateString()+" " +Convert.ToDateTime(IJPF.two[0].Modified).ToShortTimeString()) : "" )"></td>
+                                            </tr>
+
+                                            <tr>
+                                                <td colspan="3" class="f-600">Authorization by HRC(Respective HRC) </td>
+                                                <td class="display-none"></td>
+                                                <td class="display-none"></td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2">
+                                                    Name: <input type="text" name="" class="inpDisable inpIsNewDisable input-width-1" value="@(!IsNew ||!IsEdit ? (IJPF.three[1].UserName ?? ""): "")">
+                                                </td>
+                                                <td>
+                                                    <div class="form-group">
+                                                        <label for="comment" class="">Approver Comment:</label>
+                                                        <textarea class="form-control mx-auto" rows="5" id="comment" disabled>@(!IsNew ||!IsEdit ? (IJPF.three[1].Comment ?? ""): "")</textarea>
+                                                    </div>
+                                                </td>
+                                                <td class="display-none"></td>
+                                                <td style="word-wrap: break-word;width:25%;">Signature: <input type="text" name="" class="inpDisable inpIsNewDisable input-width-1" value="@(!IsNew ||!IsEdit && IJPF.three[0].ApproverStatus != "Pending" ? (IJPF.three[1].ApproverStatus + " on " + Convert.ToDateTime(IJPF.two[0].Modified).ToShortDateString()+" " +Convert.ToDateTime(IJPF.two[0].Modified).ToShortTimeString()) : "" )"></td>
+                                            </tr>
+
+                                            <tr>
+                                                <td colspan="3" class="f-600">Authorization by HOD </td>
+                                                <td class="display-none"></td>
+                                                <td class="display-none"></td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2">
+                                                    Name: <input type="text" name="" class="inpDisable inpIsNewDisable input-width-1" value="@(!IsNew ||!IsEdit ? (IJPF.three[2].UserName ?? ""): "")">
+                                                </td>
+                                                <td>
+                                                    <div class="form-group">
+                                                        <label for="comment" class="">Approver Comment:</label>
+                                                        <textarea class="form-control mx-auto" cols="5" rows="10" id="comment" disabled>@(!IsNew ||!IsEdit ? (IJPF.three[2].Comment ?? ""): "")</textarea>
+                                                    </div>
+                                                </td>
+                                                <td class="display-none"></td>
+                                                <td style="word-wrap: break-word;width:25%;">Signature: <input type="text" name="" class="inpDisable inpIsNewDisable input-width-1" value="@(!IsNew ||!IsEdit && IJPF.three[0].ApproverStatus != "Pending" ? (IJPF.three[2].ApproverStatus + " on " + Convert.ToDateTime(IJPF.two[0].Modified).ToShortDateString()+" " +Convert.ToDateTime(IJPF.two[0].Modified).ToShortTimeString()) : "" )"></td>
+                                            </tr>
+                                        }
+
+                                        @*<tr>
+                                                <td>
+                                                    <table class="w-100 form-border">
+                                                        <tr>
+                                                            <td class="w-26 br-0 bb-0">Place</td>
+                                                            <td class="bl-0 br-0 bb-0">:<input class="inputCourier" type="text" readonly></td>
+                                                            <td class="br-0 bl-0 bb-0">Date</td>
+                                                            <td class="bl-0 bb-0">:<input class="inputCourier" type="date" readonly></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="br-0 bb-0 bt-0">Employee Signature:</td>
+                                                            <td colspan="3" class="bl-0 bb-0 bt-0">:<input class="inputCourier" type="text" readonly></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="br-0 bt-0">HRC (Signature/Date)</td>
+                                                            <td colspan="3" class="bl-0 bt-0">:<input class="inputCourier" type="text" readonly></td>
+                                                        </tr>
+                                                        <tr>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>*@
+                                    </table>
+                                    <table class="detail-sec-p">
+                                        <tr>
+                                            <td class="text-center">SF_S_29</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="breadcrumb-container">
+                            <div>
+                                <ol class="breadcrumb pl-0">
+                                    <li>
+                                        <a href="/Dashboard?formName=IJPF">
+                                            Dashboard
+                                        </a>
+                                    </li>
+
+                                    <li class="active">
+                                        <a href="/Dashboard/GetDepartmentWiseForms?department=HR">
+                                            HR Department
+                                        </a>
+                                    </li>
+                                    <li class="active">Internal Job Posting Form</li>
+                                </ol>
+                            </div>
+                        </div>
+                        <div class="container radius-5 border-info mb-5">
+                            <div class="row topContent">
+                                <div class="col-lg-6 col-md-6 ">
+                                    <h4 class="font-h4 f-500 pl-2">Form Name : Internal Job Posting Form</h4>
+                                </div>
+                                <div class="col-lg-6 col-md-6 text-right">
+                                    <h4 class="font-h4 f-500">
+                                        Form Department | Owner
+                                    </h4>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="container form-container">
+                            <div class="card-header pb-4 pt-4">
+                                <div class="alignRight">
+                                    @*<img class="skodaImg" src="img/skodalogo.png">*@
+                                </div>
+                                <table class="w-95 m-auto">
+                                    <tr>
+                                        <td id="hiddenApproverInformation"></td>
+                                        <td>
+                                            <table class="w-100 form-border">
+                                                <tr>
+                                                    <td class="bb-0 topheaderCouries">MobiNext Technologies India Private Limited</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="bt-0 topheaderCouriesBorder"><h4>Internal Job Posting Form</h4></td>
+                                                </tr>
+                                            </table>
+                                            <table class="w-100 form-border">
+                                                <tr class="br-1">
+                                                    <td class="br-0">IJP Ref.</td>
+                                                    <td class="bl-0 br-0">:<input class="inputCourier" id="IJPReference" name="IJPReference" type="text"></td>
+                                                    <td class="br-0 bl-0">MPR No.</td>
+                                                    <td class="bl-0">:<input class="inputCourier" id="MPRReference" name="MPRReference" type="text"></td>
+                                                    <td class="br-0 bl-0">Department:</td>
+                                                    <td class="bl-0">:<input class="inputCourier" type="text" name="txtDepartment" id="txtDepartment"></td>
+                                                </tr>
+
+                                            </table>
+                                            <table class="w-100 form-border">
+
+                                                <tr>
+                                                    <td class="allFormLables borderLTB f-600">
+                                                        <label class="f-600">Date:</label>
+                                                    </td>
+                                                    <td colspan="2" class="borderLTB text-left">
+                                                        <input type="text" name="txtDate" placeholder="/ /" class="" value="@(!IsNew || !IsEdit ? (Convert.ToDateTime(IJPF.one[0].FormID.CreatedDate).ToShortDateString()) : DateTime.Now.ToShortDateString())" readonly>
+                                                    </td>
+
+                                                    @if (!IsNew || !IsEdit)
+                                                    {
+                                                        <td class="allFormLables borderLTB f-600 align" colspan="2">
+
+                                                            <label class="f-600">Form Id:</label>
+
+                                                        </td>
+                                                        <td colspan="2" class="borderLTB text-right">
+
+                                                            <input type="text" name="txtFormId" class="" value="@(!IsNew || !IsEdit ? ("IJPF" + IJPF.one[0].FormID.Id ?? "") : "" )" readonly>
+                                                        </td>
+                                                    }
+                                                </tr>
+
+                                                <tr>
+                                                    <td class="br-0"><b>Employee Details:</b></td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="">
+                                                        <label>  Request Submission For</label>
+                                                    </td>
+                                                    <td>
+                                                        <select name="drpRequestSubmissionFor" id="drpRequestSubmissionFor" class="" onchange="RequestSubmissionFor()">
+                                                            <option value="null">Choose..</option>
+                                                            <option value="Self">Self</option>
+                                                            <option value="OnBehalf">On Behalf</option>
+                                                        </select>
+                                                    </td>
+                                                </tr>
+                                                <tr class="employe-row info-pr-1" id="OtherEmpName" style="display:none;">
+                                                    <td class="bb-0 bt-0" colspan="2">
+                                                        <label id="lblOtherEmpName" class="">Name (Type at least 4 letters for faster results):</label>
+
+                                                        <input type="text" name="txtOtherEmpname" id="txtOtherEmpname" class="w-100" required="required" />
+                                                        <input type="hidden" id="hiddentxtEmail" name="hiddentxtEmail" value="" />
+                                                    </td>
+                                                </tr>
+
+                                                <tr class="br-1">
+                                                    <td class="br-0">Employee Name</td>
+                                                    <td class="bl-0">:<input class="inputCourier" type="text" name="txtEmployeeName" id="txtEmployeeName" onkeypress="alphaOnly(event)"></td>
+                                                    <td class="br-0">Employee Number</td>
+                                                    <td class="bl-0">:<input class="inputCourier" type="text" name="txtEmployeeNumber" id="txtEmployeeNumber" onkeypress="allowNumbersOnly(event)"></td>
+                                                </tr>
+                                                <tr class="br-1">
+                                                    <td class="br-0">Date of Joining</td>
+                                                    <td class="bl-0">:<input class="inputCourier" type="date" name="txtDateOfJoining" id="txtDateOfJoining"></td>
+                                                    <td class="br-0">Qualification</td>
+                                                    <td class="bl-0">:<textarea class="inputCourier" cols="5" rows="10" type="text" name="txtQualification" id="txtQualification"></textarea></td>
+                                                </tr>
+                                                <tr class="br-1">
+                                                    <td class="br-0">Telephone number</td>
+                                                    <td class="bl-0">:<input class="inputCourier" type="tel" name="txtTelephoneNumber" id="txtTelephoneNumber" onkeypress="allowNumbersOnly(event)"></td>
+                                                    <td class="br-0">Level</td>
+                                                    <td class="bl-0">:<input class="inputCourier" type="text" name="txtLevel" id="txtLevel" onkeypress="allowNumbersOnly(event)"></td>
+                                                </tr>
+                                                <tr class="br-1">
+                                                    <td class="br-0">Current role</td>
+                                                    <td class="bl-0">:<input class="inputCourier" type="text" name="txtCurrentRole" id="txtCurrentRole" onkeypress="alphaOnly(event)"></td>
+                                                    <td class="br-0">How long you have been in current department?</td>
+                                                    <td class="bl-0">:<textarea class="inputCourier" cols="5" rows="10" type="text" name="txtCurrentDepartmentDuration" id="txtCurrentDepartmentDuration"></textarea></td>
+                                                </tr>
+                                                <tr class="br-1">
+                                                    <td class="br-0">How long you have been in current role?</td>
+                                                    <td class="bl-0">:<textarea class="inputCourier" cols="5" rows="10" type="text" name="txtCurrentRoleDuration" id="txtCurrentRoleDuration"></textarea></td>
+                                                    <td class="br-0">Name of current reporting manager</td>
+                                                    <td class="bl-0">:<textarea class="inputCourier" cols="5" rows="10" type="text" name="txtCurrentReportingManagerName" id="txtCurrentReportingManagerName"></textarea></td>
+                                                </tr>
+                                            </table>
+                                            <table class="w-100 form-border">
+                                                <tr>
+                                                    <td class="bb-0"><b>Employment Details:</b></td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="bt-0 bb-0">(Include the details of all the positions starting with the current job and experience outside. Please do mention if you have held other positions within Volkswagen Group (VWIPL, SAIPL and VWGSIPL) as a Separate line item)</td>
+                                                </tr>
+
+                                            </table>
+                                            <table class="w-100 form-border">
+                                                <tr>
+                                                    <td class="bt-0 bb-0">
+                                                        <table class="w-95 mx-auto form-border">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th></th>
+                                                                    <th>Organisation</th>
+                                                                    <th>Designation</th>
+                                                                    <th>From</th>
+                                                                    <th>To</th>
+                                                                    <th>Main Responsibilities</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody class="tableEmployeeDetails" id="tbody">
+                                                                @for (var i = 1; i < 2; i++)
+                                                                {
+                                                                    <tr id='@("row"+i)' class="tr_input">
+                                                                        <td class="sNo">@i</td>
+                                                                        <td><input class="inputCourier" type="text" name="txtOrganisation" id="txtOrganisation" onkeypress="alphaOnly(event)"></td>
+                                                                        <td><input class="inputCourier" type="text" name="txtDesignation" id="txtDesignation" onkeypress="alphaOnly(event)"></td>
+                                                                        <td><input class="inputCourier" type="date" name="txtFromDate" id="txtFromDate"></td>
+                                                                        <td><input class="inputCourier" type="date" name="txtToDate" id="txtToDate"></td>
+                                                                        <td><textarea class="" type="text" cols="5" rows="10" name="txtMainResponsibilites" id="txtMainResponsibilities"></textarea></td>
+                                                                    </tr>
+                                                                }
+                                                        </table>
+                                                    </td>
+                                                </tr>
+                                                @if (IsNew || !IsEdit)
+                                                {
+                                                    <tr align="right">
+                                                        <td class="">
+                                                            <button type="button" class="btn btn-sm btn-success submit-btn d-flex float-right mb-2 bl-1 " onclick="AddRows()">
+                                                                + Add Rows
+                                                            </button>
+                                                            <input type="hidden" name="totalRows" id="totalRows" />
+                                                        </td>
+                                                    </tr>
+                                                }
+
+                                            </table>
+                                            <table class="w-100 form-border">
+                                                <tr>
+                                                    <td class="w-20">Position and Department Applied for:</td>
+                                                    <td><textarea cols="90" rows="10" class="" type="text" name="txtPositionAndDepartmentAppliedFor" id="txtPositionAndDepartmentAppliedFor"></textarea></td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <table class="detail-sec-p">
+                                    <tr>
+                                        <td class="text-center">SF_S_29</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="container form-container">
+                            <div class="card-header pb-4 pt-4">
+                                <div class="alignRight">
+                                    @*<img class="skodaImg" src="img/skodalogoimg.png">*@
+                                </div>
+                                <table class="w-100">
+                                    <tr>
+                                        <td>Why would you like to change your profile?</td>
+                                    </tr>
+                                    <tr>
+                                        <td><textarea cols="90" rows="10" name="txtReasonForChangingJobProfile" id="txtReasonForChangingJobProfile"></textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td>What have been some of your significant achievements in the current job profile?</td>
+                                    </tr>
+                                    <tr>
+                                        <td><textarea cols="90" rows="10" name="txtAchievements" id="txtAchievements"></textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            What is your understanding of the role of that you are applying for? What are some of the challenges you will face in that role and how will you deal with them? (Please attach an extra sheet if required)
+                                            <input type="file" id="fileToUpload" name="fileToUpload" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><textarea cols="90" rows="10" name="txtAboutRoleAppliedFor" id="txtAboutRoleAppliedFor"></textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Agreement with Supervisor and HoD:</td>
+                                    </tr>
+                                    <tr class="border-2px">
+                                        <td>
+                                            <table class="w-100 form-border">
+                                                <tr class="">
+                                                    <td><label>Agreed to make application for IJP and release the employee within 90 days if selected</label></td>
+                                                </tr>
+                                                <tr class="">
+                                                    <td><label>Supervisor Name & Signature</label></td>
+                                                    <td><label>HOD Name & Signature</label></td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <!-- <div class="hodSign">
+                                    <p>Agreed to make application for IJP and release the employee within 90 days if selected</p>
+                                    <br>
+                                    <div class="row">
+                                        <div class="col-lg-9 col-sm-6 col-md-6">
+                                            Supervisor Name & Signature
+                                        </div>
+                                        <div class="col-lg-3 col-sm-6 col-sm-6">
+                                            HoD Name & Signature
+                                        </div>
+                                    </div>
+                                </div> -->
+                                <table class="w-100 detail-sec-p">
+                                    <tr>
+                                        <td>
+                                            <label class="checkbox-container">
+                                                <label class="f-600"><b>I declare that the information provided above is true to the best of my knowledge and I will be responsible for the consequences rising out of any misrepresentation of the same.</b></label>
+                                                <input type="checkbox" name="chkDeclaration" id="chkDeclaration" />
+                                                <span class="checkmark"></span>
+                                            </label>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                </table>
+                                <table class="detail-sec-p">
+                                    <tr>
+                                        <td class="text-center">SF_S_29</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="container form-container">
+                            <div class="card-header pb-4 pt-4">
+                                <div class="alignRight">
+                                    @*<img class="skodaImg" src="img/skodalogoimg.png">*@
+                                </div>
+                                <table class="w-95 m-auto">
+                                    <tr>
+                                        <td>
+                                            <table class="w-100 form-border">
+                                                <tr>
+                                                    <td class="w-26 br-0 bb-0">Place</td>
+                                                    <td class="bl-0 br-0 bb-0">:<input class="inputCourier" type="text" readonly></td>
+                                                    <td class="br-0 bl-0 bb-0">Date</td>
+                                                    <td class="bl-0 bb-0">:<input class="inputCourier" type="date" readonly></td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="br-0 bb-0 bt-0">Employee Signature:</td>
+                                                    <td colspan="3" class="bl-0 bb-0 bt-0">:<input class="inputCourier" type="text" readonly></td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="br-0 bt-0">HRC (Signature/Date)</td>
+                                                    <td colspan="3" class="bl-0 bt-0">:<input class="inputCourier" type="text" readonly></td>
+                                                </tr>
+                                                <tr>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <table class="detail-sec-p">
+                                    <tr>
+                                        <td class="text-center">SF_S_29</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    foreach (var item in IJPF.one)
+                    {
+                        <div class="container form-container">
+                            <div class="card-header pb-4 pt-4">
+                                <div class="alignRight">
+                                    @*<img class="skodaImg" src="img/skodalogo.png">*@
+                                </div>
+                                <table class="w-95 m-auto">
+                                    <tr>
+                                        <td>
+                                            <table class="w-100 form-border">
+                                                <tr>
+                                                    <td class="bb-0 topheaderCouries">MobiNext Technologies India Private Limited</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="bt-0 topheaderCouriesBorder"><h4>Internal Job Posting Form</h4></td>
+                                                </tr>
+                                            </table>
+                                            <table class="w-100 form-border">
+                                                <tr class="br-1">
+                                                    <td class="br-0">IJP Ref.</td>
+                                                    <td class="bl-0 br-0">:<input class="inpDisable" type="text" id="IJPReference" name="IJPReference" value="@(!IsNew ? (item.IJPReference ?? "") : "")"></td>
+                                                    <td class="br-0 bl-0">MPR No.</td>
+                                                    <td class="bl-0">:<input class="inpDisable" type="text" id="MPRReference" name="MPRReference" value="@(!IsNew ? (item.MPRReference ?? "") : "")"></td>
+                                                    <td class="br-0 bl-0">Department:</td>
+                                                    <td class="bl-0">:<input class="inpDisable" type="text" name="txtDepartment" id="txtDepartment" value="@(!IsNew ? (item.Department ?? "") : "")"></td>
+                                                </tr>
+
+                                            </table>
+                                            <table class="w-100 form-border">
+                                                <tr>
+                                                    <td class="allFormLables borderLTB f-600">
+                                                        <label class="f-600">Date:</label>
+                                                    </td>
+                                                    <td colspan="2" class="borderLTB text-left">
+                                                        @*<input type="text" name="txtDate" placeholder="/ /" class="" value="@(!IsNew || !IsEdit ? (Convert.ToDateTime(item.FormID.CreatedDate).ToShortDateString()) : DateTime.Now.ToShortDateString())" readonly>*@
+                                                    </td>
+                                                    @if (!IsNew || !IsEdit)
+                                                    {
+                                                        <td class="allFormLables borderLTB f-600 align" colspan="2">
+                                                            <label class="f-600">Form Id:</label>
+                                                        </td>
+                                                        <td colspan="2" class="borderLTB text-right">
+                                                            @*<input type="text" name="txtFormId" class="" value="@(!IsNew || !IsEdit ? ("IJPF" + item.FormID.Id ?? "") : "" )" readonly>*@
+                                                        </td>
+                                                    }
+                                                </tr>
+                                                <tr>
+                                                    <td class="br-0"><b>Employee Details:</b></td>
+                                                </tr>
+                                                <tr class="br-1">
+                                                    <td class="br-0">Employee Name</td>
+                                                    <td class="bl-0">:<input class="inpDisable" type="text" name="txtEmployeeName" id="txtEmployeeName" value="@(!IsNew ? (item.EmployeeName ?? "") : "")"></td>
+                                                    <td class="br-0">Employee Number</td>
+                                                    <td class="bl-0">:<input class="inpDisable" type="text" name="txtEmployeeNumber" id="txtEmployeeNumber" value="@(!IsNew ? (item.EmployeeNumber ?? "") : "")"></td>
+                                                </tr>
+                                                <tr class="br-1">
+                                                    <td class="br-0">Date of Joining</td>
+                                                    <td class="bl-0">:<input class="inpDisable" type="text" name="txtDateOfJoining" id="txtDateOfJoining" value="@(!IsNew ? (item.DateOfJoining.ToShortDateString() ?? "") : "")"></td>
+                                                    <td class="br-0">Qualification</td>
+                                                    <td class="bl-0">:<textarea class="inpDisable" type="text" name="txtQualification" id="txtQualification">@(!IsNew ? (item.Qualification ?? "") : "")</textarea></td>
+                                                </tr>
+                                                <tr class="br-1">
+                                                    <td class="br-0">Telephone number</td>
+                                                    <td class="bl-0">:<input class="inpDisable" type="tel" name="txtTelephoneNumber" id="txtTelephoneNumber" value="@(!IsNew ? (item.TelephoneNumber ?? "") : "")"></td>
+                                                    <td class="br-0">Level</td>
+                                                    <td class="bl-0">:<input class="inpDisable" type="text" name="txtLevel" id="txtLevel" value="@(!IsNew ? (item.Level ?? "") : "")"></td>
+                                                </tr>
+                                                <tr class="br-1">
+                                                    <td class="br-0">Current role</td>
+                                                    <td class="bl-0">:<input class="inpDisable" type="text" name="txtCurrentRole" id="txtCurrentRole" value="@(!IsNew ? (item.CurrentRole ?? "") : "")"></td>
+                                                    <td class="br-0">How long you have been in current department?</td>
+                                                    <td class="bl-0">:<textarea class="inpDisable" type="text" name="txtCurrentDepartmentDuration" id="txtCurrentDepartmentDuration">@(!IsNew ? (item.CurrentDepartmentDuration ?? "") : "")</textarea></td>
+                                                </tr>
+                                                <tr class="br-1">
+                                                    <td class="br-0">How long you have been in current role?</td>
+                                                    <td class="bl-0">:<textarea class="inpDisable" type="text" name="txtCurrentRoleDuration" id="txtCurrentRoleDuration">@(!IsNew ? (item.CurrentRoleDuration ?? "") : "")</textarea></td>
+                                                    <td class="br-0">Name of current reporting manager</td>
+                                                    <td class="bl-0">:<textarea class="inpDisable" type="text" name="txtCurrentReportingManagerName" id="txtCurrentReportingManagerName">@(!IsNew ? (item.CurrentReportingManagerName ?? "") : "")</textarea></td>
+                                                </tr>
+                                            </table>
+                                            <table class="w-100 form-border">
+                                                <tr>
+                                                    <td class="bb-0"><b>Employment Details:</b></td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="bt-0 bb-0">(Include the details of all the positions starting with the current job and experience outside. Please do mention if you have held other positions within Volkswagen Group (VWIPL, SAIPL and VWGSIPL) as a Separate line item)</td>
+                                                </tr>
+
+                                            </table>
+                                            <table class="w-100 form-border">
+                                                <tr>
+                                                    <td class="bt-0 bb-0">
+                                                        <table class="w-95 mx-auto form-border">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th></th>
+                                                                    <th>Organisation</th>
+                                                                    <th>Designation</th>
+                                                                    <th>From</th>
+                                                                    <th>To</th>
+                                                                    <th>Main Responsibilities</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody class="tableEmployeeDetails" id="tbody">
+                                                                @foreach (var EmpList in IJPF.four)
+                                                                {
+                                                                    var count = 1;
+                                                                    <tr id='@("row"+count)' class="tr_input">
+                                                                        <td class="sNo">@count</td>
+                                                                        <td><input class="inpDisable" type="text" name="txtOrganisation" id="txtOrganisation" value=@EmpList.Organisation></td>
+                                                                        <td><input class="inpDisable" type="text" name="txtDesignation" id="txtDesignation" value="@EmpList.Designation"></td>
+                                                                        <td><input class="inpDisable" type="text" name="txtFromDate" id="txtFromDate" value="@EmpList.FromDate.ToShortDateString() "></td>
+                                                                        <td><input class="inpDisable" type="text" name="txtToDate" id="txtToDate" value="@EmpList.ToDate.ToShortDateString() "></td>
+                                                                        <td><textarea class="inpDisable" cols="5" rows="10" type="text" name="txtMainResponsibilites" id="txtMainResponsibilities">@EmpList.MainResponsibilities</textarea></td>
+                                                                    </tr>
+                                                                    count++;
+                                                                }
+                                                                @*@for (var i = 1; i < IJPF.four.Count; i++)
+                                                                    {
+                                                                        <tr id='@("row"+i)' class="tr_input">
+                                                                            <td class="sNo">@i</td>
+                                                                            <td><input class="inpDisable" type="text" name="txtOrganisation" id="txtOrganisation" value=@IJPF.four[0].Organisation></td>
+                                                                            <td><input class="inpDisable" type="text" name="txtDesignation" id="txtDesignation">@IJPF.four[0].Designation</td>
+                                                                            <td><input class="inpDisable" type="date" name="txtFromDate" id="txtFromDate"></td>
+                                                                            <td><input class="inpDisable" type="date" name="txtToDate" id="txtToDate"></td>
+                                                                            <td><textarea class="inpDisable" type="text" name="txtMainResponsibilites" id="txtMainResponsibilities"></textarea></td>
+                                                                        </tr>
+                                                                    }*@
+                                                        </table>
+                                                    </td>
+                                                </tr>
+                                                @if (IsNew || !IsEdit)
+                                                {
+                                                    <tr align="right">
+                                                        <td class="">
+                                                            <button type="button" class="btn btn-sm btn-success submit-btn d-flex float-right mb-2 bl-1 " onclick="AddRows()">
+                                                                + Add Rows
+                                                            </button>
+                                                            <input type="hidden" name="totalRows" id="totalRows" />
+                                                        </td>
+                                                    </tr>
+                                                }
+
+                                            </table>
+                                            <table class="w-100 form-border">
+                                                <tr>
+                                                    <td class="w-20">Position and Department Applied for:</td>
+                                                    <td><textarea class="inpDisable" cols="90" rows="10" type="text" name="txtPositionAndDepartmentAppliedFor" id="txtPositionAndDepartmentAppliedFor">@(!IsNew ? (item.PositionAndDepartmentAppliedFor ?? "") : "")</textarea></td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <table class="detail-sec-p">
+                                    <tr>
+                                        <td class="text-center">SF_S_29</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="container form-container">
+                            <div class="card-header pb-4 pt-4">
+                                <div class="alignRight">
+                                    @*<img class="skodaImg" src="img/skodalogoimg.png">*@
+                                </div>
+                                <table class="w-100">
+                                    <tr>
+                                        <td>Why would you like to change your profile?</td>
+                                    </tr>
+                                    <tr>
+                                        <td><textarea class="inpDisable" cols="90" rows="10" name="txtReasonForChangingJobProfile" id="txtReasonForChangingJobProfile">@(!IsNew ? (item.ReasonForChangingJobProfile ?? "") : "")</textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td>What have been some of your significant achievements in the current job profile?</td>
+                                    </tr>
+                                    <tr>
+                                        <td><textarea class="inpDisable" cols="90" rows="10" name="txtAchievements" id="txtAchievements">@(!IsNew ? (item.Achievements ?? "") : "")</textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            What is your understanding of the role of that you are applying for? What are some of the challenges you will face in that role and how will you deal with them? (Please attach an extra sheet if required)
+                                            @if (IJPF.one[0].attachmentIJPFlist.attachmentIJPFData.Count != 0)
+                                            {
+                                                foreach (var attachment in IJPF.one[0].attachmentIJPFlist.attachmentIJPFData)
+                                                {
+                                                    <a href=@System.Configuration.ConfigurationManager.AppSettings["SharepointSiteURL"]@attachment.ServerRelativeUrl download=@attachment.FileName target="_blank">@attachment.FileName </a>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                @*<input type="text" id="fileToUpload" name="fileToUpload" disabled />*@
+                                            }
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td><textarea class="inpDisable" cols="90" rows="10" name="txtAboutRoleAppliedFor" id="txtAboutRoleAppliedFor">@(!IsNew ? (item.AboutRoleAppliedFor ?? "") : "")</textarea></td>
+                                    </tr>
+                                    @*<tr>
+                                            <td>Agreement with Supervisor and HoD:</td>
+                                        </tr>
+                                        <tr class="border-2px">
+                                            <td>
+                                                <table class="w-100 form-border">
+                                                    <tr class="">
+                                                        <td><label>Agreed to make application for IJP and release the employee within 90 days if selected</label></td>
+                                                    </tr>
+                                                    <tr class="">
+                                                        <td><label>Supervisor Name & Signature</label></td>
+                                                        <td><label>HOD Name & Signature</label></td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>*@
+                                </table>
+                                <!-- <div class="hodSign">
+                                    <p>Agreed to make application for IJP and release the employee within 90 days if selected</p>
+                                    <br>
+                                    <div class="row">
+                                        <div class="col-lg-9 col-sm-6 col-md-6">
+                                            Supervisor Name & Signature
+                                        </div>
+                                        <div class="col-lg-3 col-sm-6 col-sm-6">
+                                            HoD Name & Signature
+                                        </div>
+                                    </div>
+                                </div> -->
+                                <table class="w-100 detail-sec-p">
+                                    <tr>
+                                        <td>
+                                            <label class="checkbox-container">
+                                                <label class="f-600"><b>I declare that the information provided above is true to the best of my knowledge and I will be responsible for the consequences rising out of any misrepresentation of the same.</b></label>
+                                                <input type="checkbox" name="chkDeclaration" id="chkDeclaration" checked disabled />
+                                                <span class="checkmark"></span>
+                                            </label>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                </table>
+                                <table class="detail-sec-p">
+                                    <tr>
+                                        <td class="text-center">SF_S_29</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="container form-container">
+                            <div class="card-header pb-4 pt-4">
+                                <div class="alignRight">
+                                    @*<img class="skodaImg" src="img/skodalogoimg.png">*@
+                                </div>
+                                <table class="w-95 m-auto">
+                                    @if (!IsNew)
+                                    {
+                                        <tr>
+                                            <td colspan="3" class="f-600">Authorization by RC </td>
+                                            <td class="display-none"></td>
+                                            <td class="display-none"></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">
+                                                Name: <input type="text" name="" class="inpDisable inpIsNewDisable input-width-1" value="@(!IsNew ? (IJPF.three[0].UserName ?? ""): "")">
+                                            </td>
+                                            <td>
+                                                <div class="form-group">
+                                                    <label for="comment" class="">Approver Comment:</label>
+                                                    <textarea class="form-control mx-auto" cols="90" rows="10" id="comment" disabled>@(!IsNew ? (IJPF.three[0].Comment ?? ""): "")</textarea>
+                                                </div>
+                                            </td>
+                                            <td class="display-none"></td>
+                                            <td style="word-wrap: break-word;width:25%;">Signature: <input type="text" name="" class="inpDisable inpIsNewDisable input-width-1" value="@(!IsNew && IJPF.three[0].ApproverStatus != "Pending" ? (IJPF.three[0].ApproverStatus + " on " + Convert.ToDateTime(IJPF.two[0].Modified).ToShortDateString()+" " +Convert.ToDateTime(IJPF.two[0].Modified).ToShortTimeString()) : "" )"></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td colspan="3" class="f-600">Authorization by HRC(Respective HRC) </td>
+                                            <td class="display-none"></td>
+                                            <td class="display-none"></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">
+                                                Name: <input type="text" name="" class="inpDisable inpIsNewDisable input-width-1" value="@(!IsNew ? (IJPF.three[1].UserName ?? ""): "")">
+                                            </td>
+                                            <td>
+                                                <div class="form-group">
+                                                    <label for="comment" class="">Approver Comment:</label>
+                                                    <textarea class="form-control mx-auto" cols="5" rows="10" id="comment" disabled>@(!IsNew ? (IJPF.three[1].Comment ?? ""): "")</textarea>
+                                                </div>
+                                            </td>
+                                            <td class="display-none"></td>
+                                            <td style="word-wrap: break-word;width:25%;">Signature: <input type="text" name="" class="inpDisable inpIsNewDisable input-width-1" value="@(!IsNew && IJPF.three[0].ApproverStatus != "Pending" ? (IJPF.three[1].ApproverStatus + " on " + Convert.ToDateTime(IJPF.two[0].Modified).ToShortDateString()+" " +Convert.ToDateTime(IJPF.two[0].Modified).ToShortTimeString()) : "" )"></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td colspan="3" class="f-600">Authorization by HOD </td>
+                                            <td class="display-none"></td>
+                                            <td class="display-none"></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">
+                                                Name: <input type="text" name="" class="inpDisable inpIsNewDisable input-width-1" value="@(!IsNew ? (IJPF.three[2].UserName ?? ""): "")">
+                                            </td>
+                                            <td>
+                                                <div class="form-group">
+                                                    <label for="comment" class="">Approver Comment:</label>
+                                                    <textarea class="form-control mx-auto" cols="5" rows="10" id="comment" disabled>@(!IsNew ? (IJPF.three[2].Comment ?? ""): "")</textarea>
+                                                </div>
+                                            </td>
+                                            <td class="display-none"></td>
+                                            <td style="word-wrap: break-word;width:25%;">Signature: <input type="text" name="" class="inpDisable inpIsNewDisable input-width-1" value="@(!IsNew && IJPF.three[0].ApproverStatus != "Pending" ? (IJPF.three[2].ApproverStatus + " on " + Convert.ToDateTime(IJPF.two[0].Modified).ToShortDateString()+" " +Convert.ToDateTime(IJPF.two[0].Modified).ToShortTimeString()) : "" )"></td>
+                                        </tr>
+                                    }
+
+                                    @*<tr>
+                                            <td>
+                                                <table class="w-100 form-border">
+                                                    <tr>
+                                                        <td class="w-26 br-0 bb-0">Place</td>
+                                                        <td class="bl-0 br-0 bb-0">:<input class="inputCourier" type="text" readonly></td>
+                                                        <td class="br-0 bl-0 bb-0">Date</td>
+                                                        <td class="bl-0 bb-0">:<input class="inputCourier" type="date" readonly></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="br-0 bb-0 bt-0">Employee Signature:</td>
+                                                        <td colspan="3" class="bl-0 bb-0 bt-0">:<input class="inputCourier" type="text" readonly></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="br-0 bt-0">HRC (Signature/Date)</td>
+                                                        <td colspan="3" class="bl-0 bt-0">:<input class="inputCourier" type="text" readonly></td>
+                                                    </tr>
+                                                    <tr>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>*@
+                                </table>
+                                <table class="detail-sec-p">
+                                    <tr>
+                                        <td class="text-center">SF_S_29</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    }
+                }
+
+                @if (IsNew)
+                {
+                    if (!IsEdit)
+                    {
+                        <div class="card-footer align-content-center">
+                            <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                                Re-Submit
+                            </button>
+                            <button type="reset" class="btn btn-danger btn-sm cancl-btn">
+                                Cancel
+                            </button>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="card-footer align-content-center">
+                            <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                                Submit
+                            </button>
+                            <button type="reset" class="btn btn-danger btn-sm cancl-btn">
+                                Cancel
+                            </button>
+                        </div>
+                    }
+                }
+            </form>
+        </div>
+    </div>
+</body>
+<div class="modal fade" id="successModel" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header modelHeader">
+                <span class="modal-title modalMsgTitle" id="modalTitle"></span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label id="modalBody" class="lableMsg">  </label>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="submitBomBtn publishBtn" id="modalOkButton">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var spinner = $('#loader');
+    var formID = @Html.Raw(Json.Encode(FormId));
+    var RowId = @Html.Raw(Json.Encode(RowId));
+    var isNew = @Html.Raw(Json.Encode(IsNew));
+    var ijpf = @Html.Raw(Json.Encode(IJPF));
+    var appRowId = @Html.Raw(Json.Encode(AppRowId));
+    var approvalType =@Html.Raw(Json.Encode(ApprovalType));
+    var isEdit = @Html.Raw(Json.Encode(IsEdit));
+     var FlagRedirect = @Html.Raw(Json.Encode(FlagRedirect));
+
+    pageLoad();
+
+    function pageLoad() {
+        GetApprovers();
+        if (!isNew) {
+            $(".inpDisable").attr("disabled", "disabled");
+            $(".txtDisable").prop("readonly", true);
+        }
+        if (!isEdit) {
+
+            $(".inpDisable").attr("disabled", false);
+            $(".txtDisable").prop("readonly", false);
+        }
+    }
+
+    $("#txtOtherEmpname").autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                url: "/List/GetEmployeeDetails",
+                dataType: "json",
+                cache: false,
+                async: false,
+                data: {
+                    searchText: $("#txtOtherEmpname").val()
+                },
+                success: function (data) {
+                    ////
+                    response($.map(data, function (item) {
+                        console.log(data, 'data');
+                        return { label: item.FirstName, value: item.FirstName, raw: item };
+                    }));
+                }
+            });
+        },
+        search: function (event, ui) {
+            var value = $("#txtOtherEmpname").val();
+            // If less than three chars, cancel the search event
+            if (value.length < 4) {
+                event.preventDefault();
+            }
+        },
+        min_length: 4,
+        delay: 0,
+        select: function (event, ui) {
+            ////
+            var empOtherDetails = ui.item['raw'];
+            console.log(empOtherDetails);
+            //Get the other details like Cost Center Code, Employee Number from DB.
+            $.ajax({
+                url: "/List/GetExistingEmployeeDetails",
+                dataType: "json",
+                cache: false,
+                async: false,
+                data: {
+                    otherEmpUserId: empOtherDetails.Email,
+                },
+                success: function (data) {
+                    console.log(data, 'data');
+                    $('#txtEmployeeCode').val(data.EmpNumber);
+                    $('#txtDepartment').val(data.Department);
+                    $('#txtEmployeeName').val(data.UserName);
+                    $('#txtCostcenterCode').val(data.CostCenter);
+                    $('#txtUserId').val(data.UserId);
+                    $('#txtContactNo').val(data.PhoneNumber);
+                }
+            });
+        }
+    });
+
+    function RequestSubmissionFor() {
+       // //
+         var drpRequestSubmissionFor = $("#drpRequestSubmissionFor").val();
+         if (drpRequestSubmissionFor == "OnBehalf") {
+            $("#OtherEmpName").show();
+            $("#txtOtherEmpname").val('');
+            $("#txtEmployeeCode").val("");
+            $("#txtCostcenterCode").val("");
+            $("#txtUserId").val("");
+            $("#txtEmployeeName").val("");
+            $("#txtDepartment").val("");
+            $("#txtContactNo").val("");
+        }
+         else if (drpRequestSubmissionFor == "Self") {
+            $("#OtherEmpName").hide();
+            $("#txtEmployeeNumber").val("@user.EmpNumber");
+            $("#txtUserId").val("@user.UserId");
+            $("#txtEmployeeName").val("@user.UserName");
+            $("#txtDepartment").val("@user.Department");
+            $("#txtContactNo").val("");
+        }
+        else {
+            $("#OtherEmpName").hide();
+            $("#txtEmployeeCode").val("");
+            $("#txtCostcenterCode").val("");
+            $("#txtUserId").val("");
+            $("#txtEmployeeName").val("");
+            $("#txtDepartment").val("");
+            $("#txtContactNo").val("");
+             }
+    }
+
+    $(document).ready(function () {
+        rowIdx = 1;
+        srNo = 1;
+
+        if (!isEdit) {
+            ganeshModuleAccessCount = guicf[1].Value.length;
+            console.log("ganeshModuleAccessCount=" + ganeshModuleAccessCount);
+            rowIdx = ganeshModuleAccessCount;
+            console.log("rowIdx=" + rowIdx);
+        }
+
+    });
+
+    function AddRows() {
+        var newCount = rowIdx + 1;
+
+        var row = '<tr id="row' + newCount + '" class="tr_input"><td class="sNo">' + newCount + '</td>'
+                    +'<td><input class="inputCourier" type="text" name="txtOrganisation" id="txtOrganisation"></td>'
+                    +'<td><input class="inputCourier" type="text" name="txtDesignation" id="txtDesignation"></td>'
+                    +'<td><input class="inputCourier" type="date" name="txtFromDate" id="txtFromDate"></td>'
+                    +'<td><input class="inputCourier" type="date" name="txtToDate" id="txtToDate"></td>'
+                    +'<td><textarea class="inputCourier" type="text" name="txtMainResponsibilites" id="txtMainResponsibilities"></textarea></td> </tr>'
+
+        $(".tableEmployeeDetails tr:last").after(row);
+
+        rowIdx++;
+        srNo++;
+    };
+
+    function successModal(txt) {
+        ////
+        $('#modalTitle').html('Success');
+        if (txt == "approve") {
+            $('#modalBody').html('Form has been approved!');
+            FlagRedirect = txt;// For Email Update
+        }
+        else if (txt == "reject") {
+            $('#modalBody').html('Form has been rejected!');
+        }
+        else if (txt == "enquire") {
+            $('#modalBody').html('Form has been enquired!');
+        }
+        else if (txt == "cancelled") {
+            $('#modalBody').html('Form has been cancelled!');
+        } else {
+            $('#modalBody').html('Your form with ID: IJPF' + txt + ' has been submitted! Kindly use this for future reference');
+            FlagRedirect = txt;// For Email Update
+        }
+        // $("#modalOkButton").attr('data-dismiss', 'modal');//Commented For Email Update
+        $("#successModel").modal('show');
+    }
+
+    function failureModal() {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html('Some error occurred!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function validityModal(txt) {
+        ////
+        if (txt == 'approve') {
+            //DisplayAlert('error', 'Error', 'Please select the Type of Car');
+        }
+        else if (txt == 'reject') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for rejecting the form');
+        }
+        else if (txt == 'enquire') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for enquiring the form');
+        }
+
+    }
+
+    function requiredModal(text) {
+        $('#modalTitle').html('Required');
+        $('#modalBody').html(text + '!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function allowNumbersOnly(e) {
+        var code = (e.which) ? e.which : e.keyCode;
+        if (code > 31 && (code < 48 || code > 57)) {
+            e.preventDefault();
+        }
+    }
+
+    function alphaOnly(e) {
+        var key = e.keyCode;
+        if (key > 32 && (key < 65 || key > 122 || key == 91 || key == 92 || key == 93 || key == 94 || key == 95 || key == 96)) {
+            e.preventDefault();
+        }
+    }
+
+    function GetApprovers() {
+        ////
+        $.ajax({
+            url: '/InternalJobPosting/GetIJPApprovalList',
+            type: 'GET',
+            data: {},
+            dataType: 'JSON',
+            success: (function (data) {
+                ////
+                approverData = data;
+                console.log(data);
+                var row = "";
+                for (var i = 0; i < data.length; i++) {
+                    row += '<input type="hidden" id="hidden' + data[i].Department + 'Approver" name="hidden' + data[i].Department + 'Approver" value="' + data[i].ApproverEmailId + '">';
+                }
+                $("#hiddenApproverInformation").html(row);
+
+            }),
+            error: (function (data) {
+                //code
+            })
+        })
+
+    }
+
+    $("#btnSubmit").on('click', function (e) {
+        ////
+
+        //File Checking if it is re-uploaded or not on edit mode
+        if (!isEdit) {
+            var fileToUpload = $("#fileToUpload").val();
+            if (fileToUpload!="")
+            {
+                $("#attachedfile").val('');
+                $("#attachedfileName").val('');
+            }
+        }
+
+        var IJPReference = document.getElementById("IJPReference").value;
+        if (IJPReference == "") {
+            requiredModal("Please enter the IJP Reference");
+            return false;
+        }
+
+        var MPRReference = document.getElementById("MPRReference").value;
+        if (MPRReference == "") {
+            requiredModal("Please enter the MPR Number");
+            return false;
+        }
+
+        var txtDepartment = document.getElementById("txtDepartment").value;
+        if (txtDepartment == "") {
+            requiredModal("Please enter the Department");
+            return false;
+        }
+
+        var name = document.getElementById("txtEmployeeName").value;
+        if (name == "") {
+            requiredModal("Please enter the Name of Employee");
+            return false;
+        }
+
+        var employeeNumberlen = $("#txtEmployeeNumber").val().length;
+        if (employeeNumberlen == 0 || employeeNumberlen < 0) {
+            requiredModal('Please enter a valid Employee Number');
+            return false;
+        }
+
+        var doj = document.getElementById("txtDateOfJoining").value;
+        if (doj == "") {
+            requiredModal("Please enter the Date of Joining");
+            return false;
+        }
+
+        var qualification = document.getElementById("txtQualification").value;
+        if (qualification == "") {
+            requiredModal("Please enter the Qualification");
+            return false;
+        }
+
+        var telephoneNumberlen = $("#txtTelephoneNumber").val().length;
+        if (telephoneNumberlen == 0 || telephoneNumberlen > 10 || telephoneNumberlen < 0) {
+            requiredModal('Please enter a valid Telephone Number');
+            return false;
+        }
+
+        var level = document.getElementById("txtLevel").value;
+        if (level == "") {
+            requiredModal("Please enter the Level");
+            return false;
+        }
+
+        var currentRole = document.getElementById("txtCurrentRole").value;
+        if (currentRole == "") {
+            requiredModal("Please enter the Current Role");
+            return false;
+        }
+
+        var appliedForPAndD = document.getElementById("txtPositionAndDepartmentAppliedFor").value;
+        if (appliedForPAndD == "") {
+            requiredModal("Please mention the Position And Department Applied for");
+            return false;
+        }
+
+        var check = document.getElementById("chkDeclaration").checked;
+        if (check == false) {
+            requiredModal("Declaration checkbox not checked");
+            return false;
+        }
+
+        $("#pageLoader").removeClass('invisible');
+        var form = $("#IJPForm");
+        var formData = new FormData(form[0]);
+
+
+        $.ajax({
+            url: '/InternalJobPosting/CreateInternalJobPostingFormRequest',
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            data: formData,
+            enctype: 'multipart/form-data',
+            success: (function (data) {
+                if (data[0].Value == 1) {
+                    console.log(data);
+                    $("#pageLoader").addClass('invisible');
+                    successModal(data[1].Value);
+                }
+                else {
+                    failureModal();
+                    $("#pageLoader").addClass('invisible');
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+                $("#pageLoader").addClass('invisible');
+            })
+        })
+    });
+
+    function saveResponse(text) {
+        ////
+
+        var status = '', comment = '';
+        comment = $("#comment-" + text).val();
+        switch (text) {
+            case 'approve': {
+                status = 'Approved';
+                if (comment != '') {
+                    //validityModal(text);
+                    //return;
+                }
+                break;
+            }
+            case 'reject': {
+                status = 'Rejected';
+                if (comment == '') {
+                    validityModal(text);
+                    return;
+                }
+                break;
+            }
+            case 'enquire': {
+                status = 'Enquired';
+                if (comment == '') {
+                    validityModal(text);
+                    return;
+                }
+                break;
+            }
+        }
+        spinner.show();
+        $.ajax({
+            url: '/List/SaveResponse',
+            type: 'POST',
+            data: { response: status, appRowId: appRowId, comment: comment, approvalType: approvalType },
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data == 1) {
+                    successModal(text);
+                    setTimeout(FilterMyTasks, 5000);
+                    spinner.hide();
+                }
+                else {
+                    failureModal();
+                    spinner.hide();
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+                spinner.hide();
+            })
+        })
+    }
+
+    $("#modalOkButton").on('click', function () {
+        ////
+        if (FlagRedirect != null) {
+            window.location = "../Dashboard";
+        }
+    });
+
+
+</script>

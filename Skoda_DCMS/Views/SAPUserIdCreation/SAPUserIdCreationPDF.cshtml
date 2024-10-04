@@ -1,0 +1,582 @@
+﻿@model dynamic
+@{
+    ViewBag.Title = "SAP User Id Creation Form";
+    var user = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    bool IsNew = true;
+    bool IsEdit = true;
+    dynamic SUCF = null;
+    Layout = ViewBag.Layout;
+    int RowId = 0, FormId = 0, AppRowId = 0, ApprovalType = 0;
+    List<Skoda_DCMS.Models.ApprovalDataModel> appList = new List<Skoda_DCMS.Models.ApprovalDataModel>(); ;
+    List<Skoda_DCMS.Models.SAPUserIDCreationDataModel> TransDet = new List<Skoda_DCMS.Models.SAPUserIDCreationDataModel>(); ;
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IsNew = ViewBag.IsNew;
+        IsEdit = ViewBag.IsEdit;
+        SUCF = ViewBag.Model;
+        RowId = ViewBag.RowId;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+        appList = ViewBag.Model?.three as List<Skoda_DCMS.Models.ApprovalDataModel>;
+        TransDet = ViewBag.Model?.one as List<Skoda_DCMS.Models.SAPUserIDCreationDataModel>;
+    }
+}
+
+
+<!DOCTYPE html>
+<html>
+<head>
+
+    <style type="text/css">
+        *:visited, *:focus {
+            box-shadow: none;
+        }
+
+        input, select, input:focus, select:focus, textarea, textarea:focus {
+            border: 1px solid #000;
+        }
+
+        input, textarea {
+            padding: 5px;
+        }
+
+        .asset {
+            border: 1px solid black;
+            height: 20px;
+        }
+
+        .signature-table thead td {
+            border-bottom: 1px solid black;
+            border-left: 1px solid black;
+            border-collapse: collapse;
+        }
+
+        .signature-table tbody, .signature-table td {
+            border: none;
+            border-left: 1px solid black;
+            border-collapse: collapse;
+            padding: 5px;
+        }
+
+            .signature-table td:first-child {
+                border-left: none;
+            }
+
+        .signature-table {
+            border: 1px solid black;
+        }
+
+        @@font-face {
+            font-family: 'SKODANext-Black';
+            src: url('../../fonts/SKODANextfont/SKODANext-Black.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Bold.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Light.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Regular.ttf') format('truetype');
+        }
+
+        body {
+            font-family: 'SKODANext-Black';
+        }
+
+        .form_lbl {
+            color: #000;
+            font-weight: 600;
+        }
+
+        #formlbl {
+            width: 250px;
+        }
+
+        label {
+            font-family: "Trebuchet MS", Verdana, Halvetica, Arial;
+            font-size: 20px;
+            font-weight: normal;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+            table td, th {
+                padding-left: 10px;
+            }
+    </style>
+
+</head>
+<body>
+
+    <table style="width: 100%; font-size: 14px; color: #000; font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+        <tr>
+            <td>
+                <table style="width: 100%;" cellspadding="0" cellspacing="0">
+                    <tr>
+                        <td colspan="6" width="60%" style="text-align: right;">
+                            <img style="width: 50%;" src="/assets/img/SAVWIPL_Merger_Logo.JPG" />
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="6" align="center">
+                <h2 style="font-weight:bold"> SAP User Id Creation Form </h2>
+            </td>
+        </tr>
+
+        <tr>
+            <td style="padding: 15px;">
+                <table cellspacing="0" border="" cellpadding="0" width="100%">
+                    <tr>
+                        <td colspan="8" align='left'>
+                            <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Submitter Details</u></b></h6>
+                        </td>
+                    </tr>
+
+                    <tr style="margin-top:5px;">
+                        <td>
+                            Type of Employee
+                        </td>
+                        <td colspan="2" align='left'>
+                            @(SUCF.one[0].EmployeeType)
+                        </td>
+                        <td align='left'>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "></span>
+                        </td>
+                    </tr>
+
+                    <tr style="margin-top:5px;">
+                        <td style="width:20%; font-weight: bold;">
+                            Employee Name
+                        </td>
+                        <td style="width: 30%; font-weight: normal;" colspan="3" align='left'>
+                            <span style="height: 25px; width:85%; border-radius: 0; "> @(SUCF.one[0].EmployeeName)</span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">
+                            Employee Code
+                        </td>
+                        <td style="width: 30%; font-weight: normal;" colspan="3" align='left'>
+                            <span style="height: 25px; width:85%; border-radius: 0; ">  @(SUCF.one[0].EmployeeCode) </span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Cost Center Number
+                        </td>
+                        <td colspan="3" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SUCF.one[0].EmployeeCCCode)</span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">
+                            UserID
+                        </td>
+                        <td colspan="3" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SUCF.one[0].EmployeeUserId)</span>
+                        </td>
+                    </tr>
+
+                    <tr style="margin-top:5px;">
+                        <td style="width:20%; font-weight: bold;">
+                            Designation
+                        </td>
+                        <td colspan="3" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SUCF.one[0].EmployeeDesignation) </span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">
+                            Location
+                        </td>
+                        <td colspan="3" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SUCF.one[0].EmployeeLocation)</span>
+                        </td>
+                    </tr>
+
+                    <tr style="margin-top:5px;">
+                        <td style="width:20%; font-weight: bold;">
+                            Department
+                        </td>
+                        <td colspan="3" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@(SUCF.one[0].EmployeeDepartment)</span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">
+                            Contact Number
+                        </td>
+                        <td colspan="3" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@(SUCF.one[0].EmployeeContactNo)</span>
+                        </td>
+                    </tr>
+
+                    @*<tr>
+            <td style="width:20%; font-weight: bold;">
+                Submission Type
+            </td>
+            <td colspan="2" align='left'>
+                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "></span>
+            </td>
+            <td style="width:10%; font-weight: bold;">
+                Form Type
+            </td>
+            <td>
+                <input disabled type="checkbox" class="wd" id="chkWeight" name="chkWeight">
+                SAVWIPL Employee
+            </td>
+            <td>
+                <input disabled type="checkbox" class="wd" id="chkWeight" name="chkWeight">
+                Blue Collar Employee
+            </td>
+        </tr>*@
+
+                    @if (SUCF.one[0].EmployeeType == "SAVWIPLEmployee")
+                    {
+                        <tr>
+                            <td colspan="8" align='left'>
+                                <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Applicants Details</u></b></h6>
+                            </td>
+                        </tr>
+                        <tr>
+
+                            <td style="width:20%; font-weight: bold;">
+                                Employee Name
+                            </td>
+                            <td style="width: 30%" colspan="3" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SUCF.one[0].OtherEmployeeName)  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Employee Code
+                            </td>
+                            <td style="width: 30%" colspan="3" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SUCF.one[0].OtherEmployeeCode) </span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Designation
+                            </td>
+                            <td colspan="3" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SUCF.one[0].OtherEmployeeDesignation) </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Location
+                            </td>
+                            <td colspan="3" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SUCF.one[0].OtherEmployeeLocation) </span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Department
+                            </td>
+                            <td colspan="3" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SUCF.one[0].OtherEmployeeDepartment) </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Contact Number
+                            </td>
+                            <td colspan="3" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SUCF.one[0].OtherEmployeeContactNo) </span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Cost Center Number
+                            </td>
+                            <td colspan="3" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SUCF.one[0].OtherEmployeeCCCode)  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                UserID
+                            </td>
+                            <td colspan="3" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SUCF.one[0].OtherEmployeeUserId)  </span>
+                            </td>
+
+                        </tr>
+                    }
+                    else if (SUCF.one[0].EmployeeType == "New")
+                    {
+                        <tr>
+                            <td colspan="8" align='left'>
+                                <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Applicants Details</u></b></h6>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Employee Name
+                            </td>
+                            <td style="width: 30%" colspan="3" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SUCF.one[0].OtherEmployeeName)  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Employee Code
+                            </td>
+                            <td style="width: 30%" colspan="3" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SUCF.one[0].OtherEmployeeCode) </span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Designation
+                            </td>
+                            <td colspan="3" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SUCF.one[0].OtherEmployeeDesignation) </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Location
+                            </td>
+                            <td colspan="3" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SUCF.one[0].OtherEmployeeLocation) </span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Department
+                            </td>
+                            <td colspan="3" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SUCF.one[0].OtherEmployeeDepartment) </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Contact Number
+                            </td>
+                            <td colspan="3" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SUCF.one[0].OtherEmployeeContactNo) </span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Cost Center Number
+                            </td>
+                            <td colspan="3" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SUCF.one[0].OtherEmployeeCCCode)  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                UserID
+                            </td>
+                            <td colspan="3" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SUCF.one[0].OtherEmployeeUserId)  </span>
+                            </td>
+
+                        </tr>
+                    }
+
+                    <tr>
+                        <td colspan="8" align='left'>
+                            <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Transaction Field</u></b></h6>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="width:116px;">System</td>
+                        <td style="width:116px;">Client</td>
+                        <td style="width: 144px;">Type of user id</td>
+                        <td>Reason/Details/Justification</td>
+                        <td style="width: 90px;">Module</td>
+                        <td style="width: 90px;" class="module_desc">Module Desc.</td>
+                        <td>Sub-Module</td>
+                        <td style="width: 130px;">Request type</td>
+                        <td class="temp_from">Temp-From</td>
+                        <td class="temp_to">Temp-To</td>
+                    </tr>
+                    @{long a = 0; }
+                    @foreach (var item in TransDet)
+                    {
+                        a++;
+                        <tr>
+                            <td>
+                                <div style="margin-bottom: 10px; font-weight: normal;">
+                                    <div>@a</div>
+
+                                </div>
+                            </td>
+                            <td style="font-weight: normal;">
+                                <div>  @item.System  </div>
+                            </td>
+                            <td style="font-weight: normal;">
+                                <div>  @item.Client  </div>
+                            </td>
+                            <td colspan="1" style="font-weight: normal;">   <div>  @item.Type  </div>   </td>
+                            <td colspan="1" style="font-weight: normal;">   <div>  @item.Reason  </div>   </td>
+                            <td colspan="1" style="font-weight: normal;">   <div>  @item.Module  </div>   </td>
+                            <td colspan="1" style="font-weight: normal;">   <div>  @item.ModuleDescription  </div>   </td>
+                            <td colspan="1" style="font-weight: normal;">   <div>  @item.SubModule  </div>   </td>
+                            <td colspan="1" style="font-weight: normal;">   <div>  @item.RequestType  </div>   </td>
+                            <td colspan="1" style="font-weight: normal;">   <div>  @item.TempFrom  </div>   </td>
+                            <td colspan="1" style="font-weight: normal;">   <div>  @item.TempTo  </div>   </td>
+                        </tr>
+                    }
+                    @*<tr>
+            <td style="width:20%; font-weight: bold;">
+                System
+            </td>
+            <td colspan="2" align='left'>
+                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">  </span>
+            </td>
+            <td style="width:20%; font-weight: bold;">
+                Client
+            </td>
+            <td colspan="2" align='left'>
+                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">  </span>
+            </td>
+        </tr>
+
+        <tr>
+            <td style="width:20%; font-weight: bold;">
+                Type of user id
+            </td>
+            <td colspan="2" align='left'>
+                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> </span>
+            </td>
+            <td style="width:20%; font-weight: bold;">
+                Reason/Details/Justification
+            </td>
+            <td colspan="2" align='left'>
+                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> </span>
+            </td>
+        </tr>
+
+        <tr>
+            <td style="width:20%; font-weight: bold;">
+                Module
+            </td>
+            <td colspan="2" align='left'>
+                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> </span>
+            </td>
+            <td style="width:20%; font-weight: bold;">
+                Sub Module
+            </td>
+            <td colspan="2" align='left'>
+                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> </span>
+            </td>
+        </tr>
+
+        <tr style="margin-top:5px;">
+            <td style="width:20%; font-weight: bold;">
+                Request Type
+            </td>
+            <td colspan="2" align='left'>
+                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> </span>
+            </td>
+            <td style="width:20%; font-weight: bold;">
+            </td>
+            <td colspan="2" align='left'>
+                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "></span>
+            </td>
+        </tr>*@
+
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Buisness Function And Responsibility
+                        </td>
+                        <td colspan="5" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@SUCF.one[0].BusinessNeed  </span>
+                        </td>
+                    </tr>
+
+                    @if (appList.Count > 0)
+                    {
+                        if (appList.Any(x => x.ApproverStatus.Contains("Approved")))
+                        {
+                            <tr>
+                                <td colspan="6" align='left'>
+                                    <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Approval Tracking</u></b></h6>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">Name</td>
+                                <td colspan="2">Proccessed On</td>
+                                <td colspan="1">Status</td>
+                                <td colspan="1">Level</td>
+                            </tr>
+                            foreach (var item in appList)
+                            {
+                                <tr>
+                                    <td colspan="2">
+                                        <div style="margin-bottom: 10px; font-weight: normal;">
+                                            <div>@item.ApproverName</div>
+                                            <div>@item.Designation</div>
+                                        </div>
+                                    </td>
+                                    <td colspan="2" style="font-weight: normal;">
+                                        @if (item.Logic == "OR")
+                                        {
+                                            if (item.ApproverStatus != "Pending")
+                                            {
+                                                <div>
+                                                    @item.TimeStamp
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div>
+                                                @item.TimeStamp
+                                            </div>
+                                        }
+                                    </td>
+                                    <td colspan="1" style="font-weight: normal;">
+                                        @if (item.Logic == "OR")
+                                        {
+                                            if (item.ApproverStatus != "Pending")
+                                            {
+                                                <div>
+                                                    @item.ApproverStatus
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div>
+                                                @item.ApproverStatus
+                                            </div>
+                                        }
+                                    </td>
+                                    <td colspan="1" style="font-weight: normal;">
+                                        <div>
+                                            @item.Level
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+
+                        }
+
+                    }
+                    <tr>
+                        <td colspan="6" align='left'>
+                            <h6 style="margin-top:5px;margin-left:5px;color:black;font-weight:bold"><b>SF_II_024</b></h6>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

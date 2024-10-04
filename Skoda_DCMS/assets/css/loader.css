@@ -1,0 +1,83 @@
+.loading {
+    position: fixed;
+    top: 50%;
+    left: 45%;
+}
+.full-screen-container {
+    display: none;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 9999;
+}
+
+
+.loading-bar {
+    display: inline-block;
+    width: 14px;
+    height: 35px;
+    border-radius: 9px;
+    animation: loading 1s ease-in-out infinite;
+}
+
+    .loading-bar:nth-child(1) {
+        background-color: #393535;
+        animation-delay: 0;
+    }
+
+    .loading-bar:nth-child(2) {
+        background-color: #393535;
+        animation-delay: 0.09s;
+    }
+
+    .loading-bar:nth-child(3) {
+        background-color: #393535;
+        animation-delay: .18s;
+    }
+
+    .loading-bar:nth-child(4) {
+        background-color: #393535;
+        animation-delay: .27s;
+    }
+
+@keyframes loading {
+    0% {
+        transform: scale(1);
+    }
+
+    20% {
+        transform: scale(1, 2.2);
+    }
+
+    40% {
+        transform: scale(1);
+    }
+}
+
+@-webkit-keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+.fadeOut {
+    -webkit-animation-name: fadeOut;
+    animation-name: fadeOut;
+}

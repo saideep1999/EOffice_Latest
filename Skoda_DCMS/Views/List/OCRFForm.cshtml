@@ -1,0 +1,1973 @@
+﻿@model dynamic
+@{
+    bool IsNew = true;
+    dynamic OCRF = null;
+    dynamic FlagRedirect = null;
+    bool IsEdit = true;
+    bool IsOHC = true;
+    int FormId = 0, AppRowId = 0, ApprovalType = 0;
+    Layout = ViewBag.Layout;
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IsNew = ViewBag.IsNew;
+        OCRF = ViewBag.Model;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+        IsEdit = ViewBag.IsEdit;
+
+    }
+    var currentUser = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    ViewBag.Title = "OCRF Form";
+    int count = 0;
+}
+
+@*Loader*@
+<style type="text/css">
+    empl-input-select {
+        width: 41%;
+        padding: 4px;
+    }
+    empl-input-1 {
+        width: 45%;
+        padding: 4px;
+    }
+    empl-date {
+        width: 41%;
+    }
+    #loader {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        background: rgba(0,0,0,0.75) url(../../assets/img/Loading.gif) no-repeat center center;
+        z-index: 10000;
+    }
+    .OCRForder {
+        border: 1px solid #dee2e6;
+    }
+    .astColor{
+        color:red;
+    }
+    .ui-front {
+        z-index: 9999999 !important;
+    }
+</style>
+<div id="loader"></div>
+@*Loader*@
+<body>
+    <form action="/OCRF/SaveOCRF" id="OCRFForm" method="post">
+
+        <div class="right_col bg-transparent" role="main">
+            <div class="container">
+                @if (IsNew)
+                {
+
+                    if (!IsEdit)
+                    {
+                        foreach (var item in OCRF.one)
+                        {
+                            <input type="hidden" id="FormSrId" name="FormSrId" value="@(OCRF.one[0].Id)" />
+                            <input type="hidden" id="FormId" name="FormId" value="@(FormId)" />
+                            <input type="hidden" id="AppRowId" name="AppRowId" value="@(AppRowId)" />
+                            <div class="container form-container">
+                                <div class="card-header">
+                                    <table class="w-100 OCRFBorder">
+                                        <tr>
+                                            <td class="ocrfTopHeader bgDarkGreen">ŠKODA  AUTO Volkswagen India Private Limited, Pune</td>
+                                            @if (OCRF.one[0].UserType == "White Collar"){
+                                            <td>
+                                                Form ID <input type="text" name="txtFormId" class="inpDisable" value="@(!IsNew ||!IsEdit ? ("OCRF"+FormId ?? "" ) : "" )" readonly>
+                                            </td>
+                                            }
+                                            else
+                                            {
+                                            <td>
+                                                Form ID <input type="text" name="txtFormId" class="inpDisable" value="@(!IsNew ||!IsEdit ? ("OCRF"+FormId ?? "" ) : "" )" readonly>
+                                            </td>
+                                            }
+                                            <td>Date <input type="text" name="txtDate" placeholder="/ /" class="inpDisable" value="@(!IsNew ||!IsEdit ? (Convert.ToDateTime(OCRF.two[0].FormId.Created).ToShortDateString()) : DateTime.Now.ToShortDateString())" readonly></td>
+                                        </tr>
+                                        <tr>
+                                            @if (OCRF.one[0].UserType == "White Collar"){
+                                            <td class="ocrMinTopHeader bgLightGreen">Organisation Change Request Form (OCRF)</td>
+                                            }
+                                            else
+                                            {
+                                            <td class="ocrMinTopHeader bgLightGreen">Transfer Request Form (TRF)</td>
+                                            }
+                                        </tr>
+                                    </table>
+                                    <table class="w-100 OCRFBorder">
+                                        <tr class="col-border-1 bgLightGreen user type">
+                                            <td class="w-20 br-2 justification"></td>
+                                            <td id="hiddenHRBPApproverInformation"></td>
+                                            <td id="hiddenApproverInformation"></td>
+                                        </tr>
+                                        <tr class="col-border-1 bgLightGreen typeOfChange">
+                                            <td class="w-20 br-0 justification">Type of Change</td>
+                                            <td class="bl-0 br-0">
+                                                <label class="checkbox-container">
+                                                    Employee Transfer
+                                                    <input type="checkbox" class="ocrfCheck" id="EmployeeTransferChk" name="EmployeeTransferChk" @(OCRF.one[0].EmployeeTransferChk == "EmployeeTransferChk" ? "checked" : "" ) value="EmployeeTransferChk">
+                                                    <span class="checkmark"></span>
+                                                </label>
+                                            </td>
+                                            <td class="bl-0 br-0">
+                                                <label class="checkbox-container">
+                                                    Cost Center
+                                                    <input type="checkbox" class="ocrfCheck" id="CostCenterChk" name="CostCenterChk" @(OCRF.one[0].CostCenterChk == "CostCenterChk" ? "checked" : "" ) value="CostCenterChk">
+                                                    <span class="checkmark"></span>
+                                                </label>
+                                            </td>
+                                            <td class="bl-0">
+                                                <label class="checkbox-container">
+                                                    Reporting Authority
+                                                    <input type="checkbox" class="ocrfCheck" id="ReportingAuthorityChk" name="ReportingAuthorityChk" @(OCRF.one[0].ReportingAuthorityChk == "ReportingAuthorityChk" ? "checked" : "" ) value="ReportingAuthorityChk">
+                                                    <span class="checkmark"></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <table class="w-100 OCRFBorder">
+                                        <tr>
+                                            <td class="bgLightGreen">Details of Organisartional Change</td>
+                                        </tr>
+                                        @if (OCRF.one[0].attachmentlist.attachmentData.Count != 0)
+                                        {
+                                            foreach (var attachment in OCRF.one[0].attachmentlist.attachmentData)
+                                            {
+                                                <tr>
+                                                    <td><span class="p-1"><b>Proposed Organisation Chart :</b> 
+                                                                    <input type="file" id="fileToUpload" name="fileToUpload" />
+                                                                    <input type="hidden" id="attachedfile" name="attachedfile" value="@System.Configuration.ConfigurationManager.AppSettings["SharepointSiteURL"]@attachment.ServerRelativeUrl" />
+                                                                    <input type="hidden" id="attachedfileName" name="attachedfileName" value="@attachment.FileName" />
+                                                        <a href=@System.Configuration.ConfigurationManager.AppSettings["SharepointSiteURL"]@attachment.ServerRelativeUrl download=@attachment.FileName target="_blank">@attachment.FileName </a></span></td>
+                                                </tr>
+                                            }
+                                        }
+                                    </table>
+                                    <table class="w-100 OCRFBorder">
+                                        <tr>
+                                            <td class="transEmployee bgLightGreen text-left">
+                                                <span>Justification of Change :</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <textarea class="textTransfer" rows="5" cols="60" id="JustificationofChange" name="JustificationofChange">@(!IsNew || !IsEdit ? (OCRF.one[0].JustificationofChange ?? ""): "")</textarea>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <table class="w-100 OCRFBorder">
+                                        <tr>
+                                            <td class="ocrfEmployee bgLightGreen">Employee Transfer Details</td>
+                                        </tr>
+                                    </table>
+                                    <!-- <h4 class="ocrfEmployee bgLightGreen">Employee Transfer Details:</h4> -->
+                                    <table class="w-100 OCRFBorder">
+                                        <tbody>
+                                            <tr>
+                                                <td class="bgLightGreen ocrBrLeft">Employee Name:</td>
+                                                <td class="ocrfWidth ocrBrRight"> <input type="text" name="txtEmployeeName" autocomplete="off" class="" id="txtEmployeeName" onkeypress="alphaOnly(event)" value="@(!IsEdit ? (OCRF.one[0].EmployeeName ?? "") : "")"> </td>
+                                                <td class="bgLightGreen">Employee Code:</td>
+                                                <td class="ocrfWidth ocrBrRight"> <input type="text" name="txtEmployeeCode" autocomplete="off" class="" id="txtEmployeeCode" onkeypress="allowNumbersOnly(event)" value="@(!IsEdit ? (OCRF.one[0].EmployeeCode ?? " ") : " ")"> </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="bgLightGreen">Employee Type: </td>
+                                                <td class="ocrfWidth ocrBrRight">
+                                                    <select name="drpUserType" id="drpUserType" onchange="func()" class="" style="width: 44.5%; padding: 4px;">
+                                                        <option value="" disabled>Choose..</option>
+                                                        <option @(OCRF.one[0].UserType == "White Collar" ? "selected" : "" ) value="White Collar">White Collar</option>
+                                                        <option @(OCRF.one[0].UserType == "Blue Collar" ? "selected" : "" ) value="Blue Collar">Blue Collar</option>
+                                                    </select>
+                                                </td>
+                                                <td class="bgLightGreen ocrBrLeft">Designation: </td>
+                                                <td class="ocrfWidth ocrBrRight"><input type="text" name="txtDesignation" autocomplete="off" style="text-align: left;" class="" id="txtDesignation" onkeypress="alphaOnly(event)" value="@(!IsEdit ? (OCRF.one[0].Designation ?? "") : "")"></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="bgLightGreen ocrBrLeft">Transfer Effective Date: </td>
+                                                <td class="ocrfWidth ocrBrRight">
+                                                    <input type="date" name="txtTransferEffectiveDate" id="txtTransferEffectiveDate" style="width: 44.5%; padding: 4px;" placeholder="/ /" onclick="date_val()" class="border-none" value="@(!IsEdit ? (OCRF.one[0].TransferEffectiveDate.ToString("yyyy-MM-dd") ?? " ") : "")">
+                                                </td>
+                                                <td class="bgLightGreen">Employee Location: </td>
+                                                <td class="ocrfWidth ocrBrRight">
+                                                    <select class="" style="width: 38%; padding: 4px;" id="drpEmployeeLocation" name="drpEmployeeLocation"></select>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="w-100 OCRFBorder">
+                                        <tbody>
+                                            <tr>
+                                                <th>Details</th>
+                                                <th>From</th>
+                                                <th>To</th>
+                                            </tr>
+                                            <tr id="employeeRollWhiteCollar">
+                                                <td class="bgLightGreen ocrfAlignRight ocrBrLeft">Current Role</td>
+                                                <td><input type="text" name="txtCurrentRoleFromWhite" autocomplete="off" class="inpDisable" id="txtCurrentRoleFromWhite" onkeypress="alphaOnly(event)" value="@(!IsEdit ? (OCRF.one[0].CurrentRoleFrom ?? "") : "")" readonly></td>
+                                                <td class="ocrBrRight"> <input type="text" name="txtCurrentRoleToWhite" autocomplete="off" class="inpDisable" id="txtCurrentRoleToWhite" onkeypress="alphaOnly(event)" value="@(!IsEdit ? (OCRF.one[0].CurrentRoleTo ?? "") : "")"></td>
+                                            </tr>
+                                            <tr id="employeeRollBlueCollar">
+                                                <td class="bgLightGreen ocrfAlignRight ocrBrLeft">Employee Category</td>
+                                                <td class="ocrfWidth ocrBrRight">
+                                                    <select name="txtCurrentRoleFromBlue" id="txtCurrentRoleFromBlue" onchange="" style="width: 38.3%; padding: 4px;">
+                                                        <option value="" selected disabled>Choose..</option>
+                                                        <option @(OCRF.one[0].WorkContractFrom == "Direct TM" ? "selected" : "" ) value="Direct TM">Direct TM</option>
+                                                        <option @(OCRF.one[0].WorkContractFrom == "Indirect TM (TRW)" ? "selected" : "" ) value="Indirect TM (TRW)">Indirect TM (TRW)</option>
+                                                    </select>
+                                                </td>
+                                                <td class="ocrfWidth ocrBrRight">
+                                                    <select name="txtCurrentRoleToBlue" id="txtCurrentRoleToBlue" onchange="" style="width: 38.3%; padding: 4px;">
+                                                        <option value="" selected disabled>Choose..</option>
+                                                        <option @(OCRF.one[0].WorkContractTo == "Direct TM" ? "selected" : "" ) value="Direct TM">Direct TM</option>
+                                                        <option @(OCRF.one[0].WorkContractTo == "Indirect TM (TRW)" ? "selected" : "" ) value="Indirect TM (TRW)">Indirect TM (TRW)</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr id="rowWorkContract">
+                                                <td class="">WorkContract</td>
+                                                <td>
+                                                    <select name="drpWorkContractFrom" id="drpWorkContractFrom" onchange="" style="width: 48%; padding: 4px;">
+                                                        <option value="" disabled>Choose..</option>
+                                                        <option @(OCRF.one[0].WorkContractFrom == "Direct TM" ? "selected" : "" ) value="Direct TM">Direct TM</option>
+                                                        <option @(OCRF.one[0].WorkContractFrom == "Indirect TM (TRW)" ? "selected" : "" ) value="Indirect TM (TRW)">Indirect TM (TRW)</option>
+                                                    </select>
+                                                </td>
+                                                <td class="">
+                                                    <select name="drpWorkContractTo" id="drpWorkContractTo" onchange="" style="width: 48%; padding: 4px;">
+                                                        <option value="" disabled>Choose..</option>
+                                                        <option @(OCRF.one[0].WorkContractTo == "Direct TM" ? "selected" : "" ) value="Direct TM">Direct TM</option>
+                                                        <option @(OCRF.one[0].WorkContractTo == "Indirect TM (TRW)" ? "selected" : "" ) value="Indirect TM (TRW)">Indirect TM (TRW)</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="">Division</td>
+                                                <td><input type="text" name="txtDivisionFrom" autocomplete="off" class="inpDisable" id="txtDivisionFrom" onkeypress="alphaOnly(event)" value="@(!IsEdit ? (OCRF.one[0].DivisionFrom ?? "") : "")" readonly></td>
+                                                <td class=""><input type="text" name="txtDivisionTo" autocomplete="off" class="inpDisable" id="txtDivisionTo" onkeypress="alphaOnly(event)" value="@(!IsEdit ? (OCRF.one[0].DivisionTo ?? " ") : "")"></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="">Department</td>
+                                                <td><input type="text" name="txtDepartmentFrom" autocomplete="off" class="inpDisable" id="txtDepartmentFrom" onkeypress="alphaOnly(event)" value="@(!IsEdit ? (OCRF.one[0].DepartmentFrom ?? "") : "")" readonly></td>
+                                                <td class=""><input type="text" name="txtDepartmentTo" autocomplete="off" class="inpDisable" id="txtDepartmentTo" onkeypress="alphaOnly(event)" value="@(!IsEdit ? (OCRF.one[0].DepartmentTo ?? "") : "")"></td>
+                                            </tr>
+                                            <tr id="rowSubDepartment">
+                                                <td class="">Sub-Department</td>
+                                                <td><input type="text" name="txtSubDepartmentFrom" autocomplete="off" class="inpDisable" id="txtSubDepartmentFrom" onkeypress="alphaOnly(event)" value="@(!IsEdit ? (OCRF.one[0].SubDepartmentFrom ?? "") : "")" readonly></td>
+                                                <td class=""><input type="text" name="txtSubDepartmentTo" autocomplete="off" class="inpDisable" id="txtSubDepartmentTo" onkeypress="alphaOnly(event)" value="@(!IsEdit ? (OCRF.one[0].SubDepartmentTo ?? "") : "")"></td>
+                                            </tr>
+                                            <tr id="rowSubDepartment1">
+                                                <td class="">Sub-Department 1</td>
+                                                <td><input type="text" name="txtSubDepartmentFrom1" autocomplete="off" class="inpDisable" id="txtSubDepartmentFrom1" onkeypress="alphaOnly(event)" value="@(!IsEdit ? (OCRF.one[0].SubDepartmentFrom ?? "") : "")" readonly></td>
+                                                <td class=""><input type="text" name="txtSubDepartmentTo1" autocomplete="off" class="inpDisable" id="txtSubDepartmentTo1" onkeypress="alphaOnly(event)" value="@(!IsEdit ? (OCRF.one[0].SubDepartmentTo ?? "") : "")"></td>
+                                            </tr>
+                                            <tr id="rowSubDepartment2">
+                                                <td class="bgLightGreen ocrfAlignRight ocrBrLeft">Sub-Department 2</td>
+                                                <td><input type="text" name="txtSubDepartmentFrom2" autocomplete="off" class="inpDisable" id="txtSubDepartmentFrom2" onkeypress="alphaOnly(event)" value="@(!IsEdit ? (OCRF.one[0].SubDepartmentFrom2 ?? "") : "")" readonly></td>
+                                                <td class="ocrBrRight"><input type="text" name="txtSubDepartmentTo2" autocomplete="off" class="inpDisable" id="txtSubDepartmentTo2" onkeypress="alphaOnly(event)" value="@(!IsEdit ? (OCRF.one[0].SubDepartmentTo2 ?? "") : "")"></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="">Reporting Manager (Name, Emp No)</td>
+                                                <td><input type="text" name="txtReportingManagerFrom" autocomplete="off" class="inpDisable" id="txtReportingManagerFrom" onkeypress="alphaOnly(event)" value="@(!IsEdit ? (OCRF.one[0].ReportingManagerFrom ?? "") : "")" readonly></td>
+                                                <td class=""><input type="text" name="txtReportingManagerTo" autocomplete="off" class="inpDisable" id="txtReportingManagerTo" onkeypress="" value="@(!IsEdit ? (OCRF.one[0].ReportingManagerTo ?? "") : "")"></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="">Cost Centre</td>
+                                                <td><input type="text" name="txtCostCentreFrom" autocomplete="off" class="inpDisable" id="txtCostCentreFrom" onkeypress="alphaOnly(event)" value="@(!IsEdit ? (OCRF.one[0].CostCentreFrom ?? "") : "")" readonly></td>
+                                                <td class=""><input type="text" name="txtCostCentreTo" autocomplete="off" class="inpDisable" id="txtCostCentreTo" onkeypress="allowNumbersOnly(event)" value="@(!IsEdit ? (OCRF.one[0].CostCentreTo ?? "") : "")"></td>
+                                            </tr>
+                                            <tr id="rowBusinessLocation">
+                                                <td>Business Location(Location to which services are provided)</td>
+                                                <td><select class="" id="txtBusinessLocationFrom" name="txtBusinessLocationFrom" value=""></select></td>
+                                                <td class=""><select class="" id="txtBusinessLocationTo" name="txtBusinessLocationTo" value=""></select></td>
+                                            </tr>
+                                            <tr id="rowWorkLocation">
+                                                <td>Work Location (Physical location)</td>
+                                                <td><select class="inpDisable" id="txtWorkLocationFrom" name="txtWorkLocationFrom" value=""></select></td>
+                                                <td class=""><select class="" id="txtWorkLocationTo" name="txtWorkLocationTo" value=""></select></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table>
+                                        <tr>
+                                            <td>Note : - Requesting Manager has to give approved MPR for the department in which the employee is getting transferred.</td>
+                                        </tr>
+                                    </table>
+                                    <table class="w-100">
+                                        <tr class="col-lg-6 col-md-6">
+                                            <td class="text-left">SF_S_035</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="breadcrumb-container">
+                            <div>
+                                <ol class="breadcrumb pl-0">
+                                    <li>
+                                        <a href="/Dashboard?formName=OCRF">
+                                            Dashboard
+                                        </a>
+                                    </li>
+                                    <li class="active">OCRF & Transfer Request Form</li>
+                                </ol>
+                            </div>
+                        </div>
+                        <div class="container radius-5 border-info mb-5">
+                            <div class="row topContent">
+                                <div class="col-lg-6 col-md-6 ">
+                                    <h4 class="font-h4 f-500 pl-2">Form Name : OCRF & Transfer Request Form</h4>
+                                </div>
+                                <div class="col-lg-6 col-md-6 text-right">
+                                    <h4 class="font-h4 f-500">
+                                        Form Department | Owner
+                                    </h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="container form-container">
+                            <div class="card-header">
+                                <table class="w-100 OCRFBorder">
+                                    <tr>
+                                        <td class="ocrfTopHeader bgDarkGreen">ŠKODA  AUTO Volkswagen India Private Limited, Pune</td>
+
+                                        <td>Date <input type="text" name="txtDate" placeholder="/ /" class="inpDisable" value="@(!IsNew ||!IsEdit ? (Convert.ToDateTime(OCRF.two[0].FormId.Created).ToShortDateString()) : DateTime.Now.ToShortDateString())" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="ocrMinTopHeader bgLightGreen">Organisation Change Request Form (OCRF)</td>
+                                    </tr>
+                                </table>
+                                <table class="w-100 OCRFBorder">
+                                    <tr class="col-border-1 bgLightGreen user type">
+                                        <td class="w-20 br-2 justification"></td>
+                                        <td id="hiddenHRBPApproverInformation"></td>
+                                        <td id="hiddenApproverInformation"></td>
+                                    </tr>
+                                    <tr class="col-border-1 bgLightGreen typeOfChange">
+                                        <td class="w-20 br-0 justification">Type of Change<span class="astColor">*</span></td>
+                                        <td class="bl-0 br-0">
+                                            <label class="checkbox-container">
+                                                Employee Transfer
+                                                <input class="ocrfCheck" type="checkbox" id="EmployeeTransferChk" name="EmployeeTransferChk" value="EmployeeTransferChk" onchange="getRequestFor()">
+                                                <span class="checkmark"></span>
+                                            </label>
+                                        </td>
+                                        <td class="bl-0 br-0">
+                                            <label class="checkbox-container">
+                                                Cost Center
+                                                <input class="ocrfCheck" type="checkbox" id="CostCenterChk" name="CostCenterChk" value="CostCenterChk" onchange="getRequestFor()">
+                                                <span class="checkmark"></span>
+                                            </label>
+                                        </td>
+                                        <td class="bl-0">
+                                            <label class="checkbox-container">
+                                                Reporting Authority
+                                                <input class="ocrfCheck" type="checkbox" id="ReportingAuthorityChk" name="ReportingAuthorityChk" value="ReportingAuthorityChk" onchange="getRequestFor()">
+                                                <span class="checkmark"></span>
+                                            </label>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <table class="w-100 OCRFBorder">
+                                    <tr>
+                                        <td class="bgLightGreen">Details of Organisartional Change</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="p-1"><b>Proposed Organisation Chart<span class="astColor">*</span></b> (Pls attach the proposed organisation chart & highlight the employee position )</span></td>
+                                        <td>
+                                            <input type="file" id="fileToUpload" name="fileToUpload" />
+                                        </td>
+                                    </tr>
+                                </table>
+                                <table class="w-100 OCRFBorder">
+                                    <tr>
+                                        <td class="transEmployee bgLightGreen text-left">
+                                            <span>Justification of Change<span class="astColor">*</span></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <textarea class="textTransfer" id="JustificationofChange" name="JustificationofChange" cols="60" rows="3"></textarea>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="card-body removeBodyPadding">
+                                <table class="w-100 OCRFBorder">
+                                    <tr>
+                                        <td class="ocrfEmployee bgLightGreen">Employee Transfer Details</td>
+                                    </tr>
+                                </table>
+                                <!-- <h4 class="ocrfEmployee bgLightGreen">Employee Transfer Details:</h4> -->
+                                <table class="table table-bordered ocrfTable">
+                                    <tbody>
+                                        <tr>
+                                            <td class="bgLightGreen ocrBrLeft">Employee Name<span class="astColor">*</span></td>
+                                            <td class="ocrfWidth ocrBrRight"> <input type="text" name="txtEmployeeName" autocomplete="off" class="inpDisable" id="txtEmployeeName" onkeypress="alphaOnly(event)" value="@(!IsNew ? (OCRF.one[0].EmployeeName ?? "") : "")"> </td>
+                                            <td class="bgLightGreen">Employee Code<span class="astColor">*</span></td>
+                                            <td class="ocrfWidth ocrBrRight"><input type="text" name="txtEmployeeCode" id="txtEmployeeCode" class="" placeholder="Type atleast 4 letters" required="required"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="bgLightGreen">Employee Type<span class="astColor">*</span></td>
+                                            <td class="ocrfWidth ocrBrRight">
+                                                <select name="drpUserType" id="drpUserType" onchange="func()" class="" style="width: 41%; padding: 4px;">
+                                                    <option value="" selected disabled>Choose..</option>
+                                                    <option value="White Collar">White Collar</option>
+                                                    <option value="Blue Collar">Blue Collar</option>
+                                                </select>
+                                            </td>
+                                            <td class="bgLightGreen ocrBrLeft">Designation<span class="astColor">*</span></td>
+                                            <td class="ocrfWidth ocrBrRight"><input type="text" name="txtDesignation" style="text-align: left;" autocomplete="off" class="inpDisable" id="txtDesignation" onkeypress="alphaOnly(event)" value="@(!IsNew ? (OCRF.one[0].Designation ?? " ") : " ")"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="bgLightGreen">Transfer Effective Date<span class="astColor">*</span></td>
+                                            <td class="ocrfWidth ocrBrRight"><input type="date" name="txtTransferEffectiveDate" class="inpDisable" id="txtTransferEffectiveDate" onclick="date_val()" value="" style="width: 41%;"></td>
+                                            <td class="bgLightGreen ocrBrLeft">Employee Location<span class="astColor">*</span></td>
+                                            <td class="ocrfWidth ocrBrRight">
+                                                <select class="" style="width: 37%; padding: 4px;" id="drpEmployeeLocation" name="drpEmployeeLocation"></select>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table class="table table-bordered ocrfTable ocrfTop">
+                                    <tbody>
+                                        <tr>
+                                            <th class="bgLightGreen ocrfAlignRight ocrBrLeft">Details</th>
+                                            <th class="bgLightGreen">From</th>
+                                            <th class="bgLightGreen ocrBrRight">To</th>
+                                        </tr>
+                                        <tr id="employeeRollWhiteCollar">
+                                            <td class="bgLightGreen ocrfAlignRight ocrBrLeft">Current Role<span class="astColor">*</span></td>
+                                            <td><input type="text" name="txtCurrentRoleFromWhite" autocomplete="off" class="inpDisable" id="txtCurrentRoleFromWhite" onkeypress="alphaOnly(event)" value="@(!IsNew ? (OCRF.one[0].CurrentRoleFrom ?? "") : "")" readonly></td>
+                                            <td class="ocrBrRight"> <input type="text" name="txtCurrentRoleToWhite" autocomplete="off" class="inpDisable" id="txtCurrentRoleToWhite" onkeypress="alphaOnly(event)" value="@(!IsNew ? (OCRF.one[0].CurrentRoleTo ?? "") : "")"></td>
+                                        </tr>
+                                        <tr id="employeeRollBlueCollar">
+                                            <td class="bgLightGreen ocrfAlignRight ocrBrLeft">Employee Category<span class="astColor">*</span></td>
+                                            <td class="ocrfWidth ocrBrRight">
+                                                <select name="txtCurrentRoleFromBlue" id="txtCurrentRoleFromBlue" onchange="" style="width: 38.3%; padding: 4px;">
+                                                    <option value="" selected disabled>Choose..</option>
+                                                    <option value="Direct TM">Direct TM</option>
+                                                    <option value="Indirect TM (TRW)">Indirect TM (TRW)</option>
+                                                </select>
+                                            </td>
+                                            <td class="ocrfWidth ocrBrRight">
+                                                <select name="txtCurrentRoleToBlue" id="txtCurrentRoleToBlue" onchange="" style="width: 38.3%; padding: 4px;">
+                                                    <option value="" selected disabled>Choose..</option>
+                                                    <option value="Direct TM">Direct TM</option>
+                                                    <option value="Indirect TM (TRW)">Indirect TM (TRW)</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                        <tr id="rowWorkContract">
+                                            <td class="bgLightGreen ocrfAlignRight ocrBrLeft">Work Contract<span class="astColor">*</span></td>
+                                            <td class="ocrfWidth ocrBrRight">
+                                                <select name="drpWorkContractFrom" id="drpWorkContractFrom" onchange="" style="width: 45%; padding: 4px;">
+                                                    <option value="" selected disabled>Choose..</option>
+                                                    <option value="White Collar Indirect">White Collar Indirect</option>
+                                                    <option value="White Collar Direct (GL/TL)">White Collar Direct (GL/TL)</option>
+                                                </select>
+                                            </td>
+                                            <td class="ocrfWidth ocrBrRight">
+                                                <select name="drpWorkContractTo" id="drpWorkContractTo" onchange="" style="width: 45%; padding: 4px;">
+                                                    <option value="" selected disabled>Choose..</option>
+                                                    <option value="White Collar Indirect">White Collar Indirect</option>
+                                                    <option value="White Collar Direct (GL/TL)">White Collar Direct (GL/TL)</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="bgLightGreen ocrfAlignRight ocrBrLeft">Division<span class="astColor">*</span></td>
+                                            <td><input type="text" name="txtDivisionFrom" autocomplete="off" class="inpDisable" id="txtDivisionFrom" onkeypress="alphaOnly(event)" value="@(!IsNew ? (OCRF.one[0].DivisionFrom ?? "") : "")" readonly></td>
+                                            <td class="ocrBrRight"><input type="text" name="txtDivisionTo" autocomplete="off" class="inpDisable" id="txtDivisionTo" onkeypress="alphaOnly(event)" value="@(!IsNew ? (OCRF.one[0].DivisionTo ?? "") : "")"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="bgLightGreen ocrfAlignRight ocrBrLeft">Department<span class="astColor">*</span></td>
+                                            <td><input type="text" name="txtDepartmentFrom" autocomplete="off" class="inpDisable" id="txtDepartmentFrom" onkeypress="alphaOnly(event)" value="@(!IsNew ? (OCRF.one[0].DepartmentFrom ?? "") : "")" readonly></td>
+                                            <td class="ocrBrRight"><input type="text" name="txtDepartmentTo" autocomplete="off" class="inpDisable" id="txtDepartmentTo" onkeypress="alphaOnly(event)" value="@(!IsNew ? (OCRF.one[0].DepartmentTo ?? "") : "")"></td>
+                                        </tr>
+                                        <tr id="rowSubDepartment">
+                                            <td class="bgLightGreen ocrfAlignRight ocrBrLeft">Sub-Department<span class="astColor">*</span></td>
+                                            <td><input type="text" name="txtSubDepartmentFrom" autocomplete="off" class="inpDisable" id="txtSubDepartmentFrom" onkeypress="alphaOnly(event)" value="@(!IsNew ? (OCRF.one[0].SubDepartmentFrom ?? "") : "")" readonly></td>
+                                            <td class="ocrBrRight"><input type="text" name="txtSubDepartmentTo" autocomplete="off" class="inpDisable" id="txtSubDepartmentTo" onkeypress="alphaOnly(event)" value="@(!IsNew ? (OCRF.one[0].SubDepartmentTo ?? "") : "")"></td>
+                                        </tr>
+                                        <tr id="rowSubDepartment1">
+                                            <td class="bgLightGreen ocrfAlignRight ocrBrLeft">Sub-Department 1<span class="astColor">*</span></td>
+                                            <td><input type="text" name="txtSubDepartmentFrom1" autocomplete="off" class="inpDisable" id="txtSubDepartmentFrom1" onkeypress="alphaOnly(event)" value="@(!IsNew ? (OCRF.one[0].SubDepartmentFrom ?? "") : "")" readonly></td>
+                                            <td class="ocrBrRight"><input type="text" name="txtSubDepartmentTo1" autocomplete="off" class="inpDisable" id="txtSubDepartmentTo1" onkeypress="alphaOnly(event)" value="@(!IsNew ? (OCRF.one[0].SubDepartmentTo ?? "") : "")"></td>
+                                        </tr>
+                                        <tr id="rowSubDepartment2">
+                                            <td class="bgLightGreen ocrfAlignRight ocrBrLeft">Sub-Department 2<span class="astColor">*</span></td>
+                                            <td><input type="text" name="txtSubDepartmentFrom2" autocomplete="off" class="inpDisable" id="txtSubDepartmentFrom2" onkeypress="alphaOnly(event)" value="@(!IsNew ? (OCRF.one[0].SubDepartmentFrom2 ?? "") : "")"></td>
+                                            <td class="ocrBrRight"><input type="text" name="txtSubDepartmentTo2" autocomplete="off" class="inpDisable" id="txtSubDepartmentTo2" onkeypress="alphaOnly(event)" value="@(!IsNew ? (OCRF.one[0].SubDepartmentTo2 ?? "") : "")"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="bgLightGreen ocrfAlignRight ocrBrLeft">Reporting Manager (Name, Emp No)<span class="astColor">*</span></td>
+                                            <td><input type="text" name="txtReportingManagerFrom" autocomplete="off" class="inpDisable" id="txtReportingManagerFrom" onkeypress="alphaOnly(event)" value="@(!IsNew ? (OCRF.one[0].ReportingManagerFrom ?? "") : "")" readonly></td>
+                                            <td class="ocrBrRight"><input type="text" name="txtReportingManagerTo" autocomplete="off" class="inpDisable" id="txtReportingManagerTo" placeholder="Type atleast 4 letters" value="@(!IsNew ? (OCRF.one[0].ReportingManagerTo ?? "") : "")"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="bgLightGreen ocrfAlignRight ocrBrLeft">Cost Centre<span class="astColor">*</span></td>
+                                            <td><input type="text" name="txtCostCentreFrom" autocomplete="off" class="inpDisable" id="txtCostCentreFrom" onkeypress="alphaOnly(event)" value="@(!IsNew ? (OCRF.one[0].CostCentreFrom ?? "") : "")" readonly></td>
+                                            <td class="ocrBrRight"><input type="text" name="txtCostCentreTo" autocomplete="off" class="inpDisable" id="txtCostCentreTo" onkeypress="allowNumbersOnly(event)" value="@(!IsNew ? (OCRF.one[0].CostCentreTo ?? "") : "")"></td>
+                                        </tr>
+                                        <tr id="rowBusinessLocation">
+                                            <td class="bgLightGreen ocrfAlignRight ocrBrLeft">Business Location (Location to which services are provided)<span class="astColor">*</span></td>
+                                            <td><select name="txtBusinessLocationFrom" autocomplete="off" class="inpDisable" id="txtBusinessLocationFrom" value=""></select></td>
+                                            <td class="ocrBrRight"><select name="txtBusinessLocationTo" autocomplete="off" class="inpDisable" id="txtBusinessLocationTo" value=""></select></td>
+                                        </tr>
+                                        <tr id="rowWorkLocation">
+                                            <td class="bgLightGreen ocrfAlignRight ocrBrLeft">Work Location (Physical location)<span class="astColor">*</span></td>
+                                            <td><select name="txtWorkLocationFrom" autocomplete="off" class="inpDisable" id="txtWorkLocationFrom" value=""></select></td>
+                                            <td class="ocrBrRight"><select name="txtWorkLocationTo" autocomplete="off" class="inpDisable" id="txtWorkLocationTo"></select></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="w-100">
+                                    <tr class="col-lg-6 col-md-6">
+                                        <td class="text-left">SF_S_035</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                    }
+                }
+                else
+                {
+                    <div class="container form-container">
+                        <div class="card-header">
+                            <table class="w-100 OCRFBorder">
+                                <tr>
+
+                                    <td class="ocrfTopHeader bgDarkGreen">ŠKODA  AUTO Volkswagen India Private Limited, Pune</td>
+                                    @if (OCRF.one[0].UserType == "White Collar"){
+                                    <td>
+                                        Form ID <input type="text" name="txtFormId" class="inpDisable" value="@(!IsNew ||!IsEdit ? ("OCRF"+FormId ?? "" ) : "" )" readonly>
+                                    </td>
+                                    }
+                                    else
+                                    {
+                                    <td>
+                                        Form ID <input type="text" name="txtFormId" class="inpDisable" value="@(!IsNew ||!IsEdit ? ("OCRF"+FormId ?? "" ) : "" )" readonly>
+                                    </td>
+                                    }
+                                    <td>Date <input type="text" name="txtDate" placeholder="/ /" class="inpDisable" value="@(!IsNew ||!IsEdit ? (Convert.ToDateTime(OCRF.two[0].FormId.Created).ToShortDateString()) : DateTime.Now.ToShortDateString())" readonly></td>
+                                </tr>
+                                <tr>
+                                    @if (OCRF.one[0].UserType == "White Collar"){
+                                    <td class="ocrMinTopHeader bgLightGreen">Organisation Change Request Form (OCRF)</td>
+                                    }
+                                    else
+                                    {
+                                    <td class="ocrMinTopHeader bgLightGreen">Transfer Request Form (TRF)</td>
+                                    }
+                                    
+                                </tr>
+                            </table>
+                            <table class="w-100 OCRFBorder">
+                                <tr class="col-border-1 bgLightGreen typeOfChange">
+                                    <td class="w-20 br-0 justification">Type of Change</td>
+                                    <td class="bl-0 br-0">
+                                        <label class="checkbox-container">
+                                            Employee Transfer
+                                            <input type="checkbox" class="inpDisable" id="EmployeeTransferChk" @(OCRF.one[0].EmployeeTransferChk == "EmployeeTransferChk" ? "checked" : "" ) value="EmployeeTransferChk" disabled>
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </td>
+                                    <td class="bl-0 br-0">
+                                        <label class="checkbox-container">
+                                            Cost Center
+                                            <input type="checkbox" class="inpDisable" id="CostCenterChk" @(OCRF.one[0].CostCenterChk == "CostCenterChk" ? "checked" : "" ) value="CostCenterChk" disabled>
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </td>
+                                    <td class="bl-0">
+                                        <label class="checkbox-container">
+                                            Reporting Authority
+                                            <input type="checkbox" class="inpDisable" id="ReportingAuthorityChk" @(OCRF.one[0].ReportingAuthorityChk == "ReportingAuthorityChk" ? "checked" : "" ) value="ReportingAuthorityChk" disabled>
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </td>
+                                </tr>
+                            </table>
+                            <table class="w-100 OCRFBorder">
+                                <tr>
+                                    <td class="bgLightGreen">Details of Organisartional Change</td>
+                                </tr>
+                                    @if (OCRF.one[0].attachmentlist.attachmentData.Count != 0)
+                                    {
+                                        foreach (var attachment in OCRF.one[0].attachmentlist.attachmentData)
+                                        {
+                                            <tr>
+                                                <td><span class="p-1"><b>Proposed Organisation Chart :</b> <a href=@System.Configuration.ConfigurationManager.AppSettings["SharepointSiteURL"]@attachment.ServerRelativeUrl download=@attachment.FileName target="_blank">@attachment.FileName </a></span></td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        @*<tr>
+                                            <td><span class="p-1"><b>Proposed Status :</b> (Pls attach the proposed organisation chart & highlight the employee position )</span></td>
+                                            <td colspan="2" class="borderLTB">
+                                                <input type="text" id="fileToUpload" name="fileToUpload" disabled />
+                                            </td>
+                                        </tr>*@
+                                    }
+                            </table>
+                            <table class="w-100 OCRFBorder">
+                                <tr>
+                                    <td class="transEmployee bgLightGreen text-left">
+                                        <span>Justification of Change :</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <textarea class="textTransfer" rows="5" cols="60" id="JustificationofChange" name="JustificationofChange" disabled>@(!IsNew ? (OCRF.one[0].JustificationofChange ?? ""): "")</textarea>
+                                    </td>
+                                </tr>
+                            </table>
+                            <table class="w-100 OCRFBorder">
+                                <tr>
+                                    <td class="ocrfEmployee bgLightGreen">Employee Transfer Details</td>
+                                </tr>
+                            </table>
+                            <!-- <h4 class="ocrfEmployee bgLightGreen">Employee Transfer Details:</h4> -->
+                            <table class="w-100 OCRFBorder">
+                                <tbody>
+                                    <tr>
+                                        <td class="bgLightGreen ocrBrLeft">Employee Name:</td>
+                                        <td class="ocrfWidth ocrBrRight"> <input type="text" name="txtEmployeeName" autocomplete="off" class="inpDisable" id="txtEmployeeName" onkeypress="alphaOnly(event)" value="@(!IsNew ? (OCRF.one[0].EmployeeName ?? "") : "")"> </td>
+                                        <td class="bgLightGreen">Employee Code:</td>
+                                        <td class="ocrfWidth ocrBrRight"> <input type="text" name="txtEmployeeCode" autocomplete="off" class="inpDisable" id="txtEmployeeCode" onkeypress="alphaOnly(event)" value="@(!IsNew ? (OCRF.one[0].EmployeeCode ?? " ") : " ")"> </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="bgLightGreen">Employee Type: </td>
+                                        <td class="ocrfWidth ocrBrRight">
+                                            <input type="text" name="drpEmployeeLocation" autocomplete="off" class="inpDisable" id="drpEmployeeLocation" onkeypress="" value="@(!IsNew ? (OCRF.one[0].UserType ?? " ") : " ")">
+                                        </td>
+                                        <td class="bgLightGreen ocrBrLeft">Designation: </td>
+                                        <td class="ocrfWidth ocrBrRight"><input type="text" name="txtDesignation" autocomplete="off" style="text-align: left;" class="inpDisable" id="txtDesignation" onkeypress="alphaOnly(event)" value="@(!IsNew ? (OCRF.one[0].Designation ?? "") : "")"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="bgLightGreen ocrBrLeft">Transfer Effective Date: </td>
+                                        <td class="ocrfWidth ocrBrRight">
+                                            <input type="text" name="txtTransferEffectiveDate" placeholder="/ /" class="border-none" value="@(!IsNew ? (OCRF.one[0].TransferEffectiveDate.ToShortDateString() ?? " ") : DateTime.Now.ToShortDateString())" readonly>
+                                        </td>
+                                        <td class="bgLightGreen">Employee Location: </td>
+                                        <td class="ocrfWidth ocrBrRight">
+                                            <input type="text" name="drpEmployeeLocation" autocomplete="off" class="inpDisable" id="drpEmployeeLocation" onkeypress="" value="@(!IsNew ? (OCRF.one[0].EmployeeLocation ?? " ") : " ")">
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table class="w-100 OCRFBorder">
+                                <tbody>
+                                    <tr>
+                                        <th>Details</th>
+                                        <th>From</th>
+                                        <th>To</th>
+                                    </tr>
+                                    <tr>
+                                        <td class="">Current Role</td>
+                                        <td><input type="text" name="txtCurrentRoleFrom" autocomplete="off" class="inpDisable" id="txtCurrentRoleFrom" onkeypress="alphaOnly(event)" value="@(!IsNew ? (OCRF.one[0].CurrentRoleFrom ?? "") : "")"></td>
+                                        <td class=""> <input type="text" name="txtCurrentRoleTo" autocomplete="off" class="inpDisable" id="txtCurrentRoleTo" onkeypress="alphaOnly(event)" value="@(!IsNew ? (OCRF.one[0].CurrentRoleTo ?? " ") : "")"></td>
+                                    </tr>
+                                    <tr id="rowWorkContract">
+                                        <td class="">WorkContract</td>
+                                        <td><input type="text" name="drpWorkContractFrom" autocomplete="off" class="inpDisable" id="drpWorkContractFrom" onkeypress="alphaOnly(event)" value="@(!IsNew ? (OCRF.one[0].WorkContractFrom ?? "") : "")"></td>
+                                        <td class=""> <input type="text" name="drpWorkContractTo" autocomplete="off" class="inpDisable" id="drpWorkContractTo" onkeypress="alphaOnly(event)" value="@(!IsNew ? (OCRF.one[0].WorkContractTo ?? " ") : "")"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="">Division</td>
+                                        <td><input type="text" name="txtDivisionFrom" autocomplete="off" class="inpDisable" id="txtDivisionFrom" onkeypress="alphaOnly(event)" value="@(!IsNew ? (OCRF.one[0].DivisionFrom ?? "") : "")"></td>
+                                        <td class=""><input type="text" name="txtDivisionTo" autocomplete="off" class="inpDisable" id="txtDivisionTo" onkeypress="alphaOnly(event)" value="@(!IsNew ? (OCRF.one[0].DivisionTo ?? " ") : "")"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="">Department</td>
+                                        <td><input type="text" name="txtDepartmentFrom" autocomplete="off" class="inpDisable" id="txtDepartmentFrom" onkeypress="alphaOnly(event)" value="@(!IsNew ? (OCRF.one[0].DepartmentFrom ?? "") : "")"></td>
+                                        <td class=""><input type="text" name="txtDepartmentTo" autocomplete="off" class="inpDisable" id="txtDepartmentTo" onkeypress="alphaOnly(event)" value="@(!IsNew ? (OCRF.one[0].DepartmentTo ?? "") : "")"></td>
+                                    </tr>
+                                    <tr id="rowSubDepartment">
+                                        <td class="">Sub-Department</td>
+                                        <td><input type="text" name="txtSubDepartmentFrom" autocomplete="off" class="inpDisable" id="txtSubDepartmentFrom" onkeypress="alphaOnly(event)" value="@(!IsNew ? (OCRF.one[0].SubDepartmentFrom ?? "") : "")"></td>
+                                        <td class=""><input type="text" name="txtSubDepartmentTo" autocomplete="off" class="inpDisable" id="txtSubDepartmentTo" onkeypress="alphaOnly(event)" value="@(!IsNew ? (OCRF.one[0].SubDepartmentTo ?? "") : "")"></td>
+                                    </tr>
+                                    <tr id="rowSubDepartment1">
+                                        <td class="">Sub-Department 1</td>
+                                        <td><input type="text" name="txtSubDepartmentFrom1" autocomplete="off" class="inpDisable" id="txtSubDepartmentFrom1" onkeypress="alphaOnly(event)" value="@(!IsNew ? (OCRF.one[0].SubDepartmentFrom ?? "") : "")" readonly></td>
+                                        <td class=""><input type="text" name="txtSubDepartmentTo1" autocomplete="off" class="inpDisable" id="txtSubDepartmentTo1" onkeypress="alphaOnly(event)" value="@(!IsNew ? (OCRF.one[0].SubDepartmentTo ?? "") : "")"></td>
+                                    </tr>
+                                    <tr id="rowSubDepartment2">
+                                        <td class="bgLightGreen ocrfAlignRight ocrBrLeft">Sub-Department 2</td>
+                                        <td><input type="text" name="txtSubDepartmentFrom2" autocomplete="off" class="inpDisable" id="txtSubDepartmentFrom2" onkeypress="alphaOnly(event)" value="@(!IsNew ? (OCRF.one[0].SubDepartmentFrom2 ?? "") : "")" readonly></td>
+                                        <td class="ocrBrRight"><input type="text" name="txtSubDepartmentTo2" autocomplete="off" class="inpDisable" id="txtSubDepartmentTo2" onkeypress="alphaOnly(event)" value="@(!IsNew ? (OCRF.one[0].SubDepartmentTo2 ?? "") : "")"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="">Reporting Manager (Name, Emp No)</td>
+                                        <td><input type="text" name="txtReportingManagerFrom" autocomplete="off" class="inpDisable" id="txtReportingManagerFrom" onkeypress="alphaOnly(event)" value="@(!IsNew ? (OCRF.one[0].ReportingManagerFrom ?? "") : "")"></td>
+                                        <td class=""><input type="text" name="txtReportingManagerTo" autocomplete="off" class="inpDisable" id="txtReportingManagerTo" onkeypress="" value="@(!IsNew ? (OCRF.one[0].ReportingManagerTo ?? "") : "")"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="">Cost Centre</td>
+                                        <td><input type="text" name="txtCostCentreFrom" autocomplete="off" class="inpDisable" id="txtCostCentreFrom" onkeypress="alphaOnly(event)" value="@(!IsNew ? (OCRF.one[0].CostCentreFrom ?? "") : "")" ></td>
+                                        <td class=""><input type="text" name="txtCostCentreTo" autocomplete="off" class="inpDisable" id="txtCostCentreTo" onkeypress="allowNumbersOnly(event)" value="@(!IsNew ? (OCRF.one[0].CostCentreTo ?? "") : "")"></td>
+                                    </tr>
+                                    <tr id="rowBusinessLocation">
+                                        <td>Business Location(Location to which services are provided)</td>
+                                        <td><input type="text" class="inpDisable" value="@(!IsNew ? (OCRF.one[0].BusinessLocationFrom ?? "") : "")"></td>
+                                        <td class=""><input type="text" class="inpDisable" value="@(!IsNew ? (OCRF.one[0].BusinessLocationTo ?? "") : "")"></td>
+                                    </tr>
+                                    <tr id="rowWorkLocation">
+                                        <td>Work Location (Physical location)</td>
+                                        <td><input type="text" class="inpDisable" value="@(!IsNew ? (OCRF.one[0].WorkLocationFrom ?? "") : "")"></td>
+                                        <td class=""><input type="text" class="inpDisable" value="@(!IsNew ? (OCRF.one[0].WorkLocationTo ?? "") : "")"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <input type="hidden"/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                }
+                @if(!IsNew||!IsEdit){
+                    <div class="container form-container">
+                        <div class="card-header">
+                            <table class="w-100 OCRFBorder">
+
+                                <tbody>
+                                    <tr>
+                                        <td colspan="3" class="ocrfCenterAlign bgLightGreen ocrBrLeft ocrBrRight"><b>Approved by</b></td>
+                                    </tr>
+                                    <tr>
+                                        @*<td class="ocrBrLeft">Name, Signature <br> & Date</td>*@
+                                        <td>
+                                            <table>
+                                                <tr>
+                                                    <td colspan="3" class="f-600"><b>Requesting Manager</b></td>
+                                                    <td class="display-none"></td>
+                                                    <td class="display-none"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Name: <input type="text" class="inpDisable" name="name" style="width: 250px;" value="@(OCRF.three[0].UserName)"></td>
+                                                    <td colspan="2">Approver Comment: <textarea cols="50" rows="3" class="inpDisable textareawidth">@(OCRF.three[0].Comment)</textarea></td>
+                                                    <td>Signature: <input class="Signature inpDisable" type="text" style="width: 250px;" value="@(OCRF.three[0].ApproverStatus != "Pending" ? (OCRF.three[0].ApproverStatus + " on " + Convert.ToDateTime(OCRF.two[0].Modified).ToShortDateString() + " " + Convert.ToDateTime(OCRF.two[0].Modified).ToShortTimeString()) : "")"></td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                        <td class="ocrBrRight">
+                                            <table>
+                                                <tr>
+                                                    <td colspan="3" class="f-600"><b>Head of Department</b></td>
+                                                    <td class="display-none"></td>
+                                                    <td class="display-none"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Name: <input type="text" class="inpDisable" name="name" style="width: 250px;" value="@(OCRF.three[1].UserName)"></td>
+                                                    <td colspan="2">Approver Comment: <textarea cols="50" rows="3" class="inpDisable textareawidth">@(OCRF.three[1].Comment)</textarea></td>
+                                                    <td>Signature: <input class="Signature inpDisable" type="text" style="width: 250px;" value="@(OCRF.three[1].ApproverStatus != "Pending" ? (OCRF.three[1].ApproverStatus + " on " + Convert.ToDateTime(OCRF.two[1].Modified).ToShortDateString() + " " + Convert.ToDateTime(OCRF.two[1].Modified).ToShortTimeString()) : "")"></td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3" class="ocrfCenterAlign bgLightGreen ocrBrLeft ocrBrRight">Requesting / Proposed Department - where Employee is getting transferred</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <table>
+                                                <tr>
+                                                    <td colspan="3" class="f-600"><b>Reporting Manager / Superior</b></td>
+                                                    <td class="display-none"></td>
+                                                    <td class="display-none"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Name: <input type="text" class="inpDisable" name="name" style="width: 250px;" value="@(OCRF.three[2].UserName)"></td>
+                                                    <td colspan="2">Approver Comment: <textarea cols="50" rows="3" class="inpDisable textareawidth">@(OCRF.three[2].Comment)</textarea></td>
+                                                    <td>Signature: <input class="Signature inpDisable" type="text" style="width: 250px;" value="@(OCRF.three[2].ApproverStatus != "Pending" ? (OCRF.three[2].ApproverStatus + " on " + Convert.ToDateTime(OCRF.two[2].Modified).ToShortDateString() + " " + Convert.ToDateTime(OCRF.two[2].Modified).ToShortTimeString()) : "")"></td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                        <td class="ocrBrRight">
+                                            <table>
+                                                <tr>
+                                                    <td colspan="3" class="f-600"><b>Head of Department</b></td>
+                                                    <td class="display-none"></td>
+                                                    <td class="display-none"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Name: <input type="text" class="inpDisable" name="name" style="width: 250px;" value="@(OCRF.three[3].UserName)"></td>
+                                                    <td colspan="2">Approver Comment: <textarea cols="50" rows="3" class="inpDisable textareawidth">@(OCRF.three[3].Comment)</textarea></td>
+                                                    <td>Signature: <input class="Signature inpDisable" type="text" style="width: 250px;" value="@(OCRF.three[3].ApproverStatus != "Pending" ? (OCRF.three[3].ApproverStatus + " on " + Convert.ToDateTime(OCRF.two[3].Modified).ToShortDateString() + " " + Convert.ToDateTime(OCRF.two[3].Modified).ToShortTimeString()) : "")"></td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3" class="ocrfCenterAlign bgLightGreen ocrBrLeft ocrBrRight">Existing Department - where Employee is currently working</td>
+                                    </tr>
+                                
+                                @if (OCRF.one[0].UserType == "White Collar")
+                                {
+                                    if (OCRF.one[0].CostCenterChk == "CostCenterChk")
+                                    {
+                                        //10 Approval
+                                        
+                                            <tr>
+                                                <td>
+                                                    <table>
+                                                        <tr>
+                                                            <td colspan="3" class="f-600"><b>Head of HR Operations</b></td>
+                                                            <td class="display-none"></td>
+                                                            <td class="display-none"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Name: <input type="text" class="inpDisable" name="name" style="width: 250px;" value="@(OCRF.three[4].UserName)"></td>
+                                                            <td colspan="2">Approver Comment: <textarea cols="50" rows="3" class="inpDisable textareawidth">@(OCRF.three[4].Comment)</textarea></td>
+                                                            <td>Signature: <input class="Signature inpDisable" type="text" style="width: 250px;" value="@(OCRF.three[4].ApproverStatus != "Pending" ? (OCRF.three[4].ApproverStatus + " on " + Convert.ToDateTime(OCRF.two[4].Modified).ToShortDateString() + " " + Convert.ToDateTime(OCRF.two[4].Modified).ToShortTimeString()) : "")"></td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                                <td class="ocrBrRight">
+                                                    <table>
+                                                        <tr>
+                                                            <td colspan="3" class="f-600">
+                                                                <b>Head Finance Controlling</b>
+                                                                (Only in case of Cost Center change)
+                                                            </td>
+                                                            <td class="display-none"></td>
+                                                            <td class="display-none"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Name: <input type="text" class="inpDisable" name="name" style="width: 250px;" value="@(OCRF.three[5].UserName)"></td>
+                                                            <td colspan="2">Approver Comment: <textarea cols="50" rows="3" class="inpDisable textareawidth">@(OCRF.three[5].Comment)</textarea></td>
+                                                            <td>Signature: <input class="Signature inpDisable" type="text" style="width: 250px;" value="@(OCRF.three[5].ApproverStatus != "Pending" ? (OCRF.three[5].ApproverStatus + " on " + Convert.ToDateTime(OCRF.two[5].Modified).ToShortDateString() + " " + Convert.ToDateTime(OCRF.two[5].Modified).ToShortTimeString()) : "")"></td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3" class="ocrfCenterAlign bgLightGreen ocrBrLeft ocrBrRight">HR Operations & Finanace Controlling  (Only in case of Cost Center change)</td>
+                                            </tr>
+                                            <tr>
+                                                @*<td class="ocrBrLeft">Name, Signature <br> & Date</td>*@
+                                                <td>
+                                                    <table>
+                                                        <tr>
+                                                            <td colspan="3" class="f-600"><b>Head OM, Payroll and Central HR</b></td>
+                                                            <td class="display-none"></td>
+                                                            <td class="display-none"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Name: <input type="text" class="inpDisable" name="name" style="width: 250px;" value="@(OCRF.three[6].UserName)"></td>
+                                                            <td colspan="2">Approver Comment: <textarea cols="50" rows="3" class="inpDisable textareawidth">@(OCRF.three[6].Comment)</textarea></td>
+                                                            <td>Signature: <input class="Signature inpDisable" type="text" style="width: 250px;" value="@(OCRF.three[6].ApproverStatus != "Pending" ? (OCRF.three[6].ApproverStatus + " on " + Convert.ToDateTime(OCRF.two[6].Modified).ToShortDateString() + " " + Convert.ToDateTime(OCRF.two[6].Modified).ToShortTimeString()) : "")"></td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                                <td class="ocrBrRight">
+                                                    <table>
+                                                        <tr>
+                                                            <td colspan="3" class="f-600"><b>Service Desk/ IT Asset Team</b></td>
+                                                            <td class="display-none"></td>
+                                                            <td class="display-none"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Name: <input type="text" class="inpDisable" name="name" style="width: 250px;" value="@(OCRF.three[7].UserName)"></td>
+                                                            <td colspan="2">Approver Comment: <textarea cols="50" rows="3" class="inpDisable textareawidth">@(OCRF.three[7].Comment)</textarea></td>
+                                                            <td>Signature: <input class="Signature inpDisable" type="text" style="width: 250px;" value="@(OCRF.three[7].ApproverStatus != "Pending" ? (OCRF.three[7].ApproverStatus + " on " + Convert.ToDateTime(OCRF.two[7].Modified).ToShortDateString() + " " + Convert.ToDateTime(OCRF.two[7].Modified).ToShortTimeString()) : "")"></td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3" class="ocrfCenterAlign bgLightGreen ocrBrLeft ocrBrRight">HR & IT related changes (Payroll, SAP, LMS, IT related assets/ authorization/access/ system rights)</td>
+                                            </tr>
+                                            if(OCRF.one[0].Designation=="General Manager"||OCRF.one[0].Designation=="Senior General Manager"||OCRF.one[0].Designation=="Chief General Manager"||OCRF.one[0].Designation=="Vice President"||OCRF.one[0].Designation=="Managing Director")
+                                            {
+                                            <tr>
+                                                <td>
+                                                    <table>
+                                                        <tr>
+                                                            <td colspan="3" class="f-600"><b>Exec. Director - HR & Admin.</b></td>
+                                                            <td class="display-none"></td>
+                                                            <td class="display-none"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Name: <input type="text" class="inpDisable" name="name" style="width: 250px;" value="@(OCRF.three[8].UserName)"></td>
+                                                            <td colspan="2">Approver Comment: <textarea cols="50" rows="3" class="inpDisable textareawidth">@(OCRF.three[8].Comment)</textarea></td>
+                                                            <td>Signature: <input class="Signature inpDisable" type="text" style="width: 250px;" value="@(OCRF.three[8].ApproverStatus != "Pending" ? (OCRF.three[8].ApproverStatus + " on " + Convert.ToDateTime(OCRF.two[8].Modified).ToShortDateString() + " " + Convert.ToDateTime(OCRF.two[8].Modified).ToShortTimeString()) : "")"></td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                                <td class="ocrBrRight">
+                                                    <table>
+                                                        <tr>
+                                                            <td colspan="3" class="f-600"><b>Managing Director</b></td>
+                                                            <td class="display-none"></td>
+                                                            <td class="display-none"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Name: <input type="text" class="inpDisable" name="name" style="width: 250px;" value="@(OCRF.three[9].UserName)"></td>
+                                                            <td colspan="2">Approver Comment: <textarea cols="50" rows="3" class="inpDisable textareawidth">@(OCRF.three[9].Comment)</textarea></td>
+                                                            <td>Signature: <input class="Signature inpDisable" type="text" style="width: 250px;" value="@(OCRF.three[9].ApproverStatus != "Pending" ? (OCRF.three[9].ApproverStatus + " on " + Convert.ToDateTime(OCRF.two[9].Modified).ToShortDateString() + " " + Convert.ToDateTime(OCRF.two[9].Modified).ToShortTimeString()) : "")"></td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3" class="ocrfCenterAlign bgLightGreen ocrBrLeft ocrBrRight"><b>Approved by: To be obtained only in case of GM & Above transfers</b></td>
+                                            </tr>
+                                            }
+                                            
+                                            @*<tr>
+                                                    <td class="bgLightGreen ocrBrLeft"></td>
+                                                    <td class="bgLightGreen"><b>Exec. Director - HR & Admin.</b></td>
+                                                    <td class="bgLightGreen ocrBrRight"><b>Managing Director</b></td>
+                                                </tr>*@
+                                        
+                                    }
+                                    else
+                                    {
+                                        //9 Approval
+                                        
+                                            <tr>
+                                                <td>
+                                                    <table>
+                                                        <tr>
+                                                            <td colspan="3" class="f-600"><b>Head of HR Operations</b></td>
+                                                            <td class="display-none"></td>
+                                                            <td class="display-none"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Name: <input type="text" class="inpDisable" name="name" style="width: 250px;" value="@(OCRF.three[4].UserName)"></td>
+                                                            <td colspan="2">Approver Comment: <textarea cols="50" rows="3" class="inpDisable textareawidth">@(OCRF.three[4].Comment)</textarea></td>
+                                                            <td>Signature: <input class="Signature inpDisable" type="text" style="width: 250px;" value="@(OCRF.three[4].ApproverStatus != "Pending" ? (OCRF.three[4].ApproverStatus + " on " + Convert.ToDateTime(OCRF.two[4].Modified).ToShortDateString() + " " + Convert.ToDateTime(OCRF.two[4].Modified).ToShortTimeString()) : "")"></td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <table>
+                                                        <tr>
+                                                            <td colspan="3" class="f-600"><b>Head OM, Payroll and Central HR</b></td>
+                                                            <td class="display-none"></td>
+                                                            <td class="display-none"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Name: <input type="text" class="inpDisable" name="name" style="width: 250px;" value="@(OCRF.three[5].UserName)"></td>
+                                                            <td colspan="2">Approver Comment: <textarea cols="50" rows="3" class="inpDisable textareawidth">@(OCRF.three[5].Comment)</textarea></td>
+                                                            <td>Signature: <input class="Signature inpDisable" type="text" style="width: 250px;" value="@(OCRF.three[5].ApproverStatus != "Pending" ? (OCRF.three[5].ApproverStatus + " on " + Convert.ToDateTime(OCRF.two[5].Modified).ToShortDateString() + " " + Convert.ToDateTime(OCRF.two[5].Modified).ToShortTimeString()) : "")"></td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                                <td class="ocrBrRight">
+                                                    <table>
+                                                        <tr>
+                                                            <td colspan="3" class="f-600"><b>Service Desk/ IT Asset Team</b></td>
+                                                            <td class="display-none"></td>
+                                                            <td class="display-none"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Name: <input type="text" class="inpDisable" name="name" style="width: 250px;" value="@(OCRF.three[6].UserName)"></td>
+                                                            <td colspan="2">Approver Comment: <textarea cols="50" rows="3" class="inpDisable textareawidth">@(OCRF.three[6].Comment)</textarea></td>
+                                                            <td>Signature: <input class="Signature inpDisable" type="text" style="width: 250px;" value="@(OCRF.three[6].ApproverStatus != "Pending" ? (OCRF.three[6].ApproverStatus + " on " + Convert.ToDateTime(OCRF.two[6].Modified).ToShortDateString() + " " + Convert.ToDateTime(OCRF.two[6].Modified).ToShortTimeString()) : "")"></td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3" class="ocrfCenterAlign bgLightGreen ocrBrLeft ocrBrRight">HR & IT related changes (Payroll, SAP, LMS, IT related assets/ authorization/access/ system rights)</td>
+                                            </tr>
+                                            if (OCRF.one[0].Designation=="General Manager"||OCRF.one[0].Designation=="Senior General Manager"||OCRF.one[0].Designation=="Chief General Manager"||OCRF.one[0].Designation=="Vice President"||OCRF.one[0].Designation=="Managing Director")
+                                            {
+                                            <tr>
+                                                @*<td class="ocrBrLeft">Name, Signature <br> & Date</td>*@
+                                                <td>
+                                                    <table>
+                                                        <tr>
+                                                            <td colspan="3" class="f-600"><b>Exec. Director - HR & Admin.</b></td>
+                                                            <td class="display-none"></td>
+                                                            <td class="display-none"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Name: <input type="text" class="inpDisable" name="name" style="width: 250px;" value="@(OCRF.three[7].UserName)"></td>
+                                                            <td colspan="2">Approver Comment: <textarea cols="50" rows="3" class="inpDisable textareawidth">@(OCRF.three[7].Comment)</textarea></td>
+                                                            <td>Signature: <input class="Signature inpDisable" type="text" style="width: 250px;" value="@(OCRF.three[7].ApproverStatus != "Pending" ? (OCRF.three[7].ApproverStatus + " on " + Convert.ToDateTime(OCRF.two[7].Modified).ToShortDateString() + " " + Convert.ToDateTime(OCRF.two[7].Modified).ToShortTimeString()) : "")"></td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                                <td class="ocrBrRight">
+                                                    <table>
+                                                        <tr>
+                                                            <td colspan="3" class="f-600"><b>Managing Director</b></td>
+                                                            <td class="display-none"></td>
+                                                            <td class="display-none"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Name: <input type="text" class="inpDisable" name="name" style="width: 250px;" value="@(OCRF.three[8].UserName)"></td>
+                                                            <td colspan="2">Approver Comment: <textarea cols="50" rows="3" class="inpDisable textareawidth">@(OCRF.three[8].Comment)</textarea></td>
+                                                            <td>Signature: <input class="Signature inpDisable" type="text" style="width: 250px;" value="@(OCRF.three[8].ApproverStatus != "Pending" ? (OCRF.three[8].ApproverStatus + " on " + Convert.ToDateTime(OCRF.two[8].Modified).ToShortDateString() + " " + Convert.ToDateTime(OCRF.two[8].Modified).ToShortTimeString()) : "")"></td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3" class="ocrfCenterAlign bgLightGreen ocrBrLeft ocrBrRight"><b>Approved by: To be obtained only in case of GM & Above transfers</b></td>
+                                            </tr>
+                                            }
+                                            @*<tr>
+                                                    <td class="bgLightGreen ocrBrLeft"></td>
+                                                    <td class="bgLightGreen"><b>Exec. Director - HR & Admin.</b></td>
+                                                    <td class="bgLightGreen ocrBrRight"><b>Managing Director</b></td>
+                                                </tr>*@
+                                        
+                                    }
+
+
+                                }
+                                else if (OCRF.one[0].UserType == "Blue Collar")
+                                {
+                                    
+                                        <tr>
+                                            <td>
+                                                <table>
+                                                    <tr>
+                                                        <td colspan="3" class="f-600"><b>Head of HRBP Production</b></td>
+                                                        <td class="display-none"></td>
+                                                        <td class="display-none"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Name: <input type="text" class="inpDisable" name="name" style="width: 250px;" value="@(OCRF.three[4].UserName)"></td>
+                                                        <td colspan="2">Approver Comment: <textarea cols="50" rows="3" class="inpDisable textareawidth">@(OCRF.three[4].Comment)</textarea></td>
+                                                        <td>Signature: <input class="Signature inpDisable" type="text" style="width: 250px;" value="@(OCRF.three[4].ApproverStatus != "Pending" ? (OCRF.three[4].ApproverStatus + " on " + Convert.ToDateTime(OCRF.two[4].Modified).ToShortDateString() + " " + Convert.ToDateTime(OCRF.two[4].Modified).ToShortTimeString()) : "")"></td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                            
+
+                                }
+                                </tbody>
+
+                            </table>
+
+                            <table>
+                                <tr>
+                                    <td>Note : - Requesting Manager has to give approved MPR for the department in which the employee is getting transferred.</td>
+                                </tr>
+                            </table>
+                            <table class="w-100">
+                                <tr class="col-lg-6 col-md-6">
+                                    <td class="text-left">SF_S_035</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                }
+
+
+                @if (IsNew)
+                {
+                    if (!IsEdit)
+                    {
+                        <div class="card-footer align-content-center">
+                            <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                                Re-Submit
+                            </button>
+                            <button type="reset" class="btn btn-danger btn-sm cancl-btn">
+                                Cancel
+                            </button>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="card-footer align-content-center">
+                            <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                                Submit
+                            </button>
+                            <button type="reset" class="btn btn-danger btn-sm cancl-btn">
+                                Cancel
+                            </button>
+                        </div>
+                    }
+                }
+
+            </div>
+        </div>
+
+
+    </form>
+</body>
+<div class="modal fade" id="successModel" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header modelHeader">
+                <span class="modal-title modalMsgTitle" id="modalTitle"></span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label id="modalBody" class="lableMsg">  </label>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="submitBomBtn publishBtn" id="modalOkButton">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    //var spinner = $('#loader');
+    var FlagRedirect = @Html.Raw(Json.Encode(FlagRedirect));
+    var IsNew = @Html.Raw(Json.Encode(IsNew));
+    var OCRF = @Html.Raw(Json.Encode(OCRF));
+    var appRowId = @Html.Raw(Json.Encode(AppRowId));
+    var approvalType =@Html.Raw(Json.Encode(ApprovalType));
+    var IsEdit = @Html.Raw(Json.Encode(IsEdit));
+    pageLoad();
+
+    function pageLoad() {
+        //spinner.hide();
+        //debugger
+        
+        var data = "";
+        if (!IsNew) {
+            var value = JSON.stringify(OCRF[0]);
+            var value_1 = JSON.parse(value);
+            var selectedUserType = value_1.Value[0].UserType;
+            console.log(selectedUserType);
+            $(".inpDisable").attr("disabled", "disabled");
+            if (selectedUserType == "Blue Collar") {
+                $('#rowWorkLocation').hide();
+                $('#rowBusinessLocation').hide();
+                $('#rowSubDepartment').hide();
+                $('#rowSubDepartment1').show();
+                $('#rowSubDepartment2').show();
+                $('#rowWorkContract').hide();
+            }
+            if (selectedUserType == "White Collar") {
+                $('#rowWorkLocation').show();
+                $('#rowBusinessLocation').show();
+                $('#rowSubDepartment').show();
+                $('#rowSubDepartment1').hide();
+                $('#rowSubDepartment2').hide();
+                $('#rowWorkContract').show();
+            }
+        }
+        if (!IsNew) {
+            $(".drpDisable").attr("disabled", "disabled");
+        }
+        if (IsNew) {
+
+            if (!IsEdit) {
+                GetApprovers();
+                GetHRBPApprover();
+                GetLocation();
+                getRequestFor();
+
+                var value = JSON.stringify(OCRF[0]);
+                var value_1 = JSON.parse(value);
+                var selectedUserType = value_1.Value[0].UserType;
+                if (selectedUserType == "Blue Collar") {
+                    $('#employeeRollWhiteCollar').hide();
+                    $('#employeeRollBlueCollar').show();
+                    $('#rowWorkLocation').hide();
+                    $('#rowBusinessLocation').hide();
+                    $('#rowSubDepartment').hide();
+                    $('#rowSubDepartment1').show();
+                    $('#rowSubDepartment2').show();
+                    $('#rowWorkContract').hide();
+                }
+                if (selectedUserType == "White Collar") {
+                    $('#employeeRollWhiteCollar').show();
+                    $('#employeeRollBlueCollar').hide();
+                    $('#rowWorkLocation').show();
+                    $('#rowBusinessLocation').show();
+                    $('#rowSubDepartment').show();
+                    $('#rowSubDepartment1').hide();
+                    $('#rowSubDepartment2').hide();
+                    $('#rowWorkContract').show();
+                }
+                //$(".inpIsNewDisable").attr("disabled", "disabled");
+            }
+
+            else {
+                GetApprovers();
+                GetHRBPApprover();
+                GetLocation();
+                getRequestFor();
+                $('#employeeRollWhiteCollar').hide();
+                $('#employeeRollBlueCollar').hide();
+                $('#rowWorkLocation').hide();
+                $('#rowBusinessLocation').hide();
+                $('#rowSubDepartment').hide();
+                $('#rowSubDepartment1').hide();
+                $('#rowSubDepartment2').hide();
+                $('#rowWorkContract').hide();
+                $(".inpIsNewDisable").attr("disabled", "disabled");
+            }
+        }
+        
+    };
+
+    function getRequestFor() {
+        $('input:checkbox[id="EmployeeTransferChk"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                $('input[id="CostCenterChk"]').prop("checked", false);
+                $('input[id="ReportingAuthorityChk"]').prop("checked", false);
+            }
+        });
+
+        $('input:checkbox[id="CostCenterChk"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                $('input[id="EmployeeTransferChk"]').prop("checked", false);
+                $('input[id="ReportingAuthorityChk"]').prop("checked", false);
+            }
+        });
+
+        $('input:checkbox[id="ReportingAuthorityChk"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                $('input[id="EmployeeTransferChk"]').prop("checked", false);
+                $('input[id="CostCenterChk"]').prop("checked", false);
+            }
+        });
+    }
+
+    function GetApprovers() {
+        //debugger
+        $.ajax({
+            url: '/OCRF/GetOCRFApprovalList',
+            type: 'GET',
+            data: {},
+            dataType: 'JSON',
+            success: (function (data) {
+                //debugger
+                approverData = data;
+                console.log(data);
+                var row = "";
+                for (var i = 0; i < data.length; i++) {
+                    row += '<input type="hidden" id="hidden' + data[i].Department + 'Approver" name="hidden' + data[i].Department + 'Approver" value="' + data[i].ApproverEmailId + '">';
+                }
+                $("#hiddenApproverInformation").html(row);
+
+            }),
+            error: (function (data) {
+                //code
+            })
+        })
+
+    }
+
+    function GetHRBPApprover() {
+        debugger
+        $.ajax({
+            url: '/OCRF/GetOCRFHRBPApprovalList',
+            type: 'GET',
+            data: {},
+            dataType: 'JSON',
+            success: (function (data) {
+                //debugger
+                approverData = data;
+                console.log(data);
+                var row = "";
+                for (var i = 0; i < data.length; i++) {
+                    if ("@currentUser.CostCenter" == data[i].CostCenter) {
+                        row += '<input type="hidden" id="hiddenHeadofHROperationsApprover" name="hiddenHeadofHROperationsApprover" value="' + data[i].HeadHRBPEmployeeNumber + '">';
+                    }
+                    
+                }
+                $("#hiddenHRBPApproverInformation").html(row);
+
+            }),
+            error: (function (data) {
+                //code
+            })
+        })
+
+    }
+
+    $("#txtEmployeeCode").autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                url: "/OCRF/GetOCRFEmployeeDetails",
+                dataType: "json",
+                cache: false,
+                async: false,
+                data: {
+                    searchText: $("#txtEmployeeCode").val()
+                },
+                success: function (data) {
+                    //debugger;
+                    response($.map(data, function (item) {
+                        console.log("EmployeeCode");
+                        console.log(data, 'data');
+                        return { label: item.UserId, value: item.UserId, raw: item };
+                    }));
+                }
+            });
+        },
+        search: function (event, ui) {
+            var value = $("#txtEmployeeCode").val();
+            console.log(value);
+            // If less than three chars, cancel the search event
+            if (value.length < 4) {
+                event.preventDefault();
+            }
+        },
+        min_length: 4,
+        delay: 0,
+        select: function (event, ui) {
+            debugger;
+            var empOtherDetails = ui.item['raw'];
+            console.log(empOtherDetails);
+            console.log("select");
+            //Get the other details like Cost Center Code, Employee Number from DB.
+            $.ajax({
+                url: "/OCRF/GetOCRFExistingEmployeeDetails",
+                dataType: "json",
+                cache: false,
+                async: false,
+                data: {
+                    otherEmpUserId: empOtherDetails.UserId,
+                },
+                success: function (data) {
+                    console.log("select success");
+                    console.log(data, 'data');
+
+                    $('#txtEmployeeName').val(data.EmployeeName);
+                    $('#txtDesignation').val(data.Designation);
+
+                    $('#txtCurrentRoleFromWhite').val(data.CurrentRoleFrom);
+                    $('#txtDivisionFrom').val(data.DivisionFrom);
+                    $('#txtDepartmentFrom').val(data.DepartmentFrom);
+                    $('#txtSubDepartmentFrom').val(data.SubDepartmentFrom);
+                    $('#txtSubDepartmentFrom1').val(data.SubDepartmentFrom);
+                    $('#txtSubDepartmentFrom2').val("Information Technology");
+                    $('#txtBusinessLocationFrom').val("SAVW - Pune Chakan Plant");
+                    $('#txtWorkLocationFrom').val("SAVW - Pune Chakan Plant");
+                    $('#txtReportingManagerFrom').val(data.ReportingManagerFrom);
+                    $('#txtCostCentreFrom').val(data.CostCentreFrom);
+                    
+
+                }
+            });
+        }
+    });
+
+    $("#txtReportingManagerTo").autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                url: "/OCRF/GetOCRFEmployeeDetails",
+                dataType: "json",
+                cache: false,
+                async: false,
+                data: {
+                    searchText: $("#txtReportingManagerTo").val()
+                },
+                success: function (data) {
+                    //debugger;
+                    response($.map(data, function (item) {
+                        console.log("EmployeeCode");
+                        console.log(data, 'data');
+                        return { label: item.UserName, value: item.UserName, raw: item };
+                    }));
+                }
+            });
+        },
+        search: function (event, ui) {
+            var value = $("#txtReportingManagerTo").val();
+            console.log(value);
+            // If less than three chars, cancel the search event
+            if (value.length < 4) {
+                event.preventDefault();
+            }
+        },
+        min_length: 4,
+        delay: 0,
+        select: function (event, ui) {
+            debugger;
+            var empOtherDetails = ui.item['raw'];
+            console.log(empOtherDetails);
+            console.log("select");
+            //Get the other details like Cost Center Code, Employee Number from DB.
+            //$.ajax({
+            //    url: "/OCRF/GetOCRFExistingEmployeeDetails",
+            //    dataType: "json",
+            //    cache: false,
+            //    async: false,
+            //    data: {
+            //        otherEmpUserId: empOtherDetails.UserId,
+            //    },
+            //    success: function (data) {
+            //        console.log("select success");
+            //        console.log(data, 'data');
+
+            //        //$('#txtEmployeeName').val(data.EmployeeName);
+            //        //$('#txtDesignation').val(data.Designation);
+
+            //        //$('#txtCurrentRoleFrom').val(data.CurrentRoleFrom);
+            //        //$('#txtDivisionFrom').val(data.DivisionFrom);
+            //        //$('#txtDepartmentFrom').val(data.DepartmentFrom);
+            //        //$('#txtSubDepartmentFrom').val(data.SubDepartmentFrom);
+            //        //$('#txtReportingManagerFrom').val(data.ReportingManagerFrom);
+            //        //$('#txtCostCentreFrom').val(data.CostCentreFrom);
+
+            //    }
+            //});
+        }
+    });
+
+    $("#txtCostCentreTo").autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                url: "/OCRF/GetOCRFCCDetails",
+                dataType: "json",
+                cache: false,
+                async: false,
+                data: {
+                    searchText: $("#txtCostCentreTo").val()
+                },
+                success: function (data) {
+                    //debugger;
+                    response($.map(data, function (item) {
+                        console.log("CC");
+                        console.log(data, 'data');
+                        return { label: item.Department, value: item.Department, raw: item };
+                    }));
+                }
+            });
+        },
+        search: function (event, ui) {
+            var value = $("#txtCostCentreTo").val();
+            console.log(value);
+            // If less than three chars, cancel the search event
+            if (value.length < 2) {
+                event.preventDefault();
+            }
+        },
+        min_length: 2,
+        delay: 0,
+        select: function (event, ui) {
+            //debugger;
+            var empOtherDetails = ui.item['raw'];
+            console.log(empOtherDetails);
+            console.log("select");
+            //Get the other details like Cost Center Code, Employee Number from DB.
+            //$.ajax({
+            //    url: "/OCRF/GetOCRFExistingEmployeeDetails",
+            //    dataType: "json",
+            //    cache: false,
+            //    async: false,
+            //    data: {
+            //        otherEmpUserId: empOtherDetails.UserId,
+            //    },
+            //    success: function (data) {
+            //        console.log("select success");
+            //        console.log(data, 'data');
+
+            //        //$('#txtEmployeeName').val(data.EmployeeName);
+            //        //$('#txtDesignation').val(data.Designation);
+
+            //        //$('#txtCurrentRoleFrom').val(data.CurrentRoleFrom);
+            //        //$('#txtDivisionFrom').val(data.DivisionFrom);
+            //        //$('#txtDepartmentFrom').val(data.DepartmentFrom);
+            //        //$('#txtSubDepartmentFrom').val(data.SubDepartmentFrom);
+            //        //$('#txtReportingManagerFrom').val(data.ReportingManagerFrom);
+            //        //$('#txtCostCentreFrom').val(data.CostCentreFrom);
+
+            //    }
+            //});
+        }
+    });
+
+    function allowNumbersOnly(e) {
+        var code = (e.which) ? e.which : e.keyCode;
+        if (code > 31 && (code < 48 || code > 57)) {
+            e.preventDefault();
+        }
+    }
+
+    function alphaOnly(e) {
+        var key = e.keyCode;
+        if (key > 32 && (key < 65 || key > 122 || key == 91 || key == 92 || key == 93 || key == 94 || key == 95 || key == 96)) {
+            e.preventDefault();
+        }
+    }
+
+    function func() {
+        var dropdown = document.getElementById("drpUserType");
+        var selection = dropdown.value;
+        if (selection == "Blue Collar") {
+            $('#employeeRollWhiteCollar').hide();
+            $('#employeeRollBlueCollar').show();
+            $('#rowWorkLocation').hide();
+            $('#rowBusinessLocation').hide();
+            $('#rowSubDepartment').hide();
+            $('#rowSubDepartment1').show();
+            $('#rowSubDepartment2').show();
+            $('#rowWorkContract').hide();
+            
+        }
+        else if (selection == "White Collar") {
+            $('#employeeRollWhiteCollar').show();
+            $('#employeeRollBlueCollar').hide();
+            $('#rowWorkLocation').show();
+            $('#rowBusinessLocation').show();
+            $('#rowSubDepartment').show();
+            $('#rowSubDepartment1').hide();
+            $('#rowSubDepartment2').hide();
+            $('#rowWorkContract').show();
+
+        }
+        else {
+            $('#employeeRollWhiteCollar').hide();
+            $('#employeeRollBlueCollar').hide();
+            $('#rowWorkLocation').hide();
+            $('#rowBusinessLocation').hide();
+            $('#rowSubDepartment').hide();
+            $('#rowSubDepartment1').hide();
+            $('#rowSubDepartment2').hide();
+            $('#rowWorkContract').hide();
+        }
+    }
+
+    function GetLocation() {
+        debugger
+        if (IsNew) {
+            if (!IsEdit) {
+                debugger
+                var value = JSON.stringify(OCRF[0]);
+                var value_1 = JSON.parse(value);
+                var selectedLocation = value_1.Value[0].EmployeeLocation;
+                var selectedLocation1 = value_1.Value[0].BusinessLocationFrom;
+                var selectedLocation2 = value_1.Value[0].BusinessLocationTo;
+                var selectedLocation3 = value_1.Value[0].WorkLocationFrom;
+                var selectedLocation4 = value_1.Value[0].WorkLocationTo;
+                console.log(selectedLocation);
+
+                $.ajax({
+                    url: '/OCRF/GetEmployeeLocation',
+                    type: 'GET',
+                    data: {},
+                    dataType: 'JSON',
+                    success: (function (data) {
+                        locdata = data;
+
+                        //console.log(data);
+                        var s = '<option value="-1" disabled>Please Select Location Name</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            if (data[i].LocationName == selectedLocation) {
+                                s += '<option value="' + data[i].Id + '" selected>' + data[i].LocationName + '</option>';
+                            }
+                            else {
+                                s += '<option value="' + data[i].Id + '">' + data[i].LocationName + '</option>';
+                            }
+
+                        }
+                        $("#drpEmployeeLocation").html(s);
+
+                        var t = '<option value="-1" disabled>Please Select Location Name</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            if (data[i].LocationName == selectedLocation1) {
+                                t += '<option value="' + data[i].Id + '" selected>' + data[i].LocationName + '</option>';
+                            }
+                            else {
+                                t += '<option value="' + data[i].Id + '">' + data[i].LocationName + '</option>';
+                            }
+
+                        }
+                        $("#txtBusinessLocationFrom").html(t);
+
+                        var u = '<option value="-1" disabled>Please Select Location Name</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            if (data[i].LocationName == selectedLocation2) {
+                                u += '<option value="' + data[i].Id + '" selected>' + data[i].LocationName + '</option>';
+                            }
+                            else {
+                                u += '<option value="' + data[i].Id + '">' + data[i].LocationName + '</option>';
+                            }
+
+                        }
+                        $("#txtBusinessLocationTo").html(u);
+
+                        var v = '<option value="-1" disabled>Please Select Location Name</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            if (data[i].LocationName == selectedLocation3) {
+                                v += '<option value="' + data[i].Id + '" selected>' + data[i].LocationName + '</option>';
+                            }
+                            else {
+                                v += '<option value="' + data[i].Id + '">' + data[i].LocationName + '</option>';
+                            }
+
+                        }
+                        $("#txtWorkLocationFrom").html(v);
+
+                        var w = '<option value="-1" disabled>Please Select Location Name</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            if (data[i].LocationName == selectedLocation4) {
+                                w += '<option value="' + data[i].Id + '" selected>' + data[i].LocationName + '</option>';
+                            }
+                            else {
+                                w += '<option value="' + data[i].Id + '">' + data[i].LocationName + '</option>';
+                            }
+
+                        }
+                        $("#txtWorkLocationTo").html(w);
+
+                    }),
+                    error: (function (data) {
+                        //code
+                    })
+                })
+            }
+            else {
+                $.ajax({
+                    url: '/OCRF/GetEmployeeLocation',
+                    type: 'GET',
+                    data: {},
+                    dataType: 'JSON',
+                    success: (function (data) {
+                        locdata = data;
+
+                        //console.log(data);
+                        var s = '<option value="-1" selected disabled>Please Select Location</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            s += '<option value="' + data[i].LocationName + '" ' + ' id="' + data[i].LocationName + '">' + data[i].LocationName + '</option>';
+                        }
+                        $("#drpEmployeeLocation").html(s);
+                        $("#txtBusinessLocationFrom").html(s);
+                        $("#txtBusinessLocationTo").html(s);
+                        $("#txtWorkLocationFrom").html(s);
+                        $("#txtWorkLocationTo").html(s);
+
+                    }),
+                    error: (function (data) {
+                        //code
+                    })
+                })
+            }
+        }
+    }
+
+    Date.prototype.addDays = function (days) {
+        var dat = new Date(this.valueOf());
+        dat.setDate(dat.getDate() + days);
+        return dat;
+    }
+
+    $("#txtTransferEffectiveDate").on("change", function () {
+        debugger
+        var date = new Date().addDays(5);
+        var selected = new Date($(this).val());
+        console.log(selected);
+        var current = new Date();
+        console.log(current);
+        if (selected >= selected && selected <= date) {
+            DisplayAlert('error', 'Message', 'Application date should be 5 days prior to transfer effective date');
+        }
+
+        endOfMonthDate = selected.getDate();
+        console.log(endOfMonthDate);
+        if (endOfMonthDate == 25 || endOfMonthDate == 26 || endOfMonthDate == 27 || endOfMonthDate == 28 || endOfMonthDate == 29 || endOfMonthDate == 30 || endOfMonthDate == 31) {
+            DisplayAlert('error', 'Message', 'Transfer effective date between 25th to 31st will be considered in the following month payroll closing');
+        }
+    });
+
+    function successModal(txt) {
+        //debugger
+        $('#modalTitle').html('Success');
+        if (txt == "approve") {
+            $('#modalBody').html('Form has been approved!');
+         
+        }
+        else if (txt == "reject") {
+            $('#modalBody').html('Form has been rejected!');
+          
+        }
+        else if (txt == "enquire") {
+            $('#modalBody').html('Form has been enquired!');
+     
+        }
+        else if (txt == "cancelled") {
+            $('#modalBody').html('Form has been cancelled!');
+        }
+        else {
+            $('#modalBody').html('Your form with ID: OCRF' + txt + ' has been submitted! Kindly use this for future reference');   
+        }
+        FlagRedirect = txt;
+        //$("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function failureModal() {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html('Some error occured!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function permissionModal() {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html('No permssion granted since the device is not SAVWIPL owned!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function requiredModal(text) {
+        $('#modalTitle').html('Required!');
+        $('#modalBody').html(text);
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function validityModal(txt) {
+        debugger
+        if (txt == 'approve') {
+            //DisplayAlert('error', 'Error', 'Please enter the Type of Car');
+        }
+        else if (txt == 'reject') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for rejecting the form');
+        }
+        else if (txt == 'enquire') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for enquiring the form');
+        }
+
+    }
+
+    function UserType() {
+
+
+    }
+
+    $("#btnSubmit").on('click', function (e) {
+        debugger
+        //File Checking if it is re-uploaded or not on edit mode
+        if (!IsEdit) {
+            var fileToUpload = $("#fileToUpload").val();
+            if (fileToUpload != "") {
+                $("#attachedfile").val('');
+                $("#attachedfileName").val('');
+            }
+        }
+
+        var drpUserType = $("#drpUserType option:selected").val();
+        if (drpUserType == "") {
+            requiredModal("Please select the User Type");
+            return false;
+        }
+
+        if ($('.ocrfCheck:checkbox:checked').length == 0) {
+            requiredModal("Please select at least one Type of Change");
+            return false;
+        }
+
+        //var FileUpload = document.getElementById("fileToUpload").value;
+        //if (FileUpload == "") {
+        //    requiredModal("Please upload proposed status file");
+        //    return false;
+        //}
+
+        var JustificationofChange = document.getElementById("JustificationofChange").value;
+        if (JustificationofChange == "") {
+            requiredModal("Please enter the Justification of Change");
+            return false;
+        }
+
+        var EmployeeCode = document.getElementById("txtEmployeeCode").value;
+        if (EmployeeCode == "") {
+            requiredModal("Please enter the Employee Code");
+            return false;
+        }
+
+        var TransferEffectiveDate = document.getElementById("txtTransferEffectiveDate").value;
+        if (TransferEffectiveDate == "") {
+            requiredModal("Please select Transfer Effective Date");
+            return false;
+        }
+
+        //TO
+        var CurrentRoleToWhite = document.getElementById("txtCurrentRoleToWhite").value;
+        var CurrentRoleToBlue = document.getElementById("txtCurrentRoleToBlue").value;
+        if (CurrentRoleToWhite == "" && CurrentRoleToBlue=="") {
+            requiredModal("Please enter the Current Role To");
+            return false;
+        }
+        var DivisionTo = document.getElementById("txtDivisionTo").value;
+        if (DivisionTo == "") {
+            requiredModal("Please enter the Division To");
+            return false;
+        }
+        var DepartmentTo = document.getElementById("txtDepartmentTo").value;
+        if (DepartmentTo == "") {
+            requiredModal("Please enter the Department To");
+            return false;
+        }
+        //var SubDepartmentTo = document.getElementById("txtSubDepartmentTo").value;
+        //if (SubDepartmentTo == "") {
+        //    requiredModal("Please enter the Sub-Department To");
+        //    return false;
+        //}
+        var ReportingManagerTo = document.getElementById("txtReportingManagerTo").value;
+        if (ReportingManagerTo == "") {
+            requiredModal("Please enter the Reporting Manager To");
+            return false;
+        }
+        var CostCentreTo = document.getElementById("txtCostCentreTo").value;
+        if (CostCentreTo == "") {
+            requiredModal("Please enter the Cost Centre To");
+            return false;
+        }
+
+        if (drpUserType == "White Collar") {
+            var SubDepartmentTo = document.getElementById("txtSubDepartmentTo").value;
+            var BusinessLocationTo = document.getElementById("txtBusinessLocationTo").value;
+            var WorkLocationTo = document.getElementById("txtWorkLocationTo").value;
+            var WorkContractTo = document.getElementById("drpWorkContractTo").value;
+
+            if (SubDepartmentTo == "") {
+                requiredModal("Please enter the SubDepartment To");
+                return false;
+            }
+            if (BusinessLocationTo == -1) {
+                requiredModal("Please enter the Business Location To");
+                return false;
+            }
+            if (WorkLocationTo == -1) {
+                requiredModal("Please enter the Work Location To");
+                return false;
+            }
+            if (WorkContractTo == "") {
+                requiredModal("Please enter the Work Contract To");
+                return false;
+            }
+        }
+
+        if (drpUserType == "Blue Collar") {
+            var SubDepartmentTo1 = document.getElementById("txtSubDepartmentTo1").value;
+            var SubDepartmentTo2 = document.getElementById("txtSubDepartmentTo2").value;
+            if (SubDepartmentTo1 == "") {
+                requiredModal("Please enter the SubDepartment 1 To");
+                return false;
+            }
+            if (SubDepartmentTo2 == "") {
+                requiredModal("Please enter the SubDepartment 2 To");
+                return false;
+            }
+        }
+
+
+        //var form = $("#OCRFForm").serialize();
+        var form = $("#OCRFForm");
+        var formData = new FormData(form[0]);
+        $.ajax({
+            url: '/OCRF/SaveOCRF',
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            data: formData,
+            enctype: 'multipart/form-data',
+            success: (function (data) {
+                if (data[0].Value == 1) {
+                    //debugger
+                    //$("#OCRFForm").trigger("reset");
+                    successModal(data[1].Value);
+                }
+                else {
+                    failureModal();
+                    //$("#OCRFForm").trigger("reset");
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+                //$("#OCRFForm").trigger("reset");
+            })
+        })
+
+    });
+
+    function saveResponse(text) {
+        debugger
+        var status = '', comment = '';
+        comment = $("#comment-" + text).val();
+        switch (text) {
+            case 'approve': {
+                status = 'Approved';
+                break;
+            }
+            case 'reject': {
+                status = 'Rejected';
+                if (comment == '') {
+                    validityModal(text);
+                    return;
+                }
+                break;
+            }
+            case 'enquire': {
+                status = 'Enquired';
+                if (comment == '') {
+                    validityModal(text);
+                    return;
+                }
+                break;
+            }
+        }
+        //spinner.show();
+        $.ajax({
+            url: '/List/SaveResponse',
+            type: 'POST',
+            data: { response: status, appRowId: appRowId, comment: comment, approvalType: approvalType },
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data == 1) {
+                    successModal(text);
+                    $("#OCRFForm").trigger("reset");
+                    setTimeout(FilterMyTasks, 6000);
+                    //spinner.hide();
+                }
+                else {
+                    failureModal();
+                    $("#OCRFForm").trigger("reset");
+                    //spinner.hide();
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+                $("#OCRFForm").trigger("reset");
+                //spinner.hide();
+            })
+        })
+    }
+
+    $("#modalOkButton").on('click', function () {
+        debugger
+        if (FlagRedirect != null) {
+            window.location = "../Dashboard";
+        }
+    });
+
+    function date_val() {
+        var today = new Date().toISOString().split('T')[0];
+        document.getElementsByName("txtTransferEffectiveDate")[0].setAttribute("min", today);
+    }
+</script>

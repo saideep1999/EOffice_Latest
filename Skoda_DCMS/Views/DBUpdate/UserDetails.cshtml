@@ -1,0 +1,1101 @@
+﻿@model dynamic
+@{
+    ViewBag.Title = "User Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style type="text/css">
+    .empMasterHeader {
+        background: rgb(4 59 100) !important;
+        border-radius: 5px 5px 0px 0px;
+        position: relative;
+        font-size: 18px;
+        line-height: 22px;
+        padding-left: 0px;
+        padding: 12px;
+        align-items: center;
+        text-transform: uppercase;
+        color: #FFFFFF;
+    }
+
+        .empMasterHeader a {
+            font-size: 17px;
+            color: #fff;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+            .empMasterHeader a:hover {
+                text-decoration: underline;
+            }
+
+    div.input-block {
+        position: relative;
+    }
+
+        div.input-block input {
+            width: 100% !important;
+            max-width: 100%;
+            height: 45px;
+            background-color: #FFFFFF;
+            border: 1px solid #BFBFBF !important;
+            box-sizing: border-box;
+            border-radius: 5px !important;
+            padding-left: 10px;
+            z-index: 1;
+            position: relative;
+            outline: none;
+        }
+
+
+
+        div.input-block span.placeholder {
+            position: absolute;
+            margin: 17px 0;
+            padding: 0 4px;
+            font-family: Roboto, sans-serif;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            top: -6px;
+            left: 15px;
+            transition: all 0.2s;
+            transform-origin: 0% 0%;
+            background: none;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        div.input-block textarea:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: #fff !important;
+        }
+
+        div.input-block textarea:valid + span.placeholder,
+        div.input-block textarea:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px) !important;
+            background: #fff !important;
+        }
+
+        div.input-block input:valid + span.placeholder,
+        div.input-block input:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: #fff;
+        }
+
+
+
+        div.input-block input.spanUpperSide + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: rgb(219,238,213);
+        }
+
+
+
+        div.input-block input:read-only + span.placeholder,
+        div.input-block input:read-only + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: #fff;
+        }
+
+        div.input-block input:focus + span.placeholder {
+            color: #284B63;
+        }
+
+    .breadcrumb {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+        padding: 1rem 1rem 0;
+        margin-bottom: 0;
+        list-style: none;
+        background-color: #FFFFFF;
+        border-radius: .25rem;
+    }
+
+    body.nav-sm .container.body .left_col {
+        width: 63px;
+        padding: 0;
+        position: fixed;
+        height: 100%;
+        z-index: 8;
+    }
+
+
+
+    input.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213);
+    }
+
+
+    .TransView {
+        background-color: white !important;
+    }
+
+    #tblEmployee {
+        display: inline-table;
+        border: 1px solid #d6d6d6;
+    }
+
+        #tblEmployee td {
+            border: none;
+        }
+
+    @@media only screen and (min-width: 992px) {
+        div .input-block span.placeholder {
+            font-size: 15px;
+        }
+
+        div.inputSelect span.placeholder {
+            font-size: 14px;
+        }
+    }
+
+    input[type='date'].spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    .showBorder {
+        border: 1px solid #dee2e6;
+    }
+
+    .forSameHt {
+        padding-bottom: 40px;
+        height: 78px !important;
+    }
+
+    .forPoints input[type='checkbox'] {
+        margin-right: 2px;
+        position: relative;
+        top: 2px;
+    }
+
+    #lblReason {
+        font-size: 16px !important;
+    }
+
+    #drpCurrency {
+        max-width: 100% !important;
+    }
+
+    .oulineNone {
+        outline: none;
+        box-shadow: none;
+        border: none;
+        text-transform: uppercase;
+    }
+
+    button:focus {
+        outline: none;
+    }
+
+
+
+    .ease {
+        -webkit-transition: all .5s;
+        -moz-transition: all .5s;
+        -o-transition: all .5s;
+        transition: all .5s;
+    }
+
+    .container {
+        width: 100%;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .tabs {
+        background: #fff;
+        position: relative;
+        margin-bottom: 50px;
+    }
+
+        .tabs > input,
+        .tabs > span {
+            width: 20%;
+            height: 45px;
+            line-height: 45px;
+            position: absolute;
+            top: 0;
+        }
+
+        .tabs > input {
+            cursor: pointer;
+            filter: alpha(opacity=0);
+            opacity: 0;
+            position: absolute;
+            z-index: 99;
+        }
+
+        .tabs > span {
+            background: #f0f0f0;
+            text-align: center;
+            overflow: hidden;
+        }
+
+            .tabs > span i,
+            .tabs > span {
+                -webkit-transition: all .5s;
+                -moz-transition: all .5s;
+                -o-transition: all .5s;
+                transition: all .5s;
+            }
+
+        .tabs > input:hover + span {
+            background: #3498DB;
+            color: #fff;
+        }
+
+        .tabs > input:checked + span {
+            background: #3498DB;
+        }
+
+        .tabs > input:checked + span,
+        .tabs > input:hover + span {
+            color: #fff;
+        }
+
+    #tab-1, #tab-1 + span {
+        left: 0;
+    }
+
+    #tab-2, #tab-2 + span {
+        left: 20%;
+    }
+
+    #tab-3, #tab-3 + span {
+        left: 40%;
+    }
+
+   
+
+    .tab-content {
+        padding: 45px 0px 20px;
+        width: 100%;
+        min-height: 340px;
+    }
+
+        .tab-content section {
+            padding: 30px;
+            border: 1px solid #ccc;
+        }
+
+        .tab-content section {
+            width: 100%;
+            display: none;
+        }
+
+            .tab-content section h1 {
+                margin-top: 15px;
+                font-size: 100px;
+                font-weight: 100;
+                text-align: center;
+            }
+
+    #tab-1:checked ~ .tab-content #tab-item-1 {
+        display: block;
+    }
+
+    #tab-2:checked ~ .tab-content #tab-item-2 {
+        display: block;
+    }
+
+    #tab-3:checked ~ .tab-content #tab-item-3 {
+        display: block;
+    }
+
+    #tab-4:checked ~ .tab-content #tab-item-4 {
+        display: block;
+    }
+
+    #tab-5:checked ~ .tab-content #tab-item-5 {
+        display: block;
+    }
+
+   
+
+    /* effect-3 */
+
+    .effect-3 .line {
+        background: #043b64;
+        width: 20%;
+        height: 4px;
+        position: absolute;
+        top: 43px;
+    }
+
+    #tab-1:checked ~ .line {
+        left: 0;
+    }
+
+    #tab-2:checked ~ .line {
+        left: 20%;
+    }
+
+    #tab-3:checked ~ .line {
+        left: 40%;
+    }
+
+    #tab-4:checked ~ .line {
+        left: 60%;
+    }
+
+    #tab-5:checked ~ .line {
+        left: 80%;
+    }
+
+    .upload-btn {
+        width: 130px;
+        height: 40px;
+        color: #fff;
+        border-radius: 5px;
+        padding: 10px 25px;
+        font-weight: 500;
+        background: transparent;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        display: inline-block;
+        box-shadow: inset 2px 2px 2px 0px rgba(255,255,255,.5), 7px 7px 20px 0px rgba(0,0,0,.1), 4px 4px 5px 0px rgba(0,0,0,.1);
+        outline: none;
+    }
+    .btnUploadDetails {
+        width: 130px;
+        height: 40px;
+        line-height: 42px;
+        padding: 0;
+        border: none;
+        background: rgb(255,27,0);
+        background: #3498DB;
+    }
+
+        .btnUploadDetails:hover {
+            color: #3498DB;
+            background: transparent;
+            box-shadow: none;
+        }
+
+        .btnUploadDetails:before,
+        .btnUploadDetails:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            height: 2px;
+            width: 0;
+            background: #3498DB;
+            box-shadow: -1px -1px 5px 0px #fff, 7px 7px 20px 0px #0003, 4px 4px 5px 0px #0002;
+            transition: 400ms ease all;
+        }
+
+        .btnUploadDetails:after {
+            right: inherit;
+            top: inherit;
+            left: 0;
+            bottom: 0;
+        }
+
+        .btnUploadDetails:hover:before,
+        .btnUploadDetails:hover:after {
+            width: 100%;
+            transition: 800ms ease all;
+        }
+
+    #addNewDiv img {
+        width: 30%;
+    }
+    #addNewDiv h2 {
+        font-size: 2rem;
+    }
+
+    label[for="file-input"] {
+        display: block;
+        
+        font-size: 1em;
+        color: #fff;
+        opacity: .9;
+        font-weight: bold;
+        height:40px;
+        padding:7px 15px;
+        
+        line-height:40px;
+    }
+
+    input[type="file"] {
+        cursor: pointer !Important;
+        height: 40px;
+        padding: 0;
+        line-height: 40px;
+
+    }
+        input[type="file"]::-webkit-file-upload-button {
+            background: #292931;
+            border: 0;
+            
+            cursor: pointer;
+            color: #fff;
+            border-radius: .2em;
+        }
+
+        input[type="file"]::-ms-browse {
+            background: #ccc;
+            border: 0;
+           
+            cursor: pointer;
+            color: #fff;
+            border-radius: .2em;
+        }
+
+    
+</style>
+
+<body>
+
+    <div class="right_col bg-transparent" role="main">
+        @*<div class="row forRadioBtnUsers">
+            <div class="col-12 d-flex">
+                <h5 class="mr-3 f-600"> Select action: </h5>
+                <div class="mr-3">
+                    <input type="radio" id="existingUserRad" value="Existing User" name="typeOfAction" />
+                    <label for="existingUserRad"> Existing User </label>
+                </div>
+
+                <div>
+                    <input type="radio" id="newUserRad" value="Add New User" name="typeOfAction" />
+                    <label for="newUserRad"> New User </label>
+                </div>
+            </div>
+
+
+        </div>*@
+     
+        <!-- New User Excel-->
+
+        <div class="row">
+            <div class="col-12">
+                <div class="container">
+                  
+                  
+                  
+                    <div class="tabs effect-3">
+                        <!-- tab-title -->
+                        <input type="radio" id="tab-1" name="tab-effect-3" checked="checked">
+                        <span>Existing User</span>
+
+                        <input type="radio" id="tab-2" name="tab-effect-3">
+                        <span>New User</span>
+
+                        
+
+                        <div class="line ease"></div>
+
+                        <!-- tab-content -->
+                        <div class="tab-content">
+
+                            <div class="forMainDiv">
+                                <section id="tab-item-2" class="text-center">
+                                    <div id="addNewDiv" class=" pl-2">
+                                        <div class="row">
+                                            <div class="col-2">
+
+                                            </div>
+                                            <div class="col-8">
+                                                <h2>Upload User Details</h2>
+                                                <div>
+                                                    <img src="~/assets/img/fileUpload.gif" />
+                                                </div>
+
+                                                <div class="info2 m-3">
+
+                                                    <div class="mt-3">
+
+
+                                                        <div class="d-flex justify-content-center">
+
+                                                            @Html.TextBox("file", "", new { type = "file", id = "userDetailUpload" })
+
+                                                            <button type="button" value="Upload" id="upload-file" class="upload-btn btnUploadDetails ml-2 mb-3"><span>Upload</span> </button>
+
+                                                        </div>
+
+
+
+                                                        <div>  <a download href="~/Doc/DownloadSampleFile_UserDetail.xlsx" target="_blank"> <i class="fa-solid fa-file-csv"></i> Download Sample File </a></div>
+                                                        @*<input type="file" name="file-input" id="file-input">
+                <label for="file-input" value="Upload" id="upload-file" class="upload-btn btnUploadDetails mt-3 mb-3"><span>Upload</span> </label>*@
+
+                                                        @*<label for="file-input">File upload</label>
+                <input type="file" name="file-input" id="file-input">*@
+
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-2">
+                                                <div id="tempTableDiv" class="d-none">
+                                                    <table id="userTable">
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+                                <section id="tab-item-1">
+                                    <div id="updateExistingDiv">
+
+                                        <form id="UserForm" action="" method="post">
+                                            <div class="mt-4">
+                                                <div class="input-block">
+                                                    <input type="text" class="w-100 txtDisable" data-placement="bottom" name="txtempsearch" id="txtempsearch" required />
+                                                    <span class="placeholder">Search User by Name / Employee Number / Email-Id</span>
+
+                                                </div>
+                                                <br />
+
+                                                <div>
+
+
+                                                    <div class="empMasterHeader">
+                                                        <i class="fa fa-list-alt mr-2"></i>  Employee Master <a id="btnEdit" class="pull-right" onclick="editable()">Edit <i class="ml-2 fa fa-edit"></i></a>
+                                                    </div>
+
+                                                    <table id="tblEmployee" class="table pt-2 table-responsive w-100">
+
+                                                        <tr>
+                                                            <td>
+                                                                <div class="input-block mt-2">
+                                                                    <input id="txtEmployeeNumber" name="txtEmployeeNumber" type="text" readonly class="notEditable" required />
+                                                                    <span class="placeholder">Employee Number</span>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="input-block mt-2">
+                                                                    <input id="txtFirstName" name="txtFirstName" type="text" autocomplete="off" readonly required />
+                                                                    <span class="placeholder"> First Name</span>
+                                                                </div>
+
+                                                            </td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>
+                                                                <div class="input-block">
+                                                                    <input id="txtMiddleName" name="txtMiddleName" type="text" autocomplete="off" readonly required />
+                                                                    <span class="placeholder">Middle Name</span>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="input-block">
+                                                                    <input id="txtLastName" name="txtLastName" type="text" autocomplete="off" readonly required />
+                                                                    <span class="placeholder">Last Name</span>
+                                                                </div>
+
+                                                            </td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>
+                                                                <div class="input-block">
+                                                                    <input id="txtEmailID" name="txtEmailID" type="text" autocomplete="off" readonly required />
+                                                                    <span class="placeholder">EmailID</span>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="input-block">
+                                                                    <input id="txtPhoneNumber" name="txtPhoneNumber" maxlength="10" onkeypress="allowNumbersOnly(event)" type="text" autocomplete="off" readonly required />
+                                                                    <span class="placeholder">Phone Number</span>
+                                                                </div>
+
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <div class="input-block">
+                                                                    <input onkeypress="allowNumbersOnly(event)" id="txtCostCenter" placeholder="Type atleast 4 number" name="txtCostCenter" type="text" autocomplete="off" readonly required />
+                                                                    <span class="placeholder TransView">Cost Center</span>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="input-block">
+                                                                    <input id="txtDepartment" name="txtDepartment" type="text" autocomplete="off" readonly required />
+                                                                    <span class="placeholder"> Department</span>
+                                                                </div>
+
+                                                            </td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>
+                                                                <div class="input-block">
+                                                                    <input id="txtSubDepartment" name="txtSubDepartment" type="text" autocomplete="off" readonly required />
+                                                                    <span class="placeholder"> Sub Department</span>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="input-block">
+                                                                    <input id="txtManagerEmployeeNumber" onkeypress="allowNumbersOnly(event)" name="txtManagerEmployeeNumber" placeholder="Type atleast 4 number" autocomplete="off" type="text" readonly required />
+                                                                    <span class="placeholder TransView">Manager Employee Number</span>
+                                                                </div>
+
+                                                            </td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td colspan="2" class="d-flex">
+                                                                <button type="button" id="btnUpdate" class="submit-btn mr-2 oulineNone" name="btnUpdate"> Update </button>
+                                                                <button type="button" id="btnReset" name="btnReset" class="oulineNone cancl-btn"> Reset </button>
+                                                            </td>
+                                                        </tr>
+
+                                                    </table>
+
+                                                </div>
+                                            </div>
+                                        </form>
+
+                                    </div>
+                                </section>
+                            </div>
+
+                           
+                            
+                        </div>
+                    </div>
+                  
+                  
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <div class="row">
+            <div class="col-6 offset-4">
+                <div id="addNewDiv" class="d-none pl-2">
+                    <div class="info2 m-3">
+
+                        <h2>Upload User Details</h2>
+
+                        <div class="mt-3">
+                            @Html.TextBox("file", "", new { type = "file" }) <br />
+                            <div>  <a download href="~/Doc/DownloadSampleFile_UserDetail.xlsx" target="_blank"> <i class="fa-solid fa-file-csv"></i> Download Sample File </a></div>
+                            <button type="button" value="Upload" id="upload-file" class="submit-btn mt-4 oulineNone">Upload </button>
+                        </div>
+                    </div>
+                    <div id="tempTableDiv" class="d-none">
+                        <table id="userTable">
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+      
+
+
+        <div class="modal fade" id="successModel" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header modelHeader">
+                        <span class="modal-title modalMsgTitle" id="modalTitle"></span>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <label id="modalBody" class="lableMsg">  </label>
+                        <input type="hidden" id="tab" value="0" />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="submitBomBtn publishBtn" id="modalOkButton" data-dismiss="modal">OK</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+</body>
+
+
+<script>
+
+    $(document).ready(function () {
+        $('input:radio[id="existingUserRad"]').attr('checked', true);
+
+
+        $("#txtempsearch").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: "../DBUpdate/GetUserDetails",
+                    datatype: "json",
+                    cache: false,
+                    async: true,
+                    data: {
+                        searchText: $("#txtempsearch").val()
+                    },
+                    success: function (data) {
+                        console.log(data, 'data');
+
+                        response($.map(data, function (item) {
+                            return { label: item.FirstName, value: item.FirstName, raw: item };
+                        }));
+                    }
+                });
+            },
+            search: function (event, ui) {
+                var value = $("#txtempsearch").val();
+                if (value.length < 4) {
+                    event.preventDefault();
+                }
+            },
+            min_length: 4,
+            change: function (event, ui) {
+                if (!ui.item) {
+                    $(this).val('');
+                }
+            },
+            delay: 0,
+            select: function (event, ui) {
+                var empOtherDetails = ui.item['raw'];
+                console.log(empOtherDetails);
+                //Get the other details like Cost Center Code, Employee Number from DB.
+                $.ajax({
+                    url: "../DBUpdate/GetExistingUserDetails",
+                    dataType: "json",
+                    cache: false,
+                    async: true,
+                    data: {
+                        empNumber: empOtherDetails.EmpNumber,
+                    },
+                    success: function (data) {
+
+                        $('#txtEmployeeNumber').val(data.EmpNumber);
+                        $('#txtFirstName').val(data.FirstName);
+                        $('#txtMiddleName').val(data.MiddleName);
+                        $('#txtLastName').val(data.LastName);
+                        $('#txtEmailID').val(data.Email);
+                        $('#txtPhoneNumber').val(data.PhoneNumber);
+                        $('#txtCostCenter').val(data.CostCenter);
+                        $('#txtDepartment').val(data.Department);
+                        $('#txtSubDepartment').val(data.SubDepartment);
+                        $('#txtManagerEmployeeNumber').val(data.ManagerEmployeeNumber);
+                    }
+                });
+            }
+        });
+
+
+        $("#btnUpdate").on('click', function (e) {
+            
+            var txtempsearch = document.getElementById("txtempsearch").value;
+            if (txtempsearch == "") {
+                DisplayAlert('error', 'Warning', 'Kindly Search Employee Name or Employee Number or Employee Email-Id!', 4000);
+                return false
+            }
+            var txtCostCenter = $("#txtCostCenter").val();
+            if (txtCostCenter == "0" || txtCostCenter == "") {
+                DisplayAlert('error', 'Warning', 'Please enter Cost Center!', 4000);
+                return false
+            }
+            var txtManagerEmployeeNumber = $("#txtManagerEmployeeNumber").val();
+            if (txtManagerEmployeeNumber == "0" || txtManagerEmployeeNumber == "") {
+                DisplayAlert('error', 'Warning', 'Please enter Manager Employee Number!', 4000);
+                return false
+            }
+
+            $("#btnUpdate").text('Updating');
+            $("#btnUpdate").prop("disabled", true);
+
+            var form = $("#UserForm").serialize();
+            $.ajax({
+                url: '/DBUpdate/UpdateUserDetails',
+                type: 'POST',
+                data: form,
+                cache: false,
+                dataType: 'JSON',
+                success: (function (data) {
+                    console.log(data);
+                    if (data == 1) {
+                        $("#btnUpdate").prop("disabled", false);
+                        successUserModal();
+                        $("#UserForm").trigger("reset");
+                        console.log("success");
+                        $("#btnUpdate").text('Update');
+                        $('#tblEmployee').find('input').attr('readonly', true);
+                    }
+                    else if (data == -1) {
+                        $("#btnUpdate").prop("disabled", false);
+                        $("#btnUpdate").text('Update');
+                        console.log("failure");
+                        DisplayAlert('error', 'Warning', 'Employee Email-Id is already exists!', 4000);
+                    }
+                    else {
+                        $("#btnUpdate").prop("disabled", false);
+                        $("#btnUpdate").text('Update');
+                        console.log("failure");
+                        failureModal();
+                    }
+                }),
+                error: (function (data) {
+                    $("#btnUpdate").prop("disabled", false);
+                    $("#btnUpdate").text('Update');
+                    console.log("error");
+                    failureModal();
+
+
+                })
+            })
+        });
+
+        $("#btnReset").on('click', function (e) {
+            $("#UserForm").trigger("reset");
+
+            $('#tblEmployee').find('input').attr('readonly', true);
+
+        });
+
+    
+
+        $("input[type=radio]").on('change', function () {
+            if ($(this).attr('id') == "existingUserRad") {
+                $("#addNewDiv").addClass('d-none');
+                $("#updateExistingDiv").removeClass('d-none');
+            }
+            else if ($(this).attr('id') == "newUserRad") {
+                $("#updateExistingDiv").addClass('d-none');
+                $("#addNewDiv").removeClass('d-none');
+            }
+        });
+
+    });
+
+    function editable() {
+        var txtempsearch = document.getElementById("txtempsearch").value;
+        if (txtempsearch == "") {
+            DisplayAlert('error', 'Warning', 'Kindly Search Employee Name or Employee Number or Employee Email-Id!', 4000);
+            return false
+        }
+
+        console.log($(":not(.notEditable)"));
+        $(":not(.notEditable)").removeAttr('readonly');
+    }
+
+    function successUserModal(txt) {
+        ////
+        $('#modalTitle').html('Success');
+        if (txt == "approve") {
+            $('#modalBody').html('Form has been approved!');
+        }
+        else if (txt == "reject") {
+            $('#modalBody').html('Form has been rejected!');
+        }
+        else if (txt == "enquire") {
+            $('#modalBody').html('Form has been enquired!');
+        }
+        else if (txt == "cancelled") {
+            $('#modalBody').html('Form has been cancelled!');
+        }
+        else {
+            $('#modalBody').html('Your data has been updated.');
+
+        }
+
+        $("#successModel").modal('show');
+    }
+
+    function failureModal() {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html('Some error occurred!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+    // create excel
+    function bs_input_file() {
+        $(".input-file").before(
+            function () {
+                if (!$(this).prev().hasClass('input-ghost')) {
+                    var element = $("<input type='file' id='dataFile' name='upload' class='input-ghost' style='visibility:hidden; height:0'>");
+                    element.attr("name", $(this).attr("name"));
+                    element.change(function () {
+                        element.next(element).find('input').val((element.val()).split('\\').pop());
+                        console.log(element)
+                    });
+                    $(this).find("button.btn-choose").click(function () {
+                        element.click();
+                    });
+                    $(this).find("button.btn-reset").click(function () {
+                        element.val(null);
+                        $(this).parents(".input-file").find('input').val('');
+                    });
+                    $(this).find('input').css("cursor", "pointer");
+                    $(this).find('input').mousedown(function () {
+                        $(this).parents('.input-file').prev().click();
+                        return false;
+                    });
+                    return element;
+                }
+            }
+        );
+    }
+
+    function clear() {
+        var input = $("#dataFile").val('');
+    };
+
+    $(function () {
+        clear();
+        bs_input_file();
+    });
+
+    $('#upload-file').click(function () {
+        console.log('upload');
+        if ($('input[type="file"]')[0].files[0] == undefined) {
+            DisplayAlert('error', 'Warning', 'Please Upload User Details File.', 4000);
+            return false
+        }
+
+        var fileName = $('input[type="file"]')[0].files[0].name;
+        var ext = fileName.split('.').pop().toLowerCase();      
+        if (ext != "xlsx" && ext != "xls") {
+            DisplayAlert('error', 'Warning', 'Please upload a valid excel file!', 4000);
+            return false
+        }
+
+        var form = new FormData();
+        form.append("file", $('input[type="file"]')[0].files[0]);
+        $.ajax({
+            url: '/DBUpdate/CreateUserDetails',
+            type: 'POST',
+            data: form,
+            cache: false,
+            dataType: 'JSON',
+            processData: false,
+            contentType: false,
+            async: true,
+            success: (function (data) {
+                //console.log(data);
+                //if (data.Status == 200)
+                //    DisplayAlert('success', "Success!", data.Message);
+                //else if (data.Status == 500)
+                //    DisplayAlert('error', "Error!", data.Message);
+                $("#tempTableDiv").removeClass('d-none')
+                $("#userTable").children().html("");// clear
+                for (let i = 0; i < data.length; i++) {//display data 1 by 1
+                    //console.log(data[i].Item1);
+                    console.log(data[i].Item2);
+                    console.log(String(data[i].Item2).toLowerCase().includes("successfully added"));
+                    $("#userTable").append(`<tr> <td>${data[i].Item1} - ${data[i].Item2} ${String(data[i].Item2).toLowerCase().includes("successfully added") ? '' : '<span style="color: red;">*</span>'}</td> </tr>`);
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+                $("#btnUpdate").prop("disabled", false);
+                console.log("error");
+
+            }),
+            complete: (function (data) {
+                $('input[type="file"]').val(""); // this will reset the form fields
+            })
+        })
+    })
+
+    function allowNumbersOnly(e) {
+        var code = (e.which) ? e.which : e.keyCode;
+        if (code > 31 && (code < 48 || code > 57)) {
+            e.preventDefault();
+        }
+    }
+
+    $("#txtCostCenter").autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                url: "/OCRF/GetOCRFCCDetails",
+                dataType: "json",
+                cache: false,
+                async: false,
+                data: {
+                    searchText: $("#txtCostCenter").val()
+                },
+                success: function (data) {
+                    ////
+                    response($.map(data, function (item) {
+                        console.log("CC");
+                        console.log(data, 'data');
+                        return { label: item.Department, value: item.Department, raw: item };
+                    }));
+                }
+            });
+        },
+        search: function (event, ui) {
+            var value = $("#txtCostCenter").val();
+            console.log(value);
+            // If less than three chars, cancel the search event
+            if (value.length < 2) {
+                event.preventDefault();
+            }
+        },
+        min_length: 2,
+        delay: 0,
+        select: function (event, ui) {
+            ////
+            var empOtherDetails = ui.item['raw'];
+            console.log(empOtherDetails);
+            console.log("select");
+
+        }
+    });
+
+    $("#txtManagerEmployeeNumber").autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                url: "/OCRF/GetOCRFEmployeeDetails",
+                dataType: "json",
+                cache: false,
+                async: false,
+                data: {
+                    searchText: $("#txtManagerEmployeeNumber").val()
+                },
+                success: function (data) {
+
+                    ////
+                    response($.map(data, function (item) {
+                        console.log("EmployeeCode");
+                        console.log(data, 'data');
+                        return { label: item.UserName, value: item.UserName, raw: item };
+                    }));
+                }
+            });
+        },
+        search: function (event, ui) {
+            var value = $("#txtManagerEmployeeNumber").val();
+            console.log(value);
+            // If less than three chars, cancel the search event
+            if (value.length < 4) {
+                event.preventDefault();
+            }
+        },
+        min_length: 4,
+        delay: 0,
+        select: function (event, ui) {
+            //
+            var empOtherDetails = ui.item['raw'];
+            console.log(empOtherDetails);
+            console.log("select");
+
+        }
+    });
+</script>
+

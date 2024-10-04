@@ -1,0 +1,1614 @@
+﻿@{
+    ViewBag.Title = "New Global GL code form";
+    int FormId = 0, AppRowId = 0, ApprovalType = 0;
+    bool IsNewMode = true, IsEditMode = false, IsViewMode = false;
+    var currentUser = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    List<Skoda_DCMS.Models.ApprovalDataModel> appList = new List<Skoda_DCMS.Models.ApprovalDataModel>();
+    string disabled = "";
+    Skoda_DCMS.Models.NewGlobalCodeData NGCF = null;
+    var CurrentUserDesgn = "";
+    long? CurrentUserLevel = 0;
+    var glTeam = "GL Team";
+    var controllingTeam = "Controlling Team";
+    if (ViewBag != null && !ViewBag.IsNewMode)
+    {
+        IsNewMode = ViewBag.IsNewMode;
+        IsEditMode = ViewBag.IsEditMode;
+        IsViewMode = ViewBag.IsViewMode;
+        disabled = IsViewMode ? "disabled" : "";
+        NGCF = ViewBag.Model.one[0] as Skoda_DCMS.Models.NewGlobalCodeData;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        appList = ViewBag.Model?.three as List<Skoda_DCMS.Models.ApprovalDataModel>;
+        CurrentUserDesgn = appList?.Where(x => x.ApproverUserName == currentUser.UserName).Select(x => x.Designation).FirstOrDefault();
+        CurrentUserLevel = appList?.Where(x => x.ApproverUserName == currentUser.UserName && x.ApproverStatus == "Pending").Select(x => x.Level).FirstOrDefault();
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+        if (IsViewMode)
+        {
+            var Ap = appList?.Where(x =>
+                x.UserName.ToLower() == currentUser.UserName.ToLower()
+                && x.ApproverStatus.ToLower() == "pending"
+            ).FirstOrDefault();
+        }
+    }
+
+}
+<style>
+
+    .hide {
+        display: none;
+    }
+    /*New design css start here*/
+    .astColor {
+        color: red;
+    }
+
+    .textTrans {
+        width: 100%;
+        max-width: 99%;
+        border-radius: 5px;
+        margin-right: 0px;
+        border: 1px solid !important;
+    }
+
+    .empDetailsBg {
+        background-color: #fffbef;
+    }
+
+    #accordion select {
+        color: #000;
+        width: 100% !important;
+        height: 45px;
+        background-color: #FFFFFF;
+        border: 1px solid #BFBFBF;
+        box-sizing: border-box;
+        border-radius: 5px;
+        background-image: url(data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>);
+        background-repeat: no-repeat;
+        background-position: right .75rem center;
+        background-size: 16px 12px;
+    }
+
+    #accordion input[type='text'] {
+        width: 100% !important;
+        max-width: 100%;
+        height: 45px;
+        background-color: #FFFFFF;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px !important;
+    }
+
+    #accordion input[type='date'] {
+        width: 100% !important;
+        max-width: 100%;
+        height: 45px;
+        background-color: #FFFFFF;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px;
+    }
+
+    #accordion input[type='time'] {
+        height: 45px;
+    }
+
+    #accordion label {
+        font-size: 16px;
+        line-height: 22px;
+        font-weight: 600;
+        color: #201F1F;
+    }
+
+    #accordion table tr td {
+        font-size: 16px;
+        line-height: 19px;
+        color: #201F1F;
+        background-color: white;
+    }
+
+    #accordion label {
+        display: block;
+    }
+
+    #accordion .card-header {
+        /*background: rgb(4 59 100) !important;*/
+        border-radius: 5px 5px 0px 0px;
+        position: relative;
+        margin-top: 15px;
+    }
+
+        #accordion .card-header.collapsed h5:after {
+            content: '+';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        #accordion .card-header h5:after {
+            content: '-';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+    #accordion h5 button {
+        font-size: 18px;
+        line-height: 22px;
+        /* identical to box height */
+        padding-left: 0px;
+        display: flex;
+        align-items: center;
+        text-transform: uppercase;
+        /* Text_white */
+
+        color: #FFFFFF;
+    }
+
+        #accordion h5 button:focus {
+            box-shadow: none;
+        }
+
+    .empDetailsFields label {
+        display: block !important;
+        margin-bottom: 0px;
+    }
+
+    .empDetailsFields .row label {
+        display: block;
+        margin-bottom: 0px;
+    }
+
+        .empDetailsFields .row label:nth-child(1) {
+            font-style: normal;
+            font-weight: normal !important;
+            font-size: 12px;
+            line-height: 18px;
+            color: #A9A9A9 !important;
+        }
+
+        .empDetailsFields .row label:nth-child(2) {
+            font-style: normal;
+            font-weight: normal;
+            font-size: 18px;
+            line-height: 22px;
+            color: #201F1F;
+        }
+
+    .firstLastName {
+        font-style: normal;
+        font-weight: normal;
+        font-size: 20px;
+        line-height: 24px;
+        /* identical to box height */
+
+        display: flex;
+        align-items: center;
+        color: #201F1F;
+    }
+
+    .submit-btn {
+        background: #3D3D3D;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #FFFFFF;
+        border-color: transparent !important;
+    }
+
+    .cancl-btn {
+        background: #FAE99B;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        border-color: transparent !important;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #212221;
+        margin-left: 10px;
+    }
+
+
+
+
+    .card-footer {
+        display: flex;
+        background-color: transparent !important;
+    }
+
+    .photo-form {
+        width: 100%;
+    }
+
+    .ui-front {
+        z-index: 9999999 !important;
+    }
+
+    /* NEW UI CSS END*/
+
+
+    .showBorder {
+        border: 1px solid #dee2e6;
+    }
+
+    .multiselect {
+        height: 47px;
+        margin-top: -1px;
+    }
+    /*Animation CSS Starts*/
+
+    div.input-block {
+        position: relative;
+    }
+
+        div.input-block input {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 188px;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block textarea {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 100%;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            background-color: #fff;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block span.placeholder {
+            position: absolute;
+            @*margin: 17px 0;*@
+            padding: 0 4px;
+            font-family: Roboto, sans-serif;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            top: -6px;
+            left: 15px;
+            transition: all 0.2s;
+            transform-origin: 0% 0%;
+            background: none;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+    .question_span {
+        width: 116% !important;
+        font-size: 15px !important;
+    }
+
+    div.input-block textarea:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: #fff !important;
+    }
+
+    div.input-block textarea:valid + span.placeholder,
+    div.input-block textarea:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+    }
+
+    div.inputSelect select:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+    }
+
+    div.input-block input:valid + span.placeholder,
+    div.input-block input:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: rgb(219,238,213);
+    }
+
+
+    div.input-block input.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: rgb(219,238,213);
+    }
+
+    div.input-block input:read-only + span.placeholder,
+    div.input-block input:read-only + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background: rgb(219,238,213);
+    }
+
+
+    div.inputSelect span.placeholder {
+        position: absolute;
+        margin: 17px 0;
+        padding: 0 4px;
+        font-family: Roboto, sans-serif;
+        color: #000;
+        display: flex;
+        align-items: center;
+        font-size: 1rem;
+        top: -6px;
+        left: 15px;
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+        background: none;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    div.inputSelect select:focus + span.placeholder {
+        transform: scale(0.8) translateY(-30px);
+        background: rgb(219,238,213);
+        z-index: 9;
+    }
+
+    div.inputSelect select:not([value=""]):valid + span.placeholder {
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+    }
+
+
+
+    div.input-block input:focus + span.placeholder {
+        color: #284B63;
+    }
+
+    .breadcrumb {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+        padding: 1rem 1rem 0;
+        margin-bottom: 0;
+        list-style: none;
+        background-color: #FFFFFF;
+        border-radius: .25rem;
+    }
+
+    body.nav-sm .container.body .left_col {
+        width: 63px;
+        padding: 0;
+        position: fixed;
+        height: 100%;
+        z-index: 8;
+    }
+
+    .card {
+        position: relative;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        min-width: 0;
+        word-wrap: break-word;
+        background-color: #fff;
+        background-clip: border-box;
+        border: 0px;
+        border-radius: .25rem;
+    }
+
+    .dropdown-toggle::after {
+        display: none;
+        width: 0;
+        height: 0;
+        margin-left: .255em;
+        vertical-align: .255em;
+        content: "";
+        border-top: .3em solid;
+        border-right: .3em solid transparent;
+        border-bottom: 0;
+        border-left: .3em solid transparent;
+    }
+
+    input.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213);
+    }
+
+    inputSelect.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213) !important;
+    }
+
+    select.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background-color: rgb(219,238,213) !important;
+        z-index: 9;
+    }
+
+    select.spanUpperSideWhite + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background-color: rgb(255,255,255) !important;
+        z-index: 9;
+    }
+
+    textarea.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    .TransView {
+        background-color: white !important;
+    }
+
+    @@media only screen and (min-width: 992px) {
+        div .input-block span.placeholder {
+            font-size: 15px;
+        }
+
+        div.inputSelect span.placeholder {
+            font-size: 1rem;
+        }
+    }
+
+    input[type='date'].spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    .showBorder {
+        border: 1px solid #dee2e6;
+    }
+
+    .wField {
+        width: 233px !important;
+        margin-left: 10px;
+    }
+
+    @@-moz-document url-prefix() {
+        input[type=time]::-ms-clear {
+            display: none;
+        }
+    }
+
+    .datetime-reset-button {
+        display: none !important;
+    }
+
+    .forShoppingCart {
+        margin-left: 14% !important;
+    }
+
+    .btn-group {
+        display: block !important;
+    }
+
+    #accordion label {
+        display: inline-block !important;
+    }
+
+
+    .custom-select:focus {
+        box-shadow: none !important;
+        border-color: none !important;
+    }
+
+    #addSoftwarebtn td {
+        border-top: none !important;
+    }
+
+    #locationBody select {
+        background-color: #fff !important;
+    }
+
+    #loader {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        z-index: 10000;
+    }
+</style>
+<script type="text/javascript">
+    function checkSelectGlobal(id) {
+        if ($('#' + id).val() != '') {
+            $('#' + id).addClass('spanUpperSideWhite');
+        }
+    }
+</script>
+
+<body>
+    <div class="right_col bg-transparent" role="main">
+        <form id="NGCForm" method="post">
+            <div class="container">
+                <div>
+                    @if (IsEditMode || IsViewMode)
+                    {
+                        <div>
+                            <input type="hidden" id="FormId" name="FormId" value="@(FormId)" />
+                            <input type="hidden" id="FormSrId" name="FormSrId" value="@(NGCF.Id)" />
+                            <input type="hidden" id="AppRowId" name="AppRowId" value="@(AppRowId)" />
+                        </div>
+                    }
+                    else
+                    { <div class="breadcrumb-container">
+                            <div>
+                                <ol class="breadcrumb pl-0">
+                                    <li>
+                                        <a href="/Dashboard?formName=SFF">
+                                            Dashboard
+                                        </a>
+                                    </li>
+                                    <li class="active">
+                                        <a href="/Dashboard/GetDepartmentWiseForms?department=IT">
+                                            IT Department
+                                        </a>
+                                    </li>
+                                    <li class="active">New Global GL code forms</li>
+                                </ol>
+                            </div>
+                        </div>
+                    }
+                    @*<ol class="breadcrumb">
+                <li>
+                    <a href="/Dashboard?formName=NGCF">
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    New Global GL code formS
+                </li>
+            </ol>*@
+                </div>
+
+                <div class="row breadcrumb-container table-bordered  mr-1 ml-1" style="background-color: rgb(219,238,213) !important; ">
+                    <div class="col-md-2 col-lg-2">
+                        <span class="placeholder">Date : @(IsViewMode || IsEditMode ? (Convert.ToDateTime(appList.FirstOrDefault().FormId.CreatedDate).ToShortDateString()) : DateTime.Now.ToShortDateString())</span>
+                    </div>
+                    <div class="col-md-8 col-lg-8 mt-2 mb-1 form-heading" style="text-align:center; margin-top:5px">
+                        <span>New Global GL code form</span>
+                    </div>
+                    <div class="col-md-2 col-lg-2">
+                        @if (IsViewMode || IsEditMode)
+                        {
+                            <span class="placeholder white_space_nowrap"> Form Id : @(IsViewMode || IsEditMode ? ("NGCF" + FormId ?? "") : "" )</span>
+                        }
+                    </div>
+                </div>
+
+
+
+                <div class="heading d-none" id="headingErr">
+                    <h1 id="" class="info-header">Following fields are mandatory. Please fill in information for<br></h1>
+                    <div id="add_to_me" class="header-list" style="color:red;"></div>
+                </div>
+
+                <!-- ACCORDIAN STRUCTURE START HERE-->
+                @* Submitter Section *@
+                @{
+                    Html.RenderPartial("_NewSubmitterDetailsWithModel", (ViewBag as object));
+                }
+
+                @* Applicant Section *@
+                @{
+                    Html.RenderPartial("_NewApplicantDetailsWithModel", (ViewBag as object));
+                }
+
+                @* Transaction Section *@
+                <div id="accordion">
+                    <div class="card">
+                        <div class="card-header" id="headingFour" data-toggle="collapse" data-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                            <h5 class="mb-0">
+                                <button type="button" class="btn btn-link" data-toggle="collapse" data-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                                    <img src="~/assets/img/transactionIcon.svg" width="24" height="24" class="mr-2">Transaction Fields
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseThree" class="collapse show" aria-labelledby="headingFour" style="">
+
+                            @if (IsNewMode)
+                            {
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-12 table-responsive">
+                                            <table class="table mainTbl form-table-container-2">
+                                                <tbody>
+                                                    <tr>
+                                                        <td width="150px" class="actionTypeWidth" style="padding-left:0;"><label id="lblReqType" class="f-600">Request Type<span class="astColor">*</span></label></td>
+                                                        <td width="170px" class="w18">
+                                                            <label class="checkbox-container f-600">
+                                                                Profit & Loss
+                                                                <input type="checkbox" class="chk_requestType" name="chkProfLoss" id="chkProfLoss" value="Profit & Loss">
+                                                                <span class="checkmark"></span>
+                                                            </label>
+                                                        </td>
+                                                        <td width="170px" class="align w-20">
+                                                            <label class="checkbox-container f-600">
+                                                                Balance Sheet
+                                                                <input type="checkbox" class="chk_requestType" name="chkBal" id="chkBal" value="Balance Sheet">
+
+                                                                <span class="checkmark"></span>
+                                                            </label>
+                                                        </td>
+                                                        <td>
+                                                            <input type="hidden" name="RequestType" id="chkRequestType" value="">
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="form-group col-md-6 col-lg-6 col-12 input-block">
+
+                                            <textarea class="txtDisable" cols="90" rows="3" name="NameOfGLToOpen" id="txtNameGL" maxlength="500" required></textarea>
+                                            <span class="placeholder TransView">Name of GL to open<span class="astColor">*</span></span>
+
+                                        </div>
+                                        <div class="col-md-6 col-lg-6 col-12 input-block">
+                                            <textarea class="txtDisable" cols="90" rows="3" name="NatureOfTranInGL" id="txtNameTranGL" maxlength="500" required></textarea>
+                                            <span class="placeholder TransView">Nature of transaction to be captured in GL<span class="astColor">*</span></span>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="form-group col-md-6 col-lg-6 col-12 inputSelect">
+                                            <select name="Purpose" id="drpPurpose" class="choice  forResponsive" onchange="checkSelectGlobal('drpPurpose')">
+                                                <option value="" class="d-none"></option>
+                                                <option>IFRS Accounting</option>
+                                                <option>IGAAP Accounting</option>
+                                            </select>
+                                            <span class="placeholder">Purpose<span class="astColor">*</span></span>
+
+                                        </div>
+                                        <div class="col-md-6 col-lg-6 col-12 input-block">
+                                            <input type="date" class="w-100 spanUpperSide txtDisable" name="DateToOpenNewGL" id="txtDateOpenGL" required="">
+                                            <span class="placeholder TransView">Date to Open New GL<span class="astColor">*</span></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2 mt-1">
+                                        <span class="placeholder ml-3"> Old GL reference</span>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                            <input type="text" class="w-100 txtDisable" name="GLCode" autocomplete="off" id="txtGLCode" required="">
+                                            <span class="placeholder TransView">GL Code<span class="astColor">*</span></span>
+
+                                        </div>
+                                        <div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                            <input type="text" class="w-100 txtDisable" autocomplete="off" name="GLName" id="txtGLName" required="">
+                                            <span class="placeholder TransView">GL Name<span class="astColor">*</span></span>
+                                        </div>
+
+                                        <div class="form-group col-md-4 col-lg-4 col-12 inputSelect">
+                                            <select name="GLSeries" id="drpGLSeries" class="choice  forResponsive" onchange="checkSelectGlobal('drpGLSeries')">
+                                                <option value="" class="d-none"></option>
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="6">6</option>
+                                                <option value="7">7</option>
+                                                <option value="8">8</option>
+                                                <option value="9">9</option>
+                                            </select>
+                                            <span class="placeholder">GL Series<span class="astColor">*</span></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-12 col-lg-12 col-12 input-block">
+                                            <textarea class="txtDisable" cols="90" rows="3" name="BusinessNeed" id="txtBusinessNeed" maxlength="500" required></textarea>
+                                            <span class="placeholder TransView">Business Function & Responsibility (Max. 500)<span class="astColor">*</span></span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            }
+
+                            @if (IsViewMode)
+                            {
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-12 table-responsive">
+                                            <table class="table mainTbl form-table-container-2">
+                                                <tbody>
+                                                    <tr>
+                                                        <td width="150px" class="actionTypeWidth" style="padding-left:0;"><label id="lblReqType" class="f-600">Request Type<span class="astColor">*</span></label></td>
+                                                        @if (NGCF.RequestType == "Profit & Loss")
+                                                        {
+                                                            <td width="170px" class="w18">
+                                                                <label class="checkbox-container f-600">
+                                                                    Profit & Loss
+                                                                    <input type="checkbox" class="chk_requestType" disabled name="chkProfLoss" id="chkProfLoss" checked>
+                                                                    <span class="checkmark"></span>
+                                                                </label>
+                                                            </td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td width="170px" class="w18">
+                                                                <label class="checkbox-container f-600">
+                                                                    Profit & Loss
+                                                                    <input type="checkbox" class="chk_requestType" disabled name="chkProfLoss" id="chkProfLoss">
+                                                                    <span class="checkmark"></span>
+                                                                </label>
+                                                            </td>
+                                                        }
+                                                        @if (NGCF.RequestType == "Balance Sheet")
+                                                        {
+                                                            <td class="align w-20">
+                                                                <label class="checkbox-container f-600">
+                                                                    Balance Sheet
+                                                                    <input type="checkbox" disabled class="chk_requestType" name="chkBal" id="chkBal" checked>
+
+                                                                    <span class="checkmark"></span>
+                                                                </label>
+                                                            </td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td class="align w-20">
+                                                                <label class="checkbox-container f-600">
+                                                                    Balance Sheet
+                                                                    <input type="checkbox" disabled class="chk_requestType" name="chkBal" id="chkBal">
+
+                                                                    <span class="checkmark"></span>
+                                                                </label>
+                                                            </td>
+                                                        }
+
+                                                        <td>
+                                                            <input type="hidden" name="RequestType" id="chkRequestType" value="@NGCF.RequestType">
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="form-group col-md-6 col-lg-6 col-12 input-block">
+
+                                            <textarea class="txtDisable" cols="90" rows="3" name="NameOfGLToOpen" id="txtNameGL" maxlength="500" required disabled>@NGCF.NameOfGLToOpen</textarea>
+                                            <span class="placeholder TransView">Name of GL to open<span class="astColor">*</span></span>
+
+                                        </div>
+                                        <div class="col-md-6 col-lg-6 col-12 input-block">
+                                            <textarea class="txtDisable" cols="90" rows="3" name="NatureOfTranInGL" id="txtNameTranGL" maxlength="500" required readonly>@NGCF.NatureOfTranInGL</textarea>
+                                            <span class="placeholder TransView">Nature of transaction to be captured in GL<span class="astColor">*</span></span>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="form-group col-md-6 col-lg-6 col-12 inputSelect">
+                                            <select name="Purpose" id="drpPurpose" disabled class="choice  forResponsive" onchange="checkSelectGlobal('drpPurpose')">
+                                                <option @(NGCF.Purpose == "IFRS Accounting" ? "selected" : "" ) value="IFRS Accounting">IFRS Accounting</option>
+                                                <option @(NGCF.Purpose == "IGAAP Accounting" ? "selected" : "" ) value="IGAAP Accounting">IGAAP Accounting</option>
+                                            </select>
+                                            <span class="placeholder">Purpose<span class="astColor">*</span></span>
+
+                                        </div>
+                                        <div class="col-md-6 col-lg-6 col-12 input-block">
+                                            <input type="date" value="@((NGCF.DateToOpenNewGL.ToString("yyyy-MM-dd") ?? ""))" disabled class="w-100 spanUpperSide txtDisable" name="DateToOpenNewGL" id="txtDateOpenGL" required="">
+                                            <span class="placeholder TransView">Date to Open New GL<span class="astColor">*</span></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2 mt-1">
+                                        <span class="placeholder ml-3"> Old GL Reference</span>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                            <input type="text" class="w-100 spanUpperSide txtDisable" disabled name="GLCode" id="txtGLCode" value="@NGCF.GLCode" required="">
+                                            <span class="placeholder TransView">GL Code<span class="astColor">*</span></span>
+
+                                        </div>
+                                        <div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                            <input type="text" class="w-100 spanUpperSide txtDisable" disabled name="GLName" id="txtGLName" value="@NGCF.GLName" required="">
+                                            <span class="placeholder TransView">GL Name<span class="astColor">*</span></span>
+                                        </div>
+
+                                        <div class="form-group col-md-4 col-lg-4 col-12 inputSelect">
+                                            <select name="GLSeries" id="drpGLSeries" disabled class="choice  forResponsive" onchange="checkSelectGlobal('drpGLSeries')">
+                                                @*BS*@
+                                                <option @(NGCF.GLSeries == "1" ? "selected" : "" ) value="1">1</option>
+                                                <option @(NGCF.GLSeries == "2" ? "selected" : "" ) value="2">2</option>
+                                                <option @(NGCF.GLSeries == "3" ? "selected" : "" ) value="3">3</option>
+                                                <option @(NGCF.GLSeries == "4" ? "selected" : "" ) value="4">4</option>
+                                                @*PL*@
+                                                <option @(NGCF.GLSeries == "6" ? "selected" : "" ) value="6">6</option>
+                                                <option @(NGCF.GLSeries == "7" ? "selected" : "" ) value="7">7</option>
+                                                <option @(NGCF.GLSeries == "8" ? "selected" : "" ) value="8">8</option>
+                                                <option @(NGCF.GLSeries == "9" ? "selected" : "" ) value="9">9</option>
+                                            </select>
+                                            <span class="placeholder">GL Series<span class="astColor">*</span></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-12 col-lg-12 col-12 input-block">
+                                            <textarea class="txtDisable" cols="90" rows="3" name="BusinessNeed" id="txtBusinessNeed" disabled maxlength="500" required>@NGCF.BusinessNeed</textarea>
+                                            <span class="placeholder TransView">Business Function & Responsibility (Max. 500)<span class="astColor">*</span></span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            }
+
+                            @if (IsEditMode)
+                            {
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-12 table-responsive">
+                                            <table class="table mainTbl form-table-container-2">
+                                                <tbody>
+                                                    <tr>
+                                                        <td width="150px" class="actionTypeWidth" style="padding-left:0;"><label id="lblReqType" class="f-600">Request Type<span class="astColor">*</span></label></td>
+                                                        @if (NGCF.RequestType == "Profit & Loss")
+                                                        {
+                                                            <td width="170px" class="w18">
+                                                                <label class="checkbox-container f-600">
+                                                                    Profit & Loss
+                                                                    <input type="checkbox" class="chk_requestType" name="chkProfLoss" id="chkProfLoss" checked>
+                                                                    <span class="checkmark"></span>
+                                                                </label>
+                                                            </td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td width="170px" class="w18">
+                                                                <label class="checkbox-container f-600">
+                                                                    Profit & Loss
+                                                                    <input type="checkbox" class="chk_requestType" name="chkProfLoss" id="chkProfLoss">
+                                                                    <span class="checkmark"></span>
+                                                                </label>
+                                                            </td>
+                                                        }
+                                                        @if (NGCF.RequestType == "Balance Sheet")
+                                                        {
+                                                            <td class="align w-20">
+                                                                <label class="checkbox-container f-600">
+                                                                    Balance Sheet
+                                                                    <input type="checkbox" class="chk_requestType" name="chkBal" id="chkBal" checked>
+
+                                                                    <span class="checkmark"></span>
+                                                                </label>
+                                                            </td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td class="align w-20">
+                                                                <label class="checkbox-container f-600">
+                                                                    Balance Sheet
+                                                                    <input type="checkbox" class="chk_requestType" name="chkBal" id="chkBal">
+
+                                                                    <span class="checkmark"></span>
+                                                                </label>
+                                                            </td>
+                                                        }
+
+                                                        <td>
+                                                            <input type="hidden" name="RequestType" id="chkRequestType" value="@NGCF.RequestType">
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="form-group col-md-6 col-lg-6 col-12 input-block">
+
+                                            <textarea class="txtDisable" cols="90" rows="3" name="NameOfGLToOpen" id="txtNameGL" maxlength="500" required>@NGCF.NameOfGLToOpen</textarea>
+                                            <span class="placeholder TransView">Name of GL to open<span class="astColor">*</span></span>
+
+                                        </div>
+                                        <div class="col-md-6 col-lg-6 col-12 input-block">
+                                            <textarea class="txtDisable" cols="90" rows="3" name="NatureOfTranInGL" id="txtNameTranGL" maxlength="500" required>@NGCF.NatureOfTranInGL</textarea>
+                                            <span class="placeholder TransView">Nature of transaction to be captured in GL<span class="astColor">*</span></span>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="form-group col-md-6 col-lg-6 col-12 inputSelect">
+                                            <select name="Purpose" id="drpPurpose" class="choice  forResponsive" onchange="checkSelectGlobal('drpPurpose')">
+                                                <option @(NGCF.Purpose == "IFRS Accounting" ? "selected" : "" ) value="IFRS Accounting">IFRS Accounting</option>
+                                                <option @(NGCF.Purpose == "IGAAP Accounting" ? "selected" : "" ) value="IGAAP Accounting">IGAAP Accounting</option>
+                                            </select>
+                                            <span class="placeholder">Purpose<span class="astColor">*</span></span>
+
+                                        </div>
+                                        <div class="col-md-6 col-lg-6 col-12 input-block">
+                                            <input type="date" value="@((NGCF.DateToOpenNewGL.ToString("yyyy-MM-dd") ?? ""))" class="w-100 spanUpperSide txtDisable" name="DateToOpenNewGL" id="txtDateOpenGL" required="">
+                                            <span class="placeholder TransView">Date to Open New GL<span class="astColor">*</span></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2 mt-1">
+                                        <span class="placeholder ml-3"> Old GL Reference</span>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                            <input type="text" class="w-100 spanUpperSide txtDisable" autocomplete="off" name="GLCode" id="txtGLCode" value="@NGCF.GLCode" required="">
+                                            <span class="placeholder TransView">GL Code<span class="astColor">*</span></span>
+
+                                        </div>
+                                        <div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                            <input type="text" class="w-100 spanUpperSide txtDisable" autocomplete="off" name="GLName" id="txtGLName" value="@NGCF.GLName" required="">
+                                            <span class="placeholder TransView">GL Name<span class="astColor">*</span></span>
+                                        </div>
+
+                                        <div class="form-group col-md-4 col-lg-4 col-12 inputSelect">
+                                            <select name="GLSeries" id="drpGLSeries" class="choice  forResponsive" onchange="checkSelectGlobal('drpGLSeries')">
+                                                @*BS*@
+                                                <option @(NGCF.GLSeries == "1" ? "selected" : "" ) value="1">1</option>
+                                                <option @(NGCF.GLSeries == "2" ? "selected" : "" ) value="2">2</option>
+                                                <option @(NGCF.GLSeries == "3" ? "selected" : "" ) value="3">3</option>
+                                                <option @(NGCF.GLSeries == "4" ? "selected" : "" ) value="4">4</option>
+                                                @*PL*@
+                                                <option @(NGCF.GLSeries == "6" ? "selected" : "" ) value="6">6</option>
+                                                <option @(NGCF.GLSeries == "7" ? "selected" : "" ) value="7">7</option>
+                                                <option @(NGCF.GLSeries == "8" ? "selected" : "" ) value="8">8</option>
+                                                <option @(NGCF.GLSeries == "9" ? "selected" : "" ) value="9">9</option>
+                                            </select>
+                                            <span class="placeholder">GL Series<span class="astColor">*</span></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-12 col-lg-12 col-12 input-block">
+                                            <textarea class="txtDisable" cols="90" rows="3" name="BusinessNeed" id="txtBusinessNeed" maxlength="500" required>@NGCF.BusinessNeed</textarea>
+                                            <span class="placeholder TransView">Business Function & Responsibility (Max. 500)<span class="astColor">*</span></span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            }
+                        </div>
+
+                    </div>
+                </div>
+
+                @* Approval Section And Action Section *@
+                @if (IsViewMode || IsEditMode)
+                {
+                    //Approval Section
+                    <div id="accordion">
+                        <div class="card">
+                            <div class="card-header collapsed" id="headingFour" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                                <h5 class="mb-0">
+                                    <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                                        <img src="~/assets/img/approvalTracking.svg" width="24" height="24" class="mr-2" />Approval Tracking
+                                    </button>
+                                </h5>
+                            </div>
+                            <div id="collapseFour" class="collapse" aria-labelledby="headingFour">
+                                <div class="card-body">
+                                    <div class="form-row">
+                                        <div class="col-12">
+                                            <table class="table w-100 td-border showBorder">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Name</th>
+                                                        <th>Role</th>
+                                                        <th style="display: @(appList.Any(x => !string.IsNullOrEmpty(x.ExtraDetails)) ? " " : " none")">Content</th>
+                                                        <th>Processed on</th>
+                                                        <th>Status</th>
+                                                        <th class="text-center">Comments</th>
+                                                        <th class="text-center">Approval Level</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @if (IsViewMode || IsEditMode)
+                                                    {
+                                                        Html.RenderPartial("_ApprovalTracking", appList);
+                                                    }
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div><div id="accordion">
+                        <div class="card">
+                            <div class="card-header collapsed" id="headingFive" data-toggle="collapse" data-target="#collapseFive" aria-expanded="true" aria-controls="collapseFive">
+                                <h5 class="mb-0">
+                                    <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFive" aria-expanded="true" aria-controls="collapseFive">
+                                        <img src="~/assets/img/approvalTracking.svg" width="24" height="24" class="mr-2" /> Action
+                                    </button>
+                                </h5>
+                            </div>
+
+                            <div id="collapseFive" class="collapse" aria-labelledby="headingFive">
+                                <div class="card-body actionTab">
+                                    <div class="row">
+                                        <div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                            <input type="text" value="@(NGCF?.NewGLNo ?? "")" @(CurrentUserDesgn == glTeam ? "" : "readonly") class="w-100 spanUpperSide txtDisable" name="txtNewGLNo" id="txtNewGLNo" required="">
+                                            <span class="placeholder TransView">New GL No.<span class="astColor">*</span></span>
+
+                                        </div>
+                                        <div class="col-md-4 col-lg-4 col-12 input-block">
+                                            <input type="text" value="@(NGCF?.CommitmentItem ?? "")" @(CurrentUserDesgn == controllingTeam ? "" : "readonly") class="w-100 spanUpperSide txtDisable" name="txtCommitmentItem" id="txtCommitmentItem" required="">
+                                            <span class="placeholder TransView">Commitment Item<span class="astColor">*</span></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                @* Buttons *@
+                @if (IsNewMode)
+                {
+                    <div class="card-footer align-content-center">
+                        <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                            Submit
+                        </button>
+                        <button type="reset" class="btn btn-danger btn-sm cancl-btn" id="btnCancel">
+                            Cancel
+                        </button>
+                    </div><br><br>
+                }
+                else if (IsEditMode)
+                {
+                    <div class="card-footer align-content-center" style=" margin-top: 15px;">
+                        <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                            Re-Submit
+                        </button>
+                        <button type="reset" class="btn btn-danger btn-sm cancl-btn" id="btnCancel">
+                            Cancel
+                        </button>
+                    </div><br><br>
+                }
+
+                <div>
+                    <p class="text-left f-600">SF_II_024</p>
+                </div>
+            </div>
+
+            <!-- END HERE ACCORDIAN -->
+        </form>
+
+
+       
+
+
+    </div>
+</body>
+<div class="modal fade" id="successModel" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header modelHeader">
+                <span class="modal-title modalMsgTitle" id="modalTitle"></span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label id="modalBody" class="lableMsg">  </label>
+                <input type="hidden" id="tab" value="0" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="submitBomBtn publishBtn" id="modalOkButton" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+        var spinner = $('#loader');
+        var IsNewMode = @Html.Raw(Json.Encode(IsNewMode));
+        var IsEditMode = @Html.Raw(Json.Encode(IsEditMode));
+        var IsViewMode = @Html.Raw(Json.Encode(IsViewMode));
+        var NGCF = @Html.Raw(Json.Encode(NGCF));
+        var appRowId = @Html.Raw(Json.Encode(AppRowId));
+        var formID = @Html.Raw(Json.Encode(FormId));
+        var approvalType =@Html.Raw(Json.Encode(ApprovalType));
+        var currentUserDesgn = @Html.Raw(Json.Encode(CurrentUserDesgn));
+        var currentUserLevel =@Html.Raw(Json.Encode(CurrentUserLevel));
+        var glTeam = @Html.Raw(Json.Encode(glTeam));
+        var controllingTeam = @Html.Raw(Json.Encode(controllingTeam));
+
+        pageLoad();
+        var errorCount = 0;
+        var errors = "";
+        function pageLoad() {
+            $("#headingErr").addClass('d-none');
+            if (IsEditMode) {
+                if (NGCF.RequestType == "Profit & Loss") {
+                    $("#drpGLSeries option[value='1']").hide();
+                    $("#drpGLSeries option[value='2']").hide();
+                    $("#drpGLSeries option[value='3']").hide();
+                    $("#drpGLSeries option[value='4']").hide();
+
+                    $("#drpGLSeries option[value='6']").show();
+                    $("#drpGLSeries option[value='7']").show();
+                    $("#drpGLSeries option[value='8']").show();
+                    $("#drpGLSeries option[value='9']").show();
+                }
+                else if (NGCF.RequestType == "Balance Sheet") {
+                    $("#drpGLSeries option[value='6']").hide();
+                    $("#drpGLSeries option[value='7']").hide();
+                    $("#drpGLSeries option[value='8']").hide();
+                    $("#drpGLSeries option[value='9']").hide();
+
+                    $("#drpGLSeries option[value='1']").show();
+                    $("#drpGLSeries option[value='2']").show();
+                    $("#drpGLSeries option[value='3']").show();
+                    $("#drpGLSeries option[value='4']").show();
+                }
+            }
+
+
+    }
+
+    $("#btnSubmit").on('click', function (e) {
+        $(".full-screen-container").removeClass('invisible');
+        $(".full-screen-container").show();
+        errors = "";
+        validateSubmitter();
+        validateApplicant();
+
+        if ($('.chk_requestType:checkbox:checked').length == 0) {
+            errors += "<li id='error" + errorCount + "'>" + "Request Type" + "</li>";
+            $("#chkProfLoss").addClass('removeRequestType');
+            $("#chkBal").addClass('removeRequestType');
+            AddError("lblReqType", 'removeRequestType', errorCount);
+            errorCount++;
+        }
+        else {
+            RemoveError("lblReqType");
+        }
+
+        var txtNameGL = document.getElementById("txtNameGL").value;
+        if (txtNameGL == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Name of GL to open" + "</li>";
+            AddError("txtNameGL", '', errorCount);
+            errorCount++;
+        }
+        else {
+            RemoveError("txtNameGL");
+        }
+
+        var txtNameTranGL = document.getElementById("txtNameTranGL").value;
+        if (txtNameTranGL == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Nature of transaction to be captured in GL" + "</li>";
+            AddError("txtNameTranGL", '', errorCount);
+            errorCount++;
+        }
+        else {
+            RemoveError("txtNameTranGL");
+        }
+
+        var drpPurpose = $("#drpPurpose option:selected").val();
+        if (drpPurpose == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Purpose" + "</li>";
+            AddError("drpPurpose", '', errorCount);
+            errorCount++;
+        }
+        else {
+            RemoveError("drpPurpose");
+        }
+
+        var txtDateOpenGL = document.getElementById("txtDateOpenGL").value;
+        if (txtDateOpenGL == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Date to Open New GL" + "</li>";
+            AddError("txtDateOpenGL", '', errorCount);
+            errorCount++;
+        }
+        else {
+            RemoveError("txtDateOpenGL");
+        }
+
+        var txtGLCode = document.getElementById("txtGLCode").value;
+        if (txtGLCode == "") {
+            errors += "<li id='error" + errorCount + "'>" + "GL Code" + "</li>";
+            AddError("txtGLCode", '', errorCount);
+            errorCount++;
+        }
+        else {
+            RemoveError("txtGLCode");
+        }
+
+        var txtGLName = document.getElementById("txtGLName").value;
+        if (txtGLName == "") {
+            errors += "<li id='error" + errorCount + "'>" + "GL Name" + "</li>";
+            AddError("txtGLName", '', errorCount);
+            errorCount++;
+        }
+        else {
+            RemoveError("txtGLName");
+        }
+
+        var drpGLSeries = $("#drpGLSeries option:selected").val();
+        if (drpGLSeries == "") {
+            errors += "<li id='error" + errorCount + "'>" + "GL Series" + "</li>";
+            AddError("drpGLSeries", '', errorCount);
+            errorCount++;
+        }
+        else {
+            RemoveError("drpGLSeries");
+        }
+
+        var txtBusiness = document.getElementById("txtBusinessNeed").value;
+        if (txtBusiness == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Business justification" + "</li>";
+            AddError("txtBusinessNeed", '', errorCount);
+            errorCount++;
+        }
+        else {
+            RemoveError("txtBusinessNeed");
+        }
+
+        if (errors.length) {
+            $(".full-screen-container").hide();
+            errors = "<ol id='errorList'>" + errors + "</ol>";
+            $("#headingErr").removeClass('d-none');
+            document.getElementById("add_to_me").innerHTML = errors;
+            if (IsEditMode) {
+                $("#myModalRequest").scrollTop(0);
+            }
+            else {
+                $(window).scrollTop(0);
+            }
+            return false;
+        }
+        $("#headingErr").addClass('d-none');
+        document.getElementById("add_to_me").innerHTML = '';
+        $('#ddEmpDesignation').prop("disabled", false);
+        $('#txtOnBehalfdesignation').prop("disabled", false);
+        $("#pageLoader").removeClass('invisible');
+        $("#btnSubmit").text('Saving');
+        $("#btnSubmit").prop("disabled", true);
+        $("#btnCancel").prop("disabled", true);
+
+        var form = $('#NGCForm');
+        var formData = new FormData(form[0]);
+        $.ajax({
+            url: '/NewGlobalCode/SaveNewGlobalCode',
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            dataType: 'JSON',
+            data: formData,
+            enctype: 'multipart/form-data',
+            success: (function (data) {
+                if (data.Status == 200) {
+                    $("#pageLoader").addClass('invisible');
+                    if (IsNewMode) {
+                        $("#btnSubmit").text('Submit');
+                    }
+                    else {
+                        $("#btnSubmit").text('Re-Submit');
+                    }
+                    $("#btnSubmit").prop("disabled", false);
+                    $("#btnCancel").prop("disabled", false);
+                    successNGCFModal(data.Message);
+                }
+                else {
+                    failureModal(data.Message);
+                    if (IsNewMode) {
+                        $("#btnSubmit").text('Submit');
+                    }
+                    else {
+                        $("#btnSubmit").text('Re-Submit');
+                    }
+                    $("#pageLoader").addClass('invisible');
+                    $("#btnSubmit").prop("disabled", false);
+                    $("#btnCancel").prop("disabled", false);
+                }
+                $(".full-screen-container").hide();
+            }),
+            error: (function (data) {
+                failureModal(data.Message);
+                if (IsNewMode && IsEditMode) {
+                    $("#btnSubmit").text('Submit');
+                }
+                else {
+                    $("#btnSubmit").text('Re-Submit');
+                }
+                $("#pageLoader").addClass('invisible');
+                $("#btnSubmit").prop("disabled", false);
+                $("#btnCancel").prop("disabled", false);
+                $(".full-screen-container").hide();
+            })
+        })
+        $("#tab").val(2);
+
+    });
+
+    $("#btnCancel").on('click', function (e) {
+        $("#headingErr").addClass('d-none');
+        document.getElementById("add_to_me").innerHTML = '';
+        if ($('#myModalRequest').hasClass('show'))
+            $('#myModalRequest').modal('hide');
+        else
+            $('#myModalEdit').modal('hide');
+        if (IsNewMode) {
+            window.location = "../Dashboard";
+        }
+    });
+
+    //Request Type
+    $('input:checkbox[id="chkProfLoss"]').click(function () {
+        if ($(this).prop("checked") == true) {
+            $('input[id="chkBal"]').prop('checked', false);
+            $('input[id="chkProfLoss"]').prop('checked', true).change();
+
+            $('input[id="chkProfLoss"]').prop('disabled', true);
+            $('input[id="chkBal"]').prop("disabled", false);
+
+            $("#chkRequestType").val('Profit & Loss');
+
+
+            $("#drpGLSeries option[value='1']").hide();
+            $("#drpGLSeries option[value='2']").hide();
+            $("#drpGLSeries option[value='3']").hide();
+            $("#drpGLSeries option[value='4']").hide();
+
+            $("#drpGLSeries option[value='6']").show();
+            $("#drpGLSeries option[value='7']").show();
+            $("#drpGLSeries option[value='8']").show();
+            $("#drpGLSeries option[value='9']").show();
+        }
+    });
+
+    $('input:checkbox[id="chkBal"]').click(function () {
+        if ($(this).prop("checked") == true) {
+            $('input[id="chkProfLoss"]').prop('checked', false);
+            $('input[id="chkBal"]').prop('checked', true).change();
+
+            $('input[id="chkBal"]').prop('disabled', true);
+            $('input[id="chkProfLoss"]').prop("disabled", false);
+
+            $("#chkRequestType").val('Balance Sheet');
+
+            $("#drpGLSeries option[value='6']").hide();
+            $("#drpGLSeries option[value='7']").hide();
+            $("#drpGLSeries option[value='8']").hide();
+            $("#drpGLSeries option[value='9']").hide();
+
+            $("#drpGLSeries option[value='1']").show();
+            $("#drpGLSeries option[value='2']").show();
+            $("#drpGLSeries option[value='3']").show();
+            $("#drpGLSeries option[value='4']").show();
+        }
+    });
+
+    //Request Type
+
+    $('#successModel').on('hide.bs.modal', function () {
+        //
+        var tab = $("#tab").val();
+        if (tab == 1) {
+            GetMyTaskTab();
+        }
+        else if (tab == 2) {
+            window.location = "../Dashboard?tab=" + tab;
+        }
+    })
+
+    $('#myModal').modal({ backdrop: 'static', keyboard: false })
+
+    $("select").change();
+
+    function saveResponse(text) {
+        debugger;
+        $(".full-screen-container").removeClass('invisible');
+        $(".full-screen-container").show();
+        var status = '', comment = '';
+        if (window.matchMedia('(max-width: 425px)').matches) {
+            comment = $("#commentMobile-" + text).val();
+        } else
+            comment = $("#comment-" + text).val();
+        switch (text) {
+            case 'approve': {
+                status = 'Approved';
+                if (currentUserDesgn == glTeam) {
+                    var txtNewGLNo = document.getElementById("txtNewGLNo").value;
+                    if (txtNewGLNo == "") {
+                        AddError("txtNewGLNo", '', errorCount);
+                        DisplayAlert('error', 'Error', 'Please enter New GL No.', 5000);
+                        $("#collapseFive").addClass('show');
+                        $(".full-screen-container").hide();
+                        return;
+                    }
+                    else {
+                        RemoveError("txtNewGLNo");
+                        UpdateNGCFData(status, appRowId, comment, approvalType, text);
+                    }
+
+                }
+                if (currentUserDesgn == controllingTeam) {
+                    var txtCommitmentItem = document.getElementById("txtCommitmentItem").value;
+                    if (txtCommitmentItem == "") {
+                        AddError("txtCommitmentItem", '', errorCount);
+                        DisplayAlert('error', 'Error', 'Please enter Commitment Item', 5000);
+                        $("#collapseFive").addClass('show');
+                        $(".full-screen-container").hide();
+                        return;
+                    }
+                    else {
+                        RemoveError("txtCommitmentItem");
+                        UpdateNGCFData(status, appRowId, comment, approvalType, text);
+                    }
+
+                }
+                else {
+                    FormApproval(status, appRowId, comment, approvalType, text);
+                }
+                break;
+            }
+            case 'reject': {
+                status = 'Rejected';
+                if (comment == '') {
+                    validityModal(text);
+                    $(".full-screen-container").hide();
+                    return;
+                }
+                else {
+                    FormApproval(status, appRowId, comment, approvalType, text);
+                }
+                break;
+            }
+            case 'enquire': {
+                status = 'Enquired';
+                if (comment == '') {
+                    validityModal(text);
+                    $(".full-screen-container").hide();
+                    return;
+                }
+                else {
+                    FormApproval(status, appRowId, comment, approvalType, text);
+                }
+                break;
+            }
+        }
+        $("#tab").val(1);
+    }
+
+    function FormApproval(status, appRowId, comment, approvalType, text) {
+        $(".full-screen-container").removeClass('invisible');
+        $(".full-screen-container").show();
+        spinner.show();
+        $.ajax({
+            url: '/List/SaveResponse',
+            type: 'POST',
+            data: { response: status, appRowId: appRowId, comment: comment, approvalType: approvalType },
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data.Result == 1) {
+                    successNGCFModal(text);
+                    spinner.hide();
+                }
+                else {
+                    failureModal();
+                    spinner.hide();
+                }
+                $(".full-screen-container").hide();
+            }),
+            error: (function (data) {
+                failureModal();
+                spinner.hide();
+                $(".full-screen-container").hide();
+            })
+        })
+
+        $("#tab").val(1);
+    }
+
+    function UpdateNGCFData(status, appRowId, comment, approvalType, text) {
+        //
+        var form = $("#NGCForm").serialize();
+        console.log(form);
+        $.ajax({
+            url: '/NewGlobalCode/UpdateNGCFData',
+            type: 'POST',
+            data: form,
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data == 1) {
+                    FormApproval(status, appRowId, comment, approvalType, text);
+                }
+                else {
+                    failureModal();
+                }
+                $(".full-screen-container").hide();
+            }),
+            error: (function (data) {
+                failureModal();
+                $(".full-screen-container").hide();
+            })
+        })
+
+    }
+
+    function requiredModal(text) {
+        $('#modalTitle').html('Required!');
+        $('#modalBody').html(text);
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function successNGCFModal(txt) {
+        ////
+        $('#modalTitle').html('Success');
+        if (txt == "approve") {
+            $('#modalBody').html('Form has been approved!');
+        }
+        else if (txt == "reject") {
+            $('#modalBody').html('Form has been rejected!');
+        }
+        else if (txt == "enquire") {
+            $('#modalBody').html('Form has been enquired!');
+        }
+        else if (txt == "cancelled") {
+            $('#modalBody').html('Form has been cancelled!');
+        }
+        else {
+            if (IsEditMode) {
+                $('#modalBody').html('Your form with ID: NGCF' + txt + ' has been re-submitted! Kindly use this for future reference');
+            }
+            else {
+                $('#modalBody').html('Your form with ID: NGCF' + txt + ' has been submitted! Kindly use this for future reference');
+            }
+        }
+
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function failureModal(msg) {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html(msg);
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function permissionModal() {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html('No permssion granted since the device is not SAVWIPL owned!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+</script>

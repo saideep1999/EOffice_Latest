@@ -1,0 +1,2362 @@
+﻿@model dynamic
+@{
+    ViewBag.Title = "Data Backup Restore Form";
+    var user = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    bool IsNew = true;
+    bool IsEdit = true;
+    dynamic FlagRedirect = null; // For Email Update
+    dynamic DBRF = null;
+    Layout = ViewBag.Layout;
+    int RowId = 0, FormId = 0, AppRowId = 0, ApprovalType = 0;
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IsNew = ViewBag.IsNew;
+        IsEdit = ViewBag.IsEdit;
+        DBRF = ViewBag.Model;
+        RowId = ViewBag.RowId;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+    }
+}
+@*For Email Update*@
+<style type="text/css">
+    .table-middle tr td, .table-middle tr th{
+        text-align: center !important;
+    }
+    .bg-color td, .bg-color th {
+        border: 1px solid #dee2e6;
+        background-color: rgb(219,238,213) !important;
+    }
+
+    #OtherEmpName #txtOtherEmpname {
+        border-radius: 0;
+        height: 20%;
+        font-size: 12px;
+    }
+
+    .bg-color-2 td {
+        background-color: rgba(75,168,46,0.4) !important;
+        border: 1px solid rgba(75,168,46,0.1) !important;
+    }
+
+    .bg-color-2 th {
+        background-color: rgba(75,168,46,0.4) !important;
+        border: 1px solid rgba(75,168,46,0.1) !important;
+    }
+    #loader {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        background: rgba(0,0,0,0.75) url(../../assets/img/Loading.gif) no-repeat center center;
+        z-index: 10000;
+    }
+</style>
+<div id="loader"></div>
+@*For Email Update*@
+<div class="right_col bg-transparent" role="main">
+    <div class="container">
+        <form action="/List/CreateDataBackupRestoreRequest" id="DBRForm" method="post">
+            @if (IsNew)
+            {
+                if (!IsEdit)
+                {
+                    <div>
+                        <input type="hidden" id="FormSrId" name="FormSrId" value="@(DBRF.one[0].Id)" />
+                        <input type="hidden" id="FormId" name="FormId" value="@(FormId)" />
+                        <input type="hidden" id="AppRowId" name="AppRowId" value="@(AppRowId)" />
+                    </div>
+                }
+                else
+                {
+                    <div class="breadcrumb-container">
+                        <div>
+                            <ol class="breadcrumb pl-0">
+                                <li>
+                                    <a href="/Dashboard?formName=DBRF">
+                                        Dashboard
+                                    </a>
+                                </li>
+                                <li class="active">
+                                    <a href="/Dashboard/GetDepartmentWiseForms?department=IT">
+                                        IT Department
+                                    </a>
+                                </li>
+                                <li class="active">Data Backup Restore Form</li>
+                            </ol>
+                        </div>
+                    </div>
+                    <div class="form-main-container margin_space">
+                        <div class="row topContent">
+                            <div class="col-lg-9 col-md-7 padd_space">
+                                <h5> Form Name : Data Backup Restore Form</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-7 padd_space float-right text-right">
+
+                                <h5> @*Form Department | Owner*@</h5>
+
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            <div class="container form-container">
+                <div class="card-header pb-4 pt-4">
+                    <table class="w-100 m-auto">
+                        <tr>
+                            <td>
+                                <table class="table mainTbl table-bordered form-table-container bg-color">
+                                    <tbody>
+                                        <tr>
+                                            <td class="f-600 text-left pl-3">Classification</td>
+                                            <td class="f-600 text-left pl-3">Internal</td>
+                                            <td rowspan="2" class="text-right"><img class="img-fluid img-box" src="~/assets/img/skoda.png"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="f-600 text-left pl-3">Version</td>
+                                            <td class="f-600 text-left pl-3">01</td>
+                                            <!-- <td rowspan="2"></td> -->
+                                        </tr>
+                                    </tbody>
+
+                                </table>
+                                <table class="table mainTbl table-bordered form-table-container bg-color">
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="6" class="heading form-heading">
+                                                <span>Data Backup Restore Form</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table mainTbl table-bordered form-table-container-2 bg-color">
+                                    <tbody>
+                                        <tr>
+                                            <td class="allFormLables borderLTB f-600">
+                                                <label class="f-600">Date:</label>
+                                            </td>
+                                            <td colspan="2" class="borderLTB text-left">
+                                                <input type="text" name="txtDate" placeholder="/ /" class="w-100" value="@(!IsNew || !IsEdit ? (Convert.ToDateTime(DBRF.one[0].FormID.CreatedDate).ToShortDateString()) : DateTime.Now.ToShortDateString())" readonly>
+                                            </td>
+
+                                            @if (!IsNew || !IsEdit)
+                                            {
+                                                <td class="allFormLables borderLTB f-600 align" colspan="2">
+
+                                                    <label class="f-600">Form Id:</label>
+
+                                                </td>
+                                                <td colspan="2" class="borderLTB text-right">
+
+                                                    <input type="text" name="txtFormId" class="w-100" value="@(!IsNew ||!IsEdit ? ("DBRF" + DBRF.one[0].FormID.Id  ?? "") : "" )" readonly>
+                                                </td>
+                                            }
+                                        </tr>
+                                        @if (!IsEdit)
+                                        {
+                                            foreach (var item in DBRF.one)
+                                            {
+                                                <tr>
+
+                                                    <td class="w-20 allFormLables borderLTB f-600">
+                                                        <label class="f-600">Request Submission For:</label>
+                                                    </td>
+                                                    <td colspan="2" class="borderLTB">
+                                                        <select name="drpRequestSubmissionFor" id="drpRequestSubmissionFor" class="choice" onchange="RequestSubmissionFor()">
+                                                            <option value="Self" @(item.RequestSubmissionFor == "Self" ? "selected" : "")> Self </option>
+                                                            <option value="OnBehalf" @(item.RequestSubmissionFor == "OnBehalf" ? "selected" : "")> On Behalf </option>
+                                                        </select>
+                                                    </td>
+                                                    <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                        <label class="f-600"></label>
+                                                    </td>
+                                                    <td class="borderLTB text-left" colspan="2">
+                                                    </td>
+                                                </tr>
+                                            }
+                                            <tr id="OtherEmpName" style="display: none;">
+                                                <td>
+                                                    <label id="lblOtherEmpName" class="control-label f-600">Name (Type at least 4 letters for faster results)</label>
+                                                </td>
+                                                <td colspan="2"><input type="text" name="txtOtherEmpname" id="txtOtherEmpname" class="form-control ui-autocomplete-input" required="required" autocomplete="off"></td>
+                                            </tr>
+                                        }
+                                        else if (IsNew)
+                                        {
+                                            <tr>
+                                                <td class="w-20 allFormLables borderLTB f-600">
+                                                    <label class="f-600">Request Submission For:</label>
+                                                </td>
+                                                <td colspan="2" class="borderLTB">
+                                                    <select name="drpRequestSubmissionFor" id="drpRequestSubmissionFor" class="choice" onchange="RequestSubmissionFor()">
+                                                        <option value="null">Choose</option>
+                                                        <option value="Self">Self</option>
+                                                        <option value="OnBehalf">On Behalf</option>
+                                                    </select>
+                                                </td>
+                                                <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                    <label class="f-600"></label>
+                                                </td>
+                                                <td class="borderLTB text-left" colspan="2">
+                                                </td>
+
+                                            </tr>
+                                            <tr id="OtherEmpName" style="display: none;">
+                                                <td>
+                                                    <label id="lblOtherEmpName" class="control-label f-600">Name (Type at least 4 letters for faster results)</label>
+                                                </td>
+                                                <td colspan="2"><input type="text" name="txtOtherEmpname" id="txtOtherEmpname" class="form-control ui-autocomplete-input" required="required" autocomplete="off"></td>
+
+                                            </tr>
+                                        }
+
+                                        @if (IsNew)
+                                        {
+                                            if (!IsEdit)
+                                            {
+                                                <tr>
+                                                    <td class="allFormLables borderLTB f-600">
+                                                        <label class="f-600">Type of Employee</label>
+                                                    </td>
+                                                    <td class="borderLTB">
+                                                        <label class="checkbox-container">
+                                                            <label class="f-600">Internal</label>
+                                                            @if (DBRF.one[0].EmployeeType == "Internal")
+                                                            {
+                                                                <input type="checkbox" class="" name="chkInternal" id="chkInternal" onclick="getEmployeeType()" checked>
+                                                            }
+                                                            else
+                                                            {
+                                                                <input type="checkbox" class="" name="chkInternal" id="chkInternal" onclick="getEmployeeType()">
+                                                            }
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                    </td>
+
+                                                    <td class="borderLTB text-left align">
+                                                        <label class="checkbox-container">
+                                                            <label class="f-600">External</label>
+                                                            @if (DBRF.one[0].EmployeeType == "External")
+                                                            {
+                                                                <input type="checkbox" class="" name="chkExternal" id="chkExternal" onclick="getEmployeeType()" checked>
+                                                            }
+                                                            else
+                                                            {
+                                                                <input type="checkbox" class="" name="chkExternal" id="chkExternal" onclick="getEmployeeType()">
+                                                            }
+
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                        <input type="hidden" name="chkEmployeeType" id="chkEmployeeType" value="@(DBRF.one[0].EmployeeType ?? "")" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    @if ((DBRF.one[0].EmployeeType == "External") && (DBRF.one[0].ExternalOrganizationName == "Other"))
+                                                    {
+                                                        <td class="" id="lblExternalOrganizationName">
+                                                            <label class="f-600">External Organization Name</label>
+                                                        </td>
+                                                        <td id="ExternalOrganizationName" colspan="2">
+                                                            <select class="w-100" name="ddExternalOrganizationName" id="ddExternalOrganizationName"></select>
+                                                        </td>
+                                                        <td id="lblExternalOtherOrganizationName" colspan="2" class="align">
+                                                            <label class="f-600"> Other External Organization Name</label>
+                                                        </td>
+                                                        <td id="ExternalOtherOrganizationName" class="text-right">
+                                                            <input type="text" class="w-100" placeholder="Other External Organization Name" name="txtExternalOtherOrganizationName" id="txtExternalOtherOrganizationName" value="@(DBRF.one[0].ExternalOtherOrganizationName ?? "")" />
+                                                        </td>
+                                                    }
+
+                                                    @if ((DBRF.one[0].EmployeeType == "External") && (DBRF.one[0].ExternalOrganizationName != "Other"))
+                                                    {
+                                                        <td class="" id="lblExternalOrganizationName">
+                                                            <label class="f-600">External Organization Name</label>
+                                                        </td>
+                                                        <td id="ExternalOrganizationName" colspan="2">
+                                                            <select class="w-100" name="ddExternalOrganizationName" id="ddExternalOrganizationName"></select>
+                                                        </td>
+                                                    }
+
+                                                    <td id="lblExternalOtherOrganizationName" colspan="2" class="align" style="display:none;">
+                                                        <label class="f-600"> Other External Organization Name</label>
+                                                    </td>
+                                                    <td id="ExternalOtherOrganizationName" class="text-right" style="display:none;">
+                                                        <input type="text" class="w-100" placeholder="Other External Organization Name" name="txtExternalOtherOrganizationName" id="txtExternalOtherOrganizationName" />
+                                                    </td>
+
+                                                </tr>
+                                            }
+                                            else
+                                            {
+                                                <tr>
+                                                    <td class="allFormLables borderLTB f-600">
+                                                        <label class="f-600">Type of Employee</label>
+                                                    </td>
+                                                    <td class="borderLTB">
+                                                        <label class="checkbox-container">
+                                                            <label class="f-600">Internal</label>
+                                                            <input type="checkbox" class="" name="chkInternal" id="chkInternal" onclick="getEmployeeType()">
+
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                    </td>
+
+                                                    <td class="borderLTB text-left align">
+                                                        <label class="checkbox-container">
+                                                            <label class="f-600">External</label>
+                                                            <input type="checkbox" class="" name="chkExternal" id="chkExternal" onclick="getEmployeeType()">
+
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                        <input type="hidden" name="chkEmployeeType" id="chkEmployeeType" value="" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="" id="lblExternalOrganizationName" style="display:none;">
+                                                        <label class="f-600">External Organization Name</label>
+
+                                                    </td>
+                                                    <td id="ExternalOrganizationName" colspan="2" style="display:none;">
+                                                        <select name="ddExternalOrganizationName" id="ddExternalOrganizationName"></select>
+                                                    </td>
+
+
+                                                    <td id="lblExternalOtherOrganizationName" colspan="2" class="align" style="display:none;">
+                                                        <label class="f-600"> Other External Organization Name</label>
+
+                                                    </td>
+                                                    <td id="ExternalOtherOrganizationName" class="text-right" style="display:none;">
+                                                        <input type="text" class="w-100" placeholder="Other External Organization Name" name="txtExternalOtherOrganizationName" id="txtExternalOtherOrganizationName" />
+                                                    </td>
+
+                                                </tr>
+                                            }
+                                        }
+                                        else if (!IsNew)
+                                        {
+                                            <tr>
+                                                <td class="w-20 allFormLables borderLTB f-600">
+                                                    <label class="f-600">Type of Employee</label>
+                                                </td>
+                                                <td class="borderLTB">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Internal</label>
+                                                        @if (DBRF.one[0].EmployeeType == "Internal")
+                                                        {
+                                                            <input type="checkbox" class="" name="chkInternal" id="chkInternal" onclick="getEmployeeType()" checked>
+                                                        }
+                                                        else
+                                                        {
+                                                            <input type="checkbox" class="" name="chkInternal" id="chkInternal" onclick="getEmployeeType()">
+                                                        }
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </td>
+
+                                                <td class="borderLTB text-left align">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">External</label>
+                                                        @if (DBRF.one[0].EmployeeType == "External")
+                                                        {
+                                                            <input type="checkbox" class="" name="chkExternal" id="chkExternal" onclick="getEmployeeType()" checked>
+                                                        }
+                                                        else
+                                                        {
+                                                            <input type="checkbox" class="" name="chkExternal" id="chkExternal" onclick="getEmployeeType()">
+                                                        }
+
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                    <input type="hidden" name="chkEmployeeType" id="chkEmployeeType" value="@(DBRF.one[0].EmployeeType ?? "")" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                @if ((DBRF.one[0].EmployeeType == "External") && (DBRF.one[0].ExternalOrganizationName == "Other"))
+                                                {
+                                                    <td class="" id="lblExternalOrganizationName">
+                                                        <label class="f-600">External Organization Name</label>
+                                                    </td>
+                                                    <td id="ExternalOrganizationName" colspan="2">
+                                                        <input type="text" class="w-100 txtDisable" name="txtExternalOrganizationName" id="txtExternalOrganizationName" value="@(DBRF.one[0].ExternalOrganizationName ?? "")" />
+                                                    </td>
+                                                    <td id="lblExternalOtherOrganizationName" colspan="2" class="align">
+                                                        <label class="f-600"> Other External Organization Name</label>
+                                                    </td>
+                                                    <td id="ExternalOtherOrganizationName" class="text-right">
+                                                        <input type="text" class="w-100 txtDisable" name="txtExternalOtherOrganizationName" id="txtExternalOtherOrganizationName" value="@(DBRF.one[0].ExternalOtherOrganizationName ?? "")" />
+                                                    </td>
+                                                }
+
+                                                @if ((DBRF.one[0].EmployeeType == "External") && (DBRF.one[0].ExternalOrganizationName != "Other"))
+                                                {
+                                                    <td class="" id="lblExternalOrganizationName">
+                                                        <label class="f-600">External Organization Name</label>
+                                                    </td>
+                                                    <td id="ExternalOrganizationName" colspan="2">
+                                                        <input type="text" class="w-100 txtDisable" name="txtExternalOrganizationName" id="txtExternalOrganizationName" value="@(DBRF.one[0].ExternalOrganizationName ?? "")" />
+                                                    </td>
+                                                }
+                                            </tr>
+                                        }
+
+                                        <tr>
+                                            <td class="allFormLables borderLTB f-600">
+                                                <label class="f-600">Employee Code</label>
+                                            </td>
+                                            <td colspan="2" class="borderLTB">
+                                                <input type="text" class="w-100 txtDisable" id="txtEmployeeCode" name="txtEmployeeCode" value="@(!IsNew||!IsEdit ? (DBRF.one[0].EmployeeCode ?? "") : "")" onkeypress="allowNumbersOnly(event)" />
+                                            </td>
+                                            <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                <label class="f-600">Cost Center No</label>
+                                            </td>
+                                            <td class="borderLTB text-right" colspan="2">
+                                                <input type="text" class="w-100 txtDisable" name="txtCostcenterCode" id="txtCostcenterCode" value="@(!IsNew||!IsEdit ? (DBRF.one[0].EmployeeCCCode ?? "") : "")" onkeypress="allowNumbersOnly(event)" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="allFormLables borderLTB f-600">
+                                                <label class="f-600">Employee Name</label>
+                                            </td>
+                                            <td colspan="2" class="borderLTB">
+                                                <input type="text" class="w-100 txtDisable" name="txtEmployeeName" id="txtEmployeeName" value="@(!IsNew||!IsEdit ? (DBRF.one[0].EmployeeName ?? "") : "")" onkeypress="alphaOnly(event)" />
+                                            </td>
+                                            <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                <label class="f-600">User ID</label>
+                                            </td>
+                                            <td class="borderLTB text-right" colspan="2">
+                                                <input type="text" class="w-100 txtDisable" name="txtUserId" id="txtUserId" value="@(!IsNew||!IsEdit ? (DBRF.one[0].EmployeeUserId ?? "") : "")" onkeypress="allowNumbersOnly(event)" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="allFormLables borderLTB f-600">
+                                                <label class="f-600">Department</label>
+                                            </td>
+                                            <td colspan="2" class="borderLTB">
+                                                <input type="text" class="w-100 txtDisable" name="txtDepartment" id="txtDepartment" value="@(!IsNew||!IsEdit ? (DBRF.one[0].EmployeeDept ?? "") : "")" onkeypress="alphaOnly(event)" />
+                                            </td>
+                                            <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                <label class="f-600">Contact No</label>
+                                            </td>
+                                            <td class="borderLTB text-right" colspan="2">
+                                                <input type="text" class="w-100 txtDisable" name="txtContactNo" id="txtContactNo" value="@(!IsNew||!IsEdit ? (DBRF.one[0].EmployeeContactNo ?? "") : "")" onkeypress="allowNumbersOnly(event)" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            @if (IsNew)
+                                            {
+                                                if (!IsEdit)
+                                                {
+
+
+                                                    <td class="allFormLables borderLTB f-600">
+                                                        <label class="f-600">Designation</label>
+                                                    </td>
+                                                    <td colspan="2" class="borderLTB">
+                                                        <select name="ddEmpDesignation" class="w-100 drpSize" id="ddEmpDesignation"></select>
+                                                    </td>
+                                                    <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                        <label class="f-600">Location</label>
+                                                    </td>
+                                                    <td class="borderLTB text-right" colspan="2">
+                                                        <select name="ddEmpLocation" class="w-100 drpSize" id="ddEmpLocation"></select>
+                                                    </td>
+                                                }
+                                                else
+                                                {
+                                                    <td class="allFormLables borderLTB f-600">
+                                                        <label class="f-600">Designation</label>
+                                                    </td>
+                                                    <td colspan="2" class="borderLTB">
+                                                        <select name="ddEmpDesignation" class="w-100 drpSize" id="ddEmpDesignation"></select>
+                                                    </td>
+                                                    <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                        <label class="f-600">Location</label>
+                                                    </td>
+                                                    <td class="borderLTB text-right" colspan="2">
+                                                        <select name="ddEmpLocation" class="w-100 drpSize" id="ddEmpLocation"></select>
+                                                    </td>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <td class="allFormLables borderLTB f-600">
+                                                    <label class="f-600">Designation</label>
+                                                </td>
+                                                <td colspan="2" class="borderLTB">
+                                                    <input type="text" class="w-100 txtDisable" name="txtdesignation" id="txtdesignation" value="@(!IsNew ? (DBRF.one[0].EmployeeDesignation ?? "") : "")" />
+                                                </td>
+                                                <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                    <label class="f-600">Location</label>
+                                                </td>
+                                                <td class="borderLTB text-right" colspan="2">
+                                                    <input type="text" class="w-100 txtDisable" name="txtLocation" id="txtLocation" value="@(!IsNew ? (DBRF.one[0].EmployeeLocation ?? "") : "")" />
+                                                </td>
+                                            }
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table mainTbl table-bordered form-table-container-2 bg-color">
+                                    <tr>
+                                        <td class="w-20"><label class="f-600">Requirement For:</label></td>
+                                        <td class="w-10">
+                                            <label class="checkbox-container">
+                                                <label class="f-600">Backup</label>
+                                                @if (IsNew)
+                                                {
+                                                    if (!IsEdit)
+                                                    {
+                                                        if (DBRF.one[0].RequirementFor == "Backup")
+                                                        {
+                                                            <input type="checkbox" class="inpDisable" name="chkBackup" id="chkBackup" onclick="getRequirementFor()" checked />
+                                                        }
+                                                        else
+                                                        {
+                                                            <input type="checkbox" class="inpDisable" name="chkBackup" id="chkBackup" onclick="getRequirementFor()" />
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <input type="checkbox" name="chkBackup" id="chkBackup" onclick="getRequirementFor()" />
+                                                    }
+                                                }
+                                                else if (DBRF.one[0].RequirementFor == "Backup")
+                                                {
+                                                    <input type="checkbox" name="chkBackup" id="chkBackup" checked />
+                                                }
+                                                <span class="checkmark"></span>
+                                            </label>
+                                        </td>
+                                        <td class="w-10 align">
+                                            <label class="checkbox-container">
+                                                <label class="f-600">Restore</label>
+                                                @if (IsNew)
+                                                {
+                                                    if (!IsEdit)
+                                                    {
+                                                        if (DBRF.one[0].RequirementFor == "Restore")
+                                                        {
+                                                            <input type="checkbox" class="inpDisable" name="chkRestore" id="chkRestore" onclick="getRequirementFor()" checked />
+                                                        }
+                                                        else
+                                                        {
+                                                            <input type="checkbox" class="inpDisable" name="chkRestore" id="chkRestore" onclick="getRequirementFor()" />
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <input type="checkbox" name="chkRestore" id="chkRestore" onclick="getRequirementFor()" />
+                                                    }
+                                                }
+                                                else if (DBRF.one[0].RequirementFor == "Restore")
+                                                {
+                                                    <input type="checkbox" name="chkRestore" id="chkRestore" checked />
+                                                }
+                                                <span class="checkmark"></span>
+                                            </label>
+                                        </td>
+                                        <td class="w-10 align">
+                                            <label class="checkbox-container">
+                                                <label class="f-600">Both</label>
+                                                @if (IsNew)
+                                                {
+                                                    if (!IsEdit)
+                                                    {
+                                                        if (DBRF.one[0].RequirementFor == "Both")
+                                                        {
+                                                            <input type="checkbox" class="inpDisable" name="chkBoth" id="chkBoth" onclick="getRequirementFor()" checked />
+                                                        }
+                                                        else
+                                                        {
+                                                            <input type="checkbox" class="inpDisable" name="chkBoth" id="chkBoth" onclick="getRequirementFor()" />
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <input type="checkbox" name="chkBoth" id="chkBoth" onclick="getRequirementFor()" />
+                                                    }
+                                                }
+                                                else if (DBRF.one[0].RequirementFor == "Both")
+                                                {
+                                                    <input type="checkbox" name="chkBoth" id="chkBoth" checked />
+                                                }
+                                                <span class="checkmark"></span>
+                                            </label>
+                                        </td>
+                                        <td>
+                                            <input type="hidden" name="chkRequirementFor" id="chkRequirementFor" value="@(!IsNew||!IsEdit ? (DBRF.one[0].RequirementFor ?? "") : "")" />
+                                        </td>
+                                    </tr>
+                                </table>
+                                @if (IsNew)
+                                {
+                                    if (!IsEdit)
+                                    {
+                                        if ((DBRF.one[0].RequirementFor == "Backup") || (DBRF.one[0].RequirementFor == "Both"))
+                                        {
+                                            <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="backupDetails">
+                                                <tr>
+                                                    <td>
+                                                        <label class="f-600">Backup Details</label>
+                                                        <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="backupRequestForDetails">
+                                                            <tr>
+                                                                <td class="w-20"><label class="f-600">Request For:</label></td>
+                                                                <td class="w-20 align">
+                                                                    <label class="checkbox-container">
+                                                                        <label class="f-600">File/Folder Backup</label>
+
+                                                                        @if (DBRF.one[0].RequestFor == "FileFolderBackup")
+                                                                        {
+                                                                            <input type="checkbox" class="" name="chkFileFolderBackup" id="chkFileFolderBackup" onclick="getRequestFor()" checked style="display:normal" />
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" class="inpDisable" name="chkFileFolderBackup" id="chkFileFolderBackup" onclick="getRequestFor()" />
+                                                                        }
+                                                                        <span class="checkmark"></span>
+                                                                    </label>
+                                                                </td>
+                                                                <td class="w-20 align">
+                                                                    <label class="checkbox-container">
+                                                                        <label class="f-600">Application Backup</label>
+                                                                        @if (DBRF.one[0].RequestFor == "ApplicationBackup")
+                                                                        {
+                                                                            <input type="checkbox" class="inpDisable" name="chkApplicationBackup" id="chkApplicationBackup" onclick="getRequestFor()" checked />
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" class="inpDisable" name="chkApplicationBackup" id="chkApplicationBackup" onclick="getRequestFor()" />
+                                                                        }
+                                                                        <span class="checkmark"></span>
+                                                                    </label>
+                                                                </td>
+
+                                                                <td>
+                                                                    <input type="hidden" name="chkRequestFor" id="chkRequestFor" value="@(DBRF.one[0].RequestFor ?? "") : " ")" />
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                        @if (DBRF.one[0].RequestFor == "FileFolderBackup")
+                                                        {
+                                                            <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="bakfileFolderDetails">
+                                                                <tr>
+
+                                                                    <td>
+                                                                        <label class="f-600">Folder Path1</label>
+                                                                    </td>
+                                                                    <td>
+                                                                        <input type="text" name="w-100 txtFolderPath" id="txtFolderPath" value="@(DBRF.one[0].FolderPath ?? "")" />
+                                                                    </td>
+                                                                    <td>
+                                                                        <label class="f-600">Folder Size in GB</label>
+                                                                    </td>
+                                                                    <td class="text-right">
+                                                                        <input type="text" class="w-100" name="txtFolderSize" id="txtFolderSize" value="@(DBRF.one[0].FolderSize ?? "")" onkeypress="allowNumbersAndDecimalsOnly(event)" />
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>
+                                                                        <label class="f-600">Retention Period</label>
+                                                                    </td>
+                                                                    <td>
+                                                                        <input type="date" class="w-100" name="txtRetentionPeriod" id="txtRetentionPeriod" value="@(DBRF.one[0].RetentionPeriod.ToString("yyyy-MM-dd"))" />
+
+                                                                    </td>
+
+                                                                </tr>
+                                                            </table>
+                                                        }
+                                                        else
+                                                        {
+                                                            <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="bakfileFolderDetails" style="display:none;">
+                                                                <tr>
+
+                                                                    <td>
+                                                                        <label class="f-600">Folder Path2</label>
+                                                                    </td>
+                                                                    <td>
+                                                                        <input type="text" class="w-100" name="txtFolderPath" id="txtFolderPath" />
+                                                                    </td>
+                                                                    <td>
+                                                                        <label class="f-600">Folder Size in GB</label>
+                                                                    </td>
+                                                                    <td class="text-right">
+                                                                        <input type="text" name="txtFolderSize" id="txtFolderSize" onkeypress="allowNumbersAndDecimalsOnly(event)" />
+                                                                    </td>
+                                                                    <td>
+                                                                        <label class="f-600">Retention Period</label>
+                                                                    </td>
+                                                                    <td>
+                                                                        <input type="date" name="txtRetentionPeriod" id="txtRetentionPeriod" />
+
+                                                                    </td>
+
+                                                                </tr>
+                                                            </table>
+                                                        }
+                                                        @if (DBRF.one[0].RequestFor == "ApplicationBackup")
+                                                        {
+                                                            <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="bakapplicationDetails">
+                                                                <tr>
+                                                                    <td class="w-20 f-600">Server Name</td>
+                                                                    <td class="f-600"><input type="text" class="w-90 txtDisable" name="txtBackupServerName" id="txtBackupServerName" value="@(DBRF.one[0].BackupServerName ?? "")" /></td>
+                                                                    <td class="f-600">IP Address</td>
+                                                                    <td class="f-600 text-right"><input type="text" class="w-90 txtDisable" name="txtBackupIpAddress" id="txtBackupIpAddress" value="@(DBRF.one[0].BackupIpAddress ?? "")" onkeypress="allowNumbersAndDecimalsOnly(event)" /></td>
+                                                                </tr>
+                                                            </table>
+                                                        }
+                                                        else
+                                                        {
+                                                            <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="bakapplicationDetails" style="display:none;">
+                                                                <tr>
+                                                                    <td class="w-20 f-600">Server Name</td>
+                                                                    <td class="f-600"><input type="text" class="w-90 txtDisable" name="txtBackupServerName" id="txtBackupServerName" /></td>
+                                                                    <td class="f-600">IP Address</td>
+                                                                    <td class="f-600 text-right"><input type="text" class="w-90 txtDisable" name="txtBackupIpAddress" id="txtBackupIpAddress" onkeypress="allowNumbersAndDecimalsOnly(event)" /></td>
+                                                                </tr>
+                                                            </table>
+                                                        }
+
+                                                        <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="backupType">
+                                                            <tr>
+                                                                <td class="w-20 f-600">Backup Type:</td>
+                                                                <td class="w-20 align">
+                                                                    <label class="checkbox-container">
+                                                                        <label class="f-600">Onetime Backup</label>
+                                                                        @if (DBRF.one[0].BackupType == "Onetime")
+                                                                        {
+                                                                            <input type="checkbox" class="inpDisable" name="chkOnetime" id="chkOnetime" onclick="getBackupType()" checked />
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" class="inpDisable" name="chkOnetime" id="chkOnetime" onclick="getBackupType()" />
+                                                                        }
+                                                                        <span class="checkmark"></span>
+                                                                    </label>
+                                                                </td>
+                                                                <td class="w-20 align">
+                                                                    <label class="checkbox-container">
+                                                                        <label class="f-600">Scheduled Backup</label>
+                                                                        @if (DBRF.one[0].BackupType == "Scheduled")
+                                                                        {
+                                                                            <input type="checkbox" class="inpDisable" name="chkScheduled" id="chkScheduled" onclick="getBackupType()" checked />
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" class="inpDisable" name="chkScheduled" id="chkScheduled" onclick="getBackupType()" />
+                                                                        }
+                                                                        <span class="checkmark"></span>
+                                                                    </label>
+                                                                </td>
+                                                                <td>
+                                                                    <input type="hidden" name="chkBackupType" id="chkBackupType" value="@(DBRF.one[0].BackupType ?? "")" />
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        }
+                                        else
+                                        {
+                                            <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="backupDetails" style="display:none;">
+                                                <tr>
+                                                    <td>
+                                                        <label class="f-600">Backup Details</label>
+                                                        <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="backupRequestForDetails" style="display:none;">
+                                                            <tr>
+                                                                <td class="w-20"><label class="f-600">Request For:</label></td>
+                                                                <td class="w-20 align">
+                                                                    <label class="checkbox-container">
+                                                                        <label class="f-600">File/Folder Backup</label>
+                                                                        <input type="checkbox" class="inpDisable" name="chkFileFolderBackup" id="chkFileFolderBackup" onclick="getRequestFor()" />
+
+                                                                        <span class="checkmark"></span>
+                                                                    </label>
+                                                                </td>
+                                                                <td class="w-20 align">
+                                                                    <label class="checkbox-container">
+                                                                        <label class="f-600">Application Backup</label>
+                                                                        <input type="checkbox" class="inpDisable" name="chkApplicationBackup" id="chkApplicationBackup" onclick="getRequestFor()" />
+
+                                                                        <span class="checkmark"></span>
+                                                                    </label>
+                                                                </td>
+                                                                <td>
+                                                                    <input type="hidden" name="chkRequestFor" id="chkRequestFor" value="" />
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+
+                                                        <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="bakfileFolderDetails" style="display:none;">
+                                                            <tr>
+                                                                <td>
+                                                                    <label class="f-600">Folder Path</label>
+                                                                </td>
+                                                                <td>
+
+                                                                    <input type="text" name="txtFolderPath" id="txtFolderPath" />
+                                                                </td>
+                                                                <td>
+                                                                    <label class="f-600">Folder Size in GB</label>
+                                                                </td>
+                                                                <td class="text-right">
+                                                                    <input type="text" name="txtFolderSize" id="txtFolderSize" onkeypress="allowNumbersAndDecimalsOnly(event)" />
+                                                                </td>
+                                                                <td>
+                                                                    <label class="f-600">Retention Period</label>
+                                                                </td>
+                                                                <td>
+                                                                    <input type="date" name="txtRetentionPeriod" />
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                        <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="bakapplicationDetails" style="display:none;">
+                                                            <tr>
+                                                                <td class="w-20 f-600">Server Name</td>
+                                                                <td class="f-600"><input type="text" class="txtDisable" name="txtBackupServerName" id="txtBackupServerName" /></td>
+                                                                <td class="f-600">IP Address</td>
+                                                                <td class="f-600 text-right"><input type="text" class="txtDisable" name="txtBackupIpAddress" id="txtBackupIpAddress" onkeypress="allowNumbersAndDecimalsOnly(event)" /></td>
+
+                                                            </tr>
+                                                        </table>
+                                                        <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="backupType" style="display:none;">
+                                                            <tr class="">
+                                                                <td class="w-20 f-600">Backup Type:</td>
+                                                                <td class="w-20 align">
+                                                                    <label class="checkbox-container">
+                                                                        <label class="f-600">Onetime Backup</label>
+                                                                        <input type="checkbox" class="inpDisable" name="chkOnetime" id="chkOnetime" onclick="getBackupType()" />
+
+                                                                        <span class="checkmark"></span>
+                                                                    </label>
+                                                                </td>
+                                                                <td class="w-20 align">
+                                                                    <label class="checkbox-container">
+                                                                        <label class="f-600">Scheduled Backup</label>
+                                                                        <input type="checkbox" class="inpDisable" name="chkScheduled" id="chkScheduled" onclick="getBackupType()" />
+
+                                                                        <span class="checkmark"></span>
+                                                                    </label>
+                                                                </td>
+                                                                <td>
+                                                                    <input type="hidden" name="chkBackupType" id="chkBackupType" />
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        }
+
+                                        if ((DBRF.one[0].RequirementFor == "Restore") || (DBRF.one[0].RequirementFor == "Both"))
+                                        {
+                                            <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="restoreDetails">
+                                                <tr>
+                                                    <td>
+                                                        <label class="f-600">Restore Details</label>
+                                                        <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="restoreRequestForDetails">
+                                                            <tr>
+                                                                <td class="w-20 f-600">Restore At:</td>
+                                                                <td class="w-20 align">
+                                                                    <label class="checkbox-container">
+                                                                        <label class="f-600">Original Path</label>
+                                                                        @if (DBRF.one[0].RestoreAt == "OriginalPath")
+                                                                        {
+                                                                            <input type="checkbox" class="inpDisable" name="chkRestoreOriginalPath" id="chkRestoreOriginalPath" onclick="getRestoreAt()" checked />
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" class="inpDisable" name="chkRestoreOriginalPath" id="chkRestoreOriginalPath" onclick="getRestoreAt()" />
+                                                                        }
+                                                                        <span class="checkmark"></span>
+                                                                    </label>
+                                                                </td>
+                                                                <td class="w-15 align">
+                                                                    <label class="checkbox-container">
+                                                                        <label class="f-600">Alternate Path</label>
+                                                                        @if (DBRF.one[0].RestoreAt == "AlternatePath")
+                                                                        {
+                                                                            <input type="checkbox" class="inpDisable" name="chkRestoreAlternatePath" id="chkRestoreAlternatePath" onclick="getRestoreAt()" checked />
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" class="inpDisable" name="chkRestoreAlternatePath" id="chkRestoreAlternatePath" onclick="getRestoreAt()" />
+                                                                        }
+
+                                                                        <span class="checkmark"></span>
+                                                                    </label>
+                                                                </td>
+                                                                <td>
+                                                                    <input type="hidden" name="chkRestoreAt" id="chkRestoreAt" value="@(DBRF.one[0].RestoreAt ?? "")" />
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                        @if (DBRF.one[0].RestoreAt == "AlternatePath")
+                                                        {
+                                                            <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="alternateFolderDetails">
+                                                                <tr>
+                                                                    <td class="w-20 f-600">Alternate Folder Path</td>
+                                                                    <td><input type="text" class="w-100 txtDisable" name="txtAlternateFolderPath" id="txtAlternateFolderPath" value="@(DBRF.one[0].AlternateFolderPath ?? "")" /></td>
+                                                                </tr>
+                                                            </table>
+                                                        }
+                                                        else
+                                                        {
+                                                            <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="alternateFolderDetails" style="display:none;">
+                                                                <tr>
+                                                                    <td class="w-20 f-600">Alternate Folder Path</td>
+                                                                    <td><input type="text" class="w-100 txtDisable" name="txtAlternateFolderPath" id="txtAlternateFolderPath" /></td>
+                                                                </tr>
+                                                            </table>
+                                                        }
+                                                        <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="restoreAtDetails">
+                                                            <tr>
+                                                                <td class="w-20">
+                                                                    <label class="f-600">Server Name</label>
+                                                                </td>
+                                                                <td>
+                                                                    <input type="text" class="w-100 txtDisable" name="txtRestoreServerName" id="txtRestoreServerName" value="@(DBRF.one[0].RestoreServerName ?? "")" />
+                                                                </td>
+                                                                <td>
+                                                                    <label class="f-600">IP Address</label>
+                                                                </td>
+                                                                <td class="text-right">
+                                                                    <input type="text" class="w-100 txtDisable" name="txtRestoreIpAddress" id="txtRestoreIpAddress" value="@(DBRF.one[0].RestoreIpAddress ?? "")" onkeypress="allowNumbersAndDecimalsOnly(event)" />
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>
+                                                                    <label class="f-600">Restore Date</label>
+                                                                </td>
+                                                                <td>
+                                                                    <input type="date" class="w-100 txtDisable" name="txtRestoreDate" id="txtRestoreDate" value="@(DBRF.one[0].RestoreDate.ToString("yyyy-MM-dd"))" />
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        }
+                                        else
+                                        {
+                                            <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="restoreDetails" style="display:none;">
+                                                <tr>
+                                                    <td>
+                                                        <label class="f-600">Restore Details</label>
+                                                        <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="restoreRequestForDetails" style="display:none;">
+                                                            <tr>
+                                                                <td class="w-20 f-600">Restore At:</td>
+                                                                <td class="w-20 align">
+                                                                    <label class="checkbox-container">
+                                                                        <label class="f-600">Original Path</label>
+                                                                        <input type="checkbox" class="inpDisable" name="chkRestoreOriginalPath" id="chkRestoreOriginalPath" onclick="getRestoreAt()" />
+
+                                                                        <span class="checkmark"></span>
+                                                                    </label>
+                                                                </td>
+                                                                <td class="w-15 align">
+                                                                    <label class="checkbox-container">
+                                                                        <label class="f-600">Alternate Path</label>
+                                                                        <input type="checkbox" class="inpDisable" name="chkRestoreAlternatePath" id="chkRestoreAlternatePath" onclick="getRestoreAt()" />
+
+                                                                        <span class="checkmark"></span>
+                                                                    </label>
+                                                                </td>
+                                                                <td>
+                                                                    <input type="hidden" name="chkRestoreAt" id="chkRestoreAt" value="">
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                        <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="alternateFolderDetails" style="display:none;">
+                                                            <tr>
+                                                                <td class="w-20"><label class="f-600">Alternate Folder Path</label></td>
+                                                                <td><input type="text" class="w-100 txtDisable" name="txtAlternateFolderPath" id="txtAlternateFolderPath" /></td>
+
+                                                            </tr>
+                                                        </table>
+                                                        <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="restoreAtDetails" style="display:none;">
+                                                            <tr>
+                                                                <td class="w-20">
+                                                                    <label class="f-600">Server Name</label>
+                                                                </td>
+                                                                <td>
+                                                                    <input type="text" class="w-100 txtDisable" name="txtRestoreServerName" id="txtRestoreServerName" />
+                                                                </td>
+                                                                <td>
+                                                                    <label class="f-600">IP Address</label>
+                                                                </td>
+                                                                <td class="text-right">
+                                                                    <input type="text" class="w-100 txtDisable" name="txtRestoreIpAddress" id="txtRestoreIpAddress" onkeypress="allowNumbersAndDecimalsOnly(event)" />
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>
+                                                                    <label class="f-600">Restore Date</label>
+                                                                </td>
+                                                                <td>
+                                                                    <input type="date" class="w-100 txtDisable" name="txtRestoreDate" id="txtRestoreDate" />
+
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="backupDetails" style="display:none;">
+                                            <tr class="">
+                                                <td>
+                                                    <label class="f-600">Backup Details</label>
+                                                    <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="backupRequestForDetails" style="display:none;">
+                                                        <tr>
+                                                            <td class="w-20"><label class="f-600">Request For:</label></td>
+                                                            <td class="w-20 align">
+                                                                <label class="checkbox-container">
+                                                                    <label class="f-600">File/Folder Backup</label>
+                                                                    <input type="checkbox" class="inpDisable" name="chkFileFolderBackup" id="chkFileFolderBackup" onclick="getRequestFor()" />
+
+                                                                    <span class="checkmark"></span>
+                                                                </label>
+                                                            </td>
+                                                            <td class="w-20 align">
+                                                                <label class="checkbox-container">
+                                                                    <label class="f-600">Application Backup</label>
+                                                                    <input type="checkbox" class="inpDisable" name="chkApplicationBackup" id="chkApplicationBackup" onclick="getRequestFor()" />
+
+                                                                    <span class="checkmark"></span>
+                                                                </label>
+                                                            </td>
+
+                                                            <td>
+                                                                <input type="hidden" name="chkRequestFor" id="chkRequestFor" value="" />
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+
+                                                    <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="bakfileFolderDetails" style="display:none;">
+                                                        <tr>
+                                                            <td>
+                                                                <label class="f-600">Folder Path</label>
+                                                            </td>
+                                                            <td>
+                                                                <input type="text" class="w-100" name="txtFolderPath" id="txtFolderPath" />
+                                                            </td>
+                                                            <td>
+                                                                <label class="f-600">Folder Size in GB</label>
+                                                            </td>
+                                                            <td class="text-right">
+                                                                <input type="text" class="w-100" name="txtFolderSize" id="txtFolderSize" onkeypress="allowNumbersAndDecimalsOnly(event)" />
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <label class="f-600">Retention Period</label>
+                                                            </td>
+                                                            <td>
+                                                                <input type="date" class="w-100" name="txtRetentionPeriod" />
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                    <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="bakapplicationDetails" style="display:none;">
+                                                        <tr>
+                                                            <td class="w-20 f-600">Server Name</td>
+                                                            <td><input type="text" class="w-90 txtDisable" name="txtBackupServerName" id="txtBackupServerName" /></td>
+                                                            <td class="f-600">IP Address</td>
+                                                            <td class="text-right"><input type="text" class="w-90 txtDisable" name="txtBackupIpAddress" id="txtBackupIpAddress" onkeypress="allowNumbersAndDecimalsOnly(event)" /></td>
+
+                                                        </tr>
+                                                    </table>
+                                                    <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="backupType" style="display:none;">
+                                                        <tr class="">
+                                                            <td class="w-20 f-600">Backup Type:</td>
+                                                            <td class="w-20 align">
+                                                                <label class="checkbox-container">
+                                                                    <label class="f-600">Onetime Backup</label>
+                                                                    <input type="checkbox" class="inpDisable" name="chkOnetime" id="chkOnetime" onclick="getBackupType()" />
+
+                                                                    <span class="checkmark"></span>
+                                                                </label>
+                                                            </td>
+                                                            <td class="w-20 align">
+                                                                <label class="checkbox-container">
+                                                                    <label class="f-600">Scheduled Backup</label>
+                                                                    <input type="checkbox" class="inpDisable" name="chkScheduled" id="chkScheduled" onclick="getBackupType()" />
+
+                                                                    <span class="checkmark"></span>
+                                                                </label>
+                                                            </td>
+                                                            <td>
+                                                                <input type="hidden" name="chkBackupType" id="chkBackupType" />
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </table>
+
+                                        <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="restoreDetails" style="display:none;">
+                                            <tr>
+                                                <td>
+                                                    <label class="f-600">Restore Details</label>
+                                                    <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="restoreRequestForDetails" style="display:none;">
+                                                        <tr>
+                                                            <td class="w-20 f-600">Restore At:</td>
+                                                            <td class="w-20 align">
+                                                                <label class="checkbox-container">
+                                                                    <label class="f-600">Original Path</label>
+                                                                    <input type="checkbox" class="inpDisable" name="chkRestoreOriginalPath" id="chkRestoreOriginalPath" onclick="getRestoreAt()" />
+
+                                                                    <span class="checkmark"></span>
+                                                                </label>
+                                                            </td>
+                                                            <td class="w-15 align">
+                                                                <label class="checkbox-container">
+                                                                    <label class="f-600">Alternate Path</label>
+                                                                    <input type="checkbox" class="inpDisable" name="chkRestoreAlternatePath" id="chkRestoreAlternatePath" onclick="getRestoreAt()" />
+
+                                                                    <span class="checkmark"></span>
+                                                                </label>
+                                                            </td>
+
+                                                            <td>
+                                                                <input type="hidden" name="chkRestoreAt" id="chkRestoreAt" value="">
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                    <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="alternateFolderDetails" style="display:none;">
+                                                        <tr>
+                                                            <td class="w-20 f-600">Alternate Folder Path</td>
+                                                            <td><input type="text" class="w-100 txtDisable" name="txtAlternateFolderPath" id="txtAlternateFolderPath" /></td>
+
+                                                        </tr>
+                                                    </table>
+                                                    <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="restoreAtDetails" style="display:none;">
+                                                        <tr>
+                                                            <td class="w-20">
+                                                                <label class="f-600">Server Name</label>
+                                                            </td>
+                                                            <td>
+                                                                <input type="text" class="w-100 txtDisable" name="txtRestoreServerName" id="txtRestoreServerName" />
+                                                            </td>
+                                                            <td>
+                                                                <label class="f-600">IP Address</label>
+                                                            </td>
+                                                            <td class="text-right">
+                                                                <input type="text" class="w-100 txtDisable" name="txtRestoreIpAddress" id="txtRestoreIpAddress" onkeypress="allowNumbersAndDecimalsOnly(event)" />
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <label class="f-600">Restore Date</label>
+                                                            </td>
+                                                            <td>
+                                                                <input type="date" class="w-100 txtDisable" name="txtRestoreDate" id="txtRestoreDate" />
+
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    }
+                                }
+                                else
+                                {
+                                    if (!IsNew && (DBRF.one[0].RequirementFor == "Backup") || (DBRF.one[0].RequirementFor == "Both"))
+                                    {
+                                        <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="backupDetails">
+                                            <tr class="">
+
+                                                <td>
+                                                    <label class="f-600">Backup Details</label>
+                                                    <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="backupRequestForDetails">
+                                                        <tr>
+                                                            <td class="w-20"><label class="f-600">Request For:</label></td>
+                                                            <td class="w-20 align">
+                                                                <label class="checkbox-container">
+                                                                    <label class="f-600">File/Folder Backup</label>
+                                                                    @if (DBRF.one[0].RequestFor == "FileFolderBackup")
+                                                                    {
+                                                                        <input type="checkbox" class="inpDisable" name="chkFileFolderBackup" id="chkFileFolderBackup" onclick="getRequestFor()" checked />
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" class="inpDisable" name="chkFileFolderBackup" id="chkFileFolderBackup" />
+                                                                    }
+                                                                    <span class="checkmark"></span>
+                                                                </label>
+                                                            </td>
+                                                            <td class="w-20 align">
+                                                                <label class="checkbox-container">
+                                                                    <label class="f-600">Application Backup</label>
+                                                                    @if (DBRF.one[0].RequestFor == "ApplicationBackup")
+                                                                    {
+                                                                        <input type="checkbox" class="inpDisable" name="chkApplicationBackup" id="chkApplicationBackup" onclick="getRequestFor()" checked />
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" class="inpDisable" name="chkApplicationBackup" id="chkApplicationBackup" />
+                                                                    }
+                                                                    <span class="checkmark"></span>
+                                                                </label>
+                                                            </td>
+
+                                                            <td>
+                                                                <input type="hidden" name="chkRequestFor" id="chkRequestFor" value="@(DBRF.one[0].RequestFor ?? "")" />
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+
+                                                    <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="bakfileFolderDetails">
+                                                        <tr>
+                                                            @if (DBRF.one[0].RequestFor == "FileFolderBackup")
+                                                            {
+                                                                <td>
+                                                                    <label class="f-600">Folder Path</label>
+                                                                </td>
+                                                                <td>
+                                                                    <input type="text" class="w-100 txtDisable" name="txtFolderPath" id="txtFolderPath" value="@(DBRF.one[0].FolderPath ?? "")" />
+                                                                </td>
+                                                                <td>
+                                                                    <label class="f-600">Folder Size in GB</label>
+                                                                </td>
+                                                                <td class="text-right">
+                                                                    <input type="text" name="txtFolderSize" class="w-100 txtDisable" id="txtFolderSize" value="@(DBRF.one[0].FolderSize ?? "")" />
+                                                                </td>
+                                                            }
+                                                        </tr>
+                                                        <tr>
+                                                            @if (DBRF.one[0].RequestFor == "FileFolderBackup")
+                                                            {
+                                                                <td>
+                                                                    <label class="f-600">Retention Period</label>
+                                                                </td>
+                                                                <td>
+                                                                    <input type="text" name="txtRetentionPeriod" class="w-100 txtDisable" id="txtRetentionPeriod" value="@(Convert.ToDateTime(DBRF.one[0].RetentionPeriod).ToShortDateString() ?? "")" />
+                                                                </td>
+                                                            }
+                                                        </tr>
+                                                    </table>
+                                                    <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="bakapplicationDetails">
+                                                        <tr>
+                                                            @if (DBRF.one[0].RequestFor == "ApplicationBackup")
+                                                            {
+                                                                <td class="w-20 f-600">Server Name</td>
+                                                                <td><input type="text" class="w-90 txtDisable" name="txtBackupServerName" id="txtBackupServerName" value="@(DBRF.one[0].BackupServerName ?? "")" /></td>
+                                                                <td class="f-600">IP Address</td>
+                                                                <td class="text-right"><input type="text" class="w-90 txtDisable" name="txtBackupIpAddress" id="txtBackupIpAddress" value="@(DBRF.one[0].BackupIpAddress ?? "")" /></td>
+                                                            }
+                                                        </tr>
+                                                    </table>
+                                                    <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="backupType">
+                                                        <tr class="">
+                                                            <td class="w-20"><label class="f-600">Backup Type:</label></td>
+                                                            <td class="w-20 align">
+                                                                <label class="checkbox-container">
+                                                                    <label class="f-600">Onetime Backup</label>
+                                                                    @if (DBRF.one[0].BackupType == "Onetime")
+                                                                    {
+                                                                        <input type="checkbox" class="inpDisable" name="chkOnetime" id="chkOnetime" onclick="getBackupType()" checked />
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" class="inpDisable" name="chkOnetime" id="chkOnetime" onclick="getBackupType()" />
+                                                                    }
+                                                                    <span class="checkmark"></span>
+                                                                </label>
+                                                            </td>
+                                                            <td class="w-20 align">
+                                                                <label class="checkbox-container">
+                                                                    <label class="f-600">Scheduled Backup</label>
+                                                                    @if (DBRF.one[0].BackupType == "Scheduled")
+                                                                    {
+                                                                        <input type="checkbox" class="inpDisable" name="chkScheduled" id="chkScheduled" onclick="getBackupType()" checked />
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" class="inpDisable" name="chkScheduled" id="chkScheduled" onclick="getBackupType()" />
+                                                                    }
+                                                                    <span class="checkmark"></span>
+                                                                </label>
+                                                            </td>
+                                                            <td>
+                                                                <input type="hidden" name="chkBackupType" id="chkBackupType" value="@(DBRF.one[0].BackupType ?? "")" />
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    }
+                                    if (!IsNew && (DBRF.one[0].RequirementFor == "Restore") || (DBRF.one[0].RequirementFor == "Both"))
+                                    {
+                                        <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="restoreDetails">
+                                            <tr>
+                                                <td>
+                                                    <label class="f-600">Restore Details</label>
+                                                    <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="restoreRequestForDetails">
+                                                        <tr>
+                                                            <td class="w-20"><label class="f-600">Restore At:</label></td>
+                                                            <td class="w-20 align">
+                                                                <label class="checkbox-container">
+                                                                    <label class="f-600">Original Path</label>
+                                                                    @if (DBRF.one[0].RestoreAt == "OriginalPath")
+                                                                    {
+                                                                        <input type="checkbox" class="inpDisable" name="chkRestoreOriginalPath" id="chkRestoreOriginalPath" onclick="getRestoreAt()" checked />
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" class="inpDisable" name="chkRestoreOriginalPath" id="chkRestoreOriginalPath" />
+                                                                    }
+                                                                    <span class="checkmark"></span>
+                                                                </label>
+                                                            </td>
+                                                            <td class="w-15 align">
+                                                                <label class="checkbox-container">
+                                                                    <label class="f-600">Alternate Path</label>
+                                                                    @if (DBRF.one[0].RestoreAt == "AlternatePath")
+                                                                    {
+                                                                        <input type="checkbox" class="inpDisable" name="chkRestoreAlternatePath" id="chkRestoreAlternatePath" onclick="getRestoreAt()" checked />
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" class="inpDisable" name="chkRestoreAlternatePath" id="chkRestoreAlternatePath" />
+                                                                    }
+
+                                                                    <span class="checkmark"></span>
+                                                                </label>
+                                                            </td>
+
+                                                            <td>
+                                                                <input type="hidden" name="chkRestoreAt" id="chkRestoreAt" value="@(DBRF.one[0].RestoreAt ?? "")" />
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                    <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="alternateFolderDetails">
+                                                        <tr>
+                                                            @if (DBRF.one[0].RestoreAt == "AlternatePath")
+                                                            {
+                                                                <td class="w-20"><label class="f-600">Alternate Folder Path</label></td>
+                                                                <td><input type="text" class="w-100 txtDisable" name="txtAlternateFolderPath" id="txtAlternateFolderPath" value="@(DBRF.one[0].AlternateFolderPath ?? "")" /></td>
+                                                            }
+                                                        </tr>
+                                                    </table>
+                                                    <table class="table mainTbl table-bordered form-table-container-2 bg-color" id="restoreAtDetails" st>
+                                                        <tr>
+                                                            <td class="w-20">
+                                                                <label class="f-600"> Server Name</label>
+                                                            </td>
+                                                            <td>
+                                                                <input type="text" class="w-100" name="txtRestoreServerName" id="txtRestoreServerName" value="@(DBRF.one[0].RestoreServerName ?? "")" />
+                                                            </td>
+                                                            <td>
+                                                                <label class="f-600">IP Address</label>
+                                                            </td>
+                                                            <td class="text-right">
+                                                                <input type="text" class="w-100 txtDisable" name="txtRestoreIpAddress" id="txtRestoreIpAddress" value="@(DBRF.one[0].RestoreIpAddress ?? "")" />
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <label class="f-600">Restore Date</label>
+                                                            </td>
+                                                            <td>
+                                                                <input type="text" class="w-100 txtDisable" name="txtRestoreDate" id="txtRestoreDate" value="@(Convert.ToDateTime(DBRF.one[0].RestoreDate).ToShortDateString() ?? "")" />
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    }
+                                }
+                                <table class="table mainTbl table-bordered form-table-container-2 bg-color">
+                                    <tr>
+                                        <td class="w-50">
+
+                                            <table class="table mainTbl table-bordered form-table-container-2 bg-color">
+                                                <tr>
+                                                    <td colspan="6" class="allFormLables borderLTB f-600">
+                                                        <span>Reason for Request (Business Need)</span>
+                                                    </td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="6" class="allFormLables borderLTB f-600">
+                                                        <textarea class="textTrans txtDisable" cols="60" rows="3" name="txtBusinessNeed" id="txtBusinessNeed">@(!IsNew || !IsEdit? (DBRF.one[0].BusinessNeed ?? "") : "")</textarea>
+                                                    </td>
+                                                </tr>
+                                            </table>
+
+                                        </td>
+                                        @if (!IsNew || !IsEdit)
+                                        {
+
+                                            <table class="table mainTbl table table-bordered table-sm dataTable no-footer border-none bg-color-2 table-middle">
+                                                <thead class="form-head-1 form-border">
+                                                    <tr>
+                                                        <th>Requester Signature</th>
+                                                        <th>HOD Signature</th>
+                                                        <th>IT Server Manager Signature</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @if ((DBRF.two.Count > 0) || (DBRF.three.Count > 0))
+                                                    {
+
+                                                        <tr class="f-600">
+                                                            <td>@(!IsNew || !IsEdit ? (DBRF.two[0].Author.Title ?? " ") : DBRF.UserName)</td>
+                                                            <td>@(!IsNew || !IsEdit ? (DBRF.three[0].UserName ?? "") : "Signature")</td>
+                                                            <td>@(!IsNew || !IsEdit ? (DBRF.three[1].UserName ?? "") : "Signature")</td>
+                                                        </tr>
+                                                    }
+
+
+                                                    <tr class="f-600">
+                                                        <td>
+                                                            @(!IsNew || !IsEdit ? " Submitted on " + Convert.ToDateTime(DBRF.two[0].FormId.Created).ToShortDateString() + " " + Convert.ToDateTime(DBRF.two[0].FormId.Created).ToShortTimeString() ?? "" : "")
+                                                        </td>
+                                                        <td>
+                                                            @(DBRF.three[0].ApproverStatus != "Pending" ? (DBRF.three[0].ApproverStatus + " on "+""+ Convert.ToDateTime(DBRF.three[0].Modified).ToShortDateString() + " " + Convert.ToDateTime(DBRF.three[0].Modified).AddHours(5.5).ToShortTimeString()) : "" )
+                                                        </td>
+                                                        <td>
+                                                            @(DBRF.three[1].ApproverStatus != "Pending" ? (DBRF.three[1].ApproverStatus + " on " + "" + Convert.ToDateTime(DBRF.three[1].Modified).ToShortDateString() + " " + Convert.ToDateTime(DBRF.three[1].Modified).AddHours(5.5).ToShortTimeString()) : "" )
+                                                        </td>
+                                                    </tr>
+
+                                                    <tr class="f-600">
+                                                        @if (DBRF.three[0].ApproverStatus != "Pending")
+                                                        {
+                                                            <td></td>
+
+                                                            <td><textarea class="textTrans" cols="30" rows="3" readonly>@(!IsNew || !IsEdit ? (DBRF.three[0].Comment ?? "") : "")</textarea></td>
+                                                            if (DBRF.three[1].ApproverStatus != "Pending")
+                                                            {
+                                                                <td><textarea class="textTrans" cols="30" rows="3" readonly>@(!IsNew || !IsEdit ? (DBRF.three[1].Comment ?? "") : "")</textarea></td>
+                                                            }
+                                                        }
+                                                    </tr>
+
+                                                </tbody>
+
+                                            </table>
+                                        }
+                                    </tr>
+                                </table>
+
+                            </td>
+                        </tr>
+                    </table>
+
+                    </td>
+                    </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer align-content-center">
+                <p class="text-left f-600">SF_FI_00</p>
+            </div>
+
+            @if (IsNew)
+            {
+                if (!IsEdit)
+                {
+                    <div class="card-footer align-content-center">
+                        <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                            Re-Submit
+                        </button>
+                        <button type="reset" class="btn btn-danger btn-sm cancl-btn">
+                            Cancel
+                        </button>
+                    </div>
+                }
+                else
+                {
+                    <div class="card-footer align-content-center">
+                        <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                            Submit
+                        </button>
+                        <button type="reset" class="btn btn-danger btn-sm cancl-btn">
+                            Cancel
+                        </button>
+                    </div>
+                }
+            }
+
+        </form>
+    </div>
+</div>
+<div class="modal fade" id="successModel" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header modelHeader">
+                <span class="modal-title modalMsgTitle" id="modalTitle"></span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label id="modalBody" class="lableMsg">  </label>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="submitBomBtn publishBtn" id="modalOkButton">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+     // For Email Update
+    var spinner = $('#loader');
+    var FlagRedirect = @Html.Raw(Json.Encode(FlagRedirect));
+    var formID = @Html.Raw(Json.Encode(FormId));
+    var RowId = @Html.Raw(Json.Encode(RowId));
+    // For Email Update
+    var isNew = @Html.Raw(Json.Encode(IsNew));
+    var dbrf = @Html.Raw(Json.Encode(DBRF));
+    var appRowId = @Html.Raw(Json.Encode(AppRowId));
+    var approvalType =@Html.Raw(Json.Encode(ApprovalType));
+    var isEdit = @Html.Raw(Json.Encode(IsEdit));
+    pageLoad();
+    function pageLoad() {
+        spinner.hide();// For Email Update
+        getEmployeeType();
+        getRequirementFor();
+        getRequestFor();
+        getBackupType();
+        getRestoreAt();
+
+        if (isNew) {
+            getDesignations("submitter");
+            getServiceDeskLocations("submitter");
+            getExternalOrganization("submitter");
+            // getCurrentDateTime();
+
+            $("#OtherEmpName").hide();
+
+        }
+        if (!isNew) {
+            $(".inpDisable").attr("disabled", "disabled");
+            $(".txtDisable").prop("readonly", true);
+        }
+        if (!isEdit) {
+        }
+    }
+
+     $("#txtOtherEmpname").autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                url: "/List/GetEmployeeDetails",
+                dataType: "json",
+                cache: false,
+                async: false,
+                data: {
+                    searchText: $("#txtOtherEmpname").val()
+                },
+                success: function (data) {
+                    //debugger;
+                    response($.map(data, function (item) {
+                        console.log(data, 'data');
+                        return { label: item.FirstName, value: item.FirstName, raw: item };
+                    }));
+                }
+            });
+        },
+        search: function (event, ui) {
+            var value = $("#txtOtherEmpname").val();
+            // If less than three chars, cancel the search event
+            if (value.length < 4) {
+                event.preventDefault();
+            }
+        },
+        min_length: 4,
+        delay: 0,
+        select: function (event, ui) {
+            //debugger;
+            var empOtherDetails = ui.item['raw'];
+            //Get the other details like Cost Center Code, Employee Number from DB.
+            $.ajax({
+                url: "/List/GetExistingEmployeeDetails",
+                dataType: "json",
+                cache: false,
+                async: false,
+                data: {
+                    otherEmpUserId: empOtherDetails.Email,
+                },
+                success: function (data) {
+                    console.log(data, 'data');
+                    //$('#txtOtherEmpCCCode').val(data.CostCenter);
+                    $('#txtEmployeeCode').val(data.EmpNumber);
+                    $('#txtDepartment').val(data.Department);
+                    $('#txtEmployeeName').val(data.UserName);
+                    $('#txtCostcenterCode').val(data.CostCenter);
+                    $('#txtUserId').val(data.UserId);
+                    $('#txtContactNo').val(data.PhoneNumber);
+                    $('input[id="chkInternal"]').prop("checked", true);
+                    $('input[id="chkInternal"]').prop("disabled", true);
+
+                }
+            });
+        }
+    });
+
+
+    function successModal(txt) {
+        //debugger
+        $('#modalTitle').html('Success');
+        if (txt == "approve") {
+            $('#modalBody').html('Form has been approved!');
+            FlagRedirect = txt;// For Email Update
+        }
+        else if (txt == "reject") {
+            $('#modalBody').html('Form has been rejected!');
+        }
+        else if (txt == "enquire") {
+            $('#modalBody').html('Form has been enquired!');
+        }
+        else if (txt == "cancelled") {
+            $('#modalBody').html('Form has been cancelled!');
+        } else {
+            $('#modalBody').html('Your form with ID: DBRF' + txt + ' has been submitted! Kindly use this for future reference');
+            FlagRedirect = txt;// For Email Update
+        }
+        //$("#modalOkButton").attr('data-dismiss', 'modal');//Commented For Email Update
+        $("#successModel").modal('show');
+    }
+
+    function failureModal() {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html('Some error occured!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function uploadFileModal() {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html('File uploaded successfully');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function requiredModal(text) {
+        $('#modalTitle').html('Required');
+        $('#modalBody').html(text + '!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function getDesignations() {
+        if (isNew) {
+            if (!isEdit) {
+                var value = JSON.stringify(dbrf[0]);
+                console.log(value)
+                var value_1 = JSON.parse(value);
+                var selectedDesignation = value_1.Value[0].EmployeeDesignation;
+                console.log(selectedDesignation);
+
+                $.ajax({
+                    type: "POST",
+                    url: "/List/GetDesignations",
+                    contentType: "application/json; charset=utf-8",
+                    datatype: 'json',
+                    cache: false,
+                    async: false,
+                    success: function (data) {
+                        console.log(data);
+                        var s = '<option value="">Select</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            if (data[i].JobTitle == selectedDesignation) {
+                                console.log("hiiii" + data[i].JobTitle);
+                                s += '<option value="' + data[i].JobTitle + '" selected>' + data[i].JobTitle + '</option>';
+                            }
+                            else {
+                                s += '<option value="' + data[i].JobTitle + '">' + data[i].JobTitle + '</option>';
+                            }
+                        }
+                        $("#ddEmpDesignation").html(s);
+
+                    },
+                    error: function () {
+                    }
+                });
+            }
+            else {
+
+                $.ajax({
+                    type: "POST",
+                    url: "/List/GetDesignations",
+                    contentType: "application/json; charset=utf-8",
+                    datatype: 'json',
+                    cache: false,
+                    async: false,
+                    success: function (data) {
+                        console.log(data);
+                        var s = '<option value="">Select</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            s += '<option value="' + data[i].JobTitle + '">' + data[i].JobTitle + '</option>';
+                        }
+                        $("#ddEmpDesignation").html(s);
+                    },
+                    error: function (data) {
+                        //code
+                    }
+                });
+
+            }
+        }
+    }
+
+    function getServiceDeskLocations() {
+        if (isNew) {
+            if (!isEdit) {
+                var value = JSON.stringify(dbrf[0]);
+                console.log(value)
+                var value_1 = JSON.parse(value);
+                var selectedLocation = value_1.Value[0].EmployeeLocation;
+                console.log(selectedLocation);
+
+                $.ajax({
+                    type: "GET",
+                    url: "/List/GetServiceDeskLocations",
+                    contentType: "application/json; charset=utf-8",
+                    datatype: 'json',
+                    cache: false,
+                    async: false,
+                    success: function (data) {
+                        console.log(data);
+                        var s = '<option value="">Select</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            if (data[i].LocationName == selectedLocation) {
+                                console.log("hiiii" + data[i].LocationName);
+                                s += '<option value="' + data[i].LocationName + '" selected>' + data[i].LocationName + '</option>';
+                            }
+                            else if ((data[i].LocationName == "Pune File Server") || (data[i].LocationName == "Mumbai File Server") || (data[i].LocationName == "Aurangabad File Server") || (data[i].LocationName == "External")) { } else {
+                                s += '<option value="' + data[i].LocationName + '">' + data[i].LocationName + '</option>';
+                            }
+                        }
+                        $("#ddEmpLocation").html(s);
+                    },
+                    error: function () {
+
+                    }
+                });
+            }
+            else {
+                $.ajax({
+                    type: "GET",
+                    url: "/List/GetServiceDeskLocations",
+                    contentType: "application/json; charset=utf-8",
+                    datatype: 'json',
+                    cache: false,
+                    async: false,
+                    success: function (data) {
+                        console.log("Hi=" + data);
+                        var s = '<option value="">Select</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            if ((data[i].LocationName == "Pune File Server") || (data[i].LocationName == "Mumbai File Server") || (data[i].LocationName == "Aurangabad File Server") || (data[i].LocationName == "External")) { } else {
+                                s += '<option value="' + data[i].LocationName + '">' + data[i].LocationName + '</option>';
+                            }
+                        }
+                        $("#ddEmpLocation").html(s);
+                    },
+                    error: function () {
+
+                    }
+                });
+            }
+        }
+    }
+
+    function getExternalOrganization() {
+        if (isNew) {
+            if (!isEdit) {
+                var value = JSON.stringify(dbrf[0]);
+                console.log(value)
+                var value_1 = JSON.parse(value);
+                var selectedOrganization = value_1.Value[0].ExternalOrganizationName;
+                console.log(selectedOrganization);
+
+                $.ajax({
+                    type: "GET",
+                    url: "/List/GetExternalOrganization",
+                    contentType: "application/json; charset=utf-8",
+                    datatype: 'json',
+                    cache: false,
+                    async: false,
+                    success: function (data) {
+                        console.log(data);
+
+                        var s = '<option value="">Select</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            if (data[i].Organization == selectedOrganization) {
+                                console.log("hiiii" + data[i].Organization);
+                                s += '<option value="' + data[i].Organization + '" selected>' + data[i].Organization + '</option>';
+                            }
+                            else {
+                                s += '<option value="' + data[i].Organization + '">' + data[i].Organization + '</option>';
+                            }
+                        }
+                        $("#ddExternalOrganizationName").html(s);
+                    },
+                    error: function () {
+
+                    }
+                });
+            }
+            else {
+                $.ajax({
+                    type: "GET",
+                    url: "/List/GetExternalOrganization",
+                    contentType: "application/json; charset=utf-8",
+                    datatype: 'json',
+                    cache: false,
+                    async: false,
+                    success: function (data) {
+                        console.log(data);
+                        var s = '<option value="">Select</option>';
+                        for (var i = 0; i < data.length; i++) {
+                            s += '<option value="' + data[i].Organization + '">' + data[i].Organization + '</option>';
+                        }
+                        $("#ddExternalOrganizationName").html(s);
+                    },
+                    error: function () {
+
+                    }
+                });
+            }
+        }
+    }
+
+    function RequestSubmissionFor() {
+
+         var drpRequestSubmissionFor = $("#drpRequestSubmissionFor").val();
+         if (drpRequestSubmissionFor == "OnBehalf") {
+            $("#OtherEmpName").show();
+            $("#txtOtherEmpname").val('');
+            $("#txtEmployeeCode").val("");
+            $("#txtCostcenterCode").val("");
+            $("#txtUserId").val("");
+            $("#txtEmployeeName").val("");
+            $("#txtDepartment").val("");
+            $("#txtContactNo").val("");
+            $('input[id="chkInternal"]').prop("checked", false);
+            $('input[id="chkExternal"]').prop("checked", false);
+            $('input[id="chkInternal"]').prop("disabled", false);
+            $('input[id="chkExternal"]').prop("disabled", false);
+            $("#chkEmployeeType").val('Internal');
+            $("#ddEmpDesignation").prop("selectedIndex", 0).val();
+            $("#ddEmpLocation").prop("selectedIndex", 0).val();
+        }
+         else if (drpRequestSubmissionFor == "Self") {
+            $("#OtherEmpName").hide();
+            $("#txtEmployeeCode").val("@user.EmpNumber");
+            $("#txtCostcenterCode").val("@user.CostCenter");
+            $("#txtUserId").val("@user.UserId");
+            $("#txtEmployeeName").val("@user.UserName");
+            $("#txtDepartment").val("@user.Department");
+            $("#txtContactNo").val("");
+             $('input[id="chkInternal"]').prop("checked", true);
+
+            $('input[id="chkExternal"]').prop("checked", false);
+            $("#chkEmployeeType").val('Internal');
+            $("#ExternalOrganizationName").hide();
+             $("#ExternalOtherOrganizationName").hide();
+             $("#lblExternalOrganizationName").hide();
+             $("#lblExternalOtherOrganizationName").hide();
+            $("#ddEmpDesignation").prop("selectedIndex", 0).val();
+            $("#ddEmpLocation").prop("selectedIndex", 0).val();
+        }
+        else {
+            $("#OtherEmpName").hide();
+            $("#txtEmployeeCode").val("");
+            $("#txtCostcenterCode").val("");
+            $("#txtUserId").val("");
+            $("#txtEmployeeName").val("");
+            $("#txtDepartment").val("");
+            $("#txtContactNo").val("");
+            $('input[id="chkInternal"]').prop("checked", false);
+            $('input[id="chkExternal"]').prop("checked", false);
+            $('input[id="chkInternal"]').prop("disabled", false);
+            $('input[id="chkExternal"]').prop("disabled", false);
+            $("#ExternalOrganizationName").hide();
+             $("#ExternalOtherOrganizationName").hide();
+             $("#lblExternalOrganizationName").hide();
+             $("#lblExternalOtherOrganizationName").hide();
+            $("#ddEmpDesignation").prop("selectedIndex", 0).val();
+            $("#ddEmpLocation").prop("selectedIndex", 0).val();
+             }
+     }
+
+    function getEmployeeType() {
+        $('input:checkbox[id="chkInternal"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                console.log("Internal");
+                $('input[id="chkInternal"]').prop('disabled', true);
+                $('input[id="chkExternal"]').prop('checked', false);
+                $('input[id="chkExternal"]').prop("disabled", false);
+                $("#chkEmployeeType").val('Internal');
+
+                $("#ExternalOrganizationName").hide();
+                $("#lblExternalOrganizationName").hide();
+                $("#ExternalOtherOrganizationName").hide();
+                $("#lblExternalOtherOrganizationName").hide();
+
+                $("#drpRequestSubmissionFor").prop("selectedIndex", 0).val();
+
+                if (isEdit) {
+                    $("#txtOtherEmpname").val("");
+                    $("#txtEmployeeCode").val("");
+                    $("#txtCostcenterCode").val("");
+                    $("#txtUserId").val("");
+                    $("#txtEmployeeName").val("");
+                    $("#txtContactNo").val("");
+                    $("#txtDepartment").val("");
+                    $("#txtLevel").val("");
+                    $("#ddEmpDesignation").prop("selectedIndex", 0).val();
+                    $("#ddEmpLocation").prop("selectedIndex", 0).val();
+                }
+            }
+        });
+
+        $('input:checkbox[id="chkExternal"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                $("#chkEmployeeType").val('External');
+                $('input[id="chkExternal"]').prop('disabled', true);
+                $('input[id="chkInternal"]').prop("checked", false);
+                $('input[id="chkInternal"]').prop("disabled", false);
+
+                //hide / value empty
+                if (isEdit) {
+                    $("#OtherEmpName").hide();
+                    $("#txtEmployeeCode").val("");
+                    $("#txtCostcenterCode").val("");
+                    $("#txtUserId").val("");
+                    $("#txtEmployeeName").val("");
+                    $("#txtDepartment").val("");
+                    $("#txtContactNo").val("");
+                }
+                    //show
+                $("#ExternalOrganizationName").show();
+                $("#lblExternalOrganizationName").show();
+                    $("#drpRequestSubmissionFor").prop("selectedIndex", 2).val();
+                    $("#ddExternalOrganizationName").prop("selectedIndex", 0).val();
+                    $("#ddEmpDesignation").prop("selectedIndex", 0).val();
+                    $("#txtOtherEmpname").val("");
+            }
+        });
+    }
+
+    $("#ddExternalOrganizationName").change(function () {
+        if ($(this).val() == 'Other') {
+            console.log("other selected");
+            $("#ExternalOtherOrganizationName").show();
+            $("#lblExternalOtherOrganizationName").show();
+        }
+        else {
+            $("#ExternalOtherOrganizationName").hide();
+            $("#lblExternalOtherOrganizationName").hide();
+            $("#txtExternalOtherOrganizationName").val("");
+        }
+    });
+
+    $("#btnSubmit").on('click', function (e) {
+        e.preventDefault();
+        if (($("#chkInternal").prop("checked") == false) && ($("#chkExternal").prop("checked") == false)) {
+            requiredModal("Please select the Type of Employee");
+            return false;
+        }
+
+
+        var employeeCodelen = $("#txtEmployeeCode").val().length;
+        if (employeeCodelen == 0 || employeeCodelen < 0) {
+            requiredModal('Please enter a valid Employee Code');
+            return false;
+        }
+
+        var costCenterNumlen = $("#txtCostcenterCode").val().length;
+        if (costCenterNumlen < 6) {
+            requiredModal('Please enter a valid Cost Center Code');
+            return false;
+        }
+
+        var userIdlen = $("#txtUserId").val().length;
+        if (userIdlen == 0 || userIdlen < 0) {
+            requiredModal('Please enter a valid User Id');
+            return false;
+        }
+        var name = document.getElementById("txtEmployeeName").value;
+        if (name == "") {
+            requiredModal("Please enter the Name of Employee");
+            return false;
+        }
+        var department = document.getElementById("txtDepartment").value;
+        if (department == "") {
+            requiredModal("Please enter the Department");
+            return false;
+        }
+        var contactNumlen = $("#txtContactNo").val().length;
+        if (contactNumlen == 0 || contactNumlen > 10 || contactNumlen < 0) {
+            requiredModal('Please enter a valid Contact Number');
+            return false;
+        }
+        var designation = document.getElementById("ddEmpDesignation").selectedIndex;
+        if (designation == 0) {
+            requiredModal("Please select Designation");
+            return false;
+        }
+
+        var location = document.getElementById("ddEmpLocation").selectedIndex;
+        if (location == 0) {
+            requiredModal("Please select Location");
+            return false;
+        }
+
+        if (($("#chkBackup").prop("checked") == false) && ($("#chkRestore").prop("checked") == false) && ($("#chkBoth").prop("checked") == false)) {
+            requiredModal("Please select the Details");
+            return false;
+        }
+        var businessNeed = document.getElementById("txtBusinessNeed").value;
+        if (businessNeed == "") {
+            requiredModal("Please enter the Business Need");
+            return false;
+        }
+
+        $("#pageLoader").removeClass('invisible');
+        var form = $("#DBRForm").serialize();
+        $.ajax({
+            url: '/DataBackupRestore/CreateDataBackupRestoreRequest',
+            type: 'POST',
+            data: form,
+            cache: false,
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data[0].Value == 1) {
+                    console.log(data);
+                    $("#pageLoader").addClass('invisible');
+                    successModal(data[1].Value);
+                    $("#DBRForm").trigger("reset");
+                    redirectUser();
+                }
+                else {
+                    failureModal();
+                    $("#pageLoader").addClass('invisible');
+                    $("#DBRForm").trigger("reset");
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+                $("#pageLoader").addClass('invisible');
+                $("#DBRForm").trigger("reset");
+            })
+        })
+    });
+
+    function saveResponse(text) {
+        var status = '', comment = '';
+        comment = $("#comment-" + text).val();
+        switch (text) {
+            case 'approve': {
+                status = 'Approved';
+                break;
+            }
+            case 'reject': {
+                status = 'Rejected';
+                if (comment == '') {
+                    validityModal(text);
+                    return;
+                }
+                break;
+            }
+            case 'enquire': {
+                status = 'Enquired';
+                if (comment == '') {
+                    validityModal(text);
+                    return;
+                }
+                break;
+            }
+        }
+        $.ajax({
+            url: '/List/SaveResponse',
+            type: 'POST',
+            data: { response: status, appRowId: appRowId, comment: comment, approvalType: approvalType },
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data == 1) {
+                    successModal(text);
+                    $("#DBRForm").trigger("reset");
+                    setTimeout(FilterMyTasks, 5000)
+                }
+                else {
+                    failureModal();
+                    $("#DBRForm").trigger("reset");
+                }
+
+            }),
+            error: (function (data) {
+                failureModal();
+                $("#DBRForm").trigger("reset");
+            })
+        })
+
+        return false;
+    }
+
+    function validityModal(txt) {
+         if (txt == 'reject') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for rejecting the form');
+        }
+        else if (txt == 'enquire') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for enquiring the form');
+        }
+
+    }
+
+    function getRequirementFor() {
+        $('input:checkbox[id="chkBackup"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                $("#chkRequirementFor").val('Backup');
+                $('input[id="chkRestore"]').prop("checked", false);
+                $('input[id="chkBoth"]').prop("checked", false);
+
+                $("#backupDetails").show();
+                $("#backupRequestForDetails").show();
+                $("#backupType").show();
+
+                $("#restoreDetails").hide();
+                if (isEdit) {
+                    $('input[id="chkRestoreOriginalPath"]').prop("checked", false);
+                    $('input[id="chkRestoreAlternatePath"]').prop("checked", false);
+                }
+            }
+            else {
+                $('input[id="chkRestore"]').attr('disabled', false);
+                $('input[id="chkBoth"]').attr('disabled', false);
+                $("#chkRequirementFor").val('');
+                $("#backupDetails").hide();
+            }
+        });
+
+        $('input:checkbox[id="chkRestore"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                $("#chkRequirementFor").val('Restore');
+                $('input[id="chkBackup"]').prop("checked", false);
+                $('input[id="chkBoth"]').prop("checked", false);
+                $("#restoreRequestForDetails").show();
+                $('input[id="chkRestoreOriginalPath"]').prop("checked", false);
+                if (isEdit) {
+                    $('input[id="chkFileFolderBackup"]').prop("checked", false);
+                    $('input[id="chkApplicationBackup"]').prop("checked", false);
+
+                    $('input[id="chkOnetime"]').prop("checked", false);
+                    $('input[id="chkScheduled"]').prop("checked", false);
+                }
+                $("#restoreDetails").show();
+                $("#backupDetails").hide();
+                $("#alternateFolderDetails").hide();
+
+
+            }
+            else {
+                $('input[id="chkBackup"]').attr('disabled', false);
+                $('input[id="chkBoth"]').attr('disabled', false);
+                $("#chkRequirementFor").val('');
+                $("#restoreRequestForDetails").hide();
+                $("#restoreDetails").hide();
+            }
+        });
+
+        $('input:checkbox[id="chkBoth"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                $("#chkRequirementFor").val('Both');
+                $('input[id="chkBackup"]').prop("checked", false);
+                $('input[id="chkRestore"]').prop("checked", false);
+                $("#backupDetails").show();
+                $("#restoreDetails").show();
+                $("#restoreRequestForDetails").show();
+                $("#backupRequestForDetails").show();
+                $("#backupType").show();
+                if (isEdit) {
+                    $('input[id="chkFileFolderBackup"]').prop("checked", false);
+                    $('input[id="chkApplicationBackup"]').prop("checked", false);
+                }
+
+                $("#restoreDetails").show();
+                $("#restoreAtDetails").show();
+                $("#alternateFolderDetails").hide();
+                if (isEdit) {
+                    $('input[id="chkRestoreOriginalPath"]').prop("checked", false);
+                    $('input[id="chkRestoreAlternatePath"]').prop("checked", false);
+                }
+            }
+            else {
+                $('input[id="chkBackup"]').attr('disabled', false);
+                $('input[id="chkRestore"]').attr('disabled', false);
+                $("#chkRequirementFor").val('');
+                $("#backupDetails").hide();
+                $("#restoreDetails").hide();
+            }
+        });
+    }
+
+    function getRequestFor() {
+        $('input:checkbox[id="chkFileFolderBackup"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                $("#chkRequestFor").val('FileFolderBackup');
+                $('input[id="chkApplicationBackup"]').prop("checked", false);
+                $("#bakfileFolderDetails").show();
+                $("#bakapplicationDetails").hide();
+
+            }
+            else {
+                $('input[id="chkApplicationBackup"]').attr('disabled', false);
+                $("#chkRequestFor").val('');
+                $("#bakfileFolderDetails").hide();
+            }
+        });
+
+        $('input:checkbox[id="chkApplicationBackup"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                $("#chkRequestFor").val('ApplicationBackup');
+                $('input[id="chkFileFolderBackup"]').prop("checked", false);
+                $("#bakapplicationDetails").show();
+                $("#bakfileFolderDetails").hide();
+
+            }
+            else {
+                $('input[id="chkFileFolderBackup"]').attr('disabled', false);
+                $("#chkRequestFor").val('');
+                $("#bakapplicationDetails").hide();
+            }
+        });
+    }
+
+    function getBackupType() {
+        $('input:checkbox[id="chkOnetime"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                $("#chkBackupType").val('Onetime');
+                $('input[id="chkScheduled"]').prop("checked", false);
+
+            }
+            else {
+                $('input[id="chkScheduled"]').attr('disabled', false);
+                $("#chkBackupType").val('');
+            }
+        });
+
+        $('input:checkbox[id="chkScheduled"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                $("#chkBackupType").val('Scheduled');
+                $('input[id="chkOnetime"]').prop("checked", false);
+
+            }
+            else {
+                $('input[id="chkOnetime"]').attr('disabled', false);
+                $("#chkBackupType").val('');
+            }
+        });
+    }
+
+    function getRestoreAt() {
+        $('input:checkbox[id="chkRestoreOriginalPath"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                $("#chkRestoreAt").val('OriginalPath');
+                $('input[id="chkRestoreAlternatePath"]').prop("checked", false);
+                $("#restoreAtDetails").show();
+                $("#alternateFolderDetails").hide();
+            }
+            else {
+                $('input[id="chkRestoreAlternatePath"]').attr('disabled', false);
+                $("#chkRestoreAt").val('');
+                $("#chkRequirementFor").val("Restore");
+            }
+        });
+
+        $('input:checkbox[id="chkRestoreAlternatePath"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                $("#chkRestoreAt").val('AlternatePath');
+                $('input[id="chkRestoreOriginalPath"]').prop("checked", false);
+                $("#restoreAtDetails").show();
+                $("#alternateFolderDetails").show();
+            }
+            else {
+                $('input[id="chkRestoreOriginalPath"]').attr('disabled', false);
+                $("#chkRestoreAt").val('');
+            }
+        });
+    }
+
+    function allowNumbersOnly(e) {
+        var code = (e.which) ? e.which : e.keyCode;
+        if (code > 31 && (code < 48 || code > 57)) {
+            e.preventDefault();
+        }
+    }
+
+    function allowNumbersAndDecimalsOnly(e) {
+        var charCode = (e.which) ? e.which : e.keyCode
+        if (charCode != 46 && charCode > 31
+            && (charCode < 48 || charCode > 57)) {
+            e.preventDefault();
+        }
+    }
+
+    function alphaOnly(e) {
+        var key = e.keyCode;
+        if (key > 32 && (key < 65 || key > 122 || key == 91 || key == 92 || key == 93 || key == 94 || key == 95 || key == 96)) {
+            e.preventDefault();
+        }
+    }
+    function redirectUser() {
+        window.location = '/Dashboard/Index';
+    }
+    $(document).ready(function () {
+        //rowIdx = 1;
+        //srNo = 1;
+
+    });
+
+    // For Email Update
+    $("#modalOkButton").on('click', function () {
+        //debugger
+
+        if (FlagRedirect != null) {
+            spinner.show();
+            $.ajax({
+                url: '/EmailService/FormStatus',
+                type: 'POST',
+                data: { dataRowId: RowId, formID: formID },
+                dataType: 'JSON',
+                success: (function (data) {
+                    if (data.Result == 1) {
+                        spinner.hide();
+                        window.location = "../Dashboard";
+                    }
+                    else {
+                        spinner.hide();
+                        window.location = "../Dashboard";
+                    }
+
+                }),
+                error: (function (data) {
+                    spinner.hide();
+                    window.location = "../Dashboard";
+                })
+            })
+        }
+
+
+    });
+    // For Email Update
+</script>        

@@ -1,0 +1,546 @@
+﻿
+@{
+    Layout = null;
+    Skoda_DCMS.Models.InternalJobPostingData IJPF = null;
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IJPF = ViewBag.Model.one[0] as Skoda_DCMS.Models.InternalJobPostingData;
+    }
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SAVWIPL - Internal Job Posting</title>
+    <style type="text/css">
+        *:visited, *:focus {
+            box-shadow: none;
+        }
+
+        input, select, input:focus, select:focus, textarea, textarea:focus {
+            border: 1px solid #000;
+        }
+
+        input, textarea {
+            padding: 5px;
+        }
+
+        @@font-face {
+            font-family: 'SKODANext-Black';
+            src: url('../../fonts/SKODANextfont/SKODANext-Black.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Bold.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Light.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Regular.ttf') format('truetype');
+        }
+
+        body {
+            font-family: 'SKODANext-Black';
+        }
+        .form_lbl {
+            color: #000;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <table style="width: 100%; font-size: 14px; color: rgb(110,110,110); font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+        <tr>
+            <td>
+                <table style="width: 100%;" cellspadding="0" cellspacing="0">
+                    <tr>
+
+                        <td colspan="6" width="60%" style="text-align: right;">
+                            <img style="width: 50%;" src='@Server.MapPath("~/assets/img/SAVWIPL_Merger_Logo.JPG")'>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td class="form_lbl" style="height: 45px; text-align: center; border-left: 1px solid #000; border-right: 1px solid #000; border-bottom: 1px solid #000;">
+                SAVWIPL - Internal Job Posting
+            </td>
+        </tr>
+
+
+        <tr>
+            <td style="padding: 15px;">
+                <table cellspacing="0" cellpadding="0" width="100%">
+                    <tr>
+                        <td colspan="2">
+                            <label class="form_lbl">IJP Ref.</label>
+</td>
+                        <td>
+                            @(IJPF.IJPReference)
+                            @*<input type="text" style="height: 25px; width:80%; border-radius: 0; " value="" />*@
+                        </td>
+
+                        <td colspan="2">
+                            <label class="form_lbl">MPR No.</label>
+</td>
+                        <td>
+                            @(IJPF.MPRReference)
+                            @*<input type="text" style="height: 25px; width:80%; border-radius: 0; " value="" />*@
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="height: 15px;">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align='left'>
+                            <label class="form_lbl">Department</label>
+</td>
+                        <td colspan="2">
+                            @(IJPF.RequestSubmissionFor == "OnBehalf" ? IJPF.OtherEmployeeDepartment : IJPF.EmployeeDepartment)
+                            @*<input type="text" style="height: 25px; width:80%; border-radius: 0; "
+                                   value="" />*@
+                        </td>
+                        <td style="width:20%;">
+                            <label class="form_lbl">Employee Name</label>
+</td>
+                        <td colspan="2" align='left'>
+                            @(IJPF.RequestSubmissionFor == "OnBehalf" ? IJPF.OtherEmployeeName : IJPF.EmployeeName)
+                            @*<input type="text" style="height: 25px; width:80%; border-radius: 0; "
+                                   value="" />*@
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td style="height: 15px;">
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <label class="form_lbl">Employee Number</label>
+</td>
+                        <td colspan="2" align='left'>
+                            @(IJPF.RequestSubmissionFor == "OnBehalf" ? IJPF.OtherEmployeeCode : IJPF.EmployeeCode)
+                            @*<input type="text" style="height: 25px; width:80%; border-radius: 0; "
+                                   value="" />*@
+                        </td>
+                        <td>
+                            <label class="form_lbl">Date Of Joining</label>
+</td>
+                        <td colspan="2" align='left'>
+                            @(IJPF?.DateOfJoining.ToString("dd-MM-yyyy"))
+                            @*<input type="text" style="height: 25px; width:80%; border-radius: 0; "
+                                   value="" />*@
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="height: 15px;">
+                        </td>
+                    </tr>
+
+                    @*<tr>
+            <td>
+                Telephone Number
+            </td>
+            <td colspan="2" align='left'>
+                <input type="text" style="height: 25px; width:80%; border-radius: 0; "
+                       value="@(IJPF)"/>
+            </td>
+            <td>
+                Level
+            </td>
+            <td colspan="2" align='left'>
+                <input type="text" style="height: 25px; width:80%; border-radius: 0; " />
+            </td>
+        </tr>
+        <tr>
+            <td style="height: 15px;">
+            </td>
+        </tr>*@
+
+
+
+
+                <tr>
+                    <td>
+                        <label class="form_lbl">Qualifications</label>
+</td>
+                    <td colspan="2" align='left'>
+                        @(IJPF.Qualification)
+                        @*<input type="text" style="height: 25px; width:80%; border-radius: 0; "
+                               value="" />*@
+                    </td>
+                    <td>
+                        <label class="form_lbl">Current Role</label>
+</td>
+                    <td colspan="2" align='left'>
+                        @(IJPF.CurrentRole)
+                        @*<input type="text" style="height: 25px; width:80%; border-radius: 0; "
+                               value="" />*@
+                    </td>
+                </tr>
+
+                    <tr>
+                        <td style="height: 15px;">
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td>
+                            <label class="form_lbl">How long you have been in current department?</label>
+</td>
+                        <td colspan="2" align='left'>
+                            @(IJPF.CurrentDepartmentDuration)
+                            @*<input type="text" style="height: 25px; width:80%; border-radius: 0; "
+                                   value="" />*@
+                        </td>
+                        <td>
+                            <label class="form_lbl">How long you have been in current role?</label>
+</td>
+                        <td colspan="2" align='left'>
+                            @(IJPF.CurrentRoleDuration)
+                            @*<input type="text" style="height: 25px; width:80%; border-radius: 0; "
+                                   value="" />*@
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="height: 15px;">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label class="form_lbl">Name of current reporting manager:</label>
+</td>
+                        <td colspan="2" align='left'>
+                            @(IJPF.CurrentReportingManagerName)
+                            @*<input type="text" style="height: 25px; width:80%; border-radius: 0; "
+                                   value="" />*@
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="height: 15px;">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="6">
+                            <div><b><label class="form_lbl"> Employee Details </label> </b></div>
+                            <div>
+                                (Include the details of all the positions starting with the current job and experience outside. Please do mention if you have held other positions within Volkswagen Group (VWIPL, SAIPL and VWGSIPL) as a Separate line item)
+
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="6">
+                            <table cellpadding="0" cellspacing="0" border="1" width="100%">
+                                <tr class="form_lbl">
+                                    <th style="padding: 5px;">
+                                        Sr. No.
+                                    </th>
+                                    <th style="padding: 5px;">
+                                        Organisation
+                                    </th>
+                                    <th style="padding: 5px;">
+                                        Designation
+                                    </th>
+                                    <th style="padding: 5px;">
+                                        From
+                                    </th>
+                                    <th style="padding: 5px;">
+                                        To
+                                    </th>
+                                    <th style="padding: 5px;">
+                                        Main Responsibilities
+                                    </th>
+                                </tr>
+                                @{var cnt = 1; }
+                                @foreach (var itemEmp in ViewBag.Model.four)
+                                {
+                                    <tr id='@("row" + cnt)' class="tr_input">
+                                        <td style="padding: 5px; text-align: center;" class="sNo text-center">@cnt</td>
+                                        <td style="padding: 5px;" class="text-center">
+                                            @itemEmp.Organisation
+                                            
+
+                                        </td>
+                                        <td style="padding: 5px;" class="text-center">
+                                            @itemEmp.Designation
+
+                                        </td>
+                                        <td style="padding: 5px;" class="text-center">
+                                            @itemEmp.FromDate.ToString("dd-MM-yyyy")
+                                        </td>
+
+                                        <td style="padding: 5px;" class="text-center">
+                                            @itemEmp.ToDate.ToString("dd-MM-yyyy")
+                                        </td>
+
+                                        <td style="padding: 5px;">@itemEmp.MainResponsibilities</td>
+                                    </tr>
+                                    cnt++;
+                                }
+
+                            </table>
+
+                        </td>
+
+                    </tr>
+
+                    <tr>
+                        <td style="height: 15px;">
+                        </td>
+                    </tr>
+
+
+
+
+
+                    <tr>
+                        <td colspan="2" style="padding-bottom:10px;">
+                            <label class="form_lbl">Position and Department Applied for:</label>
+
+
+</td>
+                        <td colspan="4" align='left' style="padding-bottom:10px;">
+                            @IJPF.PositionAndDepartmentAppliedFor
+                            @*<input type="text" style="height: 25px; width:100%; border-radius: 0; " value="" />*@
+                        </td>
+
+                    </tr>
+
+                    <tr>
+                        <td colspan="2">
+                            <label class="form_lbl">Why would you like to change your profile? </label>
+
+
+</td>
+                        <td colspan="4" align='left'>
+                            @IJPF.ReasonForChangingJobProfile
+                            @*<input type="text" style="height: 25px; width:100%;  border-radius: 0; " value="" />*@ <br />
+                        </td>
+
+                    </tr>
+
+                    @*<tr>
+            <td colspan="6">
+                Agreement with Supervisor and HoD: <br />
+                Agreed to make application for IJP and release the employee within 90 days if selected
+
+            </td>
+
+
+        </tr>
+        <tr>
+            <td colspan="3">
+                <p style="height: 50px;"> </p>
+                Supervisor Name & Signature
+
+            </td>
+            <td colspan="3">
+                <p style="height: 50px;"> </p>
+                HoD Name & Signature
+
+            </td>
+
+
+        </tr>*@
+
+                    <tr>
+                        <td colspan="6" style="font-weight: bold; padding-top: 30px;">
+                            <input type="checkbox" checked />   I declare that the information provided above is true to the best of my knowledge and I will be responsible for the consequences rising out of any misrepresentation of the same.
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="6" style="height: 30px;">
+                        </td>
+                    </tr>
+
+                    @*<tr>
+                        <td colspan="3">
+                            Place:
+
+                        </td>
+                        <td colspan="3">
+
+                            Date:
+
+                        </td>
+
+
+                    </tr>*@
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="6" style="padding:10px;">
+                @*Employee Signature*@
+                <table cellspacing="0" cellpadding="0" width="100%" class="signature-table">
+                    <thead>
+                        <tr>
+                            <td style="padding-bottom:50px;">
+                                @* height: 150px; margin-left: 160px; *@
+                                Requested By
+                            </td>
+                            <td style="padding-bottom: 50px;">
+                                Approved By
+                            </td>
+                        </tr>
+                        @if ((ViewBag.Model.two.Count > 0) || (ViewBag.Model.three.Count > 0))
+                        {
+                            Html.RenderPartial("_ApprovalTrackingPDF", new Skoda_DCMS.Models.PdfParameterModel { RequesterData = ViewBag.Model.two, ApproverData = ViewBag.Model.three });
+                        }
+                    </thead>
+                </table>
+            </td>
+
+
+
+        </tr>
+
+        <!-- tests -->
+
+
+
+
+
+
+        <tr>
+            <td style="height: 25px;">
+            </td>
+        </tr>
+        @*<tr>
+            <td colspan="6">
+                <div style='text-align: center; margin-bottom: 10px;'>
+                    <b>
+                        Authorization by HOD
+                    </b>
+                </div>
+                <table cellpadding='0' cellspacing='0' width='100%' border='1'>
+                    <tr>
+                        <th style='width: 25%; text-align: center; vertical-align: top;'>
+                            Name
+
+                        </th>
+                        <th style='width: 50%; text-align: center; vertical-align: top;'>
+                            Approver Comment
+                        </th>
+                        <th style='width: 25%;text-align: center; vertical-align: top;'>
+                            Signature
+                        </th>
+                    </tr>
+
+                    <tr>
+                        <td style='width: 25%; height: 70px; vertical-align: top;'>
+                        </td>
+                        <td style='width: 50%; height: 70px; vertical-align: top;'>
+                        </td>
+                        <td style='width: 25%; height: 70px; vertical-align: top;'>
+                        </td>
+                    </tr>
+
+                </table>
+
+
+            </td>
+
+        </tr>
+
+        <tr>
+            <td colspan="6" style="height:25px;">
+            </td>
+        </tr>
+        <tr>
+            <td colspan="6">
+                <div style='text-align: center; margin-bottom: 10px;'>
+                    <b>
+                        Authorization by Area/Sub Area In charge
+
+                    </b>
+                </div>
+                <table cellpadding='0' cellspacing='0' width='100%' border='1'>
+                    <tr>
+                        <th style='width: 25%; text-align: center; vertical-align: top;'>
+                            Site Office
+
+
+                        </th>
+                        <th style='width: 50%; text-align: center; vertical-align: top;'>
+                            Approver Comment
+                        </th>
+                        <th style='width: 25%;text-align: center; vertical-align: top;'>
+                            Signature
+                        </th>
+                    </tr>
+
+                    <tr>
+                        <td style='width: 25%; height: 70px; vertical-align: top;'>
+                        </td>
+                        <td style='width: 55%; height: 70px; vertical-align: top;'>
+                        </td>
+                        <td style='width: 25%; height: 70px; vertical-align: top;'>
+                        </td>
+                    </tr>
+
+                </table>
+
+
+            </td>
+
+        </tr>
+
+
+        <tr>
+            <td colspan="6" style="height:25px;">
+            </td>
+        </tr>
+        <tr>
+            <td colspan="6">
+                <div style='text-align: center; margin-bottom: 10px;'>
+                    <b>
+                        Authorization by Authorization by Security
+
+                    </b>
+                </div>
+                <table cellpadding='0' cellspacing='0' width='100%' border='1'>
+                    <tr>
+                        <th style='width: 25%; text-align: center; vertical-align: top;'>
+                            Site Office
+
+
+                        </th>
+                        <th style='width: 50%; text-align: center; vertical-align: top;'>
+                            Approver Comment
+                        </th>
+                        <th style='width: 25%; text-align: center; vertical-align: top;'>
+                            Signature
+                        </th>
+                    </tr>
+
+                    <tr>
+                        <td style='width: 25%; height: 70px; vertical-align: top;'>
+                        </td>
+                        <td style='width: 50%; height: 70px; vertical-align: top;'>
+                        </td>
+                        <td style='width: 25%; height: 70px; vertical-align: top;'>
+                        </td>
+                    </tr>
+
+                </table>
+
+
+            </td>
+
+        </tr>
+
+
+        <tr>
+            <td style="height: 25px;">
+            </td>
+        </tr>*@
+    </table>
+</body>
+</html>
+

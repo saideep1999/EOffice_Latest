@@ -1,0 +1,1964 @@
+﻿@model dynamic
+@{
+    ViewBag.Title = "Conflict Of Interest Form";
+    var user = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    bool IsNew = true;
+    bool IsEdit = true;
+    dynamic FlagRedirect = null; // For Email Update
+    dynamic COIF = null;
+    Layout = ViewBag.Layout;
+    int RowId = 0, FormId = 0, AppRowId = 0, ApprovalType = 0;
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IsNew = ViewBag.IsNew;
+        IsEdit = ViewBag.IsEdit;
+        COIF = ViewBag.Model;
+        RowId = ViewBag.RowId;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+    }
+}
+@*For Email Update*@
+<style type="text/css">
+
+    .astColor {
+        color: red;
+    }
+
+    .per-checkbox {
+        padding-left: 61px !important;
+    }
+
+
+    .bg-color td, .bg-color th {
+        border: 1px solid #dee2e6;
+        background-color: rgb(219,238,213) !important;
+    }
+
+    #OtherEmpName #txtOtherEmpname {
+        border-radius: 0;
+        height: 20%;
+        font-size: 12px;
+    }
+
+    .bg-color-2 td {
+        background-color: rgba(75,168,46,0.4) !important;
+        border: 1px solid rgba(75,168,46,0.1) !important;
+    }
+
+    .bg-color-2 th {
+        background-color: rgba(75,168,46,0.4) !important;
+        border: 1px solid rgba(75,168,46,0.1) !important;
+    }
+
+    #loader {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        
+        z-index: 10000;
+    }
+
+    .table-bordered td, .table-bordered th {
+        background-color: #fff !important;
+    }
+
+    .noBorderTDs td {
+        border: none !important;
+    }
+    input:read-only {
+        background-color: transparent !important;
+    }
+    .form-table-container-2 tr td input {
+        width: 75% !important;
+        margin-top:10px;
+    }
+    .mainTbl label {
+        color: #8c959e !important;
+    }
+    .grayLable {
+        color: #8c959e !important;
+    }
+    /*New pdf css start*/
+    .form-table-container-2 tr td input {
+        width: 100% !important;
+        margin-top: 10px;
+        height: 45px !important;
+        border-color: #212221 !important;
+        background-color: #f1f4ff !important;
+        margin-left: 0px !important;
+    }
+
+    .form-table-container-2 tr td textarea {
+        border: 1px solid #212221 !important;
+        background-color: #f1f4ff !important;
+        padding-bottom: 3px !important;
+        margin-left: 1px !important;
+    }
+
+    .form-table-container-2 tr td select {
+        border-color: #212221 !important;
+        background-color: #f1f4ff !important;
+    }
+
+    .checkbox-container:hover input ~ .checkmark {
+        background-color: #f1f4ff !important;
+    }
+
+    .checkmark {
+        background-color: #f1f4ff !important;
+    }
+
+    .checkbox-container .checkmark:after {
+        border-color: #8c959e !important;
+    }
+
+    .borderBottom0 {
+        border-bottom-width: 0px !important;
+    }
+
+    .borderTop0 {
+        border-top-width: 0px !important;
+    }
+
+    .lineHt45 {
+        line-height: 45px !important;
+    }
+
+    .borderAll {
+        margin: 2px !important;
+    }
+    
+</style>
+
+@*For Email Update*@
+<div class="right_col bg-transparent" role="main">
+    <div class="container">
+        <form action="/List/CreateConflictOfInterestRequest" id="COIForm" method="post">
+            @if (IsNew)
+            {
+                if (!IsEdit)
+                {
+                    <div>
+                        <input type="hidden" id="FormSrId" name="FormSrId" value="@(COIF.one[0].Id)" />
+                        <input type="hidden" id="FormId" name="FormId" value="@(FormId)" />
+                        <input type="hidden" id="AppRowId" name="AppRowId" value="@(AppRowId)" />
+                    </div>
+                }
+                else
+                {
+                    <div class="breadcrumb-container">
+                        <div>
+                            <ol class="breadcrumb pl-0">
+                                <li>
+                                    <a href="/Dashboard?formName=COI">
+                                        Dashboard
+                                    </a>
+                                </li>
+                                <li class="active">
+                                    <a href="/Dashboard/GetDepartmentWiseForms?department=IT">
+                                        IT Department
+                                    </a>
+                                </li>
+                                <li class="active">OR 5_Annexure 2 – Declaration of Conflict of Interest</li>
+                            </ol>
+                        </div>
+                    </div>
+                    <div class="form-main-container margin_space">
+                        <div class="row topContent">
+                            <div class="col-lg-9 col-md-7 padd_space">
+                                <h5> Form Name : Conflict of Interest Form</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-7 padd_space float-right text-right">
+                                <h5> @*Form Department | Owner*@</h5>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+
+            <div class="container form-container">
+                <div class="card-header pb-4 pt-4">
+                    <table class="w-95 m-auto">
+                        <tr>
+                            <td>
+
+                                <table class="table mainTbl table-bordered form-table-container">
+                                    <tbody>
+                                        <tr>
+                                            <td class="f-600 w-25 text-left pl-3">Classification</td>
+                                            <td class="f-600 w-25 text-left pl-3">Internal</td>
+                                            <td rowspan="2" class="w-50 text-right"></td>
+
+                                        </tr>
+                                        <tr>
+                                            <td class="f-600 text-left pl-3">Version</td>
+                                            <td class="f-600 text-left pl-3">11</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td class="text-center" colspan="3"><h3 class="mb-0"><label class="f-600 mb-0">Conflict Of Interest Form</label></h3></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table class="table mainTbl table-bordered form-table-container-2 noBorderTDs">
+                                    <tbody>
+                                        <tr>
+                                            <td class="allFormLables borderLTB f-600" style="width:10% !important;">
+                                                <label class="f-600 mt-3">Date</label>
+                                            </td>
+                                            <td colspan="2" class=" text-left pt-2" style="width:40% !important;">
+                                                <input type="text" name="txtDate" placeholder="/ /" class="w-100" value="@(!IsNew || !IsEdit ? (Convert.ToDateTime(COIF.one[0].FormID.CreatedDate).ToShortDateString()) : DateTime.Now.ToShortDateString())" readonly>
+                                            </td>
+
+                                            @if (!IsNew || !IsEdit)
+                                            {
+                                                <td class="allFormLables borderLTB align" style="width:10%;">
+
+                                                    <label class="f-600 mt-3 ml-4">Form Id</label>
+
+                                                </td>
+                                                <td colspan="2" class=" text-right pt-2 pl-1 pr-2" style="width:40%;">
+                                                    <input type="text" name="txtFormId" class="w-100" value="@(!IsNew || !IsEdit ? ("COIF" + COIF.one[0].FormID.Id ?? "") : "" )" readonly>
+
+                                                </td>
+                                            }
+                                        </tr>
+                                        @if (IsNew)
+                                        {
+                                            if (!IsEdit)
+                                            {
+                                                <tr>
+                                                    <td class="allFormLables borderLTB f-600">
+                                                        <label class="f-600">Type of Employee<span class="astColor">*</span></label>
+                                                    </td>
+                                                    <td class="borderLTB">
+                                                        <label class="checkbox-container">
+                                                            <label class="f-600">Internal</label>
+                                                            @if (COIF.one[0].EmployeeType == "Internal")
+                                                            {
+                                                                <input type="checkbox" class="" name="chkInternal" id="chkInternal" onclick="getEmployeeType()" checked>
+                                                            }
+                                                            else
+                                                            {
+                                                                <input type="checkbox" class="" name="chkInternal" id="chkInternal" onclick="getEmployeeType()">
+                                                            }
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                    </td>
+
+                                                    <td class="borderLTB text-left align">
+                                                        <label class="checkbox-container">
+                                                            <label class="f-600">External</label>
+                                                            @if (COIF.one[0].EmployeeType == "External")
+                                                            {
+                                                                <input type="checkbox" class="" name="chkExternal" id="chkExternal" onclick="getEmployeeType()" checked>
+                                                            }
+                                                            else
+                                                            {
+                                                                <input type="checkbox" class="" name="chkExternal" id="chkExternal" onclick="getEmployeeType()">
+                                                            }
+
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                        <input type="hidden" name="chkEmployeeType" id="chkEmployeeType" value="@(COIF.one[0].EmployeeType ?? "")" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    @if (COIF.one[0].EmployeeType == "External")
+                                                    {
+                                                        <td class="" id="lblExternalOrganizationName">
+                                                            <label class="f-600">External Organization Name</label>
+                                                        </td>
+                                                        <td id="ExternalOrganizationName" colspan="2">
+                                                            <select class="w-100" name="ddExternalOrganizationName" id="ddExternalOrganizationName"></select>
+                                                        </td>
+                                                        if (COIF.one[0].ExternalOrganizationName == "Other")
+                                                        {
+                                                            <td id="lblExternalOtherOrganizationName" colspan="2" class="align">
+                                                                <label class="f-600"> Other External Organization Name</label>
+                                                            </td>
+                                                            <td id="ExternalOtherOrganizationName" class="text-right">
+                                                                <input type="text" class="w-100" placeholder="Other External Organization Name" name="txtExternalOtherOrganizationName" id="txtExternalOtherOrganizationName" value="@(COIF.one[0].ExternalOtherOrganizationName ?? "")" />
+                                                            </td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td id="lblExternalOtherOrganizationName" colspan="2" class="align" style="display:none;">
+                                                                <label class="f-600"> Other External Organization Name</label>
+                                                            </td>
+                                                            <td id="ExternalOtherOrganizationName" class="text-right" style="display:none;">
+                                                                <input type="text" class="w-100" placeholder="Other External Organization Name" name="txtExternalOtherOrganizationName" id="txtExternalOtherOrganizationName" value="@(COIF.one[0].ExternalOtherOrganizationName ?? "")" />
+                                                            </td>
+                                                        }
+                                                    }
+                                                </tr>
+                                            }
+                                            else
+                                            {
+                                                <tr>
+                                                    <td class="allFormLables borderLTB f-600">
+                                                        <label class="f-600">Type of Employee<span class="astColor">*</span></label>
+                                                    </td>
+                                                    <td class="borderLTB">
+                                                        <label class="checkbox-container">
+                                                            <label class="f-600">Internal</label>
+                                                            <input type="checkbox" class="" name="chkInternal" id="chkInternal" onclick="getEmployeeType()">
+
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                    </td>
+
+                                                    <td class="borderLTB text-left align">
+                                                        <label class="checkbox-container">
+                                                            <label class="f-600">External</label>
+                                                            <input type="checkbox" class="" name="chkExternal" id="chkExternal" onclick="getEmployeeType()">
+
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                        <input type="hidden" name="chkEmployeeType" id="chkEmployeeType" value="" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="" id="lblExternalOrganizationName" style="display:none;">
+                                                        <label class="f-600">External Organization Name</label>
+
+                                                    </td>
+                                                    <td id="ExternalOrganizationName" colspan="2" style="display:none;">
+                                                        <select name="ddExternalOrganizationName" id="ddExternalOrganizationName"></select>
+                                                    </td>
+
+
+                                                    <td id="lblExternalOtherOrganizationName" colspan="2" class="align" style="display:none;">
+                                                        <label class="f-600"> Other External Organization Name</label>
+
+                                                    </td>
+                                                    <td id="ExternalOtherOrganizationName" class="text-right" style="display:none;">
+                                                        <input type="text" class="w-100" placeholder="Other External Organization Name" name="txtExternalOtherOrganizationName" id="txtExternalOtherOrganizationName" />
+                                                    </td>
+
+                                                </tr>
+                                            }
+                                        }
+                                        else if (!IsNew)
+                                        {
+                                             <tr>
+                                                    <td class="allFormLables borderLTB f-600">
+                                                        <label class="f-600">Type of Employee</label>
+                                                    </td>
+                                                    <td class="borderLTB">
+                                                        <label class="checkbox-container">
+                                                            <label class="f-600">Internal</label>
+                                                            @if (COIF.one[0].EmployeeType == "Internal")
+                                                            {
+                                                                <input type="checkbox" class="" name="chkInternal" id="chkInternal" onclick="getEmployeeType()" checked>
+                                                            }
+                                                            else
+                                                            {
+                                                                <input type="checkbox" class="" name="chkInternal" id="chkInternal" onclick="getEmployeeType()">
+                                                            }
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                    </td>
+
+                                                    <td class="borderLTB text-left align">
+                                                        <label class="checkbox-container">
+                                                            <label class="f-600">External</label>
+                                                            @if (COIF.one[0].EmployeeType == "External")
+                                                            {
+                                                                <input type="checkbox" class="" name="chkExternal" id="chkExternal" onclick="getEmployeeType()" checked>
+                                                            }
+                                                            else
+                                                            {
+                                                                <input type="checkbox" class="" name="chkExternal" id="chkExternal" onclick="getEmployeeType()">
+                                                            }
+
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                        <input type="hidden" name="chkEmployeeType" id="chkEmployeeType" value="@(COIF.one[0].EmployeeType ?? "")" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    @if ((COIF.one[0].EmployeeType == "External") && (COIF.one[0].ExternalOrganizationName == "Other"))
+                                                    {
+                                                        <td class="" id="lblExternalOrganizationName">
+                                                            <label class="f-600">External Organization Name</label>
+                                                        </td>
+                                                        <td id="ExternalOrganizationName" colspan="2">
+                                                            <input type="text" class="w-100 txtDisable" name="txtExternalOrganizationName" id="txtExternalOrganizationName" value="@(COIF.one[0].ExternalOrganizationName ?? "")" />
+                                                        </td>
+                                                        <td id="lblExternalOtherOrganizationName" colspan="2" class="align">
+                                                            <label class="f-600"> Other External Organization Name</label>
+                                                        </td>
+                                                        <td id="ExternalOtherOrganizationName" class="text-right">
+                                                            <input type="text" class="w-100 txtDisable" name="txtExternalOtherOrganizationName" id="txtExternalOtherOrganizationName" value="@(COIF.one[0].ExternalOtherOrganizationName ?? "")" />
+                                                        </td>
+                                                    }
+
+                                                    @if ((COIF.one[0].EmployeeType == "External") && (COIF.one[0].ExternalOrganizationName != "Other"))
+                                                    {
+                                                        <td class="" id="lblExternalOrganizationName">
+                                                            <label class="f-600">External Organization Name</label>
+                                                        </td>
+                                                        <td id="ExternalOrganizationName" colspan="2">
+                                                            <input type="text" class="w-100 txtDisable" name="txtExternalOrganizationName" id="txtExternalOrganizationName" value="@(COIF.one[0].ExternalOrganizationName ?? "")" />
+                                                        </td>
+                                                    }
+                                                </tr>
+                                        }
+
+                                        @if (IsNew)
+                                        {
+                                            if (!IsEdit)
+                                            {
+                                                <tr>
+                                                    <td class="allFormLables borderLTB f-600" style="width:10%;">
+                                                        <label class="f-600">Employee Name<span class="astColor">*</span></label>
+                                                    </td>
+                                                    <td colspan="2" class="borderLTB">
+                                                        <input type="text" class="w-100 txtDisable empName" name="txtEmployeeName" id="txtEmployeeName" value="@(COIF.one[0].EmployeeName ?? "")" readonly />
+                                                    </td>
+                                                    <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                        <label class="f-600">Cost Center No<span class="astColor">*</span></label>
+                                                    </td>
+                                                    <td class="borderLTB text-left pr-2" colspan="2">
+                                                        <input type="text" class="w-100 txtDisable pr-1" name="txtCostcenterCode" id="txtCostcenterCode" value="@(COIF.one[0].EmployeeCCCode ?? "")" readonly />
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td class="allFormLables borderLTB f-600">
+                                                        <label class="f-600">Employee Code<span class="astColor">*</span></label>
+                                                    </td>
+                                                    <td colspan="2" class="borderLTB">
+                                                        <input type="text" class="w-100 txtDisable" id="txtEmployeeCode" name="txtEmployeeCode" value="@(COIF.one[0].EmployeeCode ?? "")" readonly />
+                                                    </td>
+                                                    <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                        <label class="f-600">User Id<span class="astColor">*</span></label>
+                                                    </td>
+                                                    <td class="borderLTB text-left pr-2" colspan="2">
+                                                        <input type="text" class="w-100 txtDisable" name="txtUserId" id="txtUserId" value="@(COIF.one[0].EmployeeUserId ?? "")" readonly />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="allFormLables borderLTB f-600">
+                                                        <label class="f-600">Department<span class="astColor">*</span></label>
+                                                    </td>
+                                                    <td colspan="2" class="borderLTB">
+                                                        <input type="text" class="w-100 txtDisable" name="txtDepartment" id="txtDepartment" value="@(COIF.one[0].EmployeeDepartment ?? "")" readonly />
+                                                    </td>
+                                                    <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                        <label class="f-600">Contact No</label>
+                                                    </td>
+                                                    <td class="borderLTB text-left" colspan="2">
+                                                        <input type="text" class="w-100 txtDisable" name="txtContactNo" id="txtContactNo" value="@(COIF.one[0].EmployeeContactNo ?? "")" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="allFormLables borderLTB f-600">
+                                                        <label class="f-600 mt-4">Designation<span class="astColor">*</span></label>
+                                                    </td>
+                                                    <td colspan="2" class="borderLTB text-left pr-2">
+                                                        <select name="ddEmpDesignation" class="w-100 drpSize" id="ddEmpDesignation"></select>
+                                                    </td>
+                                                    <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                        <label class="f-600 mt-4">Location<span class="astColor">*</span></label>
+                                                    </td>
+                                                    <td class="borderLTB text-left pr-2" colspan="2">
+                                                        <select name="ddEmpLocation" class="w-100 drpSize" id="ddEmpLocation"></select>
+                                                    </td>
+
+
+                                                </tr>
+                                            }
+                                            else
+                                            {
+                                                <tr>
+                                                    <td class="allFormLables borderLTB f-600">
+                                                        <label class="f-600">Employee Name<span class="astColor">*</span></label>
+                                                    </td>
+                                                    <td colspan="2" class="borderLTB">
+                                                        <input type="text" class="w-100 txtDisable empName" name="txtEmployeeName" id="txtEmployeeName" value="@user.FirstName @user.LastName" readonly />
+                                                    </td>
+                                                    <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                        <label class="f-600">Cost Center No<span class="astColor">*</span></label>
+                                                    </td>
+                                                    <td class="borderLTB text-left pr-2" colspan="2">
+                                                        <input type="text" class="w-100 txtDisable pr-1" name="txtCostcenterCode" id="txtCostcenterCode" value="@user.CostCenter" readonly />
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td class="allFormLables borderLTB f-600">
+                                                        <label class="f-600">Employee Code<span class="astColor">*</span></label>
+                                                    </td>
+                                                    <td colspan="2" class="borderLTB">
+                                                        <input type="text" class="w-100 txtDisable" id="txtEmployeeCode" name="txtEmployeeCode" value="@user.EmpNumber" readonly />
+                                                    </td>
+                                                    <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                        <label class="f-600">User Id<span class="astColor">*</span></label>
+                                                    </td>
+                                                    <td class="borderLTB text-left pr-2" colspan="2">
+                                                        <input type="text" class="w-100 txtDisable" name="txtUserId" id="txtUserId" value="@user.UserId" readonly />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="allFormLables borderLTB f-600">
+                                                        <label class="f-600">Department<span class="astColor">*</span></label>
+                                                    </td>
+                                                    <td colspan="2" class="borderLTB">
+                                                        <input type="text" class="w-100 txtDisable" name="txtDepartment" id="txtDepartment" value="@user.Department" readonly />
+                                                    </td>
+                                                    <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                        <label class="f-600">Contact No</label>
+                                                    </td>
+                                                    <td class="borderLTB text-left pr-2" colspan="2">
+                                                        <input type="text" class="w-100 txtDisable" name="txtContactNo" id="txtContactNo" value="@user.PhoneNumber" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+
+
+                                                    <td class="allFormLables borderLTB f-600">
+                                                        <label class="f-600 mt-4">Designation<span class="astColor">*</span></label>
+                                                    </td>
+                                                    <td colspan="2" class="borderLTB text-left pr-2">
+                                                        <select name="ddEmpDesignation" class="w-100 drpSize" id="ddEmpDesignation"></select>
+                                                    </td>
+                                                    <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                        <label class="f-600 mt-4">Location<span class="astColor">*</span></label>
+                                                    </td>
+                                                    <td class="borderLTB text-left pr-2" colspan="2">
+                                                        <select name="ddEmpLocation" class="w-100 drpSize" id="ddEmpLocation"></select>
+                                                    </td>
+
+                                                </tr>
+                                            }
+                                        }
+                                        else if (!IsNew)
+                                        {
+                                            
+                                                <tr>
+                                                    <td class="allFormLables borderLTB f-600" style="width:10%;">
+                                                        <label class="f-600 mt-4">Employee Name</label>
+                                                    </td>
+                                                    <td colspan="2" class="borderLTB" style="width:40%;">
+                                                        <input type="text" class="w-100 txtDisable empName" name="txtEmployeeName" id="txtEmployeeName" value="@(COIF.one[0].EmployeeName ?? "")" readonly />
+                                                    </td>
+                                                    <td colspan="2" class="allFormLables borderLTB f-600 align" style="width:10%;">
+                                                        <label class="f-600 mt-4 ml-4">Cost Center No</label>
+                                                    </td>
+                                                    <td class="borderLTB text-left pr-2" colspan="2" style="width:40%;">
+                                                        <input type="text" class="w-100 txtDisable" name="txtCostcenterCode" id="txtCostcenterCode" value="@(COIF.one[0].EmployeeCCCode ?? "")" readonly />
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td class="allFormLables borderLTB f-600" style="width:10%;">
+                                                        <label class="f-600 mt-4">Employee Code</label>
+                                                    </td>
+                                                    <td colspan="2" class="" style="width:40%;">
+                                                        <input type="text" class="w-100 txtDisable"  id="txtEmployeeCode" name="txtEmployeeCode" value="@(COIF.one[0].EmployeeCode ?? "")" readonly />
+                                                    </td>
+                                                    <td colspan="2" class="allFormLables borderLTB f-600 align" style="width:10%;">
+                                                        <label class="f-600 mt-4 ml-4">User Id</label>
+                                                    </td>
+                                                    <td class="borderLTB text-left" colspan="2" style="width: 40%;">
+                                                        <input type="text" class="w-100 txtDisable" name="txtUserId" id="txtUserId" value="@(COIF.one[0].EmployeeUserId ?? "")" readonly />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="allFormLables borderLTB f-600" style="width:10%;">
+                                                        <label class="f-600 mt-4">Department</label>
+                                                    </td>
+                                                    <td colspan="2" class="borderLTB" style="width: 40%; padding: 10px;">
+                                                        <input type="text" class="w-100 txtDisable" name="txtDepartment" id="txtDepartment" value="@(COIF.one[0].EmployeeDepartment ?? "")" readonly />
+                                                    </td>
+                                                    <td colspan="2" class="allFormLables borderLTB f-600 align" style="width:10%;">
+                                                        <label class="f-600 mt-4 ml-4">Contact No</label>
+                                                    </td>
+                                                    <td class="borderLTB text-left pr-2" colspan="2" style="width: 40%; padding: 10px;">
+                                                        <input type="text" class="w-100 txtDisable" name="txtContactNo" id="txtContactNo" value="@(COIF.one[0].EmployeeContactNo ?? "")" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="allFormLables borderLTB f-600" style="width:10%;">
+                                                        <label class="f-600 mt-4">Designation</label>
+                                                    </td>
+                                                    <td colspan="2" class="borderLTB text-left" style="width: 40%; padding-bottom:20px;">
+                                                        <input type="text" class="w-100 txtDisable" name="txtdesignation" id="txtdesignation" value="@(COIF.one[0].EmployeeDesignation ?? "")" />
+                                                    </td>
+                                                    <td colspan="2" class="allFormLables borderLTB f-600 align" style="width:10%;">
+                                                        <label class="f-600 mt-4 ml-4">Location</label>
+                                                    </td>
+                                                    <td class="borderLTB text-left pr-2" colspan="2" style="padding-bottom: 20px !important; width:40%;">
+                                                        <input type="text" class="w-100 txtDisable ht45" name="txtLocation" id="txtLocation" value="@(COIF.one[0].EmployeeLocation ?? "")" />
+                                                    </td>
+                                                </tr>
+                                        }
+
+                                        <table class="table mainTbl table-bordered form-table-container-2 noBorderTDs f-600">
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <label class="f-600">Code of Conduct</label>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        Complying with all rules and regulations is of highest importance for the reputation and success of our Company. Therefore the Board of Skoda Auto Volkswagen India have adopted the Code of Conduct of the Volkswagen Group, which provides an overview of our principles. The members of the management and all employees have to know about the Code of Conduct and comply with it.
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        The Code of Conduct is divided into three main sections:
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <label class="pl-4">• Our responsibility as a member of society</label>
+                                                    </td>
+                                                <tr>
+                                                    <td>
+                                                        <label class="pl-4">• Our responsibility as a business partner</label>
+                                                    </td>
+                                                <tr>
+                                                    <td>
+                                                        <label class="pl-4">• Our responsibility in the workplace</label>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        The Code of Conduct serves as a binding guideline in our day-to-day business. It is supplemented by internal guidelines and provisions in employment contracts. It also goes without saying that we strive to keep abreast of and comply with the latest updated provisions of national and international laws and standards applicable to the company. This also means that we never take any part in any activity that involves fraud, misappropriation, extortion, theft, embezzlement or any other deliberate damage to the assets of our customers or any third party.
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        Failure to observe the Code of Conduct can result in considerable damage, not only to our Company, but also to us as employees and to our business partners and other stakeholders. That is why the Code of Conduct is binding on all of us, irrespective of whether our role is that of a staff member, a manager or a Board member. We do not tolerate violations of the Code of Conduct. Anyone who violates the Code of Conduct must expect consequences, which, depending on the seriousness of the violation, can range from action under labor law to claims for damages under civil law, and may even extend to penalties under criminal law.
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        Every employee is advised to read, understand and follow the Code of Conduct and the policies on gifts and invitation conflict of interest and whistleblower system, which are available  <a href="http://savw-portal/GRC/GRC  Documents/Forms/AllItems.aspx">Here</a> for reporting any non-compliance.
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        Please confirm your understanding of the Code of Conduct and other Compliance policies:
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="pl-4">
+                                                        1. I have read and understood the Code of Conduct and related compliance policies and I comply with these.
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="pl-4">
+                                                        2. In case of doubt, I will ask for advice using the available channels.
+                                                    </td>
+                                                <tr>
+                                                    <td class="pl-4">
+                                                        3. I know that I can approach any of the management to seek any advice when necessary.
+                                                    </td>
+                                                <tr>
+                                                    <td class="pl-4">
+                                                        4. I know that the company has a whistleblower system where I can report any non-compliance
+                                                    </td>
+                                                </tr>
+
+                                            </tbody>
+                                        </table>
+                                        <table class="table mainTbl table-bordered form-table-container-2 noBorderTDs">
+                                            <tbody>
+                                                <tr>
+                                                    <td colspan="6" class="allFormLables borderLTB f-600">
+                                                        Describe the nature of conflict and point in time and scope in which the conflict of interest has
+                                                        arisen or may arise: (some indicative questions given below)
+                                                    </td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="6" class="allFormLables borderLTB f-600">
+                                                        a. Do you or any of your relatives, have an ownership interest in, or are any of you relatives
+                                                        employed by a SAVW or non–SAVW automotive dealer or any company doing business
+                                                        with SAVW or VW Group?
+                                                    </td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <label class="checkbox-container">
+                                                            <label class="f-600">Yes</label>
+                                                            @if (IsNew)
+                                                            {
+                                                                if (!IsEdit)
+                                                                {
+                                                                    if (COIF.one[0].IsQ1Yes == "Yes")
+                                                                    {
+                                                                        <input type="checkbox" style="border:2px solid #7a7b7a;" class="" name="chkQ1Yes" id="chkQ1Yes" value="Yes" onclick="getIsQ1Yes()" checked>
+                                                                    }
+                                                                    else
+                                                                    { <input type="checkbox" style="border:2px solid #7a7b7a;" class="" name="chkQ1Yes" id="chkQ1Yes" value="Yes" onclick="getIsQ1Yes()" />}
+                                                                }
+                                                                else
+                                                                {
+                                                                    <input type="checkbox" style="border:2px solid #7a7b7a;" class="" name="chkQ1Yes" id="chkQ1Yes" value="Yes" onclick="getIsQ1Yes()">
+                                                                }
+                                                            }
+                                                            else if (!IsNew && COIF.one[0].IsQ1Yes == "Yes")
+                                                            {
+                                                                <input type="checkbox" style="border:2px solid #7a7b7a;" class="inpDisable" name="chkQ1Yes" id="chkQ1Yes" value="Yes" checked>
+                                                            }
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                    </td>
+                                                    <td>
+                                                        <label class="checkbox-container">
+                                                            <label class="f-600">No</label>
+                                                            @if (IsNew)
+                                                            {
+                                                                if (!IsEdit)
+                                                                {
+                                                                    if (COIF.one[0].IsQ1Yes == "No")
+                                                                    {
+                                                                        <input type="checkbox" class="" name="chkQ1No" id="chkQ1No" value="No" onclick="getIsQ1Yes()" checked>
+                                                                    }
+                                                                    else
+                                                                    { <input type="checkbox" class="" name="chkQ1No" id="chkQ1No" value="Yes" onclick="getIsQ1Yes()" />}
+                                                                }
+                                                                else
+                                                                {
+                                                                    <input type="checkbox" class="" name="chkQ1No" id="chkQ1No" value="Yes" onclick="getIsQ1Yes()">
+                                                                }
+                                                            }
+                                                            else if (!IsNew && COIF.one[0].IsQ1Yes == "No")
+                                                            {
+                                                                <input type="checkbox" class="inpDisable" name="chkQ1No" id="chkQ1No" value="Yes" checked>
+                                                            }
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                        <input type="hidden" class="" name="chkIsQ1Yes" id="chkIsQ1Yes" value="@(!IsNew ||!IsEdit ? COIF.one[0].IsQ1Yes??"":"")">
+
+                                                </tr>
+                                                @if (IsNew)
+                                                {
+                                                    if (!IsEdit && (COIF.one[0].IsQ1Yes == "Yes") && (COIF.one[0].Elaboration1 != null))
+                                                    {
+                                                        <tr>
+                                                            <td colspan="6" class="allFormLables borderLTB f-600" id="trElaboration1">
+                                                                Please elaborate
+                                                                <textarea style="border: 2px solid #7a7b7a !important;" class="textTrans txtDisable" cols="60" rows="15" name="txtElaboration1" id="txtElaboration1">@(COIF.one[0].Elaboration1 ?? "")</textarea>
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                    else
+                                                    {
+                                                        <tr>
+                                                            <td colspan="6" class="allFormLables borderLTB f-600" style="display:none;" id="trElaboration1">
+                                                                Please elaborate
+                                                                <textarea style="border: 2px solid #7a7b7a !important;" class="textTrans txtDisable" cols="60" rows="15" name="txtElaboration1" id="txtElaboration1"></textarea>
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                }
+                                                else if (!IsNew && (COIF.one[0].IsQ1Yes == "Yes") && (COIF.one[0].Elaboration1 != null))
+                                                {
+                                                    <tr>
+                                                        <td colspan="6" class="allFormLables borderLTB f-600" id="trElaboration1" >
+                                                            Please elaborate
+                                                            <textarea style="border: 2px solid #7a7b7a !important;" class="textTrans txtDisable" cols="60"  rows="15" name="txtElaboration1" id="txtElaboration1">@(COIF.one[0].Elaboration1 ?? "")</textarea>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                                <tr>
+                                                <tr>
+                                                    <td colspan="6" class="allFormLables borderLTB f-600">
+                                                        b. do you or any members of your household have a direct or indirect material interest in any
+                                                        supplier, competitor, or service provider of SAVW?
+                                                    </td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <label class="checkbox-container">
+                                                            <label class="f-600">Yes</label>
+                                                            @if (IsNew)
+                                                            {
+                                                                if (!IsEdit)
+                                                                {
+                                                                    if (COIF.one[0].IsQ2Yes == "Yes")
+                                                                    {
+                                                                        <input type="checkbox" class="" name="chkQ2Yes" id="chkQ2Yes" value="Yes" onclick="getIsQ2Yes()" checked>
+                                                                    }
+                                                                    else
+                                                                    { <input type="checkbox" class="" name="chkQ2Yes" id="chkQ2Yes" value="Yes" onclick="getIsQ2Yes()" />}
+                                                                }
+                                                                else
+                                                                {
+                                                                    <input type="checkbox" class="" name="chkQ2Yes" id="chkQ2Yes" value="Yes" onclick="getIsQ2Yes()">
+                                                                }
+                                                            }
+                                                            else if (!IsNew && COIF.one[0].IsQ2Yes == "Yes")
+                                                            {
+                                                                <input type="checkbox" class="inpDisable" name="chkQ2Yes" id="chkQ2Yes" value="Yes" checked>
+                                                            }
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                    </td>
+                                                    <td>
+                                                        <label class="checkbox-container">
+                                                            <label class="f-600">No</label>
+                                                            @if (IsNew)
+                                                            {
+                                                                if (!IsEdit)
+                                                                {
+                                                                    if (COIF.one[0].IsQ2Yes == "No")
+                                                                    {
+                                                                        <input type="checkbox" class="" name="chkQ2No" id="chkQ2No" value="No" onclick="getIsQ2Yes()" checked>
+                                                                    }
+                                                                    else
+                                                                    { <input type="checkbox" class="" name="chkQ2No" id="chkQ2No" value="Yes" onclick="getIsQ2Yes()" />}
+                                                                }
+                                                                else
+                                                                {
+                                                                    <input type="checkbox" class="" name="chkQ2No" id="chkQ2No" value="Yes" onclick="getIsQ2Yes()">
+                                                                }
+                                                            }
+                                                            else if (!IsNew && COIF.one[0].IsQ2Yes == "No")
+                                                            {
+                                                                <input type="checkbox" class="inpDisable" name="chkQ2No" id="chkQ2No" value="Yes" checked>
+                                                            }
+                                                            <span class="checkmark"></span>
+                                                            <input type="hidden" class="" name="chkIsQ2Yes" id="chkIsQ2Yes" value="@(!IsNew ||!IsEdit ? COIF.one[0].IsQ2Yes??"":"")">
+                                                        </label>
+                                                    </td>
+                                                </tr>
+                                                @if (IsNew)
+                                                {
+                                                    if (!IsEdit && (COIF.one[0].IsQ2Yes == "Yes") && (COIF.one[0].Elaboration2 != null))
+                                                    {
+                                                        <tr>
+                                                            <td colspan="6" class="allFormLables borderLTB f-600" id="trElaboration2">
+                                                                Please elaborate
+                                                                <textarea style="border: 2px solid #7a7b7a !important;" class="textTrans txtDisable" cols="60" rows="15" name="txtElaboration2" id="txtElaboration2">@(COIF.one[0].Elaboration2 ?? "")</textarea>
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                    else
+                                                    {
+                                                        <tr>
+                                                            <td colspan="6" class="allFormLables borderLTB f-600" style="display:none;" id="trElaboration2">
+                                                                Please elaborate
+                                                                <textarea style="border: 2px solid #7a7b7a !important;" class="textTrans txtDisable" cols="60" rows="15" name="txtElaboration2" id="txtElaboration2"></textarea>
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                }
+                                                else if (!IsNew && (COIF.one[0].IsQ2Yes == "Yes") && (COIF.one[0].Elaboration2 != null))
+                                                {
+                                                    <tr>
+                                                        <td colspan="6" class="allFormLables borderLTB f-600" id="trElaboration2">
+                                                            Please elaborate
+                                                            <textarea style="border: 2px solid #7a7b7a !important;" class="textTrans txtDisable" cols="60" rows="15" name="txtElaboration2" id="txtElaboration2">@(COIF.one[0].Elaboration2 ?? "")</textarea>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                                <tr>
+                                                <tr>
+                                                    <td colspan="6" class="allFormLables borderLTB f-600">
+                                                        c. Are you a director or officer in any business organized for profit or are engaged in
+                                                        employment other than SAVW?
+                                                    </td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <label class="checkbox-container">
+                                                            <label class="f-600">Yes</label>
+                                                            @if (IsNew)
+                                                            {
+                                                                if (!IsEdit)
+                                                                {
+                                                                    if (COIF.one[0].IsQ3Yes == "Yes")
+                                                                    {
+                                                                        <input type="checkbox" class="" name="chkQ3Yes" id="chkQ3Yes" value="Yes" onclick="getIsQ3Yes()" checked>
+                                                                    }
+                                                                    else
+                                                                    { <input type="checkbox" class="" name="chkQ3Yes" id="chkQ3Yes" value="Yes" onclick="getIsQ3Yes()" />}
+                                                                }
+                                                                else
+                                                                {
+                                                                    <input type="checkbox" class="" name="chkQ3Yes" id="chkQ3Yes" value="Yes" onclick="getIsQ3Yes()">
+                                                                }
+                                                            }
+                                                            else if (!IsNew && COIF.one[0].IsQ3Yes == "Yes")
+                                                            {
+                                                                <input type="checkbox" class="inpDisable" name="chkQ3Yes" id="chkQ3Yes" value="Yes" checked>
+                                                            }
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                    </td>
+                                                    <td>
+                                                        <label class="checkbox-container">
+                                                            <label class="f-600">No</label>
+                                                            @if (IsNew)
+                                                            {
+                                                                if (!IsEdit)
+                                                                {
+                                                                    if (COIF.one[0].IsQ3Yes == "No")
+                                                                    {
+                                                                        <input type="checkbox" class="" name="chkQ3No" id="chkQ3No" value="No" onclick="getIsQ3Yes()" checked>
+                                                                    }
+                                                                    else
+                                                                    { <input type="checkbox" class="" name="chkQ3No" id="chkQ3No" value="Yes" onclick="getIsQ3Yes()" />}
+                                                                }
+                                                                else
+                                                                {
+                                                                    <input type="checkbox" class="" name="chkQ3No" id="chkQ3No" value="Yes" onclick="getIsQ3Yes()">
+                                                                }
+                                                            }
+                                                            else if (!IsNew && COIF.one[0].IsQ3Yes == "No")
+                                                            {<input type="checkbox" class="inpDisable" name="chkQ3No" id="chkQ3No" value="Yes" checked>
+                                                            }
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                        <input type="hidden" class="" name="chkIsQ3Yes" id="chkIsQ3Yes" value="@(!IsNew ||!IsEdit ? COIF.one[0].IsQ3Yes??"":"")">
+                                                    </td>
+                                                </tr>
+                                                @if (IsNew)
+                                                {
+                                                    if (!IsEdit && (COIF.one[0].IsQ3Yes == "Yes") && (COIF.one[0].Elaboration3 != null))
+                                                    {
+                                                        <tr>
+                                                            <td colspan="6" class="allFormLables borderLTB f-600" id="trElaboration3">
+                                                                Please elaborate
+                                                                <textarea style="border: 2px solid #7a7b7a !important;" class="textTrans txtDisable" cols="60" rows="15" name="txtElaboration3" id="txtElaboration3">@(COIF.one[0].Elaboration3 ?? "")</textarea>
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                    else
+                                                    {
+                                                        <tr>
+                                                            <td colspan="6" class="allFormLables borderLTB f-600" style="display:none;" id="trElaboration3">
+                                                                Please elaborate
+                                                                <textarea style="border: 2px solid #7a7b7a !important;" class="textTrans txtDisable" cols="60" rows="15" name="txtElaboration3" id="txtElaboration3"></textarea>
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                }
+                                                else if (!IsNew && (COIF.one[0].IsQ3Yes == "Yes") && (COIF.one[0].Elaboration3 != null))
+                                                {
+                                                    <tr>
+                                                        <td colspan="6" class="allFormLables borderLTB f-600" id="trElaboration3">
+                                                            Please elaborate
+                                                            <textarea style="border: 2px solid #7a7b7a !important;" class="textTrans txtDisable" cols="60" rows="15" name="txtElaboration3" id="txtElaboration3">@(COIF.one[0].Elaboration3 ?? "")</textarea>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                                <tr>
+                                                    <td colspan="6" class="allFormLables borderLTB f-600">
+                                                        Comment from HOD (indicate whether the situation described by the employee is a conflict. If
+                                                        yes, how the conflict is / will be resolved)
+                                                    </td>
+
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                                        @if (!IsNew || !IsEdit)
+                                        {
+                                            if (COIF.four == 1)
+                                            {
+
+                                                if ((COIF.two.Count > 0) || (COIF.three.Count > 0))
+                                                {
+                                                    <table class="table mainTbl table-bordered form-table-container-2 noBorderTDs">
+                                                        @if (COIF.three[0].Comment != null)
+                                                        {
+                                                            <tr>
+                                                                <td colspan="6">
+                                                                    <textarea class="textTrans txtDisable" cols="60" rows="10">
+                              @(!IsNew || !IsEdit ? (COIF.three[0].Comment ?? "") : "")
+                            </textarea>
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                        <tr>
+                                                            <td class="text-center"><input type="text" class="w-100 signature" value="@(!IsNew || !IsEdit ? (COIF.two[0].Author.Title ?? " ") : user.UserName)" /></td>
+                                                            <td class="text-center"><input type="text" class="w-100 signature" value=" @(!IsNew || !IsEdit ? (COIF.three[0].UserName ?? "") : "Signature")" /></td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td class="text-center f-600">Signature of Employee</td>
+                                                            <td class="text-center f-600">Signature of HOD</td>
+                                                        </tr>
+                                                    </table>
+                                                }
+                                            }
+                                        }
+                                        <table class="w-100">
+                                            <tr>
+                                                <td class="f-600 text-right">Page | 1</td>
+
+                                            </tr>
+                                        </table>
+                 
+                </div>
+            </div>
+            @if (IsNew)
+                            {
+                                if (!IsEdit)
+                                {
+                                    <div class="card-footer align-content-center">
+                                        <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                                            Re-Submit
+                                        </button>
+                                        <button type="reset" class="btn btn-danger btn-sm cancl-btn">
+                                            Cancel
+                                        </button>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="card-footer align-content-center">
+                                        <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                                            Submit
+                                        </button>
+                                        <button type="reset" class="btn btn-danger btn-sm cancl-btn">
+                                            Cancel
+                                        </button>
+                                    </div>
+                                }
+                            }
+        </form>
+    </div>
+</div>
+<div class="modal fade" id="successModel" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header modelHeader">
+                <span class="modal-title modalMsgTitle" id="modalTitle"></span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label id="modalBody" class="lableMsg">  </label>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="submitBomBtn publishBtn" id="modalOkButton">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+     // For Email Update
+    var spinner = $('#loader');
+    var FlagRedirect = @Html.Raw(Json.Encode(FlagRedirect));
+    var formID = @Html.Raw(Json.Encode(FormId));
+    var RowId = @Html.Raw(Json.Encode(RowId));
+    // For Email Update
+     var isNew = @Html.Raw(Json.Encode(IsNew));
+    var coif = @Html.Raw(Json.Encode(COIF));
+    var appRowId = @Html.Raw(Json.Encode(AppRowId));
+    var approvalType =@Html.Raw(Json.Encode(ApprovalType));
+    var isEdit = @Html.Raw(Json.Encode(IsEdit));
+
+    $(document).ready(function () {
+        pageLoad();
+    })
+
+
+    function pageLoad() {
+        spinner.hide();// For Email Update
+        getIsQ1Yes();
+        getIsQ2Yes();
+        getIsQ3Yes();
+
+        empDetails();
+        showHideControls();
+        getEmployeeType();
+        getOtherEmployeeType();
+
+        getDesignations();
+        getServiceDeskLocations();
+        getExternalOrganization();
+
+        if (isNew) {
+             var EmailId = "";
+            var result = EmailIDValidation("@user.Email");
+            if (result == true) {
+                console.log("Emp type ext..=" + result);
+                $('input[id="chkExternal"]').prop("checked", true);
+                $("#chkEmployeeType").val('External');
+                $("#ddEmpDesignation").empty();
+                $("#ddEmpDesignation").append('<option value="">Select</option><option value="Team Member">Team Member</option>');
+                $('#divLblExtOrg').show();
+                $('#divExtOrg').show();
+            }
+            else {
+                $('input[id="chkInternal"]').prop("checked", true);
+                $("#chkEmployeeType").val('Internal');
+            }
+        }
+
+        if (!isNew) {
+        $(".inpDisable").attr("disabled", "disabled");
+        $(".txtDisable").prop("readonly", true);
+        }
+    }
+
+    function getDesignations() {
+        if (isNew) {
+            if (!isEdit) {
+                var value = JSON.stringify(coif[0]);
+                console.log(value)
+                var value_1 = JSON.parse(value);
+                var selectedDesignation = value_1.Value[0].EmployeeDesignation;
+                console.log(selectedDesignation);
+                var selectedOtherDesignation = value_1.Value[0].OtherEmployeeDesignation;
+                console.log(selectedOtherDesignation);
+
+                $.ajax({
+                    type: "POST",
+                    url: "/List/GetDesignations",
+                    contentType: "application/json; charset=utf-8",
+                    datatype: 'json',
+                    cache: false,
+                    async: false,
+                    success: function (data) {
+                        console.log(data);
+                        var s = '<option value="">Select</option>';
+                        var s1 = '<option value="">Select</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            if (data[i].JobTitle == selectedDesignation) {
+                                console.log("hiiii" + data[i].JobTitle);
+                                s += '<option value="' + data[i].JobTitle + '" selected>' + data[i].JobTitle + '</option>';
+                            }
+                            else {
+                                s += '<option value="' + data[i].JobTitle + '">' + data[i].JobTitle + '</option>';
+                            }
+                            if (data[i].JobTitle == selectedOtherDesignation) {
+                                console.log("hiiii" + data[i].JobTitle);
+                                s1 += '<option value="' + data[i].JobTitle + '" selected>' + data[i].JobTitle + '</option>';
+                            }
+                            else {
+                                s1 += '<option value="' + data[i].JobTitle + '">' + data[i].JobTitle + '</option>';
+                            }
+                        }
+                        $("#ddEmpDesignation").html(s);
+                        $("#ddOtherEmpDesignation").html(s1);
+
+                    },
+                    error: function () {
+                    }
+                });
+            }
+            else {
+
+                $.ajax({
+                    type: "POST",
+                    url: "/List/GetDesignations",
+                    contentType: "application/json; charset=utf-8",
+                    datatype: 'json',
+                    cache: false,
+                    async: false,
+                    success: function (data) {
+                        console.log(data);
+                        var s = '<option value="">Select</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            s += '<option value="' + data[i].JobTitle + '">' + data[i].JobTitle + '</option>';
+                        }
+                        $("#ddEmpDesignation").html(s);
+                        $("#ddOtherEmpDesignation").html(s);
+                    },
+                    error: function (data) {
+                        //code
+                    }
+                });
+
+            }
+        }
+    }
+
+    function getServiceDeskLocations() {
+        if (isNew) {
+            if (!isEdit) {
+                var value = JSON.stringify(coif[0]);
+                console.log(value)
+                var value_1 = JSON.parse(value);
+                var selectedLocation = value_1.Value[0].EmployeeLocation;
+                console.log(selectedLocation);
+                var selectedOtherLocation = value_1.Value[0].OtherEmployeeLocation;
+                console.log(selectedOtherLocation);
+
+                $.ajax({
+                    type: "GET",
+                    url: "/List/GetServiceDeskLocations",
+                    contentType: "application/json; charset=utf-8",
+                    datatype: 'json',
+                    cache: false,
+                    async: false,
+                    success: function (data) {
+                        console.log(data);
+                        var s = '<option value="">Select</option>';
+                        var s1 = '<option value="">Select</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            if (data[i].LocationName == selectedLocation) {
+                                s += '<option value="' + data[i].LocationName + '" selected>' + data[i].LocationName + '</option>';
+                            }
+                            else
+                            {
+                                s += '<option value="' + data[i].LocationName + '">' + data[i].LocationName + '</option>';
+                            }
+
+                            if (data[i].LocationName == selectedOtherLocation) {
+                                s1 += '<option value="' + data[i].LocationName + '" selected>' + data[i].LocationName + '</option>';
+                            }
+                            else {
+                                s1 += '<option value="' + data[i].LocationName + '">' + data[i].LocationName + '</option>';
+                            }
+                        }
+                        $("#ddEmpLocation").html(s);
+                        $("#ddOtherEmpLocation").html(s1);
+                    },
+                    error: function () {
+
+                    }
+                });
+            }
+            else {
+                $.ajax({
+                    type: "GET",
+                    url: "/List/GetServiceDeskLocations",
+                    contentType: "application/json; charset=utf-8",
+                    datatype: 'json',
+                    cache: false,
+                    async: false,
+                    success: function (data) {
+                        console.log("Hi=" + data);
+                        var s = '<option value="">Select</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            s += '<option value="' + data[i].LocationName + '">' + data[i].LocationName + '</option>';
+                        }
+                        $("#ddEmpLocation").html(s);
+                        $("#ddOtherEmpLocation").html(s);
+                    },
+                    error: function () {
+
+                    }
+                });
+            }
+        }
+    }
+
+    function getExternalOrganization() {
+        if (isNew) {
+            if (!isEdit) {
+                var value = JSON.stringify(coif[0]);
+                console.log(value)
+                var value_1 = JSON.parse(value);
+                var selectedOrganization = value_1.Value[0].ExternalOrganizationName;
+                console.log(selectedOrganization);
+                var selectedOtherOrganization = value_1.Value[0].OtherExternalOrganizationName;
+                console.log(selectedOtherOrganization);
+
+                $.ajax({
+                    type: "GET",
+                    url: "/List/GetExternalOrganization",
+                    contentType: "application/json; charset=utf-8",
+                    datatype: 'json',
+                    cache: false,
+                    async: false,
+                    success: function (data) {
+                        console.log(data);
+
+                        var s = '<option value="">Select</option>';
+                        var s1 = '<option value="">Select</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            if (data[i].Organization == selectedOrganization) {
+                                console.log("hiiii" + data[i].Organization);
+                                s += '<option value="' + data[i].Organization + '" selected>' + data[i].Organization + '</option>';
+                            }
+                            else {
+                                s += '<option value="' + data[i].Organization + '">' + data[i].Organization + '</option>';
+                            }
+
+                            if (data[i].Organization == selectedOtherOrganization) {
+                                console.log("hiiii" + data[i].Organization);
+                                s1 += '<option value="' + data[i].Organization + '" selected>' + data[i].Organization + '</option>';
+                            }
+                            else {
+                                s1 += '<option value="' + data[i].Organization + '">' + data[i].Organization + '</option>';
+                            }
+                        }
+                        $("#ddExternalOrganizationName").html(s);
+                        $("#ddOtherExternalOrganizationName").html(s1);
+                    },
+                    error: function () {
+
+                    }
+                });
+            }
+            else {
+                $.ajax({
+                    type: "GET",
+                    url: "/List/GetExternalOrganization",
+                    contentType: "application/json; charset=utf-8",
+                    datatype: 'json',
+                    cache: false,
+                    async: false,
+                    success: function (data) {
+                        console.log(data);
+                        var s = '<option value="">Select</option>';
+                        for (var i = 0; i < data.length; i++) {
+                            s += '<option value="' + data[i].Organization + '">' + data[i].Organization + '</option>';
+                        }
+                        $("#ddExternalOrganizationName").html(s);
+                        $("#ddOtherExternalOrganizationName").html(s);
+                    },
+                    error: function () {
+
+                    }
+                });
+            }
+        }
+    }
+
+    function empDetails() {
+        ////
+        //$("#txtOtherEmpname").autocomplete({
+        console.log("Hi Employee");
+        $("#txtOtherEmployeeName").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: "/List/GetEmployeeDetails",
+                    dataType: "json",
+                    cache: false,
+                    async: false,
+                    data: {
+                        searchText: $("#txtOtherEmployeeName").val()
+                    },
+                    success: function (data) {
+                        ////
+                        response($.map(data, function (item) {
+                            console.log(data, 'data');
+                            return { label: item.FirstName, value: item.FirstName, raw: item };
+                        }));
+                    }
+                });
+            },
+            search: function (event, ui) {
+                var value = $("#txtOtherEmployeeName").val();
+                // If less than three chars, cancel the search event
+                if (value.length < 4) {
+                    event.preventDefault();
+                }
+            },
+            min_length: 4,
+            delay: 0,
+            select: function (event, ui) {
+                ////
+                var empOtherDetails = ui.item['raw'];
+                //Get the other details like Cost Center Code, Employee Number from DB.
+                $.ajax({
+                    url: "/List/GetExistingEmployeeDetails",
+                    dataType: "json",
+                    cache: false,
+                    async: false,
+                    data: {
+                        otherEmpUserId: empOtherDetails.Email,
+                    },
+                    success: function (data) {
+                        console.log(data, 'data');
+                        //$('#txtOtherEmpCCCode').val(data.CostCenter);
+                        $('#txtOtherEmployeeCode').val(data.EmpNumber);
+                        $('#txtOtherDepartment').val(data.Department);
+                        $('#txtOtherEmployeeName').val(data.UserName);
+                        $('#txtOtherCostcenterCode').val(data.CostCenter);
+                        $('#txtOtherUserId').val(data.UserId);
+                        $('#txtOtherContactNo').val(data.PhoneNumber);
+                        $('#txtOtherEmailId').val(data.Email);
+                         $('#txtEmployeeUserId').val(data.EmpNumber);
+                        // $('input[id="chkInternal"]').prop("checked", true);
+                        //$('input[id="chkInternal"]').prop("disabled", true);
+                        EmailId = data.Email;
+                        console.log(EmailId);
+                        var emailExt = EmailIDValidation(EmailId);
+                        if (emailExt == true) {
+                            $('input[id="chkExternal"]').prop("checked", true);
+                            $("#chkEmployeeType").val('External');
+                            $("#ddOtherEmpDesignation").empty();
+                            $("#ddOtherEmpDesignation").append('<option value="">Select</option><option value="Team Member">Team Member</option>');
+                            $("#ExternalOrganizationName").show();
+                            $("#lblExternalOrganizationName").show();
+                        }
+                        else {
+                            $('input[id="chkInternal"]').prop("checked", true);
+                            $("#chkEmployeeType").val('Internal');
+                        }
+                    }
+                });
+            }
+
+        });
+    }
+
+    function RequestSubmissionFor() {
+
+         var drpRequestSubmissionFor = $("#drpRequestSubmissionFor").val();
+         if (drpRequestSubmissionFor == "OnBehalf") {
+            //$("#txtEmployeeCode").val("");
+            //$("#txtCostcenterCode").val("");
+            //$("#txtUserId").val("");
+            //$("#txtEmployeeName").val("");
+            //$("#txtDepartment").val("");
+            //$("#txtContactNo").val("");
+            //$('#txtEmailId').val("");
+            //$('input[id="chkInternal"]').prop("checked", false);
+            //$('input[id="chkExternal"]').prop("checked", false);
+             $('#OtherEmployeeOptions').show();
+
+            // $("#ddEmpDesignation").prop("selectedIndex", 0).val();
+            // $("#ddEmpLocation").prop("selectedIndex", 0).val();
+        }
+         else if (drpRequestSubmissionFor == "Self") {
+             $('#OtherEmployeeOptions').hide();
+             $('#txtEmployeeUserId').val(@user.EmpNumber);
+          @*  $("#txtEmployeeCode").val("@user.EmpNumber");
+            $("#txtCostcenterCode").val("@user.CostCenter");
+            $("#txtUserId").val("@user.UserId");
+            $("#txtEmployeeName").val("@user.UserName");
+             $("#txtDepartment").val("@user.Department");
+             $("#txtContactNo").val("@user.PhoneNumber");
+             EmailId = "@user.Email";
+             console.log(EmailId);
+             var emailExt = EmailIDValidation(EmailId);
+             if (emailExt == true) {
+                 $('input[id="chkExternal"]').prop("checked", true);
+                  $("#chkEmployeeType").val('External');
+                 $("#ddEmpDesignation").empty();
+                 $("#ddEmpDesignation").append('<option value="">Select</option><option value="Team Member">Team Member</option>');
+                 $("#ExternalOrganizationName").show();
+                 $("#lblExternalOrganizationName").show();
+             }
+             else {
+                 $('input[id="chkInternal"]').prop("checked", true);
+                  $("#chkEmployeeType").val('Internal');
+             }
+            $('#txtEmailId').val("@user.Email");
+             $('input[id="chkinternal"]').prop("checked", false);
+             $('input[id="chkExternal"]').prop("checked", false);
+             $("#ddEmpDesignation").prop("selectedIndex", 0).val();
+             $("#ddEmpLocation").prop("selectedIndex", 0).val();*@
+        }
+        else {
+            //$("#OtherEmpName").hide();
+            //$("#txtEmployeeCode").val("");
+            //$("#txtCostcenterCode").val("");
+            //$("#txtUserId").val("");
+            //$("#txtEmployeeName").val("");
+            //$("#txtDepartment").val("");
+            //$("#txtContactNo").val("");
+            //$('input[id="chkInternal"]').prop("checked", false);
+            //$('input[id="chkExternal"]').prop("checked", false);
+            //$('input[id="chkInternal"]').prop("disabled", false);
+            //$('input[id="chkExternal"]').prop("disabled", false);
+            //$("#ExternalOrganizationName").hide();
+            // $("#ExternalOtherOrganizationName").hide();
+            // $("#lblExternalOrganizationName").hide();
+            // $("#lblExternalOtherOrganizationName").hide();
+            //$("#ddEmpDesignation").prop("selectedIndex", 0).val();
+            //$("#ddEmpLocation").prop("selectedIndex", 0).val();
+             }
+     }
+
+     function EmailIDValidation(txt) {
+        console.log("email-validation");
+        var result = txt.includes("extern");
+        console.log(result);
+        return result;
+    }
+
+     function getEmployeeType() {
+        $('input:checkbox[id="chkInternal"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                console.log("Internal");
+                $('input[id="chkInternal"]').prop('disabled', true);
+                $('input[id="chkExternal"]').prop('checked', false);
+                $('input[id="chkExternal"]').prop("disabled", false);
+                $("#chkEmployeeType").val('Internal');
+
+                $("#ExternalOrganizationName").hide();
+                $("#lblExternalOrganizationName").hide();
+                $("#ExternalOtherOrganizationName").hide();
+                $("#lblExternalOtherOrganizationName").hide();
+                //    $("#txtOtherEmpname").val("");
+                //    $("#txtEmployeeCode").val("");
+                //    $("#txtCostcenterCode").val("");
+                //    $("#txtUserId").val("");
+                //    $("#txtEmployeeName").val("");
+                //    $("#txtContactNo").val("");
+                //$("#txtDepartment").val("");
+                getDesignations();
+                    //$("#ddEmpDesignation").prop("selectedIndex", 0).val();
+                    //$("#ddEmpLocation").prop("selectedIndex", 0).val();
+
+            }
+        });
+
+        $('input:checkbox[id="chkExternal"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                $("#chkEmployeeType").val('External');
+                $('input[id="chkExternal"]').prop('disabled', true);
+                $('input[id="chkInternal"]').prop("checked", false);
+                $('input[id="chkInternal"]').prop("disabled", false);
+
+                //hide / value empty
+                if (isEdit) {
+                    //$("#OtherEmpName").hide();
+                    //$("#txtEmployeeCode").val("");
+                    //$("#txtCostcenterCode").val("");
+                    //$("#txtUserId").val("");
+                    //$("#txtEmployeeName").val("");
+                    //$("#txtDepartment").val("");
+                    //$("#txtContactNo").val("");
+                }
+                    //show
+                $("#ExternalOrganizationName").show();
+                $("#lblExternalOrganizationName").show();
+                    //$("#drpRequestSubmissionFor").prop("selectedIndex", 2).val();
+                //    $("#ddExternalOrganizationName").prop("selectedIndex", 0).val();
+                //    //$("#ddEmpDesignation").prop("selectedIndex", 0).val();
+                //$("#txtOtherEmpname").val("");
+                //changes 16-Sept-21
+                $("#ddEmpDesignation").empty();
+                $("#ddEmpDesignation").append('<option value="">Select</option><option value="Team Member">Team Member</option>');
+
+
+            }
+        });
+     }
+     function getOtherEmployeeType() {
+         $('input:checkbox[id="chkOtherInternal"]').click(function () {
+             if ($(this).prop("checked") == true) {
+                 console.log("other Internal");
+                 $('input[id="chkOtherInternal"]').prop('disabled', true);
+                 $('input[id="chkOtherExternal"]').prop('checked', false);
+                 $('input[id="chkOtherExternal"]').prop("disabled", false);
+                 $('#chkOtherEmployeeType').val('Internal');
+
+                 $("#OtherExternalOrganizationName").hide();
+                 $("#OtherlblExternalOrganizationName").hide();
+                 $("#OtherExternalOtherOrganizationName").hide();
+                 $("#OtherlblExternalOtherOrganizationName").hide();
+                 //$("#txtOtherEmpname").val("");
+                 //$("#txtEmployeeCode").val("");
+                 //$("#txtCostcenterCode").val("");
+                 //$("#txtUserId").val("");
+                 //$("#txtEmployeeName").val("");
+                 //$("#txtContactNo").val("");
+                 //$("#txtDepartment").val("");
+                 //getDesignations();
+                 //$("#ddOtherEmpDesignation").prop("selectedIndex", 0).val();
+                 //$("#ddOtherEmpLocation").prop("selectedIndex", 0).val();
+
+             }
+         });
+
+         $('input:checkbox[id="chkOtherExternal"]').click(function () {
+             if ($(this).prop("checked") == true) {
+                 console.log("other External");
+                 $('#chkOtherEmployeeType').val('External');
+                 $('input[id="chkOtherExternal"]').prop('disabled', true);
+                 $('input[id="chkOtherInternal"]').prop("checked", false);
+                 $('input[id="chkOtherInternal"]').prop("disabled", false);
+
+                 //hide / value empty
+                 if (isEdit) {
+                     //$("#OtherEmpName").hide();
+                     //$("#txtEmployeeCode").val("");
+                     //$("#txtCostcenterCode").val("");
+                     //$("#txtUserId").val("");
+                     //$("#txtEmployeeName").val("");
+                     //$("#txtDepartment").val("");
+                     //$("#txtContactNo").val("");
+                 }
+                 //show
+                 $("#OtherExternalOrganizationName").show();
+                 $("#OtherlblExternalOrganizationName").show();
+                 //$("#drpRequestSubmissionFor").prop("selectedIndex", 2).val();
+                 //$("#ddExternalOrganizationName").prop("selectedIndex", 0).val();
+                 ////$("#ddEmpDesignation").prop("selectedIndex", 0).val();
+                 //$("#txtOtherEmpname").val("");
+                 //changes 16-Sept-21
+                 //$("#ddOtherEmpDesignation").empty();
+                 //$("#ddOtherEmpDesignation").append('<option value="">Select</option><option value="Team Member">Team Member</option>');
+
+
+             }
+         });
+     }
+
+     $("#ddExternalOrganizationName").change(function () {
+        if ($(this).val() == 'Other') {
+            console.log("other selected");
+            $("#ExternalOtherOrganizationName").show();
+            $("#lblExternalOtherOrganizationName").show();
+        }
+        else {
+            $("#ExternalOtherOrganizationName").hide();
+            $("#lblExternalOtherOrganizationName").hide();
+            $("#txtExternalOtherOrganizationName").val("");
+        }
+    });
+
+     $("#ddOtherExternalOrganizationName").change(function () {
+         if ($(this).val() == 'Other') {
+             console.log("other selected");
+             $("#OtherExternalOtherOrganizationName").show();
+             $("#OtherlblExternalOtherOrganizationName").show();
+         }
+         else {
+             $("#OtherExternalOtherOrganizationName").hide();
+             $("#OtherlblExternalOtherOrganizationName").hide();
+             $("#OthertxtExternalOtherOrganizationName").val("");
+         }
+     });
+
+    function showHideControls() {
+        console.log("Hi");
+        //$('input[type=radio][name=rdOnBehalfOption]').click(function () {
+        //    console.log("hello");
+        //    if (this.value == 'Existing') {
+        //        console.log("Existing");
+        //        $('#otherEmployeeDetailsSection').show();
+        //        $('#rdOnBehalfOption').val('Existing');
+        //        $('#txtOtherEmployeeName').autocomplete({ disabled: false });
+        //        empDetails();
+
+        //    }
+        //    if (this.value == 'New') {
+        //        console.log("New");
+        //        $('#otherEmployeeDetailsSection').show();
+        //        $('#rdOnBehalfOption').val('New');
+        //        $("#txtEmployeeCode").val("");
+        //        $("#txtCostcenterCode").val("");
+        //        $("#txtUserId").val("");
+        //        $("#txtEmployeeName").val("");
+        //        $("#txtDepartment").val("");
+        //        $("#txtContactNo").val("");
+        //        $('#txtEmailId').val("");
+        //        $('#txtOtherEmployeeName').autocomplete({ disabled: true });
+        //        $('input[id="chkInternal"]').prop("checked", false);
+        //        $('input[id="chkExternal"]').prop("checked", false);
+        //    }
+        //});
+
+        $('input[type=radio][name=rdOnBehalfOption]').click(function () {
+            console.log("hello radio");
+
+            var onBehalfOption = $(this).val();
+            console.log(onBehalfOption);
+
+            if (onBehalfOption == "Existing") {
+                $('#otherEmployeeDetailsSection').show();
+                $('#rdOnBehalfOption').val('Existing');
+                $('#txtOtherEmployeeName').autocomplete({ disabled: false });
+                empDetails();
+            }
+            else {
+                $('#otherEmployeeDetailsSection').show();
+                $("#txtOtherEmployeeCode").val("");
+                $("#txtOtherCostcenterCode").val("");
+                $("#txtOtherUserId").val("");
+                $("#txtOtherEmployeeName").val("");
+                $("#txtOtherDepartment").val("");
+                $("#txtOtherContactNo").val("");
+                $('#txtOtherEmailId').val("");
+                $('#txtOtherEmployeeName').autocomplete({ disabled: true });
+                $('input[id="chkOtherInternal"]').prop("checked", false);
+                $('input[id="chkOtherExternal"]').prop("checked", false);
+            }
+
+        });
+    }
+
+    function getIsQ1Yes() {
+        $('input:checkbox[id="chkQ1Yes"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                $("#chkIsQ1Yes").val("Yes");
+                $("#trElaboration1").show();
+                $('input[id="chkQ1No"]').prop("checked", false);
+            }
+        });
+
+        $('input:checkbox[id="chkQ1No"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                $("#chkIsQ1Yes").val("No");
+                $("#trElaboration1").hide();
+                $('input[id="chkQ1Yes"]').prop("checked", false);
+            }
+        });
+    }
+
+    function getIsQ2Yes() {
+        $('input:checkbox[id="chkQ2Yes"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                $("#chkIsQ2Yes").val("Yes");
+                $("#trElaboration2").show();
+                $('input[id="chkQ2No"]').prop("checked", false);
+            }
+        });
+
+        $('input:checkbox[id="chkQ2No"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                $("#chkIsQ2Yes").val("No");
+                $("#trElaboration2").hide();
+                $('input[id="chkQ2Yes"]').prop("checked", false);
+            }
+        });
+    }
+
+    function getIsQ3Yes() {
+        $('input:checkbox[id="chkQ3Yes"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                $("#chkIsQ3Yes").val("Yes");
+                $("#trElaboration3").show();
+                $('input[id="chkQ3No"]').prop("checked", false);
+            }
+        });
+
+        $('input:checkbox[id="chkQ3No"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                $("#chkIsQ3Yes").val("No");
+                $("#trElaboration3").hide();
+                $('input[id="chkQ3Yes"]').prop("checked", false);
+            }
+        });
+    }
+
+    function successModal(txt) {
+        ////
+        $('#modalTitle').html('Success');
+        if (txt == "approve") {
+            $('#modalBody').html('Form has been approved!');
+            FlagRedirect = txt;// For Email Update
+        }
+        else if (txt == "reject") {
+            $('#modalBody').html('Form has been rejected!');
+        }
+        else if (txt == "enquire") {
+            $('#modalBody').html('Form has been enquired!');
+        }
+        else if (txt == "cancelled") {
+            $('#modalBody').html('Form has been cancelled!');
+        } else {
+            $('#modalBody').html('Your form with ID: COIF' + txt + ' has been submitted! Kindly use this for future reference');
+            FlagRedirect = txt;// For Email Update
+        }
+        //$("#modalOkButton").attr('data-dismiss', 'modal');//Commented For Email Update
+        $("#successModel").modal('show');
+    }
+
+    function failureModal() {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html('Some error occurred!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function requiredModal(text) {
+        $('#modalTitle').html('Required');
+        $('#modalBody').html(text + '!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    $("#btnSubmit").on('click', function (e) {
+        e.preventDefault();
+
+        if (($("#chkInternal").prop("checked") == false)) {
+            requiredModal("Please select Employee Type");
+            return false;
+        }
+        var name = document.getElementById("txtEmployeeName").value;
+        if (name == "") {
+            requiredModal("Please enter the Name of Employee");
+            return false;
+        }
+
+        var employeeCodelen = $("#txtEmployeeCode").val().length;
+        if (employeeCodelen == 0 || employeeCodelen < 0) {
+            requiredModal('Please enter a valid Employee Code');
+            return false;
+        }
+
+        var department = document.getElementById("txtDepartment").value;
+        if (department == "") {
+            requiredModal("Please enter the Department");
+            return false;
+        }
+
+        if (($("#chkQ1Yes").prop("checked") == false) && ($("#chkQ1No").prop("checked") == false)) {
+            requiredModal("Please tick Yes or No for option a.");
+            return false;
+        }
+
+        if (($("#chkQ2Yes").prop("checked") == false) && ($("#chkQ2No").prop("checked") == false)) {
+            requiredModal("Please tick Yes or No for option b.");
+            return false;
+        }
+        if (($("#chkQ3Yes").prop("checked") == false) && ($("#chkQ3No").prop("checked") == false)) {
+            requiredModal("Please tick Yes or No for option c.");
+            return false;
+        }
+
+        if (($("#chkQ1No").prop("checked") == false) && ($("#chkQ2No").prop("checked") == false) && ($("#chkQ3No").prop("checked") == false)) {
+            requiredModal("Please tick Yes or No for option c.");
+            return false;
+        }
+        $("#pageLoader").removeClass('invisible');
+        var form = $("#COIForm").serialize();
+        $.ajax({
+            url: '/ConflictOfInterest/CreateConflictOfInterestRequest',
+            type: 'POST',
+            data: form,
+            cache: false,
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data[0].Value == 1) {
+                    console.log(data);
+                    $("#pageLoader").addClass('invisible');
+                    successModal(data[1].Value);
+                    $("#COIForm").trigger("reset");
+                }
+                else {
+                    failureModal();
+                    $("#pageLoader").addClass('invisible');
+                }
+
+            }),
+            error: (function (data) {
+                failureModal();
+                $("#pageLoader").addClass('invisible');
+            })
+        })
+    });
+
+    function saveResponse(text) {
+        var status = '', comment = '';
+        comment = $("#comment-" + text).val();
+        switch (text) {
+            case 'approve': {
+                status = 'Approved';
+                break;
+            }
+            case 'reject': {
+                status = 'Rejected';
+                if (comment == '') {
+                    validityModal(text);
+                    return;
+                }
+                break;
+            }
+            case 'enquire': {
+                status = 'Enquired';
+                if (comment == '') {
+                    validityModal(text);
+                    return;
+                }
+                break;
+            }
+        }
+        spinner.show();
+        $.ajax({
+            url: '/List/SaveResponse',
+            type: 'POST',
+            data: { response: status, appRowId: appRowId, comment: comment, approvalType: approvalType },
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data == 1) {
+                    successModal(text);
+                    setTimeout(FilterMyTasks, 5000)
+                    spinner.hide();
+                }
+                else {
+                    failureModal();
+                    spinner.hide();
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+                spinner.hide();
+            })
+        })
+
+        return false;
+    }
+
+    function validityModal(txt) {
+        if (txt == 'reject') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for rejecting the form');
+        }
+        else if (txt == 'enquire') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for enquiring the form');
+        }
+    }
+
+    function redirectUser() {
+        window.location = '/Dashboard';
+    }
+
+    // For Email Update
+    $("#modalOkButton").on('click', function () {
+        ////
+
+        if (FlagRedirect != null) {
+            spinner.show();
+            $.ajax({
+                url: '/EmailService/FormStatus',
+                type: 'POST',
+                data: { dataRowId: RowId, formID: formID },
+                dataType: 'JSON',
+                success: (function (data) {
+                    if (data.Result == 1) {
+                        spinner.hide();
+                        window.location = "../Dashboard";
+                    }
+                    else {
+                        spinner.hide();
+                        window.location = "../Dashboard";
+                    }
+
+                }),
+                error: (function (data) {
+                    spinner.hide();
+                    window.location = "../Dashboard";
+                })
+            })
+        }
+
+
+    });
+    // For Email Update
+
+
+</script>
+

@@ -1,0 +1,2812 @@
+﻿@{
+    ViewBag.Title = "Gifts, Invitation and Compliance Consultation Form";
+    int FormId = 0, AppRowId = 0, ApprovalType = 0;
+    bool IsNewMode = true, IsEditMode = false, IsViewMode = false;
+    var currentUser = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    List<Skoda_DCMS.Models.ApprovalDataModel> appList = new List<Skoda_DCMS.Models.ApprovalDataModel>();
+    string disabled = "";
+    Skoda_DCMS.Models.GiftsInvitationData GAIF = null;
+    int? tableCount = 0;
+    var CurrentUserDesgn = "";
+    long? CurrentUserLevel = 0;
+    var GRCUser = "Finance/IT/Legal(GRC)";
+    if (ViewBag != null && !ViewBag.IsNewMode)
+    {
+        IsNewMode = ViewBag.IsNewMode;
+        IsEditMode = ViewBag.IsEditMode;
+        IsViewMode = ViewBag.IsViewMode;
+        disabled = IsViewMode ? "disabled" : "";
+        GAIF = ViewBag.Model.one[0] as Skoda_DCMS.Models.GiftsInvitationData;
+        tableCount = GAIF?.QuestionData?.Count();
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        appList = ViewBag.Model?.three as List<Skoda_DCMS.Models.ApprovalDataModel>;
+        CurrentUserDesgn = appList?.Where(x => x.ApproverUserName == currentUser.UserName).Select(x => x.Designation).FirstOrDefault();
+        CurrentUserLevel = appList?.Where(x => x.ApproverUserName == currentUser.UserName && x.ApproverStatus == "Pending").Select(x => x.Level).FirstOrDefault();
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+        if (IsViewMode)
+        {
+            var Ap = appList?.Where(x =>
+                x.ApproverUserName.ToLower() == currentUser.UserName.ToLower()
+                && x.ApproverStatus.ToLower() == "pending"
+            ).FirstOrDefault();
+        }
+    }
+
+    //var apprfrmExternalAffairs = GAIF?.AttachmentFiles?.Attachments?.Count > 0 ? GAIF.AttachmentFiles.Attachments.Find(x => Path.GetFileNameWithoutExtension(x.FileName).Contains("File1_")) : null;
+
+    var otherDocument = GAIF?.AttachmentFiles?.Attachments?.Count > 0 ? GAIF.AttachmentFiles.Attachments[0] : null;
+
+
+}
+
+<style>
+
+    .hide {
+        display: none;
+    }
+    /*New design css start here*/
+    .astColor {
+        color: red;
+    }
+
+    .textTrans {
+        width: 100%;
+        max-width: 99%;
+        border-radius: 5px;
+        margin-right: 0px;
+        border: 1px solid !important;
+    }
+
+    .empDetailsBg {
+        background-color: #fffbef;
+    }
+
+    #accordion select {
+        color: #000;
+        width: 100% !important;
+        height: 45px;
+        background-color: #FFFFFF;
+        border: 1px solid #BFBFBF;
+        box-sizing: border-box;
+        border-radius: 5px;
+        background-image: url(data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>);
+        background-repeat: no-repeat;
+        background-position: right .75rem center;
+        background-size: 16px 12px;
+    }
+
+    #accordion input[type='text'] {
+        width: 100% !important;
+        max-width: 100%;
+        height: 45px;
+        background-color: #FFFFFF;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px !important;
+    }
+
+    #accordion input[type='date'] {
+        width: 100% !important;
+        max-width: 100%;
+        height: 45px;
+        background-color: #FFFFFF;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px;
+    }
+
+    #accordion input[type='time'] {
+        height: 45px;
+    }
+
+    #accordion label {
+        font-size: 16px;
+        line-height: 22px;
+        font-weight: 600;
+        color: #201F1F;
+    }
+
+    #accordion table tr td {
+        font-size: 16px;
+        line-height: 19px;
+        color: #201F1F;
+        background-color: white;
+    }
+
+    #accordion label {
+        display: block;
+    }
+
+    #accordion .card-header {
+        background: rgb(4 59 100) !important;
+        border-radius: 5px 5px 0px 0px;
+        position: relative;
+        margin-top: 15px;
+    }
+
+        #accordion .card-header.collapsed h5:after {
+            content: '+';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        #accordion .card-header h5:after {
+            content: '-';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+    #accordion h5 button {
+        font-size: 18px;
+        line-height: 22px;
+        /* identical to box height */
+        padding-left: 0px;
+        display: flex;
+        align-items: center;
+        text-transform: uppercase;
+        /* Text_white */
+
+        color: #FFFFFF;
+    }
+
+        #accordion h5 button:focus {
+            box-shadow: none;
+        }
+
+    .empDetailsFields label {
+        display: block !important;
+        margin-bottom: 0px;
+    }
+
+    .empDetailsFields .row label {
+        display: block;
+        margin-bottom: 0px;
+    }
+
+        .empDetailsFields .row label:nth-child(1) {
+            font-style: normal;
+            font-weight: normal !important;
+            font-size: 12px;
+            line-height: 18px;
+            color: #A9A9A9 !important;
+        }
+
+        .empDetailsFields .row label:nth-child(2) {
+            font-style: normal;
+            font-weight: normal;
+            font-size: 18px;
+            line-height: 22px;
+            color: #201F1F;
+        }
+
+    .firstLastName {
+        font-style: normal;
+        font-weight: normal;
+        font-size: 20px;
+        line-height: 24px;
+        /* identical to box height */
+
+        display: flex;
+        align-items: center;
+        color: #201F1F;
+    }
+
+    .submit-btn {
+        background: #3D3D3D;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #FFFFFF;
+        border-color: transparent !important;
+    }
+
+    .cancl-btn {
+        background: #FAE99B;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        border-color: transparent !important;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #212221;
+        margin-left: 10px;
+    }
+
+
+
+
+    .card-footer {
+        display: flex;
+        background-color: transparent !important;
+    }
+
+    .photo-form {
+        width: 100%;
+    }
+
+    .ui-front {
+        z-index: 9999999 !important;
+    }
+
+    /* NEW UI CSS END*/
+
+
+    .showBorder {
+        border: 1px solid #dee2e6;
+    }
+
+    .multiselect {
+        height: 47px;
+        margin-top: -1px;
+    }
+    /*Animation CSS Starts*/
+
+    div.input-block {
+        position: relative;
+    }
+
+        div.input-block input {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 188px;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block textarea {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 100%;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            background-color: #fff;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block span.placeholder {
+            position: absolute;
+            margin: 17px 0;
+            padding: 0 4px;
+            font-family: Roboto, sans-serif;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            top: -6px;
+            left: 15px;
+            transition: all 0.2s;
+            transform-origin: 0% 0%;
+            background: none;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+    .question_span {
+        width: 116% !important;
+        font-size: 15px !important;
+    }
+
+    div.input-block textarea:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: #fff !important;
+    }
+
+    div.input-block textarea:valid + span.placeholder,
+    div.input-block textarea:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+    }
+
+    div.input-block input:valid + span.placeholder,
+    div.input-block input:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: rgb(219,238,213);
+    }
+
+
+    div.input-block input.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: rgb(219,238,213);
+    }
+
+    div.input-block input:read-only + span.placeholder,
+    div.input-block input:read-only + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background: rgb(219,238,213);
+    }
+
+
+    div.inputSelect span.placeholder {
+        position: absolute;
+        margin: 17px 0;
+        padding: 0 4px;
+        font-family: Roboto, sans-serif;
+        color: #000;
+        display: flex;
+        align-items: center;
+        font-size: 1rem;
+        top: -6px;
+        left: 15px;
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+        background: none;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    div.inputSelect select:focus + span.placeholder {
+        transform: scale(0.8) translateY(-30px);
+        background: rgb(219,238,213);
+        z-index: 9;
+    }
+
+    div.inputSelect select:not([value=""]):valid + span.placeholder {
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+    }
+
+
+
+    div.input-block input:focus + span.placeholder {
+        color: #284B63;
+    }
+
+    .breadcrumb {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+        padding: 1rem 1rem 0;
+        margin-bottom: 0;
+        list-style: none;
+        background-color: #FFFFFF;
+        border-radius: .25rem;
+    }
+
+    body.nav-sm .container.body .left_col {
+        width: 63px;
+        padding: 0;
+        position: fixed;
+        height: 100%;
+        z-index: 8;
+    }
+
+    .card {
+        position: relative;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        min-width: 0;
+        word-wrap: break-word;
+        background-color: #fff;
+        background-clip: border-box;
+        border: 0px;
+        border-radius: .25rem;
+    }
+
+    .dropdown-toggle::after {
+        display: none;
+        width: 0;
+        height: 0;
+        margin-left: .255em;
+        vertical-align: .255em;
+        content: "";
+        border-top: .3em solid;
+        border-right: .3em solid transparent;
+        border-bottom: 0;
+        border-left: .3em solid transparent;
+    }
+
+    input.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213);
+    }
+
+    inputSelect.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213) !important;
+    }
+
+    select.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background-color: rgb(219,238,213) !important;
+        z-index: 9;
+    }
+
+    textarea.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    .TransView {
+        background-color: white !important;
+    }
+
+    @@media only screen and (min-width: 992px) {
+        div .input-block span.placeholder {
+            font-size: 15px;
+        }
+
+        div.inputSelect span.placeholder {
+            font-size: 14px;
+        }
+    }
+
+    input[type='date'].spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    .showBorder {
+        border: 1px solid #dee2e6;
+    }
+
+    .wField {
+        width: 233px !important;
+        margin-left: 10px;
+    }
+
+    @@-moz-document url-prefix() {
+        input[type=time]::-ms-clear {
+            display: none;
+        }
+    }
+
+    .datetime-reset-button {
+        display: none !important;
+    }
+
+    .forShoppingCart {
+        margin-left: 14% !important;
+    }
+
+    .btn-group {
+        display: block !important;
+    }
+
+    #accordion label {
+        display: inline-block !important;
+    }
+
+
+    .custom-select:focus {
+        box-shadow: none !important;
+        border-color: none !important;
+    }
+
+    #addSoftwarebtn td {
+        border-top: none !important;
+    }
+
+    #locationBody select {
+        background-color: #fff !important;
+    }
+
+    #loader {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        
+        z-index: 10000;
+    }
+</style>
+
+
+
+<div class="container">
+    <form id="GAIForm" method="post">
+        <div class="main_container">
+            <div class="right_col bg-transparent" role="main">
+
+                <div class="">
+                    <div class="breadcrumb-container height-space">
+                        <div>
+                            @if (IsEditMode || IsViewMode)
+                            {
+                                <div>
+                                    <input type="hidden" id="FormId" name="FormId" value="@(FormId)" />
+                                    <input type="hidden" id="FormSrId" name="FormSrId" value="@(GAIF.Id)" />
+                                    <input type="hidden" id="AppRowId" name="AppRowId" value="@(AppRowId)" />
+                                    <input type="hidden" name="QuestionDataCurr" id="QuestionDataCurr" value="@(GAIF.QuestionData.Count)" />
+                                </div>
+                            }
+                            <ol class="breadcrumb">
+                                <li>
+                                    <a href="/Dashboard?formName=GAIF">
+                                        Dashboard
+                                    </a>
+                                </li>
+                                <li>
+                                    Gifts, Invitation and Compliance Consultation Form
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                    <div class="row breadcrumb-container table-bordered  mr-1 ml-1" style="background-color: rgb(219,238,213) !important; ">
+                        <div class="col-md-2 col-lg-2">
+                            <span class="placeholder">Date : @(IsViewMode || IsEditMode ? (Convert.ToDateTime(appList.FirstOrDefault().FormId.CreatedDate).ToShortDateString()) : DateTime.Now.ToShortDateString())</span>
+                        </div>
+                        <div class="col-md-8 col-lg-8 mt-2 mb-1 form-heading" style="text-align:center; margin-top:5px">
+                            <span>Gifts, Invitation and Compliance Consultation Form</span>
+                        </div>
+                        <div class="col-md-2 col-lg-2">
+                            @if (IsViewMode || IsEditMode)
+                            {
+                                <span class="placeholder"> Form Id : @(IsViewMode || IsEditMode ? ("GAIF" + FormId ?? "") : "" )</span>
+                            }
+                        </div>
+                    </div>
+
+                </div>
+                <div class="heading d-none" id="headingErr">
+                    <h1 id="" class="info-header">Following fields are mandatory. Please fill in information for<br /></h1>
+                    <div id="add_to_me" class="header-list" style="color:red;"></div>
+                </div>
+
+                @* Submitter Section *@
+                @{
+                    Html.RenderPartial("_NewSubmitterDetailsWithModel", (ViewBag as object));
+                }
+
+                @* Applicant Section *@
+                @{
+                    Html.RenderPartial("_NewApplicantDetailsWithModel", (ViewBag as object));
+                }
+
+                @* Transaction Section *@
+
+                <div id="accordion">
+                    <div class="card">
+                        <div class="card-header" id="headingFour" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                            <h5 class="mb-0">
+                                <button type="button" class="btn btn-link" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                                    <img src="~/assets/img/transactionIcon.svg" width="24" height="24" class="mr-2">Transaction Fields
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseFour" class="collapse show" aria-labelledby="headingFour" style="">
+                            @if (IsNewMode)
+                            {
+                                <div class="card-body">
+                                    <div class="row w-100">
+                                        <div class="row w-100">
+                                            <div class="form-group col-md-2 d-flex align-items-center col-lg-2 col-12">
+                                                <label id="lblRequestType" class="f-600" style="margin-left:15px; position: relative; top:10px;">
+                                                    Request Type<span class="astColor">*</span>
+                                                </label>
+                                            </div>
+
+                                            <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                                <label class="checkbox-container">
+                                                    <label class="f-600">Gift</label>
+                                                    <input type="checkbox" class="chk_requestType" name="chkGift" id="chkGift" value="Gift">
+
+                                                    <span class="checkmark"></span>
+                                                </label>
+                                            </div>
+                                            <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                <label class="checkbox-container">
+                                                    <label class="f-600">Invitation</label>
+                                                    <input type="checkbox" class="chk_requestType" name="chkInvitation" id="chkInvitation" value="Invitation">
+
+                                                    <span class="checkmark"></span>
+                                                </label>
+                                            </div>
+                                            <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                                <label class="checkbox-container">
+                                                    <label class="f-600">Consultation</label>
+                                                    <input type="checkbox" class="chk_requestType" name="Chk_requestType" id="chkConsultation" value="Consultation">
+
+                                                    <span class="checkmark"></span>
+                                                </label>
+                                            </div>
+                                            <input type="hidden" name="RequestType" id="chkRequestTypeVal" />
+                                        </div>
+                                    </div>
+                                    <div class="row w-100 giving_Section">
+                                        <input type="hidden" name="Transaction" id="chkTransactionVal" />
+                                        <div class="row w-100">
+                                            <div class="form-group col-md-2 d-flex align-items-center col-lg-2 col-12">
+                                                <label id="lbltran" class="f-600" style="margin-left:15px; position: relative; top:10px;">
+                                                    Transaction<span class="astColor">*</span>
+                                                </label>
+                                            </div>
+
+                                            <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                                <label class="checkbox-container">
+                                                    <label class="f-600">Giving</label>
+                                                    <input type="checkbox" class="chk_tran" name="chkTransaction" id="chkGiving" value="Giving" onclick="getTran()">
+
+                                                    <span class="checkmark"></span>
+                                                </label>
+                                            </div>
+                                            <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                <label class="checkbox-container">
+                                                    <label class="f-600">Receiving</label>
+                                                    <input type="checkbox" class="chk_tran" name="chkTransaction" id="chkReceiving" value="Receiving" onclick="getTran()">
+
+                                                    <span class="checkmark"></span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="giving_Section hide">
+                                        <div class="row w-100 giving_questions">
+                                            <div class="w-100">
+                                                <input type="hidden" name="IsGiftOrInviteToPublicOfficial" id="chkGiftGivenVal" />
+                                                <div class="form-group col-md-4 d-flex align-items-center col-lg-4 col-12">
+                                                    <label id="lblgiftGivenNo" class="f-600" style="position: relative; top:10px;">
+                                                        Is Gift/Invitation given to public official?<span class="astColor">*</span>
+                                                    </label>
+                                                </div>
+                                                <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Yes</label>
+                                                        <input type="checkbox" class="chkgiftGiven" name="chkgiftGivenYes" id="chkgiftGivenYes" value="Yes">
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                                <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">No</label>
+                                                        <input type="checkbox" class="chkgiftGiven" name="chkgiftGivenNo" id="chkgiftGivenNo" value="No">
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            @*<div class="w-100 sec_quest hide">
+                                                    <div class="form-group col-md-4 d-flex align-items-center col-lg-4 col-12">
+                                                        <label id="lblRequestType" class="f-600" style="position: relative; top:10px;">
+                                                            Please provide approval from external affairs for providing Gifts / Invitation?<span class="astColor">*</span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-group col-md-4 d-flex align-items-end col-lg-4 col-12">
+                                                        <input type="file" name="fileToUpload" id="fileToUpload">
+                                                    </div>
+                                                </div>*@
+                                        </div>
+                                        <div class="row">
+                                            <div class="form-group col-md-12 d-flex align-items-center col-lg-12 col-12">
+                                                <label id="lblNameBusiness" class="f-600" style="position: relative; top:10px;">
+                                                    Name of Business partner/ Other individual providing the gift/invitation?<span class="astColor">*</span>
+                                                </label>
+                                            </div>
+                                            <div class="form-group col-md-12 col-lg-12 col-12 input-block">
+                                                <textarea placeholder="Name, Relation and Other details" class="w-100 txtDisable" name="NameRelationOtherDet" id="gift_other_details"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group input-block">
+                                                    <input type="text" class="w-100 txtDisable ui-autocomplete-input" id="frequency_of_receipt" name="FrequencyOfGiftsOrInvitationfrm" autocomplete="off">
+                                                    <span id="lblFreq" class="placeholder question_span" style="background-color: #fff;">Frequency of receipt of gifts/invitation from the same business partner in a year?<span class="astColor">*</span></span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group input-block">
+                                                    <input type="text" class="w-100 txtDisable ui-autocomplete-input" name="ApproxValueOfGiftsInvt" id="approximate_value" autocomplete="off">
+                                                    <span id="lblApp" class="placeholder question_span" style="background-color: #fff;">Approximate value of gifts/invitation (How is the value estimated) ?<span class="astColor">*</span></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group input-block">
+                                                    <input type="text" class="w-100 txtDisable ui-autocomplete-input" name="ReasonForGiftingInvitation" id="reason_for_gifting" autocomplete="off">
+                                                    <span id="lblResGift" class="placeholder question_span" style="background-color: #fff;">Reason for gifting/invitation ?<span class="astColor">*</span></span>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div class="row w-100 receiving_questions">
+                                            <div class="row w-100 col-md-6">
+                                                <input type="hidden" name="GiftIsAcceptedRefused" id="chkGiftacceptedVal" />
+                                                <div class="row w-100">
+                                                    <div class="form-group col-md-4 d-flex align-items-center col-lg-4 col-12">
+                                                        <label id="lblChkgiftaccepted" class="f-600" style="margin-left:15px; position: relative; top:10px;">
+                                                            Gift is accepted/ Refused ?<span class="astColor">*</span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                                        <label class="checkbox-container">
+                                                            <label class="f-600">Yes</label>
+                                                            <input type="checkbox" class="chkgiftaccepted" name="chkacceptedYes" id="chkacceptedYes" value="Yes">
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                        <label class="checkbox-container">
+                                                            <label class="f-600">No</label>
+                                                            <input type="checkbox" class="chkgiftaccepted" name="chkacceptedNo" id="chkacceptedNo" value="No">
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="col-md-6" id="divReasonOfAccept">
+                                                        <div class="w-100">
+                                                            <div class="form-group input-block">
+                                                                <input type="text" class="w-100 txtDisable ui-autocomplete-input" name="ReasonGiftIsAcceptedRefused" id="reason_of_acceptance" autocomplete="off">
+                                                                <span id="lblResAccRef" class="placeholder question_span" style="background-color: #fff;">Reason of acceptance/ refusal of gift/ Invitation<span class="astColor">*</span></span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="receiving_Section hide">
+                                        <div>
+                                            <label class="f-600" style="margin-left:15px; position: relative; top:10px;" id="lblQuestion">Question</label>
+                                        </div>
+                                        <table class="mainTbl table table-border form-table-container-2">
+                                            <tr>
+                                                <td class="bt-0 bb-0 pl-0 pr-0">
+                                                    <table class="w-100 mx-auto table table-border form-border text-center">
+
+                                                        <thead class="form-head-1" style="margin-left:inherit !important;">
+                                                            <tr>
+                                                                <th>Sr. No.</th>
+                                                                <th>Question</th>
+                                                                @if (IsNewMode || IsEditMode)
+                                                                {
+                                                                    <th></th>
+                                                                }
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody class="form-border tableUser" id="usersBody">
+                                                        </tbody>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                            @if (IsNewMode || IsEditMode)
+                                            {
+
+                                                <tr align="right" id="addSoftwarebtn">
+                                                    <td class="">
+                                                        <button type="button" class="btn btn-sm submit-btn d-flex float-right mb-2 bl-1 " onclick="add_new_question()">
+                                                            + Add
+                                                        </button>
+                                                        <input type="hidden" name="totalrows" id="totalrows" />
+                                                    </td>
+                                                </tr>
+
+                                            }
+                                        </table>
+
+                                    </div>
+                                    <div class="row w-100">
+                                        <div class="form-group d-flex align-items-center col-12">
+                                            <label id="lbldocUpld" class="f-600" style="position: relative; top:10px;">
+                                                <span class="placeholder" style="background-color: #fff;">Document Upload (Optional)</span>
+                                            </label>
+                                        </div>
+
+                                        <div class="form-group col-md-4 d-flex align-items-end col-lg-4 col-12">
+                                            <input type="file" name="docUpload" id="docUpload">
+                                        </div>
+                                    </div>
+
+                                    <div class="input-block">
+                                        <textarea name="BusinessNeed" id="txtBusiness" cols="60" rows="6" maxlength="500" class="w-100 spanUpperSide inpDisable"></textarea>
+                                        <span class="placeholder" style="background-color: #fff;">Business justification(Max. 500)<span style="color:red;">*</span></span>
+                                    </div>
+                                </div>
+                            }
+                            else if (IsEditMode)
+                            {
+                                <div class="card-body">
+                                    <div class="row w-100">
+                                        <div class="row w-100">
+                                            <div class="form-group col-md-2 d-flex align-items-center col-lg-2 col-12">
+                                                <label id="lblRequestType" class="f-600" style="margin-left:15px; position: relative; top:10px;">
+                                                    Request Type<span class="astColor">*</span>
+                                                </label>
+                                            </div>
+                                            @if (GAIF.RequestType == "Gift")
+                                            {
+                                                <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Gift</label>
+                                                        <input type="checkbox" class="chk_requestType" name="chkGift" id="chkGift" checked value="Gift">
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Gift</label>
+                                                        <input type="checkbox" class="chk_requestType" name="chkGift" id="chkGift" value="Gift">
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+
+                                            @if (GAIF.RequestType == "Invitation")
+                                            {
+                                                <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Invitation</label>
+                                                        <input type="checkbox" class="chk_requestType" checked name="chkInvitation" id="chkInvitation" value="Invitation">
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Invitation</label>
+                                                        <input type="checkbox" class="chk_requestType" name="chkInvitation" id="chkInvitation" value="Invitation">
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            @if (GAIF.RequestType == "Consultation")
+                                            {
+                                                <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Consultation</label>
+                                                        <input type="checkbox" class="chk_requestType" checked name="Chk_requestType" id="chkConsultation" value="Consultation">
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Consultation</label>
+                                                        <input type="checkbox" class="chk_requestType" name="Chk_requestType" id="chkConsultation" value="Consultation">
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            <input type="hidden" name="RequestType" id="chkRequestTypeVal" value="@GAIF.RequestType" />
+                                        </div>
+                                    </div>
+                                    <div class="row w-100 giving_Section">
+                                        <input type="hidden" name="Transaction" id="chkTransactionVal" value="@GAIF.Transaction" />
+                                        <div class="row w-100">
+                                            <div class="form-group col-md-2 d-flex align-items-center col-lg-2 col-12">
+                                                <label id="lbltran" class="f-600" style="margin-left:15px; position: relative; top:10px;">
+                                                    Transaction<span class="astColor">*</span>
+                                                </label>
+                                            </div>
+                                            @if (GAIF.Transaction == "Giving")
+                                            {
+                                                <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Giving</label>
+                                                        <input type="checkbox" class="chk_tran" checked name="chkTransaction" id="chkGiving" value="Giving">
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Giving</label>
+                                                        <input type="checkbox" class="chk_tran" name="chkTransaction" id="chkGiving" value="Giving">
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            @if (GAIF.Transaction == "Receiving")
+                                            {
+                                                <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Receiving</label>
+                                                        <input type="checkbox" class="chk_tran" checked name="chkTransaction" id="chkReceiving" value="Receiving">
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Receiving</label>
+                                                        <input type="checkbox" class="chk_tran" name="chkTransaction" id="chkReceiving" value="Receiving">
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="giving_Section">
+                                        <div class="row w-100 giving_questions">
+                                            <div class="w-100">
+                                                <input type="hidden" name="IsGiftOrInviteToPublicOfficial" id="chkGiftGivenVal" value="@GAIF.IsGiftOrInviteToPublicOfficial" />
+                                                <div class="form-group col-md-4 d-flex align-items-center col-lg-4 col-12">
+                                                    <label id="lblgiftGivenNo" class="f-600" style="position: relative; top:10px;">
+                                                        Is Gift/Invitation given to public official?<span class="astColor">*</span>
+                                                    </label>
+                                                </div>
+                                                @if (GAIF.IsGiftOrInviteToPublicOfficial == "Yes")
+                                                {
+                                                    <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                                        <label class="checkbox-container">
+                                                            <label class="f-600">Yes</label>
+                                                            <input type="checkbox" class="chkgiftGiven" checked name="chkgiftGivenYes" id="chkgiftGivenYes" value="Yes">
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                                        <label class="checkbox-container">
+                                                            <label class="f-600">Yes</label>
+                                                            <input type="checkbox" class="chkgiftGiven" name="chkgiftGivenYes" id="chkgiftGivenYes" value="Yes">
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                    </div>
+                                                }
+                                                @if (GAIF.IsGiftOrInviteToPublicOfficial == "No")
+                                                {
+                                                    <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                        <label class="checkbox-container">
+                                                            <label class="f-600">No</label>
+                                                            <input type="checkbox" class="chkgiftGiven" checked name="chkgiftGivenNo" id="chkgiftGivenNo" value="No" onclick="getChkgiftGiven()">
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                        <label class="checkbox-container">
+                                                            <label class="f-600">No</label>
+                                                            <input type="checkbox" class="chkgiftGiven" name="chkgiftGivenNo" id="chkgiftGivenNo" value="No" onclick="getChkgiftGiven()">
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                    </div>
+                                                }
+                                            </div>
+                                            @*<div class="w-100 sec_quest">
+                                                    <div class="form-group col-md-4 d-flex align-items-center col-lg-4 col-12">
+                                                        <label id="lblRequestType" class="f-600" style="position: relative; top:10px;">
+                                                            Please provide approval from external affairs for providing Gifts / Invitation?<span class="astColor">*</span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-group col-md-4 d-flex align-items-end col-lg-4 col-12">
+                                                        <input type="file" name="fileToUpload" id="fileToUpload">
+
+                                                        @if (apprfrmExternalAffairs != null)
+                                                        {
+                                                            <input type="hidden" id="attachedfile" name="attachedfile" value="@System.Configuration.ConfigurationManager.AppSettings["SharepointSiteURL"]@Server.HtmlEncode(apprfrmExternalAffairs.ServerRelativeUrl)" />
+                                                            <input type="hidden" id="attachedfileName" name="attachedfileName" value="@apprfrmExternalAffairs.FileName" />
+                                                            <a href="@System.Configuration.ConfigurationManager.AppSettings["SharepointSiteURL"]@Server.HtmlEncode(apprfrmExternalAffairs.ServerRelativeUrl)" id="attachedfileLink" download=@apprfrmExternalAffairs.FileName target="_blank">@apprfrmExternalAffairs.FileName </a>
+                                                        }
+
+                                                    </div>
+                                                </div>*@
+                                        </div>
+                                        <div class="row">
+                                            <div class="w-100">
+                                                <div class="form-group col-md-12 d-flex align-items-center col-lg-12 col-12">
+                                                    <label id="lblNameBusiness" class="f-600" style="position: relative; top:10px;">
+                                                        Name of Business partner/ Other individual providing the gift/invitation ?<span class="astColor">*</span>
+                                                    </label>
+                                                </div>
+                                                <div class="form-group col-md-12 col-lg-12 col-12 input-block">
+                                                    <textarea placeholder="Name, Relation and Other details" class="w-100 txtDisable" name="NameRelationOtherDet" id="gift_other_details">@GAIF.NameRelationOtherDet</textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group input-block">
+                                                    <input type="text" class="w-100 txtDisable ui-autocomplete-input" id="frequency_of_receipt" name="FrequencyOfGiftsOrInvitationfrm" autocomplete="off" value="@GAIF.FrequencyOfGiftsOrInvitationfrm">
+                                                    <span id="lblFreq" class="placeholder question_span" style="background-color: #fff;">Frequency of receipt of gifts/invitation from the same business partner in a year?<span class="astColor">*</span></span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group input-block">
+                                                    <input type="text" class="w-100 txtDisable ui-autocomplete-input" name="ApproxValueOfGiftsInvt" id="approximate_value" autocomplete="off" value="@GAIF.ApproxValueOfGiftsInvt">
+                                                    <span id="lblApp" class="placeholder question_span" style="background-color: #fff;">Approximate value of gifts/invitation (How is the value estimated) ?<span class="astColor">*</span></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group input-block">
+                                                    <input type="text" class="w-100 txtDisable ui-autocomplete-input" name="ReasonForGiftingInvitation" id="reason_for_gifting" autocomplete="off" value="@GAIF.ReasonForGiftingInvitation">
+                                                    <span id="lblResGift" class="placeholder question_span" style="background-color: #fff;">Reason for gifting/invitation ?<span class="astColor">*</span></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row receiving_questions">
+                                            <div class="col-md-6">
+                                                <input type="hidden" name="GiftIsAcceptedRefused" id="chkGiftacceptedVal" value="@GAIF.GiftIsAcceptedRefused " />
+                                                <div class="row w-100">
+                                                    <div class="form-group col-md-4 d-flex align-items-center col-lg-4 col-12">
+                                                        <label id="lblChkgiftaccepted" class="f-600" style="margin-left:15px; position: relative; top:10px;">
+                                                            Gift is accepted/ Refused ?<span class="astColor">*</span>
+                                                        </label>
+                                                    </div>
+                                                    @if (GAIF.GiftIsAcceptedRefused == "Yes")
+                                                    {
+                                                        <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                                            <label class="checkbox-container">
+                                                                <label class="f-600">Yes</label>
+                                                                <input type="checkbox" checked class="chkgiftaccepted" name="chkacceptedYes" id="chkacceptedYes" value="Yes">
+                                                                <span class="checkmark"></span>
+                                                            </label>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                                            <label class="checkbox-container">
+                                                                <label class="f-600">Yes</label>
+                                                                <input type="checkbox" class="chkgiftaccepted" name="chkacceptedYes" id="chkacceptedYes" value="Yes">
+                                                                <span class="checkmark"></span>
+                                                            </label>
+                                                        </div>
+                                                    }
+                                                    @if (GAIF.GiftIsAcceptedRefused == "No")
+                                                    {
+                                                        <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                            <label class="checkbox-container">
+                                                                <label class="f-600">No</label>
+                                                                <input type="checkbox" class="chkgiftaccepted" checked name="chkacceptedNo" id="chkacceptedNo" value="No">
+                                                                <span class="checkmark"></span>
+                                                            </label>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                            <label class="checkbox-container">
+                                                                <label class="f-600">No</label>
+                                                                <input type="checkbox" class="chkgiftaccepted" name="chkacceptedNo" id="chkacceptedNo" value="No">
+                                                                <span class="checkmark"></span>
+                                                            </label>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6" id="divReasonOfAccept">
+                                                <div class="">
+                                                    <div class="form-group input-block">
+                                                        <input type="text" class="w-100 txtDisable ui-autocomplete-input" name="ReasonGiftIsAcceptedRefused" id="reason_of_acceptance" autocomplete="off" value="@GAIF.ReasonGiftIsAcceptedRefused ">
+                                                        <span id="lblResAccRef" class="placeholder question_span" style="background-color: #fff;">Reason of acceptance/ refusal of gift/ Invitation<span class="astColor">*</span></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="receiving_Section">
+                                        <div>
+                                            <label class="f-600" style="margin-left:15px; position: relative; top:10px;" id="lblQuestion">Question</label>
+                                        </div>
+
+                                        <table class="mainTbl table table-border form-table-container-2">
+                                            <tr>
+                                                <td class="bt-0 bb-0 pl-0 pr-0">
+                                                    <table class="w-100 mx-auto table table-border form-border text-center">
+
+                                                        <thead class="form-head-1" style="margin-left:inherit !important;">
+                                                            <tr>
+                                                                <th>Sr. No.</th>
+                                                                <th>Question</th>
+                                                                @if (IsNewMode || IsEditMode)
+                                                                {
+                                                                    <th></th>
+                                                                }
+                                                            </tr>
+                                                        </thead>
+                                                        @if (IsEditMode)
+                                                        {
+                                                            var count = 1;
+                                                            <tbody class="form-border tableUser" id="usersBody">
+                                                                @foreach (var item in GAIF.QuestionData)
+                                                                {
+
+                                                                    <tr id='@("row" + count)' class="tr_input">
+                                                                        <td class="sNo text-center">@count</td>
+                                                                        <td class="text-center">
+                                                                            <textarea class=" form-control txtDisable input-width-1 select-border emp-name-input inpValidateQuestion" cols="60" rows="2" maxlength="500" id='@("txtQuestion_"+count)' name="Question" onPaste="return false">@item.Question</textarea>
+                                                                        </td>
+                                                                        <td class="text-center" style="background-color:white; max-width:123px; vertical-align:central;">
+                                                                            <input class="remove-btn  remove align-center" type="image" src="~/assets/img/remove.png"
+                                                                                   alt="Remove" style="max-width: 85%; background-color: white; border:none;">
+                                                                        </td>
+
+                                                                    </tr>
+                                                                    count++;
+                                                                }
+
+                                                            </tbody>
+                                                        }
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                            @if (IsNewMode || IsEditMode)
+                                            {
+
+                                                <tr align="right" id="addSoftwarebtn">
+                                                    <td class="">
+                                                        <button type="button" class="btn btn-sm submit-btn d-flex float-right mb-2 bl-1 " onclick="add_new_question()">
+                                                            + Add
+                                                        </button>
+                                                        <input type="hidden" name="totalrows" id="totalrows" />
+                                                    </td>
+                                                </tr>
+
+                                            }
+                                        </table>
+
+                                    </div>
+                                    <div class="row w-100">
+                                        <div class="form-group d-flex align-items-center col-12">
+                                            <label id="lbldocUpld" class="f-600" style="margin-left:15px; position: relative; top:10px;">
+                                                <span class="placeholder">Document Upload (Optional)</span>
+                                            </label>
+                                        </div>
+
+                                        <div class="form-group d-flex align-items-end col-12">
+                                            <input type="file" name="docUpload" id="docUpload">
+
+                                            @if (otherDocument != null)
+                                            {
+                                                <input type="hidden" id="attachedfile1" name="attachedfile1" value="@System.Configuration.ConfigurationManager.AppSettings["SharepointSiteURL"]@Server.HtmlEncode(otherDocument.ServerRelativeUrl)" />
+                                                <input type="hidden" id="attachedfileName1" name="attachedfileName1" value="@otherDocument.FileName" />
+                                                <a href="@System.Configuration.ConfigurationManager.AppSettings["SharepointSiteURL"]@Server.HtmlEncode(otherDocument.ServerRelativeUrl)" id="attachedfileLink1" download=@otherDocument.FileName target="_blank">@otherDocument.FileName </a>
+                                            }
+                                        </div>
+                                    </div>
+
+                                    <div class="input-block">
+                                        <textarea name="BusinessNeed" id="txtBusiness" cols="60" rows="6" maxlength="500" class="w-100 spanUpperSide">@GAIF.BusinessNeed </textarea>
+                                        <span class="placeholder">Business justification(Max. 500)<span style="color:red;">*</span></span>
+                                    </div>
+                                </div>
+                            }
+                            else if (IsViewMode)
+                            {
+                                <div class="card-body">
+                                    <div class="row w-100">
+                                        <div class="row w-100">
+                                            <div class="form-group col-md-2 d-flex align-items-center col-lg-2 col-12">
+                                                <label id="lblRequestType" class="f-600" style="margin-left:15px; position: relative; top:10px;">
+                                                    Request Type<span class="astColor">*</span>
+                                                </label>
+                                            </div>
+                                            @if (GAIF.RequestType == "Gift")
+                                            {
+                                                <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Gift</label>
+                                                        <input type="checkbox" class="chk_requestType" disabled name="chkGift" id="chkGift" checked value="Gift">
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Gift</label>
+                                                        <input type="checkbox" class="chk_requestType" disabled name="chkGift" id="chkGift" value="Gift">
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+
+                                            @if (GAIF.RequestType == "Invitation")
+                                            {
+                                                <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Invitation</label>
+                                                        <input type="checkbox" class="chk_requestType" disabled checked name="chkInvitation" id="chkInvitation" value="Invitation">
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Invitation</label>
+                                                        <input type="checkbox" class="chk_requestType" disabled name="chkInvitation" id="chkInvitation" value="Invitation">
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            @if (GAIF.RequestType == "Consultation")
+                                            {
+                                                <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Consultation</label>
+                                                        <input type="checkbox" class="chk_requestType" disabled checked name="Chk_requestType" id="chkConsultation" value="Consultation">
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Consultation</label>
+                                                        <input type="checkbox" class="chk_requestType" disabled name="Chk_requestType" id="chkConsultation" value="Consultation">
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            <input type="hidden" name="RequestType" id="chkRequestTypeVal" value="@GAIF.RequestType" />
+                                        </div>
+                                    </div>
+                                    <div class="row w-100 giving_Section">
+                                        <input type="hidden" name="Transaction" id="chkTransactionVal" value="@GAIF.Transaction" />
+                                        <div class="row w-100">
+                                            <div class="form-group col-md-2 d-flex align-items-center col-lg-2 col-12">
+                                                <label id="lbltran" class="f-600" style="margin-left:15px; position: relative; top:10px;">
+                                                    Transaction<span class="astColor">*</span>
+                                                </label>
+                                            </div>
+                                            @if (GAIF.Transaction == "Giving")
+                                            {
+                                                <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Giving</label>
+                                                        <input type="checkbox" class="chk_tran" disabled checked name="chkTransaction" id="chkGiving" value="Giving">
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Giving</label>
+                                                        <input type="checkbox" class="chk_tran" disabled name="chkTransaction" id="chkGiving" value="Giving">
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            @if (GAIF.Transaction == "Receiving")
+                                            {
+                                                <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Receiving</label>
+                                                        <input type="checkbox" class="chk_tran" disabled checked name="chkTransaction" id="chkReceiving" value="Receiving">
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Receiving</label>
+                                                        <input type="checkbox" class="chk_tran" disabled name="chkTransaction" id="chkReceiving" value="Receiving">
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="giving_Section">
+                                        <div class="row w-100 giving_questions">
+                                            <div class="w-100">
+                                                <input type="hidden" name="IsGiftOrInviteToPublicOfficial" id="chkGiftGivenVal" value="@GAIF.IsGiftOrInviteToPublicOfficial" />
+                                                <div class="form-group col-md-4 d-flex align-items-center col-lg-4 col-12">
+                                                    <label id="lblgiftGivenNo" class="f-600" style="position: relative; top:10px;">
+                                                        Is Gift/Invitation given to public official?<span class="astColor">*</span>
+                                                    </label>
+                                                </div>
+                                                @if (GAIF.IsGiftOrInviteToPublicOfficial == "Yes")
+                                                {
+                                                    <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                                        <label class="checkbox-container">
+                                                            <label class="f-600">Yes</label>
+                                                            <input type="checkbox" class="chkgiftGiven" disabled checked name="chkgiftGivenYes" id="chkgiftGivenYes" value="Yes">
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                                        <label class="checkbox-container">
+                                                            <label class="f-600">Yes</label>
+                                                            <input type="checkbox" class="chkgiftGiven" disabled name="chkgiftGivenYes" id="chkgiftGivenYes" value="Yes">
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                    </div>
+                                                }
+                                                @if (GAIF.IsGiftOrInviteToPublicOfficial == "No")
+                                                {
+                                                    <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                        <label class="checkbox-container">
+                                                            <label class="f-600">No</label>
+                                                            <input type="checkbox" class="chkgiftGiven" disabled checked name="chkgiftGivenNo" id="chkgiftGivenNo" value="No" onclick="getChkgiftGiven()">
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                        <label class="checkbox-container">
+                                                            <label class="f-600">No</label>
+                                                            <input type="checkbox" class="chkgiftGiven" disabled name="chkgiftGivenNo" id="chkgiftGivenNo" value="No" onclick="getChkgiftGiven()">
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                    </div>
+                                                }
+                                            </div>
+                                            @*<div class="w-100 sec_quest">
+                                                    <div class="form-group col-md-4 d-flex align-items-end col-lg-4 col-12">
+                                                        @if (apprfrmExternalAffairs != null)
+                                                        {
+                                                            <input type="hidden" id="attachedfile" name="attachedfile" value="@System.Configuration.ConfigurationManager.AppSettings["SharepointSiteURL"]@Server.HtmlEncode(apprfrmExternalAffairs.ServerRelativeUrl)" />
+                                                            <input type="hidden" id="attachedfileName" name="attachedfileName" value="@apprfrmExternalAffairs.FileName" />
+                                                            <a href="@System.Configuration.ConfigurationManager.AppSettings["SharepointSiteURL"]@Server.HtmlEncode(apprfrmExternalAffairs.ServerRelativeUrl)" id="attachedfileLink" download=@apprfrmExternalAffairs.FileName target="_blank">@apprfrmExternalAffairs.FileName </a>
+                                                        }
+
+                                                    </div>
+                                                    <div class="form-group col-md-4 d-flex align-items-end col-lg-4 col-12">
+
+
+                                                    </div>
+                                                </div>*@
+                                        </div>
+                                        <div class="row">
+                                            <div class="w-100">
+                                                <div class="form-group col-md-12 d-flex align-items-center col-lg-12 col-12">
+                                                    <label id="lblNameBusiness" class="f-600" style="position: relative; top:10px;">
+                                                        Name of Business partner/ Other individual providing the gift/invitation ?<span class="astColor">*</span>
+                                                    </label>
+                                                </div>
+                                                <div class="form-group col-md-12 col-lg-12 col-12 input-block">
+                                                    <textarea placeholder="Name, Relation and Other details" class="w-100 txtDisable" name="NameRelationOtherDet" disabled id="gift_other_details">@GAIF.NameRelationOtherDet</textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group input-block">
+                                                    <input type="text" class="w-100 txtDisable ui-autocomplete-input" id="frequency_of_receipt" name="FrequencyOfGiftsOrInvitationfrm" autocomplete="off" disabled value="@GAIF.FrequencyOfGiftsOrInvitationfrm">
+                                                    <span id="lblFreq" class="placeholder question_span" style="background-color: #fff;">Frequency of receipt of gifts/invitation from the same business partner in a year?<span class="astColor">*</span></span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group input-block">
+                                                    <input type="text" class="w-100 txtDisable ui-autocomplete-input" name="ApproxValueOfGiftsInvt" id="approximate_value" autocomplete="off" disabled value="@GAIF.ApproxValueOfGiftsInvt">
+                                                    <span id="lblApp" class="placeholder question_span" style="background-color: #fff;">Approximate value of gifts/invitation (How is the value estimated) ?<span class="astColor">*</span></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group input-block">
+                                                    <input type="text" class="w-100 txtDisable ui-autocomplete-input" name="ReasonForGiftingInvitation" id="reason_for_gifting" autocomplete="off" disabled value="@GAIF.ReasonForGiftingInvitation">
+                                                    <span id="lblResGift" class="placeholder question_span" style="background-color: #fff;">Reason for gifting/invitation ?<span class="astColor">*</span></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row receiving_questions">
+                                            <div class="col-md-6">
+                                                <input type="hidden" name="GiftIsAcceptedRefused" id="chkGiftacceptedVal" value="@GAIF.GiftIsAcceptedRefused " />
+                                                <div class="row w-100">
+                                                    <div class="form-group col-md-4 d-flex align-items-center col-lg-4 col-12">
+                                                        <label id="lblChkgiftaccepted" class="f-600" style="margin-left:15px; position: relative; top:10px;">
+                                                            Gift is accepted/ Refused ?<span class="astColor">*</span>
+                                                        </label>
+                                                    </div>
+                                                    @if (GAIF.GiftIsAcceptedRefused == "Yes")
+                                                    {
+                                                        <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                                            <label class="checkbox-container">
+                                                                <label class="f-600">Yes</label>
+                                                                <input type="checkbox" disabled checked class="chkgiftaccepted" name="chkacceptedYes" id="chkacceptedYes" value="Yes">
+                                                                <span class="checkmark"></span>
+                                                            </label>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                                            <label class="checkbox-container">
+                                                                <label class="f-600">Yes</label>
+                                                                <input type="checkbox" disabled class="chkgiftaccepted" name="chkacceptedYes" id="chkacceptedYes" value="Yes">
+                                                                <span class="checkmark"></span>
+                                                            </label>
+                                                        </div>
+                                                    }
+                                                    @if (GAIF.GiftIsAcceptedRefused == "No")
+                                                    {
+                                                        <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                            <label class="checkbox-container">
+                                                                <label class="f-600">No</label>
+                                                                <input type="checkbox" class="chkgiftaccepted" disabled checked name="chkacceptedNo" id="chkacceptedNo" value="No">
+                                                                <span class="checkmark"></span>
+                                                            </label>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                            <label class="checkbox-container">
+                                                                <label class="f-600">No</label>
+                                                                <input type="checkbox" disabled class="chkgiftaccepted" name="chkacceptedNo" id="chkacceptedNo" value="No">
+                                                                <span class="checkmark"></span>
+                                                            </label>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6" id="divReasonOfAccept">
+                                                <div class="">
+                                                    <div class="form-group input-block">
+                                                        <input type="text" class="w-100 txtDisable ui-autocomplete-input" name="ReasonGiftIsAcceptedRefused" id="reason_of_acceptance" autocomplete="off" disabled value="@GAIF.ReasonGiftIsAcceptedRefused ">
+                                                        <span id="lblResAccRef" class="placeholder question_span" style="background-color: #fff;">Reason of acceptance/ refusal of gift/ Invitation<span class="astColor">*</span></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="receiving_Section">
+                                        <div>
+                                            <label class="f-600" style="margin-left:15px; position: relative; top:10px;" id="lblQuestion">Question</label>
+                                        </div>
+                                        <table class="mainTbl table table-border form-table-container-2">
+                                            <tr>
+                                                <td class="bt-0 bb-0 pl-0 pr-0">
+                                                    <table class="w-100 mx-auto table table-border form-border text-center">
+
+                                                        <thead class="form-head-1" style="margin-left:inherit !important;">
+                                                            <tr>
+                                                                <th>Sr. No.</th>
+                                                                <th>Question</th>
+                                                                @if (IsNewMode || IsEditMode)
+                                                                {
+                                                                    <th></th>
+                                                                }
+                                                            </tr>
+                                                        </thead>
+                                                        @if (IsViewMode)
+                                                        {
+                                                            <tbody class="form-border tableUser" id="usersBody">
+                                                            </tbody>
+                                                            var count = 1;
+                                                            <tbody class="form-border tableUser" id="usersBody">
+                                                                @foreach (var item in GAIF.QuestionData)
+                                                                {
+
+                                                                    <tr id='@("row" + count)' class="tr_input">
+                                                                        <td class="sNo text-center">@count</td>
+                                                                        <td class="text-center">
+                                                                            <textarea disabled class=" form-control txtDisable input-width-1 select-border emp-name-input inpValidateQuestion" cols="60" rows="2" maxlength="500" id='@("txtQuestion_"+count)' name='@("txtQuestion_"+count)' onPaste="return false">@item.Question</textarea>
+                                                                        </td>
+                                                                    </tr>
+                                                                    count++;
+                                                                }
+
+                                                            </tbody>
+                                                        }
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                            @if (IsNewMode || IsEditMode)
+                                            {
+
+                                                <tr align="right" id="addSoftwarebtn">
+                                                    <td class="">
+                                                        <button type="button" class="btn btn-sm submit-btn d-flex float-right mb-2 bl-1 " onclick="add_new_question()">
+                                                            + Add
+                                                        </button>
+                                                        <input type="hidden" name="totalrows" id="totalrows" />
+                                                    </td>
+                                                </tr>
+
+                                            }
+                                        </table>
+
+                                    </div>
+                                    <div class="row w-100">
+                                        <div class="form-group d-flex align-items-center col-12">
+                                            <label id="lbldocUpld" class="f-600" style="margin-left:15px; position: relative; top:10px;">
+                                                <span class="placeholder">Document Upload (Optional)</span>
+                                            </label>
+                                        </div>
+
+                                        <div class="form-group d-flex align-items-end col-12">
+
+                                            @if (otherDocument != null)
+                                            {
+                                                <input type="hidden" id="attachedfile1" name="attachedfile1" value="@System.Configuration.ConfigurationManager.AppSettings["SharepointSiteURL"]@Server.HtmlEncode(otherDocument.ServerRelativeUrl)" />
+                                                <input type="hidden" id="attachedfileName1" name="attachedfileName1" value="@otherDocument.FileName" />
+                                                <a href="@System.Configuration.ConfigurationManager.AppSettings["SharepointSiteURL"]@Server.HtmlEncode(otherDocument.ServerRelativeUrl)" id="attachedfileLink1" download=@otherDocument.FileName target="_blank">@otherDocument.FileName </a>
+                                            }
+                                        </div>
+                                    </div>
+
+                                    <div class="input-block">
+                                        <textarea name="BusinessNeed" id="txtBusiness" cols="60" rows="6" disabled maxlength="500" class="w-100 spanUpperSide inpDisable">@GAIF.BusinessNeed </textarea>
+                                        <span class="placeholder">Business justification(Max. 500)<span style="color:red;">*</span></span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                @* Approval Section And Action Section *@
+                @if (IsViewMode || IsEditMode)
+                {
+                    //Approval Section
+                    <div id="accordion">
+                        <div class="card">
+                            <div class="card-header collapsed" id="headingFour" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                                <h5 class="mb-0">
+                                    <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                                        <img src="~/assets/img/approvalTracking.svg" width="24" height="24" class="mr-2" />Approval Tracking
+                                    </button>
+                                </h5>
+                            </div>
+                            <div id="collapseFour" class="collapse" aria-labelledby="headingFour">
+                                <div class="card-body">
+                                    <div class="form-row">
+                                        <div class="col-12">
+                                            <table class="table w-100 td-border showBorder">
+                                                <thead>
+                                                    <tr>
+                                                        @*<th>Sr. No.</th>*@
+                                                        <th>Name</th>
+                                                        <th>Role</th>
+                                                        <th style="display: @(appList.Any(x => !string.IsNullOrEmpty(x.ExtraDetails)) ? "" : "none")">Content</th>
+                                                        <th>Processed on</th>
+                                                        <th>Status</th>
+                                                        <th class="text-center">Comments</th>
+                                                        <th class="text-center">Approval Level</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @if (IsViewMode || IsEditMode)
+                                                    {
+                                                        Html.RenderPartial("_ApprovalTracking", appList);
+                                                    }
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div><div id="accordion">
+                        <div class="card">
+                            <div class="card-header collapsed" id="headingFive" data-toggle="collapse" data-target="#collapseFive" aria-expanded="true" aria-controls="collapseFive">
+                                <h5 class="mb-0">
+                                    <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFive" aria-expanded="true" aria-controls="collapseFive">
+                                        <img src="~/assets/img/approvalTracking.svg" width="24" height="24" class="mr-2" /> Action
+                                    </button>
+                                </h5>
+                            </div>
+
+                            <div id="collapseFive" class="collapse" aria-labelledby="headingFive">
+                                <div class="card-body actionTab">
+                                    @if (GAIF.RequestType == "Consultation")
+                                    {
+                                        <div class="form-row" id="divConsultation">
+                                            <div class="form-group col-md-12 col-12 input-block">
+                                                <div class="w-100">
+                                                    @if (GAIF.Answers == "" || GAIF.Answers == null)
+                                                    {
+                                                        if (CurrentUserDesgn == GRCUser)
+                                                        {
+                                                            <textarea name="txtAnswers" id="txtAnswers" cols="60" rows="6" maxlength="1000" class="w-100 textTrans spanUpperSide"></textarea>
+                                                            <span class="placeholder">Answers(Max. 1000)</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <textarea disabled name="txtAnswers" id="txtAnswers" cols="60" rows="6" maxlength="1000" class="w-100 textTrans spanUpperSide"></textarea>
+                                                            <span class="placeholder">Answers(Max. 1000)</span>
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <textarea disabled name="txtAnswers" id="txtAnswers" cols="60" rows="6" maxlength="1000" class="w-100 textTrans spanUpperSide">@GAIF.Answers </textarea>
+                                                        <span class="placeholder">Answers(Max. 1000)</span>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="form-row" id="divGiftInvitation">
+                                            <div class="form-group col-md-12 col-12 input-block">
+                                                <div class="w-100">
+                                                    <input type="hidden" name="chkGiftPublic" id="chkGiftPublic" value="@GAIF.GiftTobeDepoWithGRC" /><div class="form-group col-md-4 d-flex align-items-center col-lg-4 col-12">
+                                                        <label id="lblGiftTobeDepositedWithGRC" class="f-600" style="position: relative; top:10px;">
+                                                            Gift to be Deposited with GRC?
+                                                        </label>
+                                                    </div>
+                                                    @if (GAIF.GiftTobeDepoWithGRC == "" || GAIF.GiftTobeDepoWithGRC == null)
+                                                    {
+                                                        if (GAIF.GiftTobeDepoWithGRC == "Yes")
+                                                        {
+                                                            <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                                                <label class="checkbox-container">
+                                                                    <label class="f-600">Yes</label>
+                                                                    <input type="checkbox" class="chkGrcClass" disabled checked name="chkGrcYes" id="chkGrcYes">
+                                                                    <span class="checkmark"></span>
+                                                                </label>
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            if (CurrentUserDesgn == GRCUser)
+                                                            {
+                                                                <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                                                    <label class="checkbox-container">
+                                                                        <label class="f-600">Yes</label>
+                                                                        <input type="checkbox" class="chkGrcClass" name="chkGrcYes" id="chkGrcYes">
+                                                                        <span class="checkmark"></span>
+                                                                    </label>
+                                                                </div>
+                                                            }
+                                                            else
+                                                            {
+                                                                <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                                                    <label class="checkbox-container">
+                                                                        <label class="f-600">Yes</label>
+                                                                        <input type="checkbox" class="chkGrcClass" disabled name="chkGrcYes" id="chkGrcYes">
+                                                                        <span class="checkmark"></span>
+                                                                    </label>
+                                                                </div>
+                                                            }
+
+                                                        }
+                                                        if (GAIF.GiftTobeDepoWithGRC == "No")
+                                                        {
+                                                            <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                                <label class="checkbox-container">
+                                                                    <label class="f-600">No</label>
+                                                                    <input type="checkbox" class="chkGrcClass" disabled checked name="chkGrcYes" id="chkGrcNo">
+                                                                    <span class="checkmark"></span>
+                                                                </label>
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            if (CurrentUserDesgn == GRCUser)
+                                                            {
+                                                                <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                                    <label class="checkbox-container">
+                                                                        <label class="f-600">No</label>
+                                                                        <input type="checkbox" class="chkGrcClass" name="chkGrcYes" id="chkGrcNo">
+                                                                        <span class="checkmark"></span>
+                                                                    </label>
+                                                                </div>
+                                                            }
+                                                            else
+                                                            {
+                                                                <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                                    <label class="checkbox-container">
+                                                                        <label class="f-600">No</label>
+                                                                        <input type="checkbox" class="chkGrcClass" disabled name="chkGrcYes" id="chkGrcNo">
+                                                                        <span class="checkmark"></span>
+                                                                    </label>
+                                                                </div>
+                                                            }
+
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="per col-md-2 col-lg-2 d-flex align-items-end col-12">
+                                                            <label class="checkbox-container">
+                                                                <label class="f-600">Yes</label>
+                                                                <input type="checkbox" class="chkGrcClass" disabled @(GAIF.GiftTobeDepoWithGRC == "Yes" ? "checked" : "") name="chkGrcYes" id="chkGrcYes">
+                                                                <span class="checkmark"></span>
+                                                            </label>
+                                                        </div>
+                                                        <div class="align col-md-2 d-flex align-items-end col-lg-2 col-12">
+                                                            <label class="checkbox-container">
+                                                                <label class="f-600">No</label>
+                                                                <input type="checkbox" class="chkGrcClass" disabled @(GAIF.GiftTobeDepoWithGRC == "No" ? "checked" : "") name="chkGrcYes" id="chkGrcNo">
+                                                                <span class="checkmark"></span>
+                                                            </label>
+                                                        </div>
+                                                    }
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                @* Buttons *@
+                @if (IsNewMode)
+                {
+                    <div class="card-footer align-content-center">
+                        <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                            Submit
+                        </button>
+                        <button type="reset" class="btn btn-danger btn-sm cancl-btn" id="btnCancel">
+                            Cancel
+                        </button>
+                    </div>
+                }
+                else if (IsEditMode)
+                {
+                    <div class="card-footer align-content-center">
+                        <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                            Re-Submit
+                        </button>
+                        <button type="reset" class="btn btn-danger btn-sm cancl-btn" id="btnCancel">
+                            Cancel
+                        </button>
+                    </div>
+                }
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="modal fade" id="successModel" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header modelHeader">
+                <span class="modal-title modalMsgTitle" id="modalTitle"></span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label id="modalBody" class="lableMsg">  </label>
+                <input type="hidden" id="tab" value="0" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="submitBomBtn publishBtn" id="modalOkButton" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    var spinner = $('#loader');
+    var IsNewMode = @Html.Raw(Json.Encode(IsNewMode));
+    var IsEditMode = @Html.Raw(Json.Encode(IsEditMode));
+    var IsViewMode = @Html.Raw(Json.Encode(IsViewMode));
+    var GAIF = @Html.Raw(Json.Encode(GAIF));
+    var appRowId = @Html.Raw(Json.Encode(AppRowId));
+    var formID = @Html.Raw(Json.Encode(FormId));
+    var approvalType =@Html.Raw(Json.Encode(ApprovalType));
+    var currentUserDesgn = @Html.Raw(Json.Encode(CurrentUserDesgn));
+    var currentUserLevel=@Html.Raw(Json.Encode(CurrentUserLevel));
+    var grcUser = @Html.Raw(Json.Encode(GRCUser));
+    var $tr = $('#row_clone');
+    pageLoad();
+    var errorCount = 0;
+    var errors = "";
+    function pageLoad() {
+        //
+        $("#headingErr").addClass('d-none');
+        var data = "";
+        if (IsViewMode) {
+            if (GAIF.Transaction == "Giving") {
+                $('.receiving_questions').addClass('hide');
+                $('.giving_questions').removeClass('hide');
+                $("#divReasonOfAccept").addClass('hide');
+            }
+            else {
+                $('.giving_questions').addClass('hide');
+                $('.receiving_questions').removeClass('hide');
+                //$("#divReasonOfAccept").removeClass('hide');
+            }
+            //if (GAIF.IsGiftOrInviteToPublicOfficial == "Yes") {
+            //    $('.sec_quest').removeClass('hide');
+            //}
+            //else {
+            //    $('.sec_quest').addClass('hide');
+            //}
+            if (GAIF.RequestType == "Consultation") {
+                $('.giving_Section').addClass('hide');
+                $('.receiving_Section').removeClass('hide');
+            }
+            else {
+                $('.giving_Section').removeClass('hide');
+                $('.receiving_Section').addClass('hide');
+            }
+
+            if (GAIF.GiftTobeDepoWithGRC != "") {
+                $("#chkGrcYes").attr("disabled");
+                $("#chkGrcNo").attr("disabled");
+            }
+
+            //if (GAIF.GiftIsAcceptedRefused == "No") {
+            //    //$('#divReasonOfAccept').addClass('hide');
+            //}
+
+            if (GAIF.RequestType == "Consultation") {
+                $('#divConsultation').removeClass('hide');
+                $('#divGiftInvitation').addClass('hide');
+            }
+            else {
+                $('#divGiftInvitation').removeClass('hide');
+                $('#divConsultation').addClass('hide');
+            }
+
+
+            if (GAIF.RequestType == "Gift") {
+                document.getElementById('lblgiftGivenNo').innerHTML = 'Is Gift given to public official?';
+                document.getElementById('lblNameBusiness').innerHTML = 'Name of Business partner/ Other individual providing the gift?';
+                document.getElementById('lblFreq').innerHTML = 'Frequency of receipt of gifts from the same business partner in a year?';
+                document.getElementById('lblApp').innerHTML = 'Approximate value of gifts (How is the value estimated) ?';
+                document.getElementById('lblResGift').innerHTML = 'Reason for gifting ?';
+                document.getElementById('lblChkgiftaccepted').innerHTML = 'Gift is accepted/ Refused ?';
+                document.getElementById('lblResAccRef').innerHTML = 'Reason of acceptance/ refusal of gift';
+            }
+            else if (GAIF.RequestType == "Invitation") {
+            document.getElementById('lblgiftGivenNo').innerHTML = 'Is Invitation given to public official?';
+            document.getElementById('lblNameBusiness').innerHTML = 'Name of Business partner/ Other individual providing the invitation?';
+            document.getElementById('lblFreq').innerHTML = 'Frequency of receipt of invitation from the same business partner in a year?';
+            document.getElementById('lblApp').innerHTML = 'Approximate value of invitation (How is the value estimated) ?';
+            document.getElementById('lblResGift').innerHTML = 'Reason for invitation ?';
+            document.getElementById('lblChkgiftaccepted').innerHTML = 'Invitation is accepted/ Refused ?';
+            document.getElementById('lblResAccRef').innerHTML = 'Reason of acceptance/ refusal of invitation';
+            }
+        }
+        if (IsEditMode) {
+            if (GAIF.Transaction == "Giving") {
+                $('.receiving_questions').addClass('hide');
+                $('.giving_questions').removeClass('hide');
+                $("#divReasonOfAccept").addClass('hide');
+            }
+            else {
+                $('.giving_questions').addClass('hide');
+                $('.receiving_questions').removeClass('hide');
+                //$("#divReasonOfAccept").removeClass('hide');
+            }
+            //if (GAIF.IsGiftOrInviteToPublicOfficial == "Yes") {
+            //    $('.sec_quest').removeClass('hide');
+            //}
+            //else {
+            //    $('.sec_quest').addClass('hide');
+            //}
+            if (GAIF.RequestType == "Consultation") {
+                $('.giving_Section').addClass('hide');
+                $('.receiving_Section').removeClass('hide');
+            }
+            else {
+                $('.giving_Section').removeClass('hide');
+                $('.receiving_Section').addClass('hide');
+            }
+
+            var cabuserTotal = parseInt(document.getElementById("QuestionDataCurr").value);
+                console.log(cabuserTotal);
+                rowIdx = cabuserTotal;
+                count = cabuserTotal;
+            $("#txtNumberofUsers").val(count);
+
+            if (GAIF.RequestType == "Consultation") {
+                $('#divConsultation').removeClass('hide');
+                $('#divGiftInvitation').addClass('hide');
+            }
+            else {
+                $('#divGiftInvitation').removeClass('hide');
+                $('#divConsultation').addClass('hide');
+            }
+
+            if (GAIF.RequestType == "Gift") {
+                document.getElementById('lblgiftGivenNo').innerHTML = 'Is Gift given to public official?';
+                document.getElementById('lblNameBusiness').innerHTML = 'Name of Business partner/ Other individual providing the gift?';
+                document.getElementById('lblFreq').innerHTML = 'Frequency of receipt of gifts from the same business partner in a year?';
+                document.getElementById('lblApp').innerHTML = 'Approximate value of gifts (How is the value estimated) ?';
+                document.getElementById('lblResGift').innerHTML = 'Reason for gifting ?';
+                document.getElementById('lblChkgiftaccepted').innerHTML = 'Gift is accepted/ Refused ?';
+                document.getElementById('lblResAccRef').innerHTML = 'Reason of acceptance/ refusal of gift';
+            }
+            else if (GAIF.RequestType == "Invitation") {
+                document.getElementById('lblgiftGivenNo').innerHTML = 'Is Invitation given to public official?';
+                document.getElementById('lblNameBusiness').innerHTML = 'Name of Business partner/ Other individual providing the invitation?';
+                document.getElementById('lblFreq').innerHTML = 'Frequency of receipt of invitation from the same business partner in a year?';
+                document.getElementById('lblApp').innerHTML = 'Approximate value of invitation (How is the value estimated) ?';
+                document.getElementById('lblResGift').innerHTML = 'Reason for invitation ?';
+                document.getElementById('lblChkgiftaccepted').innerHTML = 'Invitation is accepted/ Refused ?';
+                document.getElementById('lblResAccRef').innerHTML = 'Reason of acceptance/ refusal of invitation';
+            }
+        }
+        if (IsNewMode) {
+            count = 0;
+            rowIdx = 0;
+            $("#txtNumberofUsers").val(rowIdx);
+            $("#divReasonOfAccept").addClass('hide');
+        }
+    }
+
+    $(document).ready(function () {
+       // 
+
+        $('#usersBody').on('click', '.remove', function () {
+            //
+            var delRow = $(this).closest('tr').attr('id');
+            //console.log(delRow + " a");
+            var delRowNo = parseInt(delRow.substring(3));
+            //console.log(delRowNo + " b");
+
+            var child = $(this).closest('tr').nextAll();
+            //console.log(child);
+            child.each(function () {
+                ////
+                // Getting <tr> id.
+                var id = $(this).attr('id');
+                //console.log("id="+id);
+
+                //  Getting the <p> inside the .row-index class.
+                var idx = $(this).children('.row-index').children('p');
+                //console.log("idx="+idx);
+
+                // Gets the row number from <tr> id.
+                var dig = parseInt(id.substring(3));
+                //console.log("dig="+dig);
+
+                // Modifying row index.
+                idx.html(`row${dig - 1}`);
+
+                // Modifying row id.
+                $(this).attr('id', `row${dig - 1}`);
+
+                //assigning updated serial number
+                //  //
+                updatedDig = dig - 1;
+                //console.log("updatedDig="+updatedDig);
+                $('#row' + updatedDig + ' .sNo').html(updatedDig);
+
+                $(this).find('td:eq(1) textarea').attr("id", "txtQuestion_" + updatedDig);
+
+                $(this).find('td:eq(1) textarea').attr("name", "txtQuestion_" + updatedDig);
+            });
+
+            // Removing the current row.
+            $(this).closest('tr').remove();
+            // Decreasing total number of rows by 1.
+            rowIdx--;
+            count = rowIdx;
+            // console.log("count=" + count);
+            // }
+            $("#txtNumberofUsers").val(count);
+        });
+
+        $(document).on('keydown', '.sftDetClass', function () {
+            //
+            var id = this.id;
+            //console.log("id=" + id);
+            var splitid = id.split('_');
+            // console.log("splitid=" + splitid);
+            var index = splitid[1];
+            // console.log("index=" + index);
+            if (!IsEdit) {
+
+            }
+            else {
+                count = index;
+            }
+
+
+        });
+    })
+
+    $("#btnSubmit").on('click', function (e) {
+        //
+        errors = "";
+        validateSubmitter();
+        validateApplicant();
+
+        if ($('.chk_requestType:checkbox:checked').length == 0) {
+            errors += "<li id='error" + errorCount + "'>" + "Request Type" + "</li>";
+            $("#chkGift").addClass('removeRequestType');
+            $("#chkInvitation").addClass('removeRequestType');
+            $("#chkConsultation").addClass('removeRequestType');
+            AddError("lblRequestType", 'removeRequestType', errorCount);
+            errorCount++;
+        }
+        else {
+            RemoveError("lblRequestType");
+        }
+
+
+        if ($("#chkGift").prop("checked") == true || $("#chkInvitation").prop("checked") == true) {
+
+
+            if ($('.chk_tran:checkbox:checked').length == 0) {
+                errors += "<li id='error" + errorCount + "'>" + "Transaction" + "</li>";
+                $("#chkGiving").addClass('removetran');
+                $("#chkReceiving").addClass('removetran');
+                AddError("lbltran", 'removetran', errorCount);
+                errorCount++;
+            }
+            else {
+                RemoveError("lbltran");
+            }
+
+            if ($("#chkGiving").prop("checked") == true) {
+                if ($('.chkgiftGiven:checkbox:checked').length == 0) {
+                    errors += "<li id='error" + errorCount + "'>" + "Is Gift/Invitation given to public official?" + "</li>";
+                    $("#chkgiftGivenYes").addClass('removeGiftGivenNo');
+                    $("#chkgiftGivenNo").addClass('removeGiftGivenNo');
+                    AddError("lblgiftGivenNo", 'removeGiftGivenNo', errorCount);
+                    errorCount++;
+                }
+                else {
+                    RemoveError("lblgiftGivenNo");
+                }
+
+            }
+
+            var gift_other_details = document.getElementById("gift_other_details").value;
+            if (gift_other_details == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Name of Business partner/ Other individual providing the gift/invitation?" + "</li>";
+                AddError("gift_other_details", '', errorCount);
+                errorCount++;
+            }
+            else {
+                RemoveError("gift_other_details");
+            }
+
+            var frequency_of_receipt = document.getElementById("frequency_of_receipt").value;
+            if (frequency_of_receipt == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Frequency of receipt of gifts/invitation from the same business partner in a year?" + "</li>";
+                AddError("frequency_of_receipt", '', errorCount);
+                errorCount++;
+            }
+            else {
+                RemoveError("frequency_of_receipt");
+            }
+
+            var approximate_value = document.getElementById("approximate_value").value;
+            if (approximate_value == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Approximate value of gifts/invitation (How is the value estimated) ?" + "</li>";
+                AddError("approximate_value", '', errorCount);
+                errorCount++;
+            }
+            else {
+                RemoveError("approximate_value");
+            }
+
+            var reason_for_gifting = document.getElementById("reason_for_gifting").value;
+            if (reason_for_gifting == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Reason for gifting/invitation ?" + "</li>";
+                AddError("reason_for_gifting", '', errorCount);
+                errorCount++;
+            }
+            else {
+                RemoveError("reason_for_gifting");
+            }
+        }
+
+
+        var txtBusiness = document.getElementById("txtBusiness").value;
+        if (txtBusiness == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Business justification" + "</li>";
+            AddError("txtBusiness", '', errorCount);
+            errorCount++;
+        }
+        else {
+            RemoveError("txtBusiness");
+        }
+
+        if ($("#chkReceiving").prop("checked") == true) {
+
+            if ($('.chkgiftaccepted:checkbox:checked').length == 0) {
+                errors += "<li id='error" + errorCount + "'>" + "Gift is accepted/ Refused ?" + "</li>";
+                $("#chkacceptedYes").addClass('removeChkgiftaccepted');
+                $("#chkacceptedNo").addClass('removeChkgiftaccepted');
+                AddError("lblChkgiftaccepted", 'removeChkgiftaccepted', errorCount);
+                errorCount++;
+            }
+            else {
+                RemoveError("lblChkgiftaccepted");
+            }
+
+            if ($("#chkacceptedYes").prop("checked") == true) {
+                var reason_of_acceptance = document.getElementById("reason_of_acceptance").value;
+                if (reason_of_acceptance == "") {
+                    errors += "<li id='error" + errorCount + "'>" + "Reason of acceptance/ refusal of gift/ Invitation" + "</li>";
+                    AddError("reason_of_acceptance", '', errorCount);
+                    errorCount++;
+                }
+                else {
+                    RemoveError("reason_of_acceptance");
+                }
+            }
+        }
+
+        if ($("#chkConsultation").prop("checked") == true) {
+            let invalidCount = 0;
+            var tableRowCount = $('#usersBody tr').length;
+
+            if (tableRowCount == 0) {
+                errors += "<li id='error" + errorCount + "'>" + "Add atleast 1 Question" + "</li>";
+                $("#lblQuestion").addClass('removelblQuestion');
+                AddError("lblQuestion", 'removelblQuestion', errorCount);
+                errorCount++;
+            }
+            else {
+                RemoveError("lblQuestion");
+            }
+
+
+             if (tableRowCount > 0) {
+                let rowCount = 1;
+
+                $(".tableUser").find('tr').each(function () {
+                    let currentTr = $(this);
+                    let currQuestion = $(currentTr).find(".inpValidateQuestion").val();
+
+                    if (currQuestion.trim() == '') {
+
+                        errors += "<li id='error" + errorCount + "'>" + "Enter Question in row " + rowCount + "." + "</li>";
+                        AddError("txtQuestion_" + rowCount, '', errorCount);
+                        errorCount++;
+                        invalidCount++;
+                    }
+                    else {
+                        RemoveError("txtQuestion_" + rowCount);
+                    }
+                    rowCount++;
+                });
+            }
+        }
+
+        if (errors.length) {
+            errors = "<ol id='errorList'>" + errors + "</ol>";
+            $("#headingErr").removeClass('d-none');
+            document.getElementById("add_to_me").innerHTML = errors;
+            if (IsEditMode) {
+                $("#myModalRequest").scrollTop(0);
+            }
+            else {
+                $(window).scrollTop(0);
+            }
+            return false;
+        }
+
+        $("#headingErr").addClass('d-none');
+        document.getElementById("add_to_me").innerHTML = '';
+        $('#ddEmpDesignation').prop("disabled", false);
+        $('#txtOnBehalfdesignation').prop("disabled", false);
+        $("#pageLoader").removeClass('invisible');
+        $("#btnSubmit").text('Saving');
+        $("#btnSubmit").prop("disabled", true);
+        $("#btnCancel").prop("disabled", true);
+        $("#totalrows").val(count);
+        var form = $('#GAIForm');
+        var formData = new FormData(form[0]);
+
+        //if ($("#chkGiving").prop("checked") == true) {
+        //    if ($("#chkgiftGivenYes").prop("checked") == true) {
+        //        //var fileUpload = $("#fileToUpload").get(0);
+        //        //var files = fileUpload.files;
+        //        //for (var i = 0; i < files.length; i++) {
+        //        //    formData.append(files[i].name, files[i]);
+        //        //}
+        //    }
+        //}
+
+        var docUpload = $("#docUpload").get(0);
+        var files1 = docUpload.files;
+        if (files1.length == 1) {
+            for (var i = 0; i < files1.length; i++) {
+            formData.append(files1[i].name, files1[i]);
+            }
+        }
+
+        if ($("#chkConsultation").prop("checked") == true) {
+            var arr = [];
+            var transData = {
+            };
+            var serializedArray = $("#GAIForm").serializeArray();
+            var i = 0;
+            serializedArray.forEach((x, index) => {
+                if (x.name === 'Question') {
+                    formData.append('QuestionData[' + (i++) + '].Question', x.value);
+                }
+            });
+        }
+
+       // console.log(formData);
+
+
+        $.ajax({
+            url: '/GiftsInvitation/SaveGiftsInvitation',
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            dataType: 'JSON',
+            data: formData,
+            enctype: 'multipart/form-data',
+            success: (function (data) {
+                if (data.Status == 200) {
+                    $("#pageLoader").addClass('invisible');
+                    if (IsNewMode) {
+                        $("#btnSubmit").text('Submit');
+                    }
+                    else {
+                        $("#btnSubmit").text('Re-Submit');
+                    }
+                    $("#btnSubmit").prop("disabled", false);
+                    $("#btnCancel").prop("disabled", false);
+                    successModal(data.Message);
+                }
+                else {
+                    failureModal(data.Message);
+                    if (IsNewMode) {
+                        $("#btnSubmit").text('Submit');
+                    }
+                    else {
+                        $("#btnSubmit").text('Re-Submit');
+                    }
+                    $("#pageLoader").addClass('invisible');
+                    $("#btnSubmit").prop("disabled", false);
+                    $("#btnCancel").prop("disabled", false);
+                }
+            }),
+            error: (function (data) {
+                failureModal(data.Message);
+                if (IsNewMode && IsEditMode) {
+                    $("#btnSubmit").text('Submit');
+                }
+                else {
+                    $("#btnSubmit").text('Re-Submit');
+                }
+                $("#pageLoader").addClass('invisible');
+                $("#btnSubmit").prop("disabled", false);
+                $("#btnCancel").prop("disabled", false);
+            })
+        })
+        $("#tab").val(2);
+    });
+
+    $("#btnCancel").on('click', function (e) {
+        $("#headingErr").addClass('d-none');
+        document.getElementById("add_to_me").innerHTML = '';
+        if ($('#myModalRequest').hasClass('show'))
+            $('#myModalRequest').modal('hide');
+        else
+            $('#myModalEdit').modal('hide');
+        if (IsNewMode) {
+            window.location = "../Dashboard";
+        }
+    });
+
+    function checkSelect(id) {
+        if ($('#' + id).val() != '') {
+            $('#' + id).addClass('spanUpperSide');
+        }
+    }
+
+    function saveResponse(text) {
+        
+        var status = '', comment = '';
+        comment = $("#comment-" + text).val();
+        switch (text) {
+            case 'approve': {
+                status = 'Approved';
+                if (currentUserDesgn == grcUser) {
+                    if (GAIF.RequestType == "Consultation") {
+                        var txtAnswers = document.getElementById("txtAnswers").value;
+                        if (txtAnswers == "") {
+                            AddError("txtAnswers", '', errorCount);
+                            DisplayAlert('error', 'Error', 'Please enter Answers', 5000);
+                            $("#collapseFive").addClass('show');
+                            return;
+                        }
+                        else {
+                            RemoveError("txtAnswers");
+                            UpdateGAIFData(status, appRowId, comment, approvalType, text);
+                        }
+                    }
+                    else {
+                        if ($('.chkGrcClass:checkbox:checked').length == 0) {
+                            $("#chkGrcYes").addClass('removechkGrcClass');
+                            $("#chkGrcNo").addClass('removechkGrcClass');
+                            AddError("lblGiftTobeDepositedWithGRC", 'removechkGrcClass', errorCount);
+                            DisplayAlert('error', 'Error', 'Please check the Gift to be Deposited with GRC', 5000);
+                            $("#collapseFive").addClass('show');
+                            return;
+                        }
+                        else {
+                            RemoveError("lblGiftTobeDepositedWithGRC");
+                            UpdateGAIFData(status, appRowId, comment, approvalType, text);
+                        }
+                    }
+                }
+                else {
+                    FormApproval(status, appRowId, comment, approvalType, text);
+                }
+                break;
+            }
+            case 'reject': {
+                status = 'Rejected';
+                if (comment == '') {
+                    validityModal(text);
+                    return;
+                }
+                else {
+                    FormApproval(status, appRowId, comment, approvalType, text);
+                }
+                break;
+            }
+            case 'enquire': {
+                status = 'Enquired';
+                if (comment == '') {
+                    validityModal(text);
+                    return;
+                }
+                else {
+                    FormApproval(status, appRowId, comment, approvalType, text);
+                }
+                break;
+            }
+        }
+
+        $("#tab").val(1);
+    }
+
+    function FormApproval(status, appRowId, comment, approvalType, text) {
+        //
+        spinner.show();
+        $.ajax({
+            url: '/List/SaveResponse',
+            type: 'POST',
+            data: { response: status, appRowId: appRowId, comment: comment, approvalType: approvalType },
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data.Result == 1) {
+                    successGAIFFModal(text);
+                    spinner.hide();
+                }
+                else {
+                    failureModal();
+                    spinner.hide();
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+                spinner.hide();
+            })
+        })
+
+        $("#tab").val(1);
+    }
+
+    function UpdateGAIFData(status, appRowId, comment, approvalType, text) {
+        //
+        var form = $("#GAIForm").serialize();
+        console.log(form);
+        $.ajax({
+            url: '/GiftsInvitation/UpdateGAIFData',
+            type: 'POST',
+            data: form,
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data == 1) {
+                    FormApproval(status, appRowId, comment, approvalType, text);
+                }
+                else {
+                    failureModal();
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+            })
+        })
+
+    }
+
+    function successGAIFFModal(txt) {
+        //
+        $('#modalTitle').html('Success');
+        if (txt == "approve") {
+            $('#modalBody').html('Form has been approved!');
+        }
+        else if (txt == "reject") {
+            $('#modalBody').html('Form has been rejected!');
+        }
+        else if (txt == "enquire") {
+            $('#modalBody').html('Form has been enquired!');
+        }
+        else if (txt == "cancelled") {
+            $('#modalBody').html('Form has been cancelled!');
+        }
+        else {
+            if (IsEditMode) {
+                $('#modalBody').html('Your form with ID: GAIF' + txt + ' has been re-submitted! Kindly use this for future reference');
+            }
+            else {
+                $('#modalBody').html('Your form with ID: GAIF' + txt + ' has been submitted! Kindly use this for future reference');
+            }
+
+        }
+        FlagRedirect = txt;
+        //$("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    //Request Type
+    $('input:checkbox[id="chkGift"]').click(function () {
+        if ($(this).prop("checked") == true) {
+            $('input[id="chkConsultation"]').prop('checked', false);
+            $('input[id="chkInvitation"]').prop('checked', false);
+            $('input[id="chkGift"]').prop('checked', true).change();
+
+            $('.giving_Section').removeClass('hide');
+            $('.receiving_Section').addClass('hide');
+
+            $('input[id="chkGift"]').prop('disabled', true);
+            $('input[id="chkInvitation"]').prop('disabled', false);
+            $('input[id="chkConsultation"]').prop("disabled", false);
+
+            $("#chkRequestTypeVal").val('Gift');
+
+            document.getElementById('lblgiftGivenNo').innerHTML = 'Is Gift given to public official?';
+            document.getElementById('lblNameBusiness').innerHTML = 'Name of Business partner/ Other individual providing the gift?';
+            document.getElementById('lblFreq').innerHTML = 'Frequency of receipt of gifts from the same business partner in a year?';
+            document.getElementById('lblApp').innerHTML = 'Approximate value of gifts (How is the value estimated) ?';
+            document.getElementById('lblResGift').innerHTML = 'Reason for gifting ?';
+            document.getElementById('lblChkgiftaccepted').innerHTML = 'Gift is accepted/ Refused ?';
+            document.getElementById('lblResAccRef').innerHTML = 'Reason of acceptance/ refusal of gift';
+        }
+    });
+
+    $('input:checkbox[id="chkInvitation"]').click(function () {
+        if ($(this).prop("checked") == true) {
+            $('input[id="chkConsultation"]').prop('checked', false);
+            $('input[id="chkGift"]').prop('checked', false);
+            $('input[id="chkInvitation"]').prop('checked', true).change();
+
+            $('.giving_Section').removeClass('hide');
+            $('.receiving_Section').addClass('hide');
+
+            $('input[id="chkInvitation"]').prop('disabled', true);
+            $('input[id="chkGift"]').prop('disabled', false);
+            $('input[id="chkConsultation"]').prop("disabled", false);
+
+            $("#chkRequestTypeVal").val('Invitation');
+
+            document.getElementById('lblgiftGivenNo').innerHTML = 'Is Invitation given to public official?';
+            document.getElementById('lblNameBusiness').innerHTML = 'Name of Business partner/ Other individual providing the invitation?';
+            document.getElementById('lblFreq').innerHTML = 'Frequency of receipt of invitation from the same business partner in a year?';
+            document.getElementById('lblApp').innerHTML = 'Approximate value of invitation (How is the value estimated) ?';
+            document.getElementById('lblResGift').innerHTML = 'Reason for invitation ?';
+            document.getElementById('lblChkgiftaccepted').innerHTML = 'Invitation is accepted/ Refused ?';
+            document.getElementById('lblResAccRef').innerHTML = 'Reason of acceptance/ refusal of invitation';
+        }
+    });
+
+    $('input:checkbox[id="chkConsultation"]').click(function () {
+        if ($(this).prop("checked") == true) {
+            $('input[id="chkGift"]').prop('checked', false);
+            $('input[id="chkInvitation"]').prop('checked', false);
+            $('input[id="chkConsultation"]').prop('checked', true).change();
+
+            $('.giving_Section').addClass('hide');
+            $('.receiving_Section').removeClass('hide');
+
+            $('input[id="chkConsultation"]').prop('disabled', true);
+            $('input[id="chkGift"]').prop('disabled', false);
+            $('input[id="chkInvitation"]').prop("disabled", false);
+
+            $("#chkRequestTypeVal").val('Consultation');
+        }
+    });
+    //Request Type
+
+    //Transaction
+    $('input:checkbox[id="chkGiving"]').click(function () {
+        if ($(this).prop("checked") == true) {
+            $('input[id="chkReceiving"]').prop('checked', false);
+            $('input[id="chkGiving"]').prop('checked', true).change();
+
+            $('.receiving_questions').addClass('hide');
+            $('.giving_questions').removeClass('hide');
+
+            $("#divReasonOfAccept").addClass('hide');
+
+            $('input[id="chkGiving"]').prop('disabled', true);
+            $('input[id="chkReceiving"]').prop('disabled', false);
+
+            $("#chkTransactionVal").val('Giving');
+        }
+    });
+
+    $('input:checkbox[id="chkReceiving"]').click(function () {
+        if ($(this).prop("checked") == true) {
+            $('input[id="chkGiving"]').prop('checked', false);
+            $('input[id="chkReceiving"]').prop('checked', true).change();
+
+            $('.giving_questions').addClass('hide');
+            $('.receiving_questions').removeClass('hide');
+            $("#divReasonOfAccept").removeClass('hide');
+
+            $('input[id="chkReceiving"]').prop('disabled', true);
+            $('input[id="chkGiving"]').prop('disabled', false);
+
+            $("#chkTransactionVal").val('Receiving');
+        }
+    });
+     //Transaction
+
+    //Is GiftOrInvitation given to public official
+    $('input:checkbox[id="chkgiftGivenYes"]').click(function () {
+        if ($(this).prop("checked") == true) {
+            $('input[id="chkgiftGivenNo"]').prop('checked', false);
+            $('input[id="chkgiftGivenYes"]').prop('checked', true).change();
+
+            //$('.sec_quest').removeClass('hide');
+
+            $('input[id="chkgiftGivenYes"]').prop('disabled', true);
+            $('input[id="chkgiftGivenNo"]').prop('disabled', false);
+
+            $("#chkGiftGivenVal").val('Yes');
+        }
+    });
+
+    $('input:checkbox[id="chkgiftGivenNo"]').click(function () {
+        if ($(this).prop("checked") == true) {
+            $('input[id="chkgiftGivenYes"]').prop('checked', false);
+            $('input[id="chkgiftGivenNo"]').prop('checked', true).change();
+
+            //$('.sec_quest').addClass('hide');
+
+            $('input[id="chkgiftGivenNo"]').prop('disabled', true);
+            $('input[id="chkgiftGivenYes"]').prop('disabled', false);
+
+            $("#chkGiftGivenVal").val('No');
+        }
+    });
+    //Is GiftOrInvitation given to public official
+
+    //Gift is accepted/ Refused ?
+    $('input:checkbox[id="chkacceptedYes"]').click(function () {
+        if ($(this).prop("checked") == true) {
+            $('input[id="chkacceptedNo"]').prop('checked', false);
+            $('input[id="chkacceptedYes"]').prop('checked', true).change();
+
+            $('#divReasonOfAccept').removeClass('hide');
+
+            $('input[id="chkacceptedYes"]').prop('disabled', true);
+            $('input[id="chkacceptedNo"]').prop('disabled', false);
+
+            $("#chkGiftacceptedVal").val('Yes');
+        }
+    });
+
+    $('input:checkbox[id="chkacceptedNo"]').click(function () {
+        if ($(this).prop("checked") == true) {
+            $('input[id="chkacceptedYes"]').prop('checked', false);
+            $('input[id="chkacceptedNo"]').prop('checked', true).change();
+
+            //$('#divReasonOfAccept').addClass('hide');
+
+            $('input[id="chkacceptedNo"]').prop('disabled', true);
+            $('input[id="chkacceptedYes"]').prop('disabled', false);
+
+            $("#chkGiftacceptedVal").val('No');
+        }
+    });
+     //Gift is accepted/ Refused ?
+
+
+    $('input:checkbox[id="chkGrcYes"]').click(function () {
+        if ($(this).prop("checked") == true) {
+            $('input[id="chkGrcNo"]').prop('checked', false);
+            $('input[id="chkGrcYes"]').prop('checked', true).change();
+
+            $('input[id="chkGrcYes"]').prop('disabled', true);
+            $('input[id="chkGrcNo"]').prop('disabled', false);
+
+            $("#chkGiftPublic").val('Yes');
+        }
+    });
+
+    $('input:checkbox[id="chkGrcNo"]').click(function () {
+        if ($(this).prop("checked") == true) {
+            $('input[id="chkGrcYes"]').prop('checked', false);
+            $('input[id="chkGrcNo"]').prop('checked', true).change();
+
+            $('input[id="chkGrcNo"]').prop('disabled', true);
+            $('input[id="chkGrcYes"]').prop('disabled', false);
+
+            $("#chkGiftPublic").val('No');
+        }
+    });
+
+    function add_new_question() {
+       // 
+        var newCount = rowIdx + 1;
+
+        if (newCount > 5) {
+            alert("Maximum 5 Question can add.");
+            return
+        }
+        else {
+            var row = '<tr id="row' + newCount + '" class="tr_input text-center">   <td class="sNo text-center" >' + newCount + '</td> '
+                + '<td><textarea autocomplete="off" name="Question" id="txtQuestion_' + newCount + '"" class="form-control input-width-1 select-border emp-name-input inpValidateQuestion" cols="60" rows="2" maxlength="2000"  onkeypress="avoidSpecialSymbols(event)" onPaste="return false"></textarea></td>'
+                + '<td style="background-color:white; max-width:70px; vertical-align:central;">'
+                + '<input class="remove-btn remove" type="image" src="/assets/img/remove.png" alt="Remove" style="max-width: 85%; background-color: white;">'
+                + '</td></tr>';
+        }
+
+        if (newCount == 1) {
+            $('.tableUser').prepend(row);
+        }
+        else {
+            $(".tableUser tr:last").after(row);
+        }
+
+        count = newCount;
+
+        rowIdx++;
+
+        $("#txtNumberofUsers").val(count);
+
+    }
+
+    function getTran()
+    {
+        //$("input[name='chkTransaction']").change(function () {
+        //    if ($("input[name='chkTransaction']:checked").val() == "Giving") {
+        //        $('.receiving_questions').addClass('hide');
+        //        $('.giving_questions').removeClass('hide');
+        //    }
+        //    else if ($("input[name='chkTransaction']:checked").val() == "Receiving") {
+        //        $('.giving_questions').addClass('hide');
+        //        $('.receiving_questions').removeClass('hide');
+        //    }
+        //})
+    }
+
+    function getChkgiftGiven() {
+
+        //$("input[name='chkgiftGiven']").change(function () {
+        //    if ($("input[name='chkgiftGiven']:checked").val() == "Yes") {
+        //        $('.sec_quest').removeClass('hide');
+        //    }
+        //    else if ($("input[name='chkgiftGiven']:checked").val() == "No") {
+        //        $('.sec_quest').addClass('hide');
+        //    }
+        //})
+    }
+
+    function avoidSpecialSymbols(e) {
+        var keyCode = e.keyCode;
+        //console.log("keyCode=" + keyCode);
+        if ((keyCode >= 33 && keyCode <= 44) || (keyCode >= 58 && keyCode <= 64) || (keyCode >= 91 && keyCode <= 96) || (keyCode >= 123 && keyCode <= 126)) { e.preventDefault(); }
+
+    }
+
+    //$('#fileToUpload').change(function (e) {
+    //    //
+    //    $("#attachedfile").val('');
+    //    $("#attachedfileName").val('');
+    //    $('#attachedfileLink').remove();
+    //});
+
+    $('#docUpload').change(function (e) {
+        //
+        $("#attachedfile1").val('');
+        $("#attachedfileName1").val('');
+        $('#attachedfileLink1').remove();
+    });
+
+    $('#successModel').on('hide.bs.modal', function () {
+        //
+        var tab = $("#tab").val();
+        if (tab == 1) {
+            GetMyTaskTab();
+        }
+        else if (tab == 2) {
+            window.location = "../Dashboard?tab=" + tab;
+        }
+    })
+
+    $('#myModal').modal({ backdrop: 'static', keyboard: false })
+
+    function requiredModal(text) {
+        $('#modalTitle').html('Required!');
+        $('#modalBody').html(text);
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function successModal(txt) {
+        ////
+        $('#modalTitle').html('Success');
+        if (txt == "approve") {
+            $('#modalBody').html('Form has been approved!');
+        }
+        else if (txt == "reject") {
+            $('#modalBody').html('Form has been rejected!');
+        }
+        else if (txt == "enquire") {
+            $('#modalBody').html('Form has been enquired!');
+        }
+        else if (txt == "cancelled") {
+            $('#modalBody').html('Form has been cancelled!');
+        }
+        else {
+            if (IsEditMode) {
+                $('#modalBody').html('Your form with ID: GAIF' + txt + ' has been re-submitted! Kindly use this for future reference');
+            }
+            else {
+                $('#modalBody').html('Your form with ID: GAIF' + txt + ' has been submitted! Kindly use this for future reference');
+            }
+        }
+
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function failureModal(msg) {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html(msg);
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function permissionModal() {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html('No permssion granted since the device is not SAVWIPL owned!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+</script>

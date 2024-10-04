@@ -1,0 +1,132 @@
+﻿@model Skoda_DCMS.Models.DashboardModel
+@{
+    ViewBag.Title = "Admin";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var objectSid = ViewBag.ObjectSid;
+    var email = ViewBag.Email;
+    var name = ViewBag.Name;
+    var domain = ViewBag.Domain;
+    var userName = ViewBag.UserName;
+}
+}
+
+
+<h2>User Details</h2>
+<body>
+    <div class="right_col bg-transparent" role="main">
+        @*<div>
+                <form action="/Admin/Admin" method="post" id="">
+                    <input id="txtemail" name="txtemail" autocomplete="off" />
+                    <button id="btnSubmit" type="submit">Submit</button>
+                    <br /><br />
+                    <label>Output(Object Sid): @objectSid</label>
+
+                </form>
+                <button id="btnUpdate" type="button">Update</button>
+
+           
+            </div>
+
+            <br />*@
+
+        <form action="/Admin/Admin" method="post" id="">
+            <input id="txtusername" name="txtusername" autocomplete="off" />
+            <button id="btnSearch" type="submit">Search By UserName or Email</button>
+            @*<button id="btnUpdateUserName" type="button">Update Approver Name</button>*@
+        </form>
+        <br />
+        <table>
+            <tr>
+                <td>
+                    <label><b>Object Sid:</b> @objectSid</label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label><b>Email: </b>@email</label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label><b>Name: </b>@name</label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label><b>Domain: </b>@domain</label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label><b>UserName: </b>@userName</label>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+</body>
+<script>
+    $(document).ready(function () {
+
+        $("#btnUpdate").on('click', function (e) {
+            //
+            $("#pageLoader").removeClass('invisible');
+            $.ajax({
+                url: '/Admin/Update',
+                type: 'POST',
+                data: {},
+                cache: false,
+                dataType: 'JSON',
+                success: (function (data) {
+                    console.log(data);
+                    if (data == 1) {
+                        $("#pageLoader").addClass('invisible');
+                        alert('Data Updated Successfully.')
+                    }
+                    else {
+                        $("#pageLoader").addClass('invisible');
+                        console.log('error');
+                    }
+                }),
+                error: (function (data) {
+                    $("#pageLoader").addClass('invisible');
+                    console.log('error');
+                })
+            })
+
+        });
+
+        $("#btnUpdateUserName").on('click', function (e) {
+            //
+            $("#pageLoader").removeClass('invisible');
+            $.ajax({
+                url: '/Admin/UserNameUpdate',
+                type: 'POST',
+                data: {},
+                cache: false,
+                dataType: 'JSON',
+                success: (function (data) {
+                    console.log(data);
+                    //if (data == 1) {
+                    $("#pageLoader").addClass('invisible');
+                    alert(data);
+                    //}
+                    //else {
+                    //    $("#pageLoader").addClass('invisible');
+                    //    console.log('error');
+                    //}
+                }),
+                error: (function (data) {
+                    $("#pageLoader").addClass('invisible');
+                    console.log('error');
+                })
+            })
+
+        });
+
+       
+    });
+</script>
+
+
+

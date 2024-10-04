@@ -1,0 +1,974 @@
+﻿
+@{
+    Layout = null;
+    Skoda_DCMS.Models.ECFData ECF = null;
+    List<Skoda_DCMS.Models.ApprovalDataModel> appList = new List<Skoda_DCMS.Models.ApprovalDataModel>();
+    //Skoda_DCMS.Models.ApprovalDataModel HOD = null;
+    //Skoda_DCMS.Models.ApprovalDataModel Superior = null;
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        ECF = ViewBag.Model.one[0] as Skoda_DCMS.Models.ECFData;
+        appList = ViewBag.Model?.three as List<Skoda_DCMS.Models.ApprovalDataModel>;
+        //Superior = appList.Find(x => x.Designation.ToLower() == "superior" && x.Level == 1);
+        //HOD = appList.Find(x => x.Designation.ToLower() == "head of department" && x.Level == 2);
+    }
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SAVWIPL - Employee Clearance Form</title>
+    <style type="text/css">
+        *:visited, *:focus {
+            box-shadow: none;
+        }
+
+        input, select, input:focus, select:focus, textarea, textarea:focus {
+            border: 1px solid #000;
+        }
+
+        input, textarea {
+            padding: 5px;
+        }
+
+        table td {
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <table style="width: 100%; font-size: 14px; color: #000; font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+        <tr>
+            <td>
+                <table style="width: 100%;" cellspadding="0" cellspacing="0">
+                    <tr>
+                        <td colspan="6" width="60%" style="text-align: right;">
+                            <img style="width: 50%;" src='@Server.MapPath("~/assets/img/SAVWIPL_Merger_Logo.JPG")'>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+
+
+
+        <tr>
+            <td style="padding: 15px;">
+                <table cellspacing="0" cellpadding="0" width="100%">
+
+
+                    <tr>
+                        <td style="width:20%">
+                            Employee Name
+                        </td>
+                        <td style="width: 30%; font-weight: normal" colspan="2" align='left' >
+                            @(ECF?.EmployeeName)
+                        </td>
+                        <td style="width:20%">
+                            Employee Code
+                        </td>
+                        <td style="width: 30%; font-weight: normal" colspan="2" align='left'>
+                            @(ECF?.EmployeeCode)
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td style="width:20%">
+                            Designation
+                        </td>
+                        <td colspan="2" align='left' style="font-weight: normal;">
+                            @(ECF?.EmployeeDesignation)
+                           
+                        </td>
+                        <td style="width:20%">
+                            Location
+                        </td>
+                        <td colspan="2" align='left' style="font-weight: normal;">
+                            @(ECF?.EmployeeLocation)
+                            
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td style="width:20%">
+                            Department
+                        </td>
+                        <td colspan="2" align='left' style="font-weight: normal;">
+                            @(ECF?.EmployeeDepartment)
+                           
+                        </td>
+                        @*<td style="width:20%">
+                            Section
+                        </td>
+                        <td colspan="2" align='left'>
+                            <input type="text" style="height: 25px; width:85%; border-radius: 0; " />
+                        </td>*@
+                            
+                        @*</td>*@
+
+                    </tr>
+                    <tr>
+                        <td style="width:20%">
+                            Date of Joining
+                        </td>
+                        <td colspan="2" align='left' style="font-weight: normal">
+                            @(ECF?.DateOfJoining.ToString("dd-MM-yyyy"))
+                            
+                        </td>
+                        <td style="width:20%">
+                            Date of Relieving
+                        </td>
+                        <td colspan="2" align='left' style="font-weight: normal">
+                            @(ECF?.DateOfRelieving.ToString("dd-MM-yyyy"))
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td style="height: 15px;">
+                        </td>
+                    </tr>
+
+
+
+                    <tr>
+                        <td colspan="6">
+                            <table cellspacing="0" cellpadding="0" width="100%" border="1">
+                                <tr>
+                                    <th style="width:10%;">
+                                        Sr.No.
+                                    </th>
+                                    <th style="width:21%;">
+                                        Contents
+                                    </th>
+
+                                    <th style="width:21%;">
+                                        Department
+                                    </th>
+                                    <th style="width:21%;">
+                                        Signature
+                                    </th>
+                                    <th style="width:21%;">
+                                        Remarks
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: normal;">
+                                        1
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        Company’ Material
+                                        Returned
+                                    </td>
+
+                                    <td rowspan="6" style="font-weight: normal;">
+                                        @{
+                                            var desg = appList.First(x => x.Level == 1).Designation;
+                                            @(desg)
+                                        }
+                                    </td>
+                                    <td rowspan="6" style="font-weight: normal;">
+                                        @{
+                                            var Superior = appList.Find(x => x.Level == 1);
+                                            Skoda_DCMS.Models.ApprovalDataModel asstSuperior = null;
+                                            if (Superior != null && Superior.ApproverStatus.ToLower() == "pending")
+                                            {
+                                                asstSuperior = appList.FirstOrDefault(x =>
+                                                    x.Level == Superior.Level
+                                                    && (x.AssistantForEmployeeUserName?.ToLower() == Superior.ApproverUserName.ToLower() && x.ApproverStatus.ToLower() != "pending")
+                                                    || (x.RelationWith.HasValue && x.RelationWith != 0 ? x.RelationWith == Superior.RelationId && x.ApproverStatus.ToLower() != "pending" : false)
+                                                );
+                                            }
+                                            else
+                                            {
+                                                asstSuperior = Superior;
+                                            }
+                                            if (asstSuperior?.ApproverStatus.ToLower() == "approved")
+                                            {
+                                                @($"{asstSuperior?.ApproverStatus} on " +
+                                                $"{Convert.ToDateTime(asstSuperior?.Modified).ToShortDateString()} {Convert.ToDateTime(asstSuperior?.Modified).AddHours(5.5).ToShortTimeString()}");
+                                            }
+                                        }
+                                    </td>
+                                    <td rowspan="6" style="font-weight: normal;">
+                                        @{
+                                            @(asstSuperior != null ? asstSuperior?.Comment : "")
+                                        }
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: normal;">
+                                        2
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        Tools / Tool Kit
+                                    </td>
+
+                                    @*<td>
+            </td>*@
+                                    @*<td>
+            </td>
+            <td>
+            </td>*@
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: normal;">
+                                        3
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        Literature / Documents /
+                                        Drawings / Manuals
+                                    </td>
+
+                                    @*<td>
+            </td>*@
+                                    @*<td>
+            </td>
+            <td>
+            </td>*@
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: normal;">
+                                        4
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        Table / Drawer / Amirah /
+                                        Filing cabinet keys
+                                    </td>
+
+                                    @*<td>
+            </td>*@
+                                    @*<td>
+            </td>
+            <td>
+            </td>*@
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: normal;">
+                                        5
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        Locker Keys
+                                    </td>
+
+                                    @*<td>
+            </td>*@
+                                    @*<td>
+            </td>
+            <td>
+            </td>*@
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: normal;">
+                                        6
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        Other : Please specify
+                                    </td>
+
+                                    @*<td>
+            </td>*@
+                                    @*<td>
+            </td>
+            <td>
+            </td>*@
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: normal;">
+                                        7
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        ITP
+                                        (Service Desk / IT
+                                        Asset Team)
+                                    </td>
+
+                                    <td style="font-weight: normal;">
+                                        IT Asset Team
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        @{
+                                            var ITAssetTeam = appList.Find(x => x.Designation.ToLower() == "it asset team");
+                                            Skoda_DCMS.Models.ApprovalDataModel asstITAssetTeam = null;
+                                            if (ITAssetTeam != null && ITAssetTeam.ApproverStatus.ToLower() == "pending")
+                                            {
+                                                asstITAssetTeam = appList.FirstOrDefault(x =>
+                                                    x.Level == ITAssetTeam.Level
+                                                    && (x.AssistantForEmployeeUserName?.ToLower() == ITAssetTeam.ApproverUserName.ToLower() && x.ApproverStatus.ToLower() != "pending")
+                                                    || (x.RelationWith.HasValue && x.RelationWith != 0 ? x.RelationWith == ITAssetTeam.RelationId && x.ApproverStatus.ToLower() != "pending" : false)
+                                                );
+                                            }
+                                            else
+                                            {
+                                                asstITAssetTeam = ITAssetTeam;
+                                            }
+                                            if (asstITAssetTeam?.ApproverStatus.ToLower() == "approved")
+                                            {
+                                                @($"{asstITAssetTeam?.ApproverStatus} on " +
+                                                $"{Convert.ToDateTime(asstITAssetTeam?.Modified).ToShortDateString()} {Convert.ToDateTime(asstITAssetTeam?.Modified).AddHours(5.5).ToShortTimeString()}");
+                                            }
+                                        }
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        @{
+                                            @(asstITAssetTeam != null ? asstITAssetTeam.Comment : "")
+                                        }
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: normal;">
+                                        8
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        Safety Equipment
+                                    </td>
+
+                                    <td style="font-weight: normal;">
+                                        Safety
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        @{
+                                            var Safety = appList.Find(x => x.Designation.ToLower() == "safety");
+                                            Skoda_DCMS.Models.ApprovalDataModel asstSafety = null;
+                                            if (Safety != null && Safety.ApproverStatus.ToLower() == "pending")
+                                            {
+                                                asstSafety = appList.FirstOrDefault(x =>
+                                                    x.Level == Safety.Level
+                                                    && (x.AssistantForEmployeeUserName?.ToLower() == Safety.ApproverUserName.ToLower() && x.ApproverStatus.ToLower() != "pending")
+                                                    || (x.RelationWith.HasValue && x.RelationWith != 0 ? x.RelationWith == Safety.RelationId && x.ApproverStatus.ToLower() != "pending" : false)
+                                                );
+                                            }
+                                            else
+                                            {
+                                                asstSafety = Safety;
+                                            }
+                                            if (asstSafety?.ApproverStatus.ToLower() == "approved")
+                                            {
+                                                @($"{asstSafety?.ApproverStatus} on " +
+                                                $"{Convert.ToDateTime(asstSafety?.Modified).ToShortDateString()} {Convert.ToDateTime(asstSafety?.Modified).AddHours(5.5).ToShortTimeString()}");
+                                            }
+                                        }
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        @{
+                                            @(asstSafety != null ? asstSafety?.Comment : "")
+                                        }
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: normal;">
+                                        9
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        Identity Card
+                                    </td>
+
+                                    <td style="font-weight: normal;">
+                                        Security
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        @{
+                                            var Security = appList.Find(x => x.Designation.ToLower() == "security");
+                                            Skoda_DCMS.Models.ApprovalDataModel asstSecurity = null;
+                                            if (Security != null && Security.ApproverStatus.ToLower() == "pending")
+                                            {
+                                                asstSecurity = appList.FirstOrDefault(x =>
+                                                    x.Level == Security.Level
+                                                    && (x.AssistantForEmployeeUserName?.ToLower() == Security.ApproverUserName.ToLower() && x.ApproverStatus.ToLower() != "pending")
+                                                    || (x.RelationWith.HasValue && x.RelationWith != 0 ? x.RelationWith == Security.RelationId && x.ApproverStatus.ToLower() != "pending" : false)
+                                                );
+                                            }
+                                            else
+                                            {
+                                                asstSecurity = Security;
+                                            }
+                                            if (asstSecurity?.ApproverStatus.ToLower() == "approved")
+                                            {
+                                                @($"{asstSecurity?.ApproverStatus} on " +
+                                                $"{Convert.ToDateTime(asstSecurity?.Modified).ToShortDateString()} {Convert.ToDateTime(asstSecurity?.Modified).AddHours(5.5).ToShortTimeString()}");
+                                            }
+                                        }
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        @{
+                                            @(asstSecurity != null ? asstSecurity?.Comment : "")
+                                        }
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: normal;">
+                                        10
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        Advance taken, if any
+                                    </td>
+
+                                    <td style="font-weight: normal;">
+                                        Finance /
+                                        Accounts
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        @{
+                                            var FinanceNAccounts = appList.Find(x => x.Designation.ToLower() == "finance / accounts");
+                                            Skoda_DCMS.Models.ApprovalDataModel asstFinanceNAccounts = null;
+                                            if (FinanceNAccounts != null && FinanceNAccounts.ApproverStatus.ToLower() == "pending")
+                                            {
+                                                asstFinanceNAccounts = appList.FirstOrDefault(x =>
+                                                    x.Level == FinanceNAccounts.Level
+                                                    && (x.AssistantForEmployeeUserName?.ToLower() == FinanceNAccounts.ApproverUserName.ToLower() && x.ApproverStatus.ToLower() != "pending")
+                                                    || (x.RelationWith.HasValue && x.RelationWith != 0 ? x.RelationWith == FinanceNAccounts.RelationId && x.ApproverStatus.ToLower() != "pending" : false)
+                                                );
+                                            }
+                                            else
+                                            {
+                                                asstFinanceNAccounts = FinanceNAccounts;
+                                            }
+                                            if (asstFinanceNAccounts?.ApproverStatus.ToLower() == "approved")
+                                            {
+                                                @($"{asstFinanceNAccounts?.ApproverStatus} on " +
+                                                $"{Convert.ToDateTime(asstFinanceNAccounts?.Modified).ToShortDateString()} {Convert.ToDateTime(asstFinanceNAccounts?.Modified).AddHours(5.5).ToShortTimeString()}");
+                                            }
+                                        }
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        @{
+                                            @(asstFinanceNAccounts != null ? asstFinanceNAccounts?.Comment : "")
+                                        }
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: normal;">
+                                        11
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        Company’ car (AGM and
+                                        above only)
+
+                                    </td>
+
+                                    <td style="font-weight: normal;">
+                                        HR & Admin
+                                        (Transport Team)
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        @{
+                                            var HRNAdminTT = appList.Find(x => x.Designation.ToLower() == "hr & admin (transport team)");
+                                            Skoda_DCMS.Models.ApprovalDataModel asstHRNAdminTT = null;
+                                            if (HRNAdminTT != null && HRNAdminTT.ApproverStatus.ToLower() == "pending")
+                                            {
+                                                asstHRNAdminTT = appList.FirstOrDefault(x =>
+                                                    x.Level == HRNAdminTT.Level
+                                                    && (x.AssistantForEmployeeUserName?.ToLower() == HRNAdminTT.ApproverUserName.ToLower() && x.ApproverStatus.ToLower() != "pending")
+                                                    || (x.RelationWith.HasValue && x.RelationWith != 0 ? x.RelationWith == HRNAdminTT.RelationId && x.ApproverStatus.ToLower() != "pending" : false)
+                                                );
+                                            }
+                                            else
+                                            {
+                                                asstHRNAdminTT = HRNAdminTT;
+                                            }
+                                            if (asstHRNAdminTT?.ApproverStatus.ToLower() == "approved")
+                                            {
+                                                @($"{asstHRNAdminTT?.ApproverStatus} on " +
+                                                $"{Convert.ToDateTime(asstHRNAdminTT?.Modified).ToShortDateString()} {Convert.ToDateTime(asstHRNAdminTT?.Modified).AddHours(5.5).ToShortTimeString()}");
+                                            }
+                                        }
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        @{
+                                            @(asstHRNAdminTT != null ? asstHRNAdminTT?.Comment : "")
+                                        }
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: normal;">
+                                        12
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        Overseas Training Bond /
+                                        IGTC (Education Training
+                                        Bond) / Edu Next
+                                    </td>
+
+                                    <td style="font-weight: normal;">
+                                        HR & Admin
+                                        (Respective HRC)
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        @{
+                                            var HRNAdminRH = appList.Find(x => x.Designation.ToLower() == "hr & admin (respective hrc)");
+                                            Skoda_DCMS.Models.ApprovalDataModel asstHRNAdminRH = null;
+                                            if (HRNAdminRH != null && HRNAdminRH.ApproverStatus.ToLower() == "pending")
+                                            {
+                                                asstHRNAdminRH = appList.FirstOrDefault(x =>
+                                                    x.Level == HRNAdminRH.Level
+                                                    && (x.AssistantForEmployeeUserName?.ToLower() == HRNAdminRH.ApproverUserName.ToLower() && x.ApproverStatus.ToLower() != "pending")
+                                                    || (x.RelationWith.HasValue && x.RelationWith != 0 ? x.RelationWith == HRNAdminRH.RelationId && x.ApproverStatus.ToLower() != "pending" : false)
+                                                );
+                                            }
+                                            else
+                                            {
+                                                asstHRNAdminRH = HRNAdminRH;
+                                            }
+                                            if (asstHRNAdminRH?.ApproverStatus.ToLower() == "approved")
+                                            {
+                                                @($"{asstHRNAdminRH?.ApproverStatus} on " +
+                                                $"{Convert.ToDateTime(asstHRNAdminRH?.Modified).ToShortDateString()} {Convert.ToDateTime(asstHRNAdminRH?.Modified).AddHours(5.5).ToShortTimeString()}");
+                                            }
+                                        }
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        @{
+                                            @(asstHRNAdminRH != null ? asstHRNAdminRH?.Comment : "")
+                                        }
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: normal;">
+                                        13
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        Relocation Expenses
+                                        Recovery
+                                    </td>
+
+                                    <td style="font-weight: normal;">
+                                        HR & Admin
+                                        (Respective HRC)
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        @{
+                                            var HRNAdminRH1 = appList.FindLast(x => x.Designation.ToLower() == "hr & admin (respective hrc)");
+                                            Skoda_DCMS.Models.ApprovalDataModel asstHRNAdminRH1 = null;
+                                            if (HRNAdminRH1 != null && HRNAdminRH1.ApproverStatus.ToLower() == "pending")
+                                            {
+                                                asstHRNAdminRH1 = appList.FirstOrDefault(x =>
+                                                    x.Level == HRNAdminRH1.Level
+                                                    && (x.AssistantForEmployeeUserName?.ToLower() == HRNAdminRH1.ApproverUserName.ToLower() && x.ApproverStatus.ToLower() != "pending")
+                                                    || (x.RelationWith.HasValue && x.RelationWith != 0 ? x.RelationWith == HRNAdminRH1.RelationId && x.ApproverStatus.ToLower() != "pending" : false)
+                                                );
+                                            }
+                                            else
+                                            {
+                                                asstHRNAdminRH1 = HRNAdminRH1;
+                                            }
+                                            if (asstHRNAdminRH1?.ApproverStatus.ToLower() == "approved")
+                                            {
+                                                @($"{asstHRNAdminRH1?.ApproverStatus} on " +
+                                                $"{Convert.ToDateTime(asstHRNAdminRH1?.Modified).ToShortDateString()} {Convert.ToDateTime(asstHRNAdminRH1?.Modified).AddHours(5.5).ToShortTimeString()}");
+                                            }
+                                        }
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        @{
+                                            @(asstHRNAdminRH1 != null ? asstHRNAdminRH1?.Comment : "")
+                                        }
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: normal;">
+                                        14
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        Library
+                                    </td>
+
+                                    <td style="font-weight: normal;">
+                                        Library In – charge
+
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        @{
+                                            var LibraryInCharge = appList.Find(x => x.Designation.ToLower() == "library in – charge");
+                                            Skoda_DCMS.Models.ApprovalDataModel asstLibraryInCharge = null;
+                                            if (LibraryInCharge != null && LibraryInCharge.ApproverStatus.ToLower() == "pending")
+                                            {
+                                                asstLibraryInCharge = appList.FirstOrDefault(x =>
+                                                    x.Level == LibraryInCharge.Level
+                                                    && (x.AssistantForEmployeeUserName?.ToLower() == LibraryInCharge.ApproverUserName.ToLower() && x.ApproverStatus.ToLower() != "pending")
+                                                    || (x.RelationWith.HasValue && x.RelationWith != 0 ? x.RelationWith == LibraryInCharge.RelationId && x.ApproverStatus.ToLower() != "pending" : false)
+                                                );
+                                            }
+                                            else
+                                            {
+                                                asstLibraryInCharge = LibraryInCharge;
+                                            }
+                                            if (asstLibraryInCharge?.ApproverStatus.ToLower() == "approved")
+                                            {
+                                                @($"{asstLibraryInCharge?.ApproverStatus} on " +
+                                                $"{Convert.ToDateTime(asstLibraryInCharge?.Modified).ToShortDateString()} {Convert.ToDateTime(asstLibraryInCharge?.Modified).AddHours(5.5).ToShortTimeString()}");
+                                            }
+                                        }
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        @{
+                                            @(asstLibraryInCharge != null ? asstLibraryInCharge?.Comment : "")
+                                        }
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: normal;">
+                                        15
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        Employees Cooperative Credit
+                                        Society
+                                    </td>
+
+                                    <td style="font-weight: normal;">
+                                        Committee Member
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        @{
+                                            var CommitteeMember = appList.Find(x => x.Designation.ToLower() == "committee member");
+                                            Skoda_DCMS.Models.ApprovalDataModel asstCommitteeMember = null;
+                                            if (CommitteeMember != null && CommitteeMember.ApproverStatus.ToLower() == "pending")
+                                            {
+                                                asstCommitteeMember = appList.FirstOrDefault(x =>
+                                                    x.Level == CommitteeMember.Level
+                                                    && (x.AssistantForEmployeeUserName?.ToLower() == CommitteeMember.ApproverUserName.ToLower() && x.ApproverStatus.ToLower() != "pending")
+                                                    || (x.RelationWith.HasValue && x.RelationWith != 0 ? x.RelationWith == CommitteeMember.RelationId && x.ApproverStatus.ToLower() != "pending" : false)
+                                                );
+                                            }
+                                            else
+                                            {
+                                                asstCommitteeMember = CommitteeMember;
+                                            }
+                                            if (asstCommitteeMember?.ApproverStatus.ToLower() == "approved")
+                                            {
+                                                @($"{asstCommitteeMember?.ApproverStatus} on " +
+                                                $"{Convert.ToDateTime(asstCommitteeMember?.Modified).ToShortDateString()} {Convert.ToDateTime(asstCommitteeMember?.Modified).AddHours(5.5).ToShortTimeString()}");
+                                            }
+                                        }
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        @{
+                                            @(asstCommitteeMember != null ? asstCommitteeMember?.Comment : "")
+                                        }
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: normal;">
+                                        16
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        Any disciplinary action
+                                        taken in the assessment
+                                        period (Yes/No)
+                                    </td>
+
+                                    <td style="font-weight: normal;">
+                                        HRC
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        @{
+                                            var HRC = appList.Find(x => x.Designation.ToLower() == "hrc");
+                                            Skoda_DCMS.Models.ApprovalDataModel asstHRC = null;
+                                            if (HRC != null && HRC.ApproverStatus.ToLower() == "pending")
+                                            {
+                                                asstHRC = appList.FirstOrDefault(x =>
+                                                    x.Level == HRC.Level
+                                                    && (x.AssistantForEmployeeUserName?.ToLower() == HRC.ApproverUserName.ToLower() && x.ApproverStatus.ToLower() != "pending")
+                                                    || (x.RelationWith.HasValue && x.RelationWith != 0 ? x.RelationWith == HRC.RelationId && x.ApproverStatus.ToLower() != "pending" : false)
+                                                );
+                                            }
+                                            else
+                                            {
+                                                asstHRC = HRC;
+                                            }
+                                            if (asstHRC?.ApproverStatus.ToLower() == "approved")
+                                            {
+                                                @($"{asstHRC?.ApproverStatus} on " +
+                                                $"{Convert.ToDateTime(asstHRC?.Modified).ToShortDateString()} {Convert.ToDateTime(asstHRC?.Modified).AddHours(5.5).ToShortTimeString()}");
+                                            }
+                                        }
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        @{
+                                            @(asstHRC != null ? asstHRC?.Comment : "")
+                                            <input type="checkbox" @(ECF?.DisciplinaryAction == "Yes" ? "checked" : "")> <span>Yes</span>
+                                            <input type="checkbox" @(ECF?.DisciplinaryAction == "No" ? "checked" : "") style="margin-left:10px;"> <span>No</span>
+                                        }
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td style="font-weight: normal;">
+                                        17
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        Credit card
+                                    </td>
+
+                                    <td style="font-weight: normal;">
+                                        Treasury
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        @{
+                                            var Treasury = appList.Find(x => x.Designation.ToLower() == "treasury");
+                                            Skoda_DCMS.Models.ApprovalDataModel asstTreasury = null;
+                                            if (Treasury != null && Treasury.ApproverStatus.ToLower() == "pending")
+                                            {
+                                                asstTreasury = appList.FirstOrDefault(x =>
+                                                    x.Level == Treasury.Level
+                                                    && (x.AssistantForEmployeeUserName?.ToLower() == Treasury.ApproverUserName.ToLower() && x.ApproverStatus.ToLower() != "pending")
+                                                    || (x.RelationWith.HasValue && x.RelationWith != 0 ? x.RelationWith == Treasury.RelationId && x.ApproverStatus.ToLower() != "pending" : false)
+                                                );
+                                            }
+                                            else
+                                            {
+                                                asstTreasury = Treasury;
+                                            }
+                                            if (asstTreasury?.ApproverStatus.ToLower() == "approved")
+                                            {
+                                                @($"{asstTreasury?.ApproverStatus} on " +
+                                                $"{Convert.ToDateTime(asstTreasury?.Modified).ToShortDateString()} {Convert.ToDateTime(asstTreasury?.Modified).AddHours(5.5).ToShortTimeString()}");
+                                            }
+                                        }
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        @{
+                                            @(asstTreasury != null ? asstTreasury?.Comment : "")
+                                            <input type="checkbox" @(ECF?.CreditCard?.ToLower() == "yes" ? "checked" : "")> <span>Yes</span>
+                                            <input type="checkbox" @(ECF?.CreditCard?.ToLower() == "no" ? "checked" : "") style="margin-left:10px;"> <span>No</span>
+                                        }
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td style="font-weight: normal;">
+                                        18
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        Mobile Reimbursement
+                                    </td>
+
+                                    <td style="font-weight: normal;">
+                                        HR Compliance Team /
+                                        HRC
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        @{
+                                            var HRComplianceTeam = appList.Find(x => x.Designation.ToLower() == "hr compliance team / hrc");
+                                            Skoda_DCMS.Models.ApprovalDataModel asstHRComplianceTeam = null;
+                                            if (HRComplianceTeam != null && HRComplianceTeam.ApproverStatus.ToLower() == "pending")
+                                            {
+                                                asstHRComplianceTeam = appList.FirstOrDefault(x =>
+                                                    x.Level == HRComplianceTeam.Level
+                                                    && (x.AssistantForEmployeeUserName?.ToLower() == HRComplianceTeam.ApproverUserName.ToLower() && x.ApproverStatus.ToLower() != "pending")
+                                                    || (x.RelationWith.HasValue && x.RelationWith != 0 ? x.RelationWith == HRComplianceTeam.RelationId && x.ApproverStatus.ToLower() != "pending" : false)
+                                                );
+                                            }
+                                            else
+                                            {
+                                                asstHRComplianceTeam = HRComplianceTeam;
+                                            }
+                                            if (asstHRComplianceTeam?.ApproverStatus.ToLower() == "approved")
+                                            {
+                                                @($"{asstHRComplianceTeam?.ApproverStatus} on " +
+                                                $"{Convert.ToDateTime(asstHRComplianceTeam?.Modified).ToShortDateString()} {Convert.ToDateTime(asstHRComplianceTeam?.Modified).AddHours(5.5).ToShortTimeString()}");
+                                            }
+                                        }
+                                    </td>
+                                    <td style="font-weight: normal;">
+                                        @{
+                                            @(asstHRComplianceTeam != null ? asstHRComplianceTeam?.Comment : "")
+                                        }
+                                    </td>
+                                </tr>
+
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%">
+                            Charge to be handed over to
+                        </td>
+                        <td style="width: 80%" colspan="5" align='left'>
+                            <input type="text" style="height: 25px; width:80%; border-radius: 0; " value="@(ECF?.ChargeHandOverToEmpName ?? "")" />
+                        </td>
+
+
+                    </tr>
+                    <tr>
+                        <td style="width:33%" colspan="2" align="center">
+                            @{
+                                var formSubmittedDate = appList.FirstOrDefault()?.FormId?.CreatedDate;
+                                if (formSubmittedDate != null)
+                                {
+                                    @(Convert.ToDateTime(formSubmittedDate).ToShortDateString())
+                                }
+                            }
+
+                            <span style="width:100%; display:block; margin-bottom: 5px; height: 30px; border-bottom: 2px solid #000;"> </span>
+                            Date
+                        </td>
+                        <td style="width: 33%;" colspan="2" align="center" >
+                            @{
+                                var HOD = appList.Find(x => x.Designation.ToLower() == "head of department");
+                                Skoda_DCMS.Models.ApprovalDataModel asstHOD = null;
+                                if (HOD != null && HOD.ApproverStatus.ToLower() == "pending")
+                                {
+                                    asstHOD = appList.FirstOrDefault(x =>
+                                        x.Level == HOD.Level
+                                        && (x.AssistantForEmployeeUserName?.ToLower() == HOD.ApproverUserName.ToLower() && x.ApproverStatus.ToLower() != "pending")
+                                        || (x.RelationWith.HasValue && x.RelationWith != 0 ? x.RelationWith == HOD.RelationId && x.ApproverStatus.ToLower() != "pending" : false)
+                                    );
+                                }
+                                else
+                                {
+                                    asstHOD = HOD;
+                                }
+                                if (asstHOD?.ApproverStatus.ToLower() == "approved")
+                                {
+                                    @($"{asstHOD?.ApproverStatus} on " +
+                                            $"{Convert.ToDateTime(asstHOD?.Modified).ToShortDateString()} {Convert.ToDateTime(asstHOD?.Modified).AddHours(5.5).ToShortTimeString()}");
+                                    <br/>
+                                    @(asstHOD != null ? asstHOD?.Comment : "");
+                                }
+                            }
+                            <span style="width:100%; display:block; margin-bottom: 5px; height: 30px; border-bottom: 2px solid #000;"> </span>
+                            Department Head
+                        </td>
+                        <td style="width:33%;" colspan="2" align="center">
+                            @{
+                                var HRNAdmin = appList.Find(x => x.Designation.ToLower() == "hr & admin");
+                                Skoda_DCMS.Models.ApprovalDataModel asstHRNAdmin = null;
+                                if (HRNAdmin != null && HRNAdmin.ApproverStatus.ToLower() == "pending")
+                                {
+                                    asstHRNAdmin = appList.FirstOrDefault(x =>
+                                        x.Level == HRNAdmin.Level
+                                        && (x.AssistantForEmployeeUserName?.ToLower() == HRNAdmin.ApproverUserName.ToLower() && x.ApproverStatus.ToLower() != "pending")
+                                        || (x.RelationWith.HasValue && x.RelationWith != 0 ? x.RelationWith == HRNAdmin.RelationId && x.ApproverStatus.ToLower() != "pending" : false)
+                                    );
+                                }
+                                else
+                                {
+                                    asstHRNAdmin = HRNAdmin;
+                                }
+                                if (asstHRNAdmin?.ApproverStatus.ToLower() == "approved")
+                                {
+                                    @($"{asstHRNAdmin?.ApproverStatus} on " +
+                                            $"{Convert.ToDateTime(asstHRNAdmin?.Modified).ToShortDateString()} {Convert.ToDateTime(asstHRNAdmin?.Modified).AddHours(5.5).ToShortTimeString()}");
+                                    <br />
+                                    @(asstHRNAdmin != null ? asstHRNAdmin?.Comment : "");
+                                }
+                            }
+                            <span style="width:100%; display:block; margin-bottom: 5px; height: 30px; border-bottom: 2px solid #000;"> </span>
+                            HR & Admin.
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td style="width:100%; padding-top: 40px;" align="left" colspan="6">
+                            Payroll clearance
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="6">
+                            <table style="width:100%" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td style="width:15%" align="left">
+                                        Resignation received on
+                                    </td>
+                                    <td style="width:35%; font-weight: normal" align="left" colspan="2">
+                                        @(ECF?.ResignationReceivedDate?.ToString("dd-MM-yyyy"))
+                                        @*<input style="width:80%" type="text" value="">*@
+                                    </td>
+                                    <td style="width:15%" align="left" colspan="2">
+                                        Resignation given date
+                                    </td>
+                                    <td style="width:35%; font-weight: normal" align="left">
+                                        @(ECF?.ResignationGivenDate?.ToString("dd-MM-yyyy"))
+                                        @*<input type="text" name="" style="width:80%" value="">*@
+                                    </td>
+
+                                </tr>
+                                @*<tr>
+                                    <td style="width:15%" align="left">
+                                        Resignation received on
+                                    </td>
+                                    <td style="width:35%" align="left" colspan="2">
+                                        <input style="width:80%" type="text" name="">
+                                    </td>
+                                    <td style="width:15%" align="left" colspan="2">
+                                        Resignation given date
+                                    </td>
+                                    <td style="width:35%" align="left">
+                                        <input type="text" name="" style="width:80%">
+                                    </td>
+
+                                </tr>*@
+                                <tr>
+                                    <td style="width:15%">
+                                        <label>Notice Period</label>
+                                    </td>
+                                    <td style="width:35%; font-weight: normal;" colspan="2">
+                                        <input type="checkbox"  @(ECF?.NoticePeriod?.ToLower() == "applicable" ? "checked" : "")> <span>Applicable</span>
+                                        <input type="checkbox" @(ECF?.NoticePeriod?.ToLower() == "not applicable" ? "checked" : "") value="Not-applicable" style="margin-left:10px;"> <span>Not-applicable</span>
+                                    </td>
+                                    <td style="width:15%" colspan="2">
+                                        Applicable Days
+                                    </td>
+                                    <td style="width:35%; font-weight: normal">
+                                        @(ECF?.ApplicableDays.ToString() ?? "")
+                                        @*<input type="text" name="" style="width: 80%; border-bottom: 1px solid #000;" value="@(ECF?.ApplicableDays.ToString() ?? "")">*@
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="width:15%">
+                                        <label>Eligible for Gratuity</label>
+                                    </td>
+                                    <td style="width:35%; font-weight: normal;" colspan="2">
+                                        <input type="checkbox" @(ECF?.Gratuity?.ToLower() == "yes" ? "checked" : "")> <span>Yes</span>
+                                        <input type="checkbox" @(ECF?.Gratuity?.ToLower() == "no" ? "checked" : "") value="Not-applicable" style="margin-left:10px;"> <span>No</span>
+                                    </td>
+                                    <td style="width:15%" colspan="2">
+                                    </td>
+                                    <td style="width:35%">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="width:80%; padding-top:100px;" colspan="4">
+                                        @{
+                                            var HRNAdminDept = appList.Find(x => x.Designation.ToLower() == "hr & admin dept");
+                                            Skoda_DCMS.Models.ApprovalDataModel asstHRNAdminDept = null;
+                                            if (HRNAdmin != null && HRNAdmin.ApproverStatus.ToLower() == "pending")
+                                            {
+                                                asstHRNAdminDept = appList.FirstOrDefault(x =>
+                                                                    x.Level == HRNAdminDept.Level
+                                                                    && (x.AssistantForEmployeeUserName?.ToLower() == HRNAdminDept.ApproverUserName.ToLower() && x.ApproverStatus.ToLower() != "pending")
+                                                                    || (x.RelationWith.HasValue && x.RelationWith != 0 ? x.RelationWith == HRNAdminDept.RelationId && x.ApproverStatus.ToLower() != "pending" : false)
+                                                                );
+                                            }
+                                            else
+                                            {
+                                                asstHRNAdminDept = HRNAdminDept;
+                                            }
+                                            if (asstHRNAdminDept?.ApproverStatus.ToLower() == "approved")
+                                            {
+                                                @($"{asstHRNAdminDept?.ApproverStatus} on " +
+                                            $"{Convert.ToDateTime(asstHRNAdminDept?.Modified).ToShortDateString()} {Convert.ToDateTime(asstHRNAdminDept?.Modified).AddHours(5.5).ToShortTimeString()}");
+                                                <br />
+                                                @(asstHRNAdminDept != null ? asstHRNAdminDept?.Comment : "");
+                                            }
+                                        }
+                                        <span style="text-align: center; line-height: 20px; width: 20%; display: block;"> </span>
+                                        <span style="border-top: 2px solid #000; text-align: center; line-height: 20px; width: 20%; display: block;">
+                                            HR & Admin Dept
+                                        </span>
+
+                                    </td>
+
+                                </tr>
+
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+</body>
+
+</html>

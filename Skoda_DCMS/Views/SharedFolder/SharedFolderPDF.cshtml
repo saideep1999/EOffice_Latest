@@ -1,0 +1,545 @@
+﻿
+@{
+    Layout = null;
+    dynamic SFF = null;
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        SFF = ViewBag.Model;
+
+    }
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <style type="text/css">
+        *:visited, *:focus {
+            box-shadow: none;
+        }
+
+        input, select, input:focus, select:focus, textarea, textarea:focus {
+            border: 1px solid #000;
+        }
+
+        input, textarea {
+            padding: 5px;
+        }
+
+        .signature-table thead td {
+            border-bottom: 1px solid black;
+            border-left: 1px solid black;
+            border-collapse: collapse;
+        }
+
+        .signature-table tbody, .signature-table td {
+            border: none;
+            border-left: 1px solid black;
+            border-collapse: collapse;
+            padding: 5px;
+        }
+
+            .signature-table td:first-child {
+                border-left: none;
+            }
+
+        .signature-table {
+            border: 1px solid black;
+        }
+
+        @@font-face {
+            font-family: 'SKODANext-Black';
+            src: url('../../fonts/SKODANextfont/SKODANext-Black.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Bold.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Light.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Regular.ttf') format('truetype');
+        }
+
+        body {
+            font-family: 'SKODANext-Black';
+        }
+    </style>
+</head>
+<body>
+
+    <table style="width: 100%; font-size: 14px; color: rgb(110,110,110); font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+        <tr>
+            <td>
+                <table style="width: 100%;" cellspadding="0" cellspacing="0">
+                    <tr>
+                        <td width="20%" style="text-align: center; border-right: 1px solid #000; border-bottom: 1px solid #000;">
+                            Classification
+                        </td>
+                        <td width="20%" style="text-align: center; border-right: 1px solid #000; border-bottom: 1px solid #000;">
+                            Internal
+                        </td>
+                        <td rowspan="2" width="60%" style="text-align: right;">
+                            <img style="width: 50%;" src='@Server.MapPath("~/assets/img/SAVWIPL_Merger_Logo.JPG")'>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: center; border-right: 1px solid #000;">
+                            Version
+                        </td>
+                        <td style="text-align: center; border-right: 1px solid #000;">
+                            01
+                        </td>
+
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td style="height: 45px; text-align: center; border-left: 1px solid #000; border-right: 1px solid #000; border-bottom: 1px solid #000;">
+                Shared Folder Creation / Change Form
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 15px;">
+                <table cellspacing="0" cellpadding="0" width="100%">
+                    @if (SFF.one[0].RequestSubmissionFor != "OnBehalf")
+                    {
+                        <tr>
+                            <td>
+                                Type of Employee
+                            </td>
+                            <td>
+                                @if (SFF.one[0].EmployeeType == "Internal")
+                                {
+                                    <input type="checkbox" id="internal" name="chkTyprEmp" value="Internal" checked>
+                                }
+                                else
+                                {
+                                    <input type="checkbox" id="internal" name="chkTyprEmp" value="Internal">
+                                }
+                                <label for="vehicle1"> Internal</label>
+                            </td>
+                            <td>
+                                @if (SFF.one[0].EmployeeType == "External")
+                                {
+                                    <input type="checkbox" id="internal" name="chkTyprEmp" value="Internal" checked>
+                                }
+                                else
+                                {
+                                    <input type="checkbox" id="internal" name="chkTyprEmp" value="Internal">
+                                }
+                                <label for="vehicle1"> External</label>
+                            </td>
+                            <td colspan="3">
+                                @if (SFF.one[0].EmployeeType == "External")
+                                {
+                                    <input type="text" placeholder="External Company Name" style="height: 25px; border-radius: 0; " value="@(SFF.one[0].ExternalOtherOrganizationName ?? "")" />
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="height: 15px;">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Employee Code
+                            </td>
+                            <td>
+                                <input type="text" style="height: 25px; border-radius: 0; " value="@(SFF.one[0].EmployeeCode ?? "")" />
+                            </td>
+                            <td>
+                                Cose Center No.
+                            </td>
+                            <td>
+                                <input type="text" style="height: 25px; border-radius: 0; " value="@(SFF.one[0].EmployeeCCCode ?? "")" />
+                            </td>
+                            <td>
+                                UserId
+                            </td>
+                            <td>
+                                <input type="text" style="height: 25px; border-radius: 0; width: 100%; " value="@(SFF.one[0].EmployeeUserId ?? "")" />
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style="height: 15px;">
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Employee Name
+                            </td>
+                            <td>
+                                <input type="text" style="height: 25px; border-radius: 0; " value="@(SFF.one[0].EmployeeName ?? "")" />
+                            </td>
+                            <td>
+                                Department
+                            </td>
+                            <td>
+                                <input type="text" style="height: 25px; border-radius: 0; " value="@(SFF.one[0].EmployeeDepartment ?? "")" />
+                            </td>
+                            <td>
+                                Contact No.
+                            </td>
+                            <td>
+                                <input type="text" style="height: 25px; border-radius: 0; width: 100%; " value="@(SFF.one[0].EmployeeContactNo ?? "")" />
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style="height: 15px;">
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td>
+                                Type of Employee
+                            </td>
+                            <td>
+                                @if (SFF.one[0].OtherEmployeeType == "Internal")
+                                {
+                                    <input type="checkbox" id="internal" name="chkTyprEmp" value="Internal" checked>
+                                }
+                                else
+                                {
+                                    <input type="checkbox" id="internal" name="chkTyprEmp" value="Internal">
+                                }
+                                <label for="vehicle1"> Internal</label>
+                            </td>
+                            <td>
+                                @if (SFF.one[0].OtherEmployeeType == "External")
+                                {
+                                    <input type="checkbox" id="internal" name="chkTyprEmp" value="Internal" checked>
+                                }
+                                else
+                                {
+                                    <input type="checkbox" id="internal" name="chkTyprEmp" value="Internal">
+                                }
+                                <label for="vehicle1"> External</label>
+                            </td>
+                            <td colspan="3">
+                                @if (SFF.one[0].OtherEmployeeType == "External")
+                                {
+                                    <input type="text" placeholder="External Company Name" style="height: 25px; border-radius: 0; " value="@(SFF.one[0].OtherExternalOtherOrganizationName ?? "")" />
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="height: 15px;">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Employee Code
+                            </td>
+                            <td>
+                                <input type="text" style="height: 25px; border-radius: 0; " value="@(SFF.one[0].OtherEmployeeCode ?? "")" />
+                            </td>
+                            <td>
+                                Cose Center No.
+                            </td>
+                            <td>
+                                <input type="text" style="height: 25px; border-radius: 0; " value="@(SFF.one[0].OtherEmployeeCCCode ?? "")" />
+                            </td>
+                            <td>
+                                UserId
+                            </td>
+                            <td>
+                                <input type="text" style="height: 25px; border-radius: 0; width: 100%; " value="@(SFF.one[0].OtherEmployeeUserId ?? "")" />
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style="height: 15px;">
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Employee Name
+                            </td>
+                            <td>
+                                <input type="text" style="height: 25px; border-radius: 0; " value="@(SFF.one[0].OtherEmployeeName ?? "")" />
+                            </td>
+                            <td>
+                                Department
+                            </td>
+                            <td>
+                                <input type="text" style="height: 25px; border-radius: 0; " value="@(SFF.one[0].OtherEmployeeDepartment ?? "")" />
+                            </td>
+                            <td>
+                                Contact No.
+                            </td>
+                            <td>
+                                <input type="text" style="height: 25px; border-radius: 0; width: 100%; " value="@(SFF.one[0].OtherEmployeeContactNo ?? "")" />
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style="height: 15px;">
+                            </td>
+                        </tr>
+                    }
+
+                    <tr>
+                        <td style="height: 15px;">
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            Request Type
+                        </td>
+                        <td>
+                            @if (SFF.one[0].RequestType == "Permanent")
+                            {
+                                <input type="checkbox" id="internal" name="chkTyprEmp" value="Internal" checked>
+                            }
+                            else
+                            {
+                                <input type="checkbox" id="internal" name="chkTyprEmp" value="Internal">
+                            }
+                            <label for="vehicle1"> Permanent</label>
+                        </td>
+                        <td>
+                            @if (SFF.one[0].RequestType == "Temporary")
+                            {
+                                <input type="checkbox" id="external" name="chkTyprEmp" value="Internal" checked>
+                            }
+                            else
+                            {
+                                <input type="checkbox" id="external" name="chkTyprEmp" value="Internal">
+                            }
+                            <label for="vehicle1"> Temporary</label>
+                        </td>
+                        <td>
+                            if Temporary
+                        </td>
+                        @if (SFF.one[0].RequestType == "Temporary")
+                        {
+                            <td>
+                                <span style="display: flex; align-items: baseline;">From <input type="text" style="height: 25px; border-radius: 0; margin-right: 5px; margin-left: 5px; width: 98%; "  value="@(SFF.one[0].TempFrom.ToString("yyyy-MM-dd"))" /></span>
+                            </td>
+                            <td>
+                                <span style="display: flex; align-items: baseline;"> To <input type="text" style="height: 25px; border-radius:0; margin-left: 5px; width: 100%; " value="@(SFF.one[0].TempTo.ToString("yyyy-MM-dd"))" /></span>
+                            </td>
+                        }
+
+                    </tr>
+                    <tr>
+                        <td style="height: 25px;">
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="3">
+                            <div>
+                                <lable>Details of Folder creation / Change</lable>
+
+
+                                <table cellspacing="0" cellpadding="0" border="0" width="100%">
+                                    <tr>
+                                        <td width="48%">
+                                            @if (SFF.one[0].RequestFor == "AddRemoveMembers")
+                                            {
+                                                <input type="checkbox" checked>
+                                            }
+                                            else
+                                            {
+                                                <input type="checkbox">
+                                            }
+                                            Add & Remove Membersver
+
+
+                                        </td>
+
+                                        <td width="4%">
+                                        </td>
+
+                                        <td width="48%">
+                                            <input placeholder="Folder Owner UserID" type="text" style="height: 15px; margin-left: 50px; border-radius: 0; margin-bottom: 5px; width: 100%%; " />
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="48%">
+                                            @if (SFF.one[0].RequestFor == "Creation")
+                                            {
+                                                <input type="checkbox" checked />
+                                            }
+                                            else
+                                            {
+                                                <input type="checkbox" />
+                                            }
+                                            <input type="checkbox" value=""> Creation
+
+
+                                        </td>
+
+                                        <td width="4%">
+                                        </td>
+
+                                        <td width="48%">
+                                            <input type="text" style="height: 15px; margin-bottom: 5px; margin-left: 50px; border-radius: 0; width: 100%%; " /> GB
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="48%">
+                                            @if (SFF.one[0].RequestFor == "Change")
+                                            {
+                                                <input type="checkbox" checked /> }
+                                            else
+                                            {
+                                                <input type="checkbox" />
+                                            }Change
+
+
+                                        </td>
+
+                                        <td width="4%">
+                                        </td>
+
+                                        <td width="48%">
+                                            <input type="text" style="height: 15px; margin-bottom: 5px; margin-left: 50px; border-radius: 0; width: 100%%; " /> GB
+
+                                        </td>
+                                    </tr>
+
+                                </table>
+                                <div style="margin-top:20px;">
+                                    <label style="margin-bottom: 0;">Folder Name</label>
+                                    <ul style="list-style: none; margin-top: 5px; padding-left: 0px;">
+                                        <li>1. Folder name 1 </li>
+                                        <li>2. Folder name 2 </li>
+
+                                    </ul>
+                                </div>
+
+                        </td>
+
+                        <td colspan="3" valign="top">
+                            <div>
+                                <lable>Add & Remove Members</lable>
+                                <table cellpadding="2" cellspacing="0" border="1" width="90%">
+                                    <tr>
+                                        <th style="width: 40%;">
+                                            User ID
+                                        </th>
+                                        <th width="40%">
+                                            Permissions Needed
+                                        </th>
+                                        <th width="20%">
+                                            Remove Access
+                                        </th>
+
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <input type="text" style="height: 15px; border-radius: 0; width: 95%;" />
+                                        </td>
+                                        <td style="text-align: center;">
+                                            <input type="checkbox" id="read" name="chkTyprEmp" value="Read" /> Read
+
+                                            <input type="checkbox" id="write" name="chkTyprEmp" value="Write" /> Write
+                                        </td>
+                                        <td style="text-align: center;">
+                                            <input type="checkbox" id="remove" name="chkTyprEmp" value="remove" /> Remove
+                                        </td>
+
+                                    </tr>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="height: 25px;">
+                        </td>
+                    </tr>
+
+                    <tr>
+
+                        <td colspan="6" style="text-align: center;">
+                            <table cellpadding="0" cellspacing="0" border="1" width="100%">
+                                <tr>
+                                    <td colspan="2" width="50%" style="height: 30px;">
+                                        <lable>Requester Signature</lable>
+                                    </td>
+                                    <td colspan="2" width="50%" style="height: 30px;">
+                                        <lable>Only for new folder creation/Additional space allocation/Owner Change</lable>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="height: 30px;">
+                                        Requester Signature
+                                    </td>
+                                    <td style="height: 30px;">
+                                        Folder Owner
+                                    </td>
+                                    <td style="height: 30px;">
+                                        HOD of Requester
+                                    </td>
+                                    <td style="height: 30px;">
+                                        IT- Server Manager
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="height: 80px;">
+                                    </td>
+                                    <td style="height: 80px;">
+                                    </td>
+                                    <td style="height: 80px;">
+                                    </td>
+                                    <td style="height: 80px;">
+                                    </td>
+                                </tr>
+                            </table>
+
+
+
+                        </td>
+
+
+
+
+
+                    </tr>
+                    <!-- <tr>
+        <td colspan="3">
+
+            <div style="margin-bottom: 10px; margin-top: 10px;">
+
+                <textarea type="text" rows="5" value="" style="width: 100%;"></textarea>
+            </div>
+
+        </td>
+
+        <td colspan="3">
+
+            <div style="margin-bottom: 10px; margin-top: 10px;">
+
+                <textarea type="text" rows="5" value="" style="width: 100%;"></textarea>
+            </div>
+
+        </td>
+
+    </tr> -->
+
+
+
+                    <tr>
+                        <td colspan="6">
+                            <lable>For IT use only</lable>
+                            <div style="margin-bottom: 10px; margin-top: 10px;">
+
+                                <span>Ticket No. </span>  <span> <input type="text" value="" style="width: 20%;"></input></span>
+                            </div>
+
+                        </td>
+
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

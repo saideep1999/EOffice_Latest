@@ -1,0 +1,696 @@
+@{
+    ViewBag.Title = "Gifts, Invitation and Compliance Consultation Form";
+    int FormId = 0, AppRowId = 0, ApprovalType = 0;
+    bool IsNewMode = true, IsEditMode = false, IsViewMode = false;
+    bool IsNew = true;
+    bool IsEdit = true;
+    var currentUser = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    List<Skoda_DCMS.Models.ApprovalDataModel> appList = new List<Skoda_DCMS.Models.ApprovalDataModel>();
+    Skoda_DCMS.Models.GiftsInvitationData GAIF = null;
+    int? tableCount = 0;
+    var CurrentUserDesgn = "";
+    long? CurrentUserLevel = 0;
+    Layout = ViewBag.Layout;
+    var GRCUser = "Finance/IT/Legal(GRC)";
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IsNew = ViewBag.IsNew;
+        IsEdit = ViewBag.IsEdit;
+        GAIF = ViewBag.Model.one[0] as Skoda_DCMS.Models.GiftsInvitationData;
+        tableCount = GAIF?.QuestionData?.Count();
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        appList = ViewBag.Model?.three as List<Skoda_DCMS.Models.ApprovalDataModel>;
+        CurrentUserDesgn = appList?.Where(x => x.ApproverUserName == currentUser.UserName).Select(x => x.Designation).FirstOrDefault();
+        CurrentUserLevel = appList?.Where(x => x.ApproverUserName == currentUser.UserName && x.ApproverStatus == "Pending").Select(x => x.Level).FirstOrDefault();
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+        var Ap = appList?.Where(x =>
+                x.ApproverUserName.ToLower() == currentUser.UserName.ToLower()
+                && x.ApproverStatus.ToLower() == "pending"
+            ).FirstOrDefault();
+    }
+
+    var otherDocument = GAIF?.AttachmentFiles?.Attachments?.Count > 0 ? GAIF.AttachmentFiles.Attachments[0] : null;
+
+
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SAVWIPL - Gifts, Invitation and Compliance Consultation Form</title>
+    <style type="text/css">
+        *:visited, *:focus {
+            box-shadow: none;
+        }
+
+        input, select, input:focus, select:focus, textarea, textarea:focus {
+            border: 1px solid #000;
+        }
+
+        input, textarea {
+            padding: 5px;
+        }
+
+        table td {
+            padding: 5px;
+        }
+
+        .mr-2 {
+            margin-right: 10px;
+        }
+
+        .hide {
+            display: none;
+        }
+
+        .row {
+            display: flex;
+        }
+    </style>
+</head>
+<body>
+
+    <table style="width: 100%; font-size: 14px; color: #000; font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+        <tr>
+            <td>
+                <table style="width: 100%;" cellspadding="0" cellspacing="0">
+                    <tr>
+                        <td colspan="6" width="60%" style="text-align: right;">
+                            <img style="width: 50%;" src='@Server.MapPath("~/assets/img/SAVWIPL_Merger_Logo.JPG")'>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td align="center">
+                <h2>Gifts, Invitation and Compliance Consultation Form</h2>
+            </td>
+        </tr>
+
+        <tr>
+            <td style="padding: 15px;">
+                <table border="1" cellspacing="0" cellpadding="0" width="100%">
+                    @if (GAIF.RequestSubmissionFor == "Self")
+                    {
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Employee Name
+                            </td>
+                            <td style="width: 30%" colspan="2" align='left'>
+                                @(GAIF.EmployeeName)
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Employee Code
+                            </td>
+                            <td style="width: 30%" colspan="2" align='left'>
+                                @(GAIF.EmployeeCode)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Designation
+                            </td>
+                            <td colspan="2" align='left'>
+                                @(GAIF.EmployeeDesignation)
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Location
+                            </td>
+                            <td colspan="2" align='left'>
+                                @(GAIF.EmployeeLocation)
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Department
+                            </td>
+                            <td colspan="2" align='left'>
+                                @(GAIF.EmployeeDepartment)
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Contact Number
+                            </td>
+                            <td colspan="2" align='left'>
+                                @(GAIF.EmployeeContactNo)
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Cost Center Number
+                            </td>
+                            <td colspan="2" align='left'>
+                                @(GAIF.EmployeeCCCode)
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                User ID
+                            </td>
+                            <td colspan="2" align='left'>
+                                @(GAIF.EmployeeUserId)
+                            </td>
+
+                        </tr>
+
+                    }
+                    else
+                    {
+                        if (GAIF.OtherEmployeeType == "SAVWIPLEmployee")
+                        {
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Employee Name
+                                </td>
+                                <td style="width: 30%" colspan="2" align='left'>
+                                    @(GAIF.OtherEmployeeName)
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Employee Code
+                                </td>
+                                <td style="width: 30%" colspan="2" align='left'>
+                                    @(GAIF.OtherEmployeeCode)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Designation
+                                </td>
+                                <td colspan="2" align='left'>
+                                    @(GAIF.OtherEmployeeDesignation)
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Location
+                                </td>
+                                <td colspan="2" align='left'>
+                                    @(GAIF.OtherEmployeeLocation)
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Department
+                                </td>
+                                <td colspan="2" align='left'>
+                                    @(GAIF.OtherEmployeeDepartment)
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Contact Number
+                                </td>
+                                <td colspan="2" align='left'>
+                                    @(GAIF.OtherEmployeeContactNo)
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Cost Center Number
+                                </td>
+                                <td colspan="2" align='left'>
+                                    @(GAIF.OtherEmployeeCCCode)
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    UserID
+                                </td>
+                                <td colspan="2" align='left'>
+                                    @(GAIF.OtherEmployeeUserId)
+                                </td>
+
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Employee Name
+                                </td>
+                                <td style="width: 30%" colspan="2" align='left'>
+                                    @(GAIF.OtherNewEmployeeName)
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Employee Code
+                                </td>
+                                <td style="width: 30%" colspan="2" align='left'>
+                                    @(GAIF.OtherNewEmployeeCode)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Designation
+                                </td>
+                                <td colspan="2" align='left'>
+                                    @(GAIF.OtherNewEmpDesignation)
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Location
+                                </td>
+                                <td colspan="2" align='left'>
+                                    @(GAIF.OtherNewEmpLocation)
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Department
+                                </td>
+                                <td colspan="2" align='left'>
+                                    @(GAIF.OtherNewDepartment)
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Contact Number
+                                </td>
+                                <td colspan="2" align='left'>
+                                    @(GAIF.OtherNewContactNo)
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Cost Center Number
+                                </td>
+                                <td colspan="2" align='left'>
+                                    @(GAIF.OtherNewCostcenterCode)
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    UserID
+                                </td>
+                                <td colspan="2" align='left'>
+                                    @(GAIF.OtherNewUserId)
+                                </td>
+
+                            </tr>
+                        }
+                    }
+
+                    <tr>
+                        <td colspan="3" style="width:20%; font-weight: bold;">
+                            Request Type
+                        </td>
+                        @if (GAIF.RequestType == "Gift")
+                        {
+                            <td colspan="3" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> Gift </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="chkGift" name="reqType" checked>
+
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> Invitation </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="chkInvitation" name="reqType">
+
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> Consultation </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="chkConsultation" name="reqType">
+                            </td>
+                        }
+                        else if (GAIF.RequestType == "Invitation")
+                        {
+                            <td colspan="3" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> Gift </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="chkGift" name="reqType">
+
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> Invitation </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="chkInvitation" name="reqType" checked>
+
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> Consultation </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="chkConsultation" name="reqType">
+                            </td>
+                        }
+                        else
+                        {
+                            <td colspan="3" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> Gift </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="chkGift" name="reqType">
+
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> Invitation </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="chkInvitation" name="reqType">
+
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> Consultation </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="chkConsultation" name="reqType" checked>
+                            </td>
+                        }
+
+
+                    </tr>
+
+                    @*GIFT & INVITATION*@
+
+                    <tr id="tr_tran">
+                        <td colspan="3" style="width:20%; font-weight: bold;">
+                            Transaction
+                        </td>
+                        @if (GAIF.Transaction == "Giving")
+                        {
+                            <td colspan="3" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> Giving </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="givingRadio" name="transactionType" checked>
+
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> Receiving </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="receiveRadio" name="transactionType">
+                            </td>
+                        }
+                        else
+                        {
+                            <td colspan="3" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> Giving </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="givingRadio" name="transactionType">
+
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> Receiving </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="receiveRadio" name="transactionType" checked>
+                            </td>
+                        }
+                    </tr>
+                    <tr id="tr_giving_Section">
+                        <td colspan="3" style="width:20%; font-weight: bold;">
+                            Is gift given to
+                            public official?
+                        </td>
+                        @if (GAIF.IsGiftOrInviteToPublicOfficial == "Yes")
+                        {
+                            <td colspan="3" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> Yes </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="giftPublicYes" name="giftPublicRadio" checked>
+
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> No </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="giftPublicNo" name="giftPublicRadio">
+                            </td>
+                        }
+                        else
+                        {
+                            <td colspan="3" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> Yes </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="giftPublicYes" name="giftPublicRadio">
+
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> No </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="giftPublicNo" name="giftPublicRadio" checked>
+                            </td>
+                        }
+                    </tr>
+                    <tr id="tr_name">
+
+                        <td colspan="6" align='left'>
+                            <span style=" width: 85%; font-weight: bold; border-radius: 0; ">Name of Business partner/ Other individual providing the gift?</span>
+                        </td>
+
+                    </tr>
+                    <tr id="tr_nameinput">
+                        <td colspan="6" align='left' style="height: 25px;">
+                            <span style="height: 25px; width: 85%; font-weight: normal; border-radius: 0; ">@GAIF.NameRelationOtherDet</span>
+                        </td>
+                    </tr>
+                    <tr id="tr_freq">
+                        <td colspan="6" align='left'>
+                            Frequency of receipt of gifts from the same business partner in a year?
+                        </td>
+                    </tr>
+                    <tr id="tr_freqinput">
+                        <td colspan="6" align='left' style="height: 25px;">
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@GAIF.FrequencyOfGiftsOrInvitationfrm </span>
+                    </tr>
+                    <tr id="tr_app">
+                        <td colspan="6" align='left'>
+                            Approximate value of gifts (How is the Value estimated?)
+                        </td>
+                    </tr>
+                    <tr id="tr_appinput">
+                        <td colspan="6" align='left' style="height: 25px;">
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @GAIF.ApproxValueOfGiftsInvt </span>
+                        </td>
+                    </tr>
+                    <tr id="tr_reasongift">
+                        <td colspan="6" align='left'>
+                            Reason for gifting ?
+                        </td>
+                    </tr>
+                    <tr id="tr_reasongiftinput">
+                        <td colspan="6" align='left' style="height: 25px;">
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @GAIF.ReasonForGiftingInvitation </span>
+                        </td>
+                    </tr>
+                    <tr id="tr_acceptedRefused">
+                        <td style="width:20%; font-weight: bold;">
+                            Gift is accepted/ Refused ?
+                        </td>
+                        @if (GAIF.GiftIsAcceptedRefused == "Yes")
+                        {
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> Yes </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="giftAccept" name="giftAcceptRadio" checked>
+
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> No </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="giftReject" name="giftAcceptRadio">
+                            </td>
+                        }
+                        else
+                        {
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> Yes </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="giftAccept" name="giftAcceptRadio">
+
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> No </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="giftReject" name="giftAcceptRadio" checked>
+                            </td>
+                        }
+
+                        <td style="width:20%; font-weight: bold;">
+                            Reason of acceptance / refusal of gift
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">  @GAIF.ReasonGiftIsAcceptedRefused </span>
+                        </td>
+                    </tr>
+                    <tr id="tr_ActionGift">
+                        <td colspan="5" align='left'>
+                            <span style=" width: 85%; font-weight: bold; border-radius: 0; ">   Gift to be Deposited with GRC?</span>
+                        </td>
+                        @if (GAIF.GiftTobeDepoWithGRC == "Yes")
+                        {
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> Yes </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="giftAccept" name="giftAcceptRadio" checked>
+
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> No </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="giftReject" name="giftAcceptRadio">
+                            </td>
+                        }
+                        else
+                        {
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> Yes </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="giftAccept" name="giftAcceptRadio">
+
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> No </span>
+                                <input disabled type="checkbox" class="wd mr-2" id="giftReject" name="giftAcceptRadio" checked>
+                            </td>
+                        }
+                    </tr>
+
+                    @*CONSULTATION*@
+
+                    <tr id="tr_lblquestions">
+                        <td colspan="6" align='left'>
+                            <span style=" width: 85%; font-weight: bold; border-radius: 0; ">Question</span>
+                        </td>
+                    </tr>
+                    <tr colspan="6" id="tr_questionsList">
+
+                        <td colspan="1">Sr. No.</td>
+                        <td colspan="5">Question</td>
+                    </tr>
+
+                    @{
+                        var count = 1;
+                        <tbody id="usersBody">
+                            @foreach (var item in GAIF.QuestionData)
+                            {
+                                <tr id='@("row" + count)' class="tr_input">
+                                    <td colspan="1" class="sNo text-center">@count</td>
+                                    <td colspan="5" class="text-center">
+                                        <textarea disabled class=" form-control txtDisable input-width-1 select-border emp-name-input inpValidateQuestion" id='@("txtQuestion_"+count)' name='@("txtQuestion_"+count)' onPaste="return false">@item.Question</textarea>
+                                    </td>
+                                </tr>
+                                count++;
+                            }
+                        </tbody>
+                    }
+
+        </tr>
+
+        <tr id="tr_ActionConsult">
+            <td colspan="1" align='left'>
+                <span style=" width: 85%; font-weight: bold; border-radius: 0; ">Answers</span>
+            </td>
+            <td colspan="5" align='left' style="height: 25px;">
+                <span style="height: 25px; width: 85%; font-weight: normal; border-radius: 0; ">@GAIF.Answers</span>
+            </td>
+        </tr>
+    </table>
+    </td>
+    </tr>
+
+
+    <tr>
+        <td align='left'>
+            <span style=" width: 85%; font-weight: bold; border-radius: 0; ">Business Justification</span>
+        </td>
+    </tr>
+    <tr>
+        <td align='left' style="height: 25px;">
+            <span style="height: 25px; width: 85%; font-weight: normal; border-radius: 0; ">@GAIF.BusinessNeed</span>
+        </td>
+    </tr>
+    </table>
+    @*<table style="width: 100%; font-size: 14px; color: #000; font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+            @if (appList.Count > 0)
+            {
+                <tr>
+                    <td>Name</td>
+                    <td>Proccessed On</td>
+                    <td>Status</td>
+                    <td>Level</td>
+                </tr>
+                foreach (var item in appList)
+                {
+                    <tr>
+                        <td style="font-weight: normal;">
+                            <div style="margin-bottom:10px;">
+                                <div>@item.UserName</div>
+                                <div>@item.Designation</div>
+                            </div>
+                        </td>
+                        <td style="font-weight: normal;">
+                            @if (item.Logic == "OR")
+                            {
+                                if (item.ApproverStatus != "Pending")
+                                {
+                                    <div>
+                                        @(item.TimeStamp.ToShortDateString() + " " + Convert.ToDateTime(item.TimeStamp).AddHours(5.5).ToShortTimeString())
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div>
+                                    @(item.TimeStamp.ToShortDateString() + " " + Convert.ToDateTime(item.TimeStamp).AddHours(5.5).ToShortTimeString())
+                                </div>
+                            }
+                        </td>
+                        <td colspan="1" style="font-weight: normal;">
+                            @if (item.Logic == "OR")
+                            {
+                                if (item.ApproverStatus != "Pending")
+                                {
+                                    <div>
+                                        @item.ApproverStatus
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div>
+                                    @item.ApproverStatus
+                                </div>
+                            }
+                        </td>
+                        <td colspan="1" style="font-weight: normal;">
+                            <div>
+                                @item.Level
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+
+        </table>*@
+    <table style="width: 100%; font-size: 14px; color: #000;" cellspacing="0" cellpadding="0">
+        @if (appList.Count > 0)
+        {
+            foreach (var item in appList)
+            {
+                if (item.ApproverStatus != "Pending")
+                {
+                    <tr>
+                        <td width="5%"></td>
+                        <td width="40%">
+                            <table style="width: 100%; font-size: 14px; color: #000;" border="1" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td height="50px" colspan="2" align="center">
+                                        @item.ApproverStatus
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td width="50%" align="center">
+                                        @item.UserName
+                                    </td>
+                                    <td width="50%" align="center">
+                                        @(item.TimeStamp.ToShortDateString() + " " + Convert.ToDateTime(item.TimeStamp).AddHours(5.5).ToShortTimeString())
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td height="50px" colspan="2" align="center">
+                                        @item.Designation
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td width="10%"></td>
+                    </tr>
+                }
+            }
+        }
+
+    </table>
+</body>
+</html>
+<script>
+    $(document).ready(function () {
+     var GAIF = @Html.Raw(Json.Encode(GAIF));
+
+        if (GAIF.RequestType == "Consultation") {
+            $('#tr_lblquestions').removeClass('hide');
+            $('#tr_questionsList').removeClass('hide');
+            $('#tr_tran').addClass('hide');
+            $('#tr_name').addClass('hide');
+            $('#tr_nameinput').addClass('hide');
+            $('#tr_freq').addClass('hide');
+            $('#tr_freqinput').addClass('hide');
+            $('#tr_app').addClass('hide');
+            $('#tr_appinput').addClass('hide');
+            $('#tr_reasongift').addClass('hide');
+            $('#tr_reasongiftinput').addClass('hide');
+            $('#tr_giving_Section').addClass('hide');
+            $('#tr_acceptedRefused').addClass('hide');
+            $('#tr_ActionGift').addClass('hide');
+
+        }
+        else {
+            $('#tr_lblquestions').addClass('hide');
+            $('#tr_questionsList').addClass('hide');
+            $('#tr_ActionConsult').addClass('hide');
+            if (GAIF.Transaction == "Giving") {
+                $('#tr_giving_Section').removeClass('hide');
+                $("#tr_acceptedRefused").addClass('hide');
+            }
+            else if (GAIF.Transaction == "Receiving") {
+                $('#tr_giving_Section').addClass('hide');
+                $("#tr_acceptedRefused").removeClass('hide');
+            }
+     }
+
+     if (GAIF.RequestType == "Gift") {
+         document.getElementById('lblgiftGivenNo').innerHTML = 'Is Gift given to public official?';
+         document.getElementById('lblNameBusiness').innerHTML = 'Name of Business partner/ Other individual providing the gift?';
+         document.getElementById('lblFreq').innerHTML = 'Frequency of receipt of gifts from the same business partner in a year?';
+         document.getElementById('lblApp').innerHTML = 'Approximate value of gifts (How is the value estimated) ?';
+         document.getElementById('lblResGift').innerHTML = 'Reason for gifting ?';
+         document.getElementById('lblChkgiftaccepted').innerHTML = 'Gift is accepted/ Refused ?';
+         document.getElementById('lblResAccRef').innerHTML = 'Reason of acceptance/ refusal of gift';
+     }
+     else if (GAIF.RequestType == "Invitation") {
+         document.getElementById('lblgiftGivenNo').innerHTML = 'Is Invitation given to public official?';
+         document.getElementById('lblNameBusiness').innerHTML = 'Name of Business partner/ Other individual providing the invitation?';
+         document.getElementById('lblFreq').innerHTML = 'Frequency of receipt of invitation from the same business partner in a year?';
+         document.getElementById('lblApp').innerHTML = 'Approximate value of invitation (How is the value estimated) ?';
+         document.getElementById('lblResGift').innerHTML = 'Reason for invitation ?';
+         document.getElementById('lblChkgiftaccepted').innerHTML = 'Invitation is accepted/ Refused ?';
+         document.getElementById('lblResAccRef').innerHTML = 'Reason of acceptance/ refusal of invitation';
+     }
+
+    });
+</script>

@@ -1,0 +1,163 @@
+.left_asset{
+    border: 2px solid $mustard-two;
+    
+    ul.nav-tabs{
+        background: $mustard-two;
+        padding-left: 32px;
+        padding-right: 32px;
+        padding-top: 24px;
+        display: flex;
+        justify-content: space-between;
+        li{
+            flex: 1;
+            a{
+                color: rgba(1, 1, 1, 0.75);
+                font-weight: bold;
+                padding: 10px 6px;
+                text-align: center;
+                border: 0;
+                border-radius: 0;
+                &.tab_icon1:before{
+                    content: '';                    
+                    background-image: url(../img/pro_obj.png);                    
+                }
+                &.tab_icon2:before{
+                    content: '';                    
+                    background-image: url(../img/scope_ico.png);                    
+                }
+                &.tab_icon3:before{
+                    content: '';                    
+                    background-image: url(../img/pro_ind.png);                    
+                }
+                &.tab_icon4:before{
+                    content: '';                    
+                    background-image: url(../img/add_info.png);                    
+                }
+                &.tab_icon:before{
+                    content: '';
+                    display: inline-block;
+                    vertical-align: middle;
+                    margin-right: 5px;
+                    width: 20px;
+                    height: 20px;                    
+                    background-position: center;
+                    background-repeat: no-repeat;
+                    background-size: contain;
+                }
+            }
+        }
+
+    }
+    .tab-content{
+        padding:30px;
+        min-height: 300px;
+    ul{
+        li{
+            list-style-type: none;
+            margin-bottom: 10px;
+            padding-left: 15px;
+            position: relative;
+            &:before{
+                content: '';
+                width: 6px;
+                height: 6px;
+                display: inline-block;
+                vertical-align: middle;
+                border-radius: 50%;
+                background-color: #d3da45;
+                position: absolute;
+                left: 0px;
+                top: 8px;
+            }
+        }
+    }
+    }
+}
+
+.download_wrp{
+    max-width: 254px;
+    width: 100%;
+    margin: auto;
+}
+.text-limit{
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;    
+    &-182{
+        width: 182px;
+    }
+}
+
+.print{
+    display: inline-block;
+    img{
+        display: inline-block;
+    }
+}
+.p_icon{
+    position: relative;
+    padding-left: 50px;
+    display: block;  
+    height: 45px;
+    margin-bottom: 25px;
+    font-size: 12px;
+    line-height: 36px;
+    a{
+        position: absolute;
+        right: 0;
+    }
+    &.ppt_icon:before{
+        content: '';
+        background-image: url(../img/ppt_icon@2x.png);        
+        background-color: $rouge;
+    }  
+    &.pdf_icon:before{
+        content: '';
+        background-color: $mustard;
+        background-image: url(../img/pdf_icon@2x.png);      
+        
+    }  
+    &.doc_icon:before{
+        content: '';
+        background-color: $marine-blue-two;
+        background-image: url(../img/doc_icon@2x.png); 
+    }  
+    &:before{
+        content: '';
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: inline-block;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: 20px;
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
+}
+.down-title{
+    margin-bottom: 20px;
+    display: block;
+}
+.process_image{
+    max-width: 254px;
+    width: 100%;
+    height: 88px;
+    
+    background-color: #fff;
+    padding: 15px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 56px;
+    box-shadow: 0 0 12px #9c9292;
+    .thumb{
+        display: inline-block;
+        vertical-align: middle;
+    }
+    span{
+        display: inline-block;
+        vertical-align: middle;
+    }
+}

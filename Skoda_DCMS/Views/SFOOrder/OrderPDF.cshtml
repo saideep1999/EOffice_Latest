@@ -1,0 +1,330 @@
+﻿
+@{
+    Layout = null;
+    dynamic Order = null;
+    if (ViewBag != null)
+    {
+        Order = ViewBag.Model;
+    }
+}
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Page Title</title>
+    <style type="text/css">
+        *:visited, *:focus {
+            box-shadow: none;
+        }
+
+        input, select, input:focus, select:focus, textarea, textarea:focus {
+            border: 1px solid #000;
+        }
+
+        input, textarea {
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <table style="width: 100%; font-size: 14px; color: rgb(110,110,110); font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+        <tr>
+            <td>
+                <table style="width: 100%;" cellspadding="0" cellspacing="0">
+                    <tr>
+
+                        <td colspan="6" width="60%" style="text-align: left;">
+                            <img style="margin:10px; width: 50%;" src='@Server.MapPath("~/assets/img/SAVWIPL_Merger_Logo.JPG")' />
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td style="height: 45px; font-size: 24px; text-align: center; border-left: 1px solid #000; border-right: 1px solid #000; border-bottom: 1px solid #000;">
+                Suggestion for Order
+            </td>
+        </tr>
+
+
+        <tr>
+            <td style="padding: 15px;">
+                <table cellspacing="0" cellpadding="0" width="100%">
+                    <tr>
+                        <td style="width:25%;">
+                            Department
+                        </td>
+                        <td colspan="2" align='left' style="font-weight: normal">
+                            @(Order.one[0].RequestSubmissionFor == "Self" ? Order.one[0].EmployeeDepartment : Order.one[0].OtherEmployeeDepartment)
+                        </td>
+                        <td>
+                            Shopping Cart Number
+                        </td>
+                        <td colspan="2" align='left' style="font-weight: normal">
+                            @(Order.one[0].ShopCartNumber ?? "")
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td style="height: 15px;">
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            Concerned Section / Facility
+                        </td>
+                        <td colspan="2" align='left' style="font-weight: normal">
+                            @(Order.one[0].ConcernSection ?? "")
+                        </td>
+                        <td>
+                            Budget
+                        </td>
+                        <td colspan="2" align='left' style="font-weight: normal">
+                            @(Order.one[0].Budget.ToString("n0") ?? "")
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td style="height: 15px;">
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="width:25%;" valign="top">
+                            Description
+                        </td>
+                        <td colspan="5" align='left' style="font-weight: normal">
+                            @(Order.one[0].Description ?? "")
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="height: 15px;">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan='6'>
+                            <table cellpadding='0' cellspacing='0' width='100%' border="1">
+                                <tr>
+                                    <th style="vertical-align: middle; text-align: center;">Sr. No.</th>
+                                    <th style='width: 60%; text-align: center; vertical-align: top;'>
+                                        Available Offers <br />
+                                        (Supplier Name)
+
+                                    </th>
+                                    <th style='width: 20%; text-align: center; vertical-align: top;'>
+                                        Technically Acceptance <br />(Ok/ Not OK)
+                                    </th>
+                                    <th style='width: 20%;text-align: center; vertical-align: top;'>
+                                        Offer Price
+                                    </th>
+                                </tr>
+                                @if (true)
+                                {
+                                    var count = 1;
+                                    foreach (var item in Order.two)
+                                    {
+
+                                        <tr>
+                                            <td style="vertical-align: middle; width: 10%; text-align: center;">@count</td>
+                                            <td style='width: 60%; text-align: center; vertical-align: top; font-weight: normal;'>
+                                                @item.SupplierName
+                                            </td>
+                                            <td style='width: 20%; text-align: center; vertical-align: top; font-weight: normal;'>
+                                                @item.TechAcceptance
+                                            </td>
+                                            <td style='width: 20%; text-align: center; vertical-align: top; font-weight: normal;'>
+                                                @(item.OfferPrice == null ? "" : item.OfferPrice.ToString("n0"))
+                                            </td>
+                                        </tr>
+                                        count++;
+                                    }
+                                }
+                            </table>
+
+
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td style="height: 15px;">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td valign="top">
+                            Reason for technically disqualification/ Not Ok Supplier(s)
+                        </td>
+                        <td colspan='5' style="font-weight: normal;">
+                            @(Order.one[0].TechDisqualify ?? "")
+                        </td>
+
+
+                    </tr>
+
+                    <tr>
+                        <td style="height: 15px;">
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td valign="top">
+                            Suggestion For Order
+                        </td>
+                        <td colspan='5' style="font-weight: normal;">
+                            @(Order.one[0].SuggestOrder ?? "")
+                        </td>
+
+
+                    </tr>
+
+                    <tr>
+                        <td style="height: 15px;">
+                        </td>
+                    </tr>
+
+                    <tr>
+                        @if ((Order.three.Count > 0) || (Order.four.Count > 0))
+                        {
+                            <td colspan='6'>
+                                <table cellpadding='0' border='1' cellspacing='0' width='100%'>
+                                    <tr>
+                                        <td style="padding:10px;">
+                                            @* height: 150px; margin-left: 160px; *@
+                                            Initiator
+                                        </td>
+                                        <td style="padding:10px;">
+                                            Head of Section 1 (AGM and above)
+                                        </td>
+                                        @if (Order.four.Count > 1)
+                                        {
+                                            <td style="padding:10px;">
+                                                Head of Department2 (GM and above)**
+                                            </td>
+                                        }
+                                        @if (Order.four.Count > 2)
+                                        {
+                                            <td style="padding:10px;">
+                                                Director and above 3
+                                            </td>
+                                        }
+                                    </tr>
+                                    <tr>
+                                        @{ Html.RenderPartial("_ApprovalTrackingPDF", new Skoda_DCMS.Models.PdfParameterModel { RequesterData = Order.three, ApproverData = Order.four });}
+
+                                    </tr>
+                                    @*<tr>
+                                            <td style='width: 25%; text-align: center; vertical-align: middle;'>
+                                                <lable>Initiator</lable>
+                                                <div style="margin-bottom: 10px; border-top: 1px solid #000; height: 30px; width:100%; margin-top: 10px;">
+
+
+                                                </div>
+
+                                            </td>
+
+                                            <td style='width: 25%; text-align: center; vertical-align: middle;'>
+                                                <lable>Head of Section 1 (AGM and above)</lable>
+                                                <div style="margin-bottom: 10px;border-top: 1px solid #000; height: 30px; width:100%;; margin-top: 10px;">
+
+
+                                                </div>
+
+                                            </td>
+
+                                            <td style='width: 25%; text-align: center; vertical-align: middle;'>
+                                                <lable>Head of Department 2 (GM and above)**</lable>
+                                                <div style="margin-bottom: 10px; border-top: 1px solid #000; height: 30px; width:100%; margin-top: 10px;">
+
+
+                                                </div>
+
+                                            </td>
+
+                                            <td style='width: 25%; text-align: center; vertical-align: middle;'>
+                                                <lable>Director and above 3</lable>
+                                                <div style="margin-bottom: 10px; height: 30px; border-top: 1px solid #000; width:100%; margin-top: 10px;">
+
+
+                                                </div>
+
+                                            </td>
+                                        </tr>*@
+                                </table>
+                            </td>
+                        }
+                    </tr>
+                    <tr>
+                        <td style="height: 25px;">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="6">
+                            <lable>Note</lable>
+                            <div style="margin-bottom: 10px; width:100%; margin-top: 10px;">
+                                <ul>
+                                    <li> Approval Up to 10,00,000*</li>
+                                    <li> Approval Above to 10,00,000*</li>
+                                    <li> Approval Above to 10,00,000,000</li>
+
+                                </ul>
+                                <div>**Unless next Hiererchical level is DGM </div>
+
+                            </div>
+
+                        </td>
+
+
+
+                    </tr>
+
+
+                    <tr>
+                        <td colspan='6' style="height: 15px;">
+                        </td>
+                    </tr>
+                    <tr>
+
+                        <td colspan='6'>
+                            <div>Additional Reasons for Technical Disqualification / Not Ok Supplier(s)</div>
+                            <textarea type="text" rows="10" value="" style="width: 97%;"></textarea>
+
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td colspan='6' style="height: 15px;">
+                        </td>
+                    </tr>
+                    <tr>
+
+                        <td colspan='6'>
+                            <div>Additional for Suggestion for Order</div>
+                            <textarea type="text" rows="10" value="" style="width: 97%;"></textarea>
+
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td colspan='6' style="height: 15px;">
+                        </td>
+                    </tr>
+                    <tr>
+
+                        <td colspan='6'>
+                            <div>Additional Remark</div>
+                            <textarea type="text" rows="10" value="" style="width: 97%;"></textarea>
+
+                        </td>
+
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+

@@ -1,0 +1,1040 @@
+﻿html {
+    color: #222;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+::-moz-selection {
+    background: #b3d4fc;
+    text-shadow: none;
+}
+
+::selection {
+    background: #b3d4fc;
+    text-shadow: none;
+}
+
+hr {
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid #ccc;
+    margin: 1em 0;
+    padding: 0;
+}
+
+fieldset {
+    border: 0;
+    margin: 0;
+    padding: 0;
+}
+
+textarea {
+    resize: vertical;
+}
+
+.browserupgrade {
+    margin: 0.2em 0;
+    background: #ccc;
+    color: #000;
+    padding: 0.2em 0;
+}
+
+.hidden {
+    display: none !important;
+}
+
+body {
+    font-family: Verdana;
+}
+
+.card {
+    background-color: #fff;
+    border: 2px solid black !important;
+    border-radius: 0 !important;
+    margin-top: 30px;
+    width: 70% !important;
+    margin-left: 15%;
+    margin-bottom: 10px;
+}
+
+.card-header {
+    background-color: #fff !important;
+    border-bottom: none !important
+}
+
+.bgDarkGreen {
+    background: rgb(27, 112, 27);
+}
+
+.bgLightGreen {
+    background: rgb(219,238,213);
+}
+
+.removeHeaderPadding {
+    padding: 0px !important;
+    width: 100%;
+}
+
+.alignRight {
+    text-align: right;
+}
+
+.skodaImg {
+    width: 300px !important;
+    margin-left: 90px;
+}
+
+.txt_border {
+    border: none !important;
+    border-bottom: 1px solid !important;
+}
+
+.centerAlign {
+    text-align: center;
+}
+
+
+/* Start Driving Licence */
+.drivingCard {
+    padding: 20px;
+}
+
+.row {
+    width: 100% !important;
+}
+
+.alignCenter {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.drivingTopHeader {
+    font-size: 25px;
+    text-align: center;
+    font-weight: 800;
+    margin: 0px;
+}
+
+.photoBox {
+    width: 200px;
+    height: 200px;
+    padding: 10px;
+    border: 1px solid;
+    text-align: center;
+}
+
+.borderBotttom {
+    border-bottom: 3px solid !important;
+    margin-left: 30px;
+    margin-right: 30px;
+    margin-bottom: 10px;
+}
+
+.table-borderless {
+    width: 100% !important;
+}
+
+.txt_input {
+    border: none !important;
+    border-bottom: 1px solid !important;
+}
+
+.txt_input2 {
+    border: none !important;
+    border-bottom: 1px solid !important;
+    width: 80%;
+}
+
+.inputText {
+    display: inline-block;
+    border: none;
+    height: 35px;
+    width: 80%;
+    padding: 0px 9px;
+    border-bottom: 1px solid !important;
+}
+
+.selectInput {
+    width: 80% !important;
+}
+
+.drivingTable tbody tr td {
+    padding: 5px;
+    vertical-align: baseline;
+    width: 30%;
+    border: none;
+}
+
+.dlDetails {
+    margin-top: -10px;
+}
+
+.dlAttach {
+    margin-left: 30px;
+    border-bottom: 2px solid;
+}
+
+.inputLeft {
+    width: 12% !important;
+}
+
+.smallWidth {
+    width: 8% !important;
+}
+
+.inputRight {
+    width: 30% !important;
+}
+
+.signatureWidth {
+    width: 70% !important;
+}
+
+.addressWidth {
+    width: 91% !important;
+}
+
+.secondTable {
+    width: 50%;
+    margin-left: 5%;
+}
+
+.drivingExp {
+    width: 15% !important;
+}
+
+.extraMarginLeft {
+    margin-left: 10%;
+}
+
+.authorization {
+    font-weight: 900;
+    border-bottom: 1px solid;
+    width: 31%;
+    margin-left: 3%;
+}
+
+.certify {
+    font-weight: 900;
+    border-bottom: 1px solid;
+    width: 44%;
+    margin-top: 10px;
+    margin-left: 3px;
+}
+
+.wellAware {
+    font-weight: 900;
+    border-bottom: 1px solid;
+    width: 42%;
+    margin-left: 3%;
+    margin-top: 10px;
+    margin-bottom: 8px;
+}
+
+.footerText {
+    margin-left: 17%;
+    margin-top: -13px !important;
+}
+
+.passengersSafety {
+    margin-left: 10%;
+}
+
+@media screen and (min-width: 320px) and (max-width:767px) {
+    .card {
+        width: 164% !important;
+        margin-left: 2px;
+    }
+
+    .drivingTable tbody tr td {
+        padding: 5px;
+        vertical-align: baseline;
+        width: 10%;
+    }
+
+    .photoBox {
+        width: 100px;
+        height: 100px;
+        padding: 5px;
+        border: 1px solid;
+    }
+
+    .wellAware {
+        width: 71%;
+    }
+
+    .certify {
+        width: 73%;
+    }
+
+    .authorization {
+        width: 56%;
+    }
+
+    .container {
+        padding-right: 0px !important;
+        padding-left: 0px !important;
+    }
+}
+
+@media screen and (min-width: 768px) and (max-width:992px) {
+    .card {
+        width: 100% !important;
+        margin-left: 2px;
+    }
+
+    .wellAware {
+        width: 47%;
+    }
+
+    .certify {
+        width: 51%;
+    }
+
+    .authorization {
+        width: 36%;
+    }
+}
+
+/*  End Start Driving Licence */
+
+/* Start Id Card Form */
+.tableId {
+    margin-bottom: 0px !important;
+    font-size: 13px;
+}
+
+.idBorderBotttom {
+    border-bottom: 1px solid !important;
+    margin-bottom: 10px;
+    margin-top: -7px;
+}
+
+.bottomLine {
+    border-bottom: 1px solid !important;
+    padding: 3px;
+    margin-bottom: 2px;
+}
+
+.card-header {
+    padding: 0px !important;
+}
+
+.idCardBody {
+    padding: 0px !important;
+    margin-top: -10px !important;
+    margin-bottom: -14px !important;
+}
+
+.idTopHeader {
+    text-align: center;
+    font-weight: 600;
+}
+/* padding: 3px;margin-top: 15px;margin-bottom: 2px; */
+.idCardBody table tbody tr td {
+    border-bottom: 1px solid;
+    padding: 5px;
+}
+
+.leftContent {
+    border-right: 1px solid;
+    width: 25%;
+}
+
+.colsContent {
+    border-right: 1px solid;
+    width: 22.0% !important;
+}
+
+.signWidth {
+    border-right: none;
+    width: 12.00% !important;
+}
+
+.sameColsWidth {
+    border-right: 1px solid;
+    width: 15.94% !important;
+}
+
+.greyColor {
+    color: rgb(185, 179, 179);
+    font-size: 12px;
+}
+
+.checkInput {
+    width: 25px;
+    height: 20px;
+    vertical-align: middle;
+    border: 2px solid rgb(185, 179, 179);
+    margin-left: 10%;
+}
+
+.doubleCheck {
+    width: 25px;
+    height: 20px;
+    border: 2px solid rgb(185, 179, 179);
+    vertical-align: middle;
+}
+
+.rightCheck {
+    width: 25px;
+    height: 20px;
+    border: 2px solid rgb(185, 179, 179);
+    vertical-align: middle;
+    margin-left: 17%;
+}
+
+.alignCenter {
+    text-align: center !important;
+}
+
+.surname {
+    margin-left: 34%;
+    color: rgb(185, 179, 179);
+    font-size: 12px;
+}
+
+.name {
+    margin-left: 10%;
+    color: rgb(185, 179, 179);
+    font-size: 12px;
+}
+
+.inputBox {
+    width: 40px;
+    height: 30px;
+    border: 2px solid rgb(185, 179, 179);
+    margin-left: 4%;
+}
+
+.inputTwo {
+    width: 40px;
+    height: 30px;
+    border: 2px solid rgb(185, 179, 179);
+    border-left: none;
+}
+
+.fixName {
+    vertical-align: bottom !important;
+    width: 100% !important;
+    margin-bottom: -15px;
+    margin-left: 20%;
+}
+
+.signBottom {
+    color: rgb(185, 179, 179);
+    font-size: 12px;
+    margin-bottom: -15px !important;
+    text-align: center !important;
+    border-bottom: 1px solid black !important;
+}
+
+.signCenter {
+    color: rgb(185, 179, 179);
+    font-size: 12px;
+    margin-bottom: -15px !important;
+    margin-left: 10%;
+}
+
+.idFooterText {
+    margin-left: 17%;
+    margin-top: -13px !important;
+}
+
+@media screen and (min-width: 320px) and (max-width:767px) {
+    .card {
+        width: 141% !important;
+        margin-left: 2px;
+    }
+
+    .inputBox {
+        width: 30px;
+        height: 20px;
+        border: 1px solid rgb(185, 179, 179);
+    }
+
+    .inputTwo {
+        width: 30px;
+        height: 20px;
+        border: 1px solid rgb(185, 179, 179);
+        border-left: none;
+    }
+}
+
+@media screen and (min-width: 768px) and (max-width:992px) {
+    .card {
+        width: 100% !important;
+        margin-left: 2px;
+    }
+}
+
+/*End Start Id Card Form */
+
+
+/* Start IJP Form */
+.ijpTable tbody
+tr th {
+    border: 1px solid black !important;
+}
+
+.ijpTable tbody
+tr td {
+    border: 1px solid black !important;
+}
+
+.hodSign {
+    border: 1px solid;
+    padding: 5px;
+    margin-top: -10px;
+    margin: 10px;
+}
+
+.boldText {
+    font-weight: 900;
+    color: black;
+    margin-top: 15px;
+}
+
+.ijpFooterText {
+    margin-top: 60%;
+}
+
+.topheaderijp {
+    font-weight: 900;
+    margin: 0px;
+    border-bottom: 1px solid !important;
+    margin-left: 36%;
+    width: 23%;
+}
+
+.topheaderijp2 {
+    text-align: center;
+    font-weight: 900;
+}
+
+textarea {
+    margin: 10px; /* padding: 50px; */
+    width: 95%;
+}
+
+.inputEmploye {
+    border: none !important;
+    border-bottom: 1px solid !important;
+    width: 50%;
+}
+
+@media screen and (min-width: 320px) and (max-width:767px) {
+    .card {
+        width: 141% !important;
+        margin-left: 2px;
+    }
+
+    .topheaderijp {
+        font-weight: 900;
+        margin: 0px;
+        border-bottom: 1px solid !important;
+        margin-left: 24%;
+        width: 56%;
+    }
+}
+
+@media screen and (min-width: 768px) and (max-width:992px) {
+    .card {
+        width: 100% !important;
+        margin-left: 2px;
+    }
+
+    .topheaderijp {
+        font-weight: 900;
+        margin: 0px;
+        border-bottom: 1px solid !important;
+        margin-left: 33%;
+        width: 36%;
+    }
+}
+
+/*End  IJP Form */
+
+/* Start Tranpotation Form */
+.topheaderTrans {
+    font-weight: 900;
+    margin: 0px;
+    text-align: center;
+}
+
+.topheaderTransDate {
+    text-align: right;
+}
+
+.inputTrans {
+    border: none !important;
+    border-bottom: 1px solid !important;
+}
+
+.textTrans {
+    width: 80%;
+}
+
+.transTable td {
+    border-top: none !important;
+}
+
+.selctTransport {
+    width: 35%;
+}
+
+@media screen and (min-width: 320px) and (max-width:767px) {
+    .card {
+        width: 151% !important;
+        margin-left: 2px;
+    }
+}
+
+@media screen and (min-width: 768px) and (max-width:992px) {
+    .card {
+        width: 100% !important;
+        margin-left: 2px;
+    }
+}
+
+/*End  Tranpotation Form */
+
+/* Start ocrf Form */
+.ocrfCard {
+    background-color: #fff;
+    border: 2px solid black !important;
+    border-radius: 0 !important;
+    margin-top: 30px;
+    width: 70% !important;
+    margin-left: 15%;
+    margin-bottom: 10px;
+}
+
+.ocrfTopHeader {
+    text-align: center;
+    color: #fff;
+    padding: 5px;
+}
+
+.ocrMinTopHeader {
+    text-align: center;
+    padding: 5px;
+    margin-top: -5px;
+    border-bottom: 1px solid;
+}
+
+.removeBodyPadding {
+    padding: 0px !important;
+    width: 100%;
+}
+
+.typeOfChange {
+    margin-left: 2%;
+    margin-top: -5px;
+    width: 100%;
+}
+
+.ocrfBorderBottom {
+    border-bottom: 1px solid;
+}
+
+.ocrfEmployee {
+    text-align: center;
+    font-weight: 900;
+    margin-top: -6px;
+    border-top: 2px solid;
+    border-bottom: 2px solid;
+}
+
+.transEmployee {
+    text-align: center;
+    font-weight: 900;
+    margin-top: -6px;
+}
+
+.ocrfTable {
+    margin-top: -7px;
+}
+
+.ocrfTop {
+    margin-top: -14px;
+}
+
+.ocrfTable tbody tr td {
+    border: 1px solid;
+    padding: 3px;
+}
+
+.ocrfTable tbody tr th {
+    border: 1px solid;
+    padding: 3px;
+}
+
+.ocrfWidth {
+    width: 30%;
+}
+
+.justification {
+    width: 100%;
+}
+
+.ocrfCheck {
+    vertical-align: middle;
+    border-radius: none !important;
+}
+
+.ocrfCenterAlign {
+    text-align: center;
+}
+
+.ocrfAlignRight {
+    text-align: right;
+}
+
+.ocrBrRight {
+    border-right: none !important;
+}
+
+.ocrBrLeft {
+    border-left: none !important;
+}
+
+.ocrFooter {
+    margin-left: 16%;
+    margin-top: -5px;
+}
+
+@media screen and (min-width: 320px) and (max-width:767px) {
+    .card {
+        width: 151% !important;
+        margin-left: 2px;
+    }
+
+    .typeOfChange {
+        width: 93% !important;
+        margin-left: 4%;
+    }
+
+    .ocrFooter {
+        margin-left: 6%;
+        margin-top: -5px;
+    }
+}
+
+@media screen and (min-width: 768px) and (max-width:992px) {
+    .card {
+        width: 100% !important;
+        margin-left: 2px;
+    }
+
+    .ocrFooter {
+        margin-left: 2%;
+        margin-top: -5px;
+    }
+}
+
+/* End ocrf Form */
+
+
+/* Start Courier Request Form */
+.courierCard {
+    border: 1px solid rgb(221, 216, 216) !important;
+    box-shadow: 0 4px 20px 0px rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(224, 205, 175, 0.4);
+    padding: 20px;
+}
+
+.topheaderCouries {
+    text-align: center;
+    font-weight: 900;
+    margin-top: 35px;
+    margin-bottom: -5px;
+    font-size: 18px;
+}
+
+.topheaderCouriesBorder {
+    text-align: center;
+    font-weight: 900;
+    border-bottom: 1px solid;
+    width: 30%;
+    margin-left: 35%;
+    font-size: 16px;
+}
+
+.courierReceipt {
+    text-align: center;
+    font-weight: 900;
+    border-bottom: 1px solid;
+    width: 11%;
+    margin-left: 44%;
+}
+
+.topheaderCourierDate {
+    text-align: right;
+}
+
+.inputCourier {
+    border: none !important;
+    border-bottom: 1px solid !important;
+    width: 25%;
+}
+
+.courierCenter {
+    margin-left: 20%;
+}
+
+.courierStamp {
+    margin-left: 60%;
+    margin-bottom: 40%;
+}
+
+.nameAddress {
+    margin-top: -50px !important;
+}
+
+.selectconsign {
+    width: 80% !important;
+    margin: 10px;
+}
+
+/* End Courier Request Form */
+
+
+/* Start INterview Rating Form */
+.topheaderInter {
+    text-align: center;
+    font-weight: 900;
+    padding: 5px;
+    border-bottom: 1px solid;
+    width: 44%;
+    margin-left: 30%;
+    margin-top: 10px;
+}
+
+.imgBox {
+    border: 1px solid rgb(156, 145, 145);
+}
+
+.interviewTable tbody tr th {
+    border: 1px solid;
+    padding: 3px;
+    text-align: center;
+}
+
+.intTraining {
+    border-bottom: 1px solid;
+    width: 36%;
+    margin-left: 2%;
+}
+
+.otherComments {
+    font-weight: 600;
+    border-bottom: 1px solid;
+    width: 21%;
+}
+
+.intFirst {
+    border: 1px solid;
+    margin-left: 1px !important;
+    margin-right: 10px !important;
+    margin-top: -13px;
+    width: 100%;
+    padding: 0px;
+}
+
+.dorgerBg {
+    background: rgb(175, 180, 185);
+    width: 100% !important;
+}
+
+.intCom {
+    border: 1px solid;
+    width: 100% !important;
+    margin-left: 14px !important;
+    margin-right: 12px !important;
+    border-bottom: none;
+}
+
+.intAlpha {
+    border: 1px solid;
+    text-align: right;
+    width: 100% !important;
+    margin-left: 14px !important;
+    margin-right: 12px !important;
+}
+
+.authority {
+    width: 65%;
+}
+
+/* End INterview Rating Form */
+
+/* Start Exit Interview Form */
+.exitCard {
+    border: 1px solid rgb(221, 216, 216) !important;
+    box-shadow: 0 4px 20px 0px rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(224, 205, 175, 0.4);
+    border: none;
+}
+
+.exitBody {
+    padding: 70px !important;
+    margin-top: -50px;
+}
+
+.topheaderExit {
+    text-align: center;
+    font-weight: 1000;
+    padding: 5px;
+    border-bottom: 3px solid;
+    margin-top: 10px;
+}
+
+.skodaImgExit {
+    text-align: right;
+    width: 300px !important;
+    height: 60px;
+    border-bottom: 1px solid;
+}
+
+.exitContent {
+    line-height: 20px;
+    letter-spacing: 1px;
+}
+
+.exitBox {
+    border: 2px solid;
+    padding: 10px;
+    width: 60%;
+    margin-bottom: 40%;
+}
+
+.exitPageBreak {
+    margin-left: 60%;
+}
+
+.exitContentCenter {
+    line-height: 20px;
+    letter-spacing: 1px;
+    margin-bottom: 80%;
+}
+
+.exitCheck {
+    width: 25px;
+    height: 20px;
+    border: 2px solid rgb(185, 179, 179);
+    vertical-align: middle;
+}
+
+.exitBody table tr td {
+    border: 1px solid;
+}
+
+.exitBody table tr th {
+    border: 1px solid;
+}
+
+.textareaWidth {
+    width: 100%;
+}
+
+@media screen and (min-width: 320px) and (max-width:767px) {
+    .card {
+        width: 151% !important;
+        margin-left: 2px;
+    }
+}
+
+@media screen and (min-width: 768px) and (max-width:992px) {
+    .card {
+        width: 100% !important;
+        margin-left: 2px;
+    }
+}
+
+/* Start Exit Interview Form */
+
+/* Start Employee Clearance Form */
+.payroll {
+    font-weight: 600;
+}
+
+.inputPayroll {
+    width: 20%;
+    border: none !important;
+    border-bottom: 1px solid !important;
+}
+
+.inputDate {
+    border: none !important;
+    border-bottom: 1px solid !important;
+    width: 80%;
+}
+
+.topheaderCouriesBorder {
+    width: 40%;
+    margin-bottom: 50px;
+}
+
+.curlyImg {
+    width: 70px;
+}
+
+.applicableInput {
+    margin-left: 110px;
+}
+
+.applicableCheck {
+    margin-left: 123px;
+}
+/* End Employee Clearance Form */
+/* Start smart_phone_requisition */
+.topheadersmartphonerequisition {
+    width: 40%;
+    text-align: center;
+    font-weight: 900;
+    border-bottom: 1px solid;
+    margin-left: 35%;
+    font-size: 16px;
+}
+
+.group > div {
+    display: inline-block;
+    padding-bottom: 4px;
+}
+
+    .group > div > span, .group > div > div {
+        height: 40px;
+        text-align: center;
+        padding-top: 20px;
+        padding-bottom: 0px;
+        display: inline-block;
+    }
+
+.details {
+    margin-top: 20%;
+}
+
+.table-bordered > thead > tr > td, .table-bordered > thead > tr > th {
+    font-weight: 300;
+    font-size: 12px;
+}
+
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse
+}
+
+th, td {
+    padding: 5px;
+    text-align: left;
+    font-weight: 100;
+}
+
+.Otherparagarph {
+    font-size: 12px;
+}
+
+.ticketNumber {
+    font-weight: 300;
+}
+/* End smart_phone_requisition */

@@ -1,0 +1,406 @@
+﻿@model dynamic
+@{
+    ViewBag.Title = "Cab Booking Request Form";
+    var user = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    bool IsNew = true;
+    bool IsEdit = true;
+    dynamic CBRF = null;
+    Layout = ViewBag.Layout;
+    int RowId = 0, FormId = 0, AppRowId = 0, ApprovalType = 0;
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IsNew = ViewBag.IsNew;
+        IsEdit = ViewBag.IsEdit;
+        CBRF = ViewBag.Model;
+        RowId = ViewBag.RowId;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+    }
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SAVWIPL - Cab Booking Request Form</title>
+    <style type="text/css">
+        *:visited, *:focus {
+            box-shadow: none;
+        }
+
+        input, select, input:focus, select:focus, textarea, textarea:focus {
+            border: 1px solid #000;
+        }
+
+        input, textarea {
+            padding: 5px;
+        }
+
+        table td {
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <table style="width: 100%; font-size: 14px; color: #000; font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+        <tr>
+            <td>
+                <table style="width: 100%;" border="1" cellspadding="0" cellspacing="0">
+                    <tr>
+                        <td width="60%" style="text-align: right;">
+                            <img style="width: 50%;" src='@Server.MapPath("~/assets/img/SAVWIPL_Merger_Logo.JPG")'>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td align="center">
+                <h2> Cab Booking Request Form </h2>
+            </td>
+        </tr>
+
+        <tr>
+            <td style="padding: 15px;">
+                <table cellspacing="0" border="1" cellpadding="0" width="100%">
+                    @if (CBRF.one[0].RequestSubmissionFor == "Self")
+                    {
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Employee Name
+                            </td>
+                            <td style="width: 30%" colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @CBRF.one[0].EmployeeName  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Employee Code
+                            </td>
+                            <td style="width: 30%" colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @CBRF.one[0].SelfEmployeeIDNo   </span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Designatiion
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @CBRF.one[0].Designation  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Location
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @CBRF.one[0].Location  </span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Department
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">  @CBRF.one[0].Department  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Contact Number
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">  @CBRF.one[0].SelfMobile  </span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Cost Center Number
+                            </td>
+                            <td colspan="5" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">  @CBRF.one[0].CostCenterNumber  </span>
+                            </td>
+                        </tr>
+
+                    }
+                    else
+                    {
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Employee Name
+                            </td>
+                            <td style="width: 30%" colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @CBRF.one[0].OtherEmployeeName  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Employee Code
+                            </td>
+                            <td style="width: 30%" colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @CBRF.one[0].OnBehalfEmployeeIDNo   </span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Designatiion
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @CBRF.one[0].OnBehalfDesignation  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Location
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @CBRF.one[0].OnBehalfLocation  </span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Department
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">  @CBRF.one[0].OnBehlafDepartment  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Contact Number
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">  @CBRF.one[0].OnBehalfMobile  </span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Cost Center Number
+                            </td>
+                            <td colspan="5" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">  @CBRF.one[0].OnBehalfCostCenterNumber  </span>
+                            </td>
+                        </tr>
+                    }
+
+
+
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Shopping Cart Number
+                        </td>
+                        <td colspan="5" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">  @CBRF.one[0].ShoppingCartNo  </span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Name(Booked By)
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @CBRF.one[0].Name </span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">
+                            Contact Number (Booked By)
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @CBRF.one[0].ContactNumber  </span>
+                        </td>
+
+                    </tr>
+
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Cab Required From
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@CBRF.one[0].CarRequiredFromDate.ToString("yyyy-MM-dd")  @CBRF.one[0].CarRequiredFromDate.ToString("HH:mm")  </span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">
+                            Cab Required To
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">@CBRF.one[0].CarRequiredToDate.ToString("yyyy-MM-dd")  @CBRF.one[0].CarRequiredToDate.ToString("HH:mm") </span>
+                        </td>
+
+                    </tr>
+
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Number of Travellers
+                        </td>
+
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @CBRF.one[0].NumberofUsers  </span>
+                        </td>
+
+
+                        <td style="width:20%; font-weight: bold;">
+                            Flight No & Time (Incase it is Airport Pickup or Drop)
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @CBRF.one[0].FlightNo @CBRF.one[0].FlightTime.ToString("HH:mm")  </span>
+                        </td>
+
+                    </tr>
+
+                    <tr>
+                                <td colspan="6" class="bt-0 bb-0 pl-0 pr-0">
+                                    <table class="w-100 mx-auto table table-border form-border text-center">
+
+                                        <thead class="form-head-1" style="margin-left:inherit !important;">
+                                            <tr>
+                                                <th>Sr. No.</th>
+                                                <th>User Name</th>
+                                                <th>User Contact Number</th>
+                                                <th>Destination</th>
+                                                <th>Reporting Time</th>
+                                                <th>Reporting Place with address</th>
+                                                <th></th>
+
+                                            </tr>
+                                        </thead>
+                                        @{
+                                            var count = 1;
+                                            <tbody class="form-border tableUser" id="usersBody" style="font-weight: normal;">
+                                                @foreach (var itemCabUser in CBRF.CabUsersList)
+                                                {
+
+                                                    <tr id='@("row" + count)' class="tr_input">
+                                                        <td class="sNo text-center">@count</td>
+                                                        <td class="text-center"><input autocomplete="off" type="text" class="sftDetClass form-control txtDisable inpValidateUserName" id='@("txtUserName_"+count)' name='@("txtUserName_"+count)' maxlength="100" onkeypress="avoidSpecialSymbols(event)" onPaste="return false" value="@itemCabUser.UserName" /></td>
+                                                        <td class="text-center"><input autocomplete="off" type="text" class="form-control txtDisable inpValidateUserContNum" id='@("txtUserContactNumber_"+count)' name='@("txtUserContactNumber_"+count)' maxlength="10" onkeypress="allowNumbersOnly(event)" onPaste="return false" value="@itemCabUser.UserContactNumber" /></td>
+                                                        <td class="text-center"><input autocomplete="off" type="text" class="form-control txtDisable inpValidateDesg" id='@("txtDestination_"+count)' name='@("txtDestination_"+count)' maxlength="100" onkeypress="avoidSpecialSymbols(event)" onPaste="return false" value="@itemCabUser.Destination" /></td>
+                                                        <td class="text-center">
+                                                            <input autocomplete="off" class="wField txtDisable widthForTime form-control inpValidateRtime" type="time" id='@("txtReportingTime_"+count)' name='@("txtReportingTime_"+count)' maxlength="100" onkeypress="avoidSpecialSymbols(event)" onPaste="return false" value="@itemCabUser.ReportingTime.ToString("HH:mm")" />
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <textarea class=" form-control txtDisable input-width-1 select-border emp-name-input inpValidateReportingAddress" cols="60" rows="2" maxlength="500" id='@("txtReportingPlaceWithAddress_"+count)' name='@("txtReportingPlaceWithAddress_"+count)' onPaste="return false">@itemCabUser.ReportingPlaceWithAddress</textarea>
+                                                        </td>
+
+                                                    </tr>
+                                                    count++;
+                                                }
+
+
+                                            </tbody>
+
+                                        }
+
+                                    </table>
+                                </td>
+                    </tr>
+
+
+                    <tr>
+                        <td colspan="6" style=" font-weight: bold;">
+                            Reason For Booking
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="6">
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @CBRF.one[0].ReasonforBooking </span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="6">
+                            <label>Note:To be filled by the Admin</label>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="6" style=" font-weight: bold;">
+                            Type of Car
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="6">
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @CBRF.one[0].TypeofCarOther </span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="6" style=" font-weight: bold;">
+                            Vehicle Number
+
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="6">
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @CBRF.one[0].VehicleNumberOther </span>
+                        </td>
+                    </tr>
+
+                    @{
+                        var appList = CBRF.three as List<Skoda_DCMS.Models.ApprovalDataModel>;
+                    }
+
+                    @if (appList.Count > 0)
+                    {
+                        <tr>
+                            <td colspan="2">Name</td>
+                            <td colspan="2">Proccessed On</td>
+                            <td colspan="1">Status</td>
+                            <td colspan="1">Level</td>
+                        </tr>
+                        foreach (var item in appList)
+                        {
+                            <tr>
+                                <td colspan="2" style="font-weight: normal;">
+                                    <div style="margin-bottom:10px;">
+                                        <div>@item.UserName</div>
+                                        <div>@item.Designation</div>
+                                    </div>
+                                </td>
+                                <td colspan="2" style="font-weight: normal;">
+                                    @if (item.Logic == "OR")
+                                    {
+                                        if (item.ApproverStatus != "Pending")
+                                        {
+                                            <div>
+                                                @item.TimeStamp
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div>
+                                            @item.TimeStamp
+                                        </div>
+                                    }
+                                </td>
+                                <td colspan="1" style="font-weight: normal;">
+                                    @if (item.Logic == "OR")
+                                    {
+                                        if (item.ApproverStatus != "Pending")
+                                        {
+                                            <div>
+                                                @item.ApproverStatus
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div>
+                                            @item.ApproverStatus
+                                        </div>
+                                    }
+                                </td>
+                                <td colspan="1" style="font-weight: normal;">
+                                    <div>
+                                        @item.Level
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    <tr>
+                        <td colspan="6" style="height: 15px;">
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

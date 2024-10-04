@@ -1,0 +1,279 @@
+.process{    
+    &_wrp{
+        margin-top: 14px;
+    }
+    &_title{
+        font-size: 15px;
+        font-weight: bold;
+        margin: 24px 0 0 0;
+    }
+    &_tbl{
+        display: table;
+        width: 100%;
+        background-color: #fff;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        border: 1px solid #f2eeee;
+    }
+    &_cell{
+        display:table-cell;
+        padding: 16px 10px;
+        line-height: normal;        
+        vertical-align: middle; 
+        font-family: Verdana;
+        font-size: 14px;
+        color: #253439;
+        &_7{
+            width: 10%;
+        }
+
+        &_5,
+        &_6{
+            width:14%;
+        }
+        &_2{
+            width:14%;
+        }
+        &_4{
+            width:14%;
+        }
+        &_3{
+            width:14%;
+        }
+        &_1{
+            width:auto;
+        }
+        .col_label{
+            font-size: 12px;
+            color: rgba(130, 152, 163, 0.75);
+        }   
+        .btn-group{
+            float: right;
+        }    
+        .dropdown-menu {
+            left: initial;
+            right: 0;
+            padding: 20px 0;
+            width: 165px;
+            text-align: left;
+            li{
+                a{
+                    font-size: 12px;
+                    padding: 12px 20px;
+                }
+            }
+        }
+    }
+}
+
+.share_icon{
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+position: relative;
+margin-left: 9px;
+vertical-align: middle;
+    &:after{
+        content:'';
+        width: 14px;
+        height: 14px;
+        background-image: url(../img/share_blue.png);
+        background-repeat: no-repeat;
+        background-size: contain;
+        display: inline-block;
+        position: absolute;
+        right: 1px;
+    top: 1px;
+
+}
+    
+}
+.share_btn{
+    width: 111px;
+    height: 33px;
+    background: #0090d7;
+    color: #fff;
+    text-align: center;
+    padding: 8px 0;
+        padding-right: 0px;
+    padding-right: 21px;
+    font-size: 12px;
+    position: relative;
+    &:focus,
+    &:hover{
+        color: #fff;
+        background: #0d638d;
+    }
+    &:after{
+        content:'';
+        width: 14px;
+        height: 14px;
+        background-image: url(../img/share_icon.svg);
+        background-repeat: no-repeat;
+        background-size: contain;
+        display: inline-block;
+        position: absolute;
+        right: 11px;
+        top: 9px;
+    }
+}
+.inline_block{
+    display: inline-block;
+    
+    &_bottom{
+        vertical-align: bottom;
+    }
+}
+.dash{
+    &_tbl{
+        display: table;
+        width: 1060px;
+        @extend %center;
+        margin-bottom: 20px;
+        
+    }
+    &_color{
+        
+        &_1{
+            background: $lipstick;
+            &:before{
+                background-image: url(../img/process_dash_icon@2x.png);
+            }
+        }
+        &_2{
+            background: $topaz;
+            &:before{
+                background-image: url(../img/iserve_dash_icon@2x.png);
+
+            }
+        }
+        &_3{
+            background: $light-navy;
+            &:before{
+                background-image: url(../img/digitalization_dash_icon@2x.png);
+            }
+        }
+        &_4{
+            background: $turquoise-blue;
+            &:before{
+                background-image: url(../img/it_security_dash_icon@2x.png);
+            }
+        }
+        &_5{
+            background: $burnt-yellow;
+            &:before{
+                background-image: url(../img/module_dash_icon@2x.png);
+            }
+        }
+        &_6{
+            background: $grass;
+            &:before{
+                background-image: url(../img/report_dash_icon@2x.png);
+            }
+        }
+    }
+    &_btn{
+        padding: 20px;
+        text-align: center;
+        color: #fff;
+        &:focus,
+        &:hover{
+            color: #fff;
+        }
+        img{
+            @extend %center;
+        }
+        &:before{
+            content: '';
+            display: block;
+            
+            background-repeat: no-repeat;
+            width: 33px;
+            height: 33px;
+            background-size: contain;
+            background-position: center;
+            margin: auto;
+
+        }
+        
+    }
+   
+    
+}
+
+ .left_col.smart_share_left_col {
+    width: 80px;
+    padding: 0;
+    position: fixed;
+    height: 100%;
+    z-index: 200;
+    background: $lightblue !important;
+    .avtor{
+        background: $marine-blue-two;
+        padding-top: 20px;
+        padding-bottom: 25px;        
+        .img-circle.profile_img {
+            width: 50px;            
+            display: block;
+            margin: auto;                
+        }
+        a{
+            color: #fff;
+            font-size: 11px;
+            text-align: center;
+            display: block;
+        }
+    }
+    .side-menu li a {
+        color:#000 !important;
+    }    
+    .skd {        
+        background-size: 22px !important;        
+    }
+      .skd-4{
+        background:url(../img/it-prt-icon.png) no-repeat;
+        background-size: 20px !important;
+      }
+      .skd-5{
+        background:url(../img/it-prt-icon.png) no-repeat;
+        background-size: 20px !important;
+      }
+      .skd-6{
+        background:url(../img/reports_black@2x.png) no-repeat;
+      }
+      .skd-7{
+        background:url(../img/help_black@2x.png) no-repeat;
+      }
+      .skd-8{
+        background:url(../img/setting_black@2x.png) no-repeat;
+      }
+
+      .nav.side-menu > li.active > a {
+        .skd-4{
+            background:url(../img/it-prt-icon.png) no-repeat;
+            background-size: 20px !important;
+          }
+          .skd-5{
+            background:url(../img/it-prt-icon.png) no-repeat;
+            background-size: 20px !important;
+          }
+          .skd-6{
+            background:url(../img/reports_black@2x.png) no-repeat;
+          }
+          .skd-7{
+            background:url(../img/help_black@2x.png) no-repeat;
+          }
+          .skd-8{
+            background:url(../img/setting_black@2x.png) no-repeat;
+          }
+      }
+}
+
+.viewmore{
+    float: right;
+}
+
+.top_logo.smartsharelogo .rgt_logo {    
+    margin-right: -8px;
+
+}

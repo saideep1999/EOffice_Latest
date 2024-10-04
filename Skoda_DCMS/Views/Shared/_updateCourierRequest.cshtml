@@ -1,0 +1,107 @@
+﻿<script type="text/javascript">
+    $(function () {
+        $("#modal-window").on("click", "#btnClose", function () {
+            $("#modal-window").modal("hide");
+            window.location.reload();
+        });
+
+
+        $("#modal-window").on("click", "#btnApprove", function () {
+
+            var weightMissing = $("#txtWeight").val() == "" ? true : false;
+            var dimensionMissing = $("#txtDimension").val() == "" ? true : false;
+            var courierInwardSrNoMissing = $("#txtCourierInwardSrNo").val() == "" ? true : false;
+
+            if (weightMissing == true && dimensionMissing == true) {
+                $("#errorSummary").show();
+                $('#errorSummaryItems').empty();
+                $('<li>' + 'Either weight or dimension is mandatory.' + '</li>').appendTo('#errorSummaryItems');
+                return;
+            }
+
+            if (courierInwardSrNoMissing == true) {
+                $("#errorSummary").show();
+                $('<li>' + 'Courier Inward Register Sl. No. is mandatory.' + '</li>').appendTo('#errorSummaryItems');
+                return;
+            }
+
+
+            ////
+            $.ajax({
+                type: "GET",
+                url: "../MyWork/ApproveCourierRequest",
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                cache: false,
+                async: false,
+                data: {
+                    requestId: $("#lblRequestIdVal").text(),
+                    comments: $("#txtForwardComments").val()
+                },
+                success: function (response) {
+                    //Request is approved successfully.
+                    $("#divRequestSuccessMsg").show();
+                    $("#btnApprove").prop("disabled", true);
+                    $("#btnReject").prop("disabled", true);
+
+                },
+                error: function (response) {
+                    ////
+                    $("#divRequestSuccessMsg").hide();
+                }
+            });
+        });
+    });
+
+
+</script>
+
+<div id="modal-window" style="display:none;" title="Forward Request" class="modal fade">
+    <div class="modal-dialog" style="width: 70%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Update Courier Data</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row" hidden="hidden" id="errorSummary">
+                    <div class="col-lg-12">
+                        <div class="panel-group">
+                            <div class="panel panel-warning">
+                                <div class="panel-heading">Please correct the below errors and proceed again.</div>
+                                <div class="panel-body"><ul id="errorSummaryItems" style="color:red;"></ul></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-lg-12">
+                        <div class="form-group col-lg-3 right-padding">
+                            <label id="lblRequestId" class="control-label">Request Id:</label>
+                            <label id="lblRequestIdVal" class="control-label"></label>
+                        </div>
+                    </div>
+                </div>
+                @Html.Partial("_courierRequestPartial")
+                <div class="row">
+                    <div class="form-group col-lg-12 right-padding">
+                        <button type="button" id="btnApprove" class="btn btn-success" onclick="approveRequest()" style="display: none">Approve</button>
+                        <button type="button" id="btnReject" class="btn btn-danger" onclick="rejectRequest()" style="display: none">Reject</button>
+                        <button type="button" id="btnClose" class="btn btn-primary">Close</button>
+                    </div>
+                </div>
+
+                <div id="divRequestApprSuccessMsg" class="row" style="display:none;">
+                    <div class="form-group col-lg-12">
+                        <label id="lblRequestSuccessMsg" class="alert-success">Request is Approved successfully!!!</label>
+                    </div>
+                </div>
+                <div id="divRequestRejSuccessMsg" class="row" style="display:none;">
+                    <div class="form-group col-lg-12">
+                        <label id="lblRequestSuccessMsg" class="alert-success">Request is Rejected successfully!!!</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

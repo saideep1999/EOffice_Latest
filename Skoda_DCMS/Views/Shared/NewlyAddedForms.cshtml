@@ -1,0 +1,172 @@
+﻿@model Skoda_DCMS.Models.DashboardModel
+@{
+    Layout = null;
+}
+
+@{ var rowCount = 1;}
+
+@if (Model != null && Model.Data != null && Model.Data.NewlyAddedForms != null)
+{
+    @for (int i = 0; i < Model.Data.NewlyAddedForms.Count; i++)
+    {
+        <div class='content'>
+            <div class="item">
+                @if (Model.Data.NewlyAddedForms.ElementAtOrDefault(i) != null)
+                {
+                    <div class="p_box">
+                        <div class="job_value value_position" style="color: #333333;">
+                            @Model.Data.NewlyAddedForms[i].FormCount
+                        </div>
+                        <div class="job text-uppercase text_position searchHere" style="font-weight:bold">
+                            @Model.Data.NewlyAddedForms[i].FormName
+                        </div>
+                        <div class="job text-uppercase added_form_icon">
+                            <div class="plus_icon_margin">
+                                @if (Model.Data.NewlyAddedForms[i].FormName == "Bourier Request Form")
+                                {
+                                    <a class="sfo_icons_info" href="http://win-6cgsdmg51od:8080/sites/DCMS/Lists/CourierRequest/NewForm.aspx?Source=https://localhost:44382/Dashboard/Index">
+                                        Create new
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a class="sfo_icons_info" href="@Url.Action("CreateForm", "List" , new { uniqueFormName=Model.Data.NewlyAddedForms[i].UniqueFormName, formParentId=Model.Data.NewlyAddedForms[i].UniqueFormId, formName=Model.Data.NewlyAddedForms[i].FormName, ControllerName=Model.Data.NewlyAddedForms[i].ControllerName})">
+                                        Create new
+                                    </a>
+                                }
+                            </div>
+                            <div>
+                                @*<a href="@Url.Action("GetMyForms", "Dashboard", new { formName = item.UniqueFormName, fullName = item.FormName })" class="sfo_icons_info">
+                                        View
+                                    </a>*@
+                                <a href="@Url.Action("GetMyFormsByName", "Dashboard", new { formName = Model.Data.NewlyAddedForms[i].UniqueFormName, formParentId = Model.Data.NewlyAddedForms[i].UniqueFormId, fullName = Model.Data.NewlyAddedForms[i].FormName,Department = Model.Data.NewlyAddedForms[i].Department,FormOwner = Model.Data.NewlyAddedForms[i].FormOwner,ControllerName = Model.Data.NewlyAddedForms[i].ControllerName })" class="sfo_icons_info">
+                                    View
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+                @if (Model.Data.NewlyAddedForms.ElementAtOrDefault(i + 1) != null)
+                {
+                    <div class="p_box">
+                        <div class="job_value value_position" style="color: #333333;">
+                            @Model.Data.NewlyAddedForms[i + 1].FormCount
+                        </div>
+                        <div class="job text-uppercase text_position searchHere" style="font-weight:bold">
+                            @Model.Data.NewlyAddedForms[i + 1].FormName
+                        </div>
+                        <div class="job text-uppercase added_form_icon">
+                            <div class="plus_icon_margin">
+                                @if (Model.Data.NewlyAddedForms[i + 1].FormName == "Bourier Request Form")
+                                {
+                                    <a class="sfo_icons_info" href="http://win-6cgsdmg51od:8080/sites/DCMS/Lists/CourierRequest/NewForm.aspx?Source=https://localhost:44382/Dashboard/Index">
+                                        Create new
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a class="sfo_icons_info" href="@Url.Action("CreateForm", "List" , new { uniqueFormName=Model.Data.NewlyAddedForms[i + 1].UniqueFormName, formParentId=Model.Data.NewlyAddedForms[i + 1].UniqueFormId, formName=Model.Data.NewlyAddedForms[i + 1].FormName, ControllerName=Model.Data.NewlyAddedForms[i + 1].ControllerName})">
+                                        Create new
+                                    </a>
+                                }
+                            </div>
+                            <div>
+                                @*<a href="@Url.Action("GetMyForms", "Dashboard", new { formName = item.UniqueFormName, fullName = item.FormName })" class="sfo_icons_info">
+                                        View
+                                    </a>*@
+                                <a href="@Url.Action("GetMyFormsByName", "Dashboard", new { formName = Model.Data.NewlyAddedForms[i + 1].UniqueFormName, formParentId = Model.Data.NewlyAddedForms[i + 1].UniqueFormId, fullName = Model.Data.NewlyAddedForms[i + 1].FormName,Department = Model.Data.NewlyAddedForms[i + 1].Department,FormOwner = Model.Data.NewlyAddedForms[i + 1].FormOwner ,ControllerName = Model.Data.NewlyAddedForms[i + 1].ControllerName})" class="sfo_icons_info">
+                                    View
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    i++;
+                }
+                @{rowCount++;}
+            </div>
+        </div>
+
+    }@for (int i = 0; i < Model.Data.NewlyAddedForms.Count; i++)
+    {
+        <div class='content'>
+            <div class="item">
+                @if (Model.Data.NewlyAddedForms.ElementAtOrDefault(i) != null)
+                {
+                    <div class="p_box">
+                        <div class="job_value value_position" style="color: #333333;">
+                            @Model.Data.NewlyAddedForms[i].FormCount
+                        </div>
+                        <div class="job text-uppercase text_position searchHere" style="font-weight:bold">
+                            @Model.Data.NewlyAddedForms[i].FormName
+                        </div>
+                        <div class="job text-uppercase added_form_icon">
+                            <div class="plus_icon_margin">
+                                @if (Model.Data.NewlyAddedForms[i].FormName == "Bourier Request Form")
+                                {
+                                    <a class="sfo_icons_info" href="http://win-6cgsdmg51od:8080/sites/DCMS/Lists/CourierRequest/NewForm.aspx?Source=https://localhost:44382/Dashboard/Index">
+                                        Create new
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a class="sfo_icons_info" href="@Url.Action("CreateForm", "List" , new { uniqueFormName=Model.Data.NewlyAddedForms[i].UniqueFormName, formParentId=Model.Data.NewlyAddedForms[i].UniqueFormId, formName=Model.Data.NewlyAddedForms[i].FormName, ControllerName=Model.Data.NewlyAddedForms[i].ControllerName})">
+                                        Create new
+                                    </a>
+                                }
+                            </div>
+                            <div>
+                                @*<a href="@Url.Action("GetMyForms", "Dashboard", new { formName = item.UniqueFormName, fullName = item.FormName })" class="sfo_icons_info">
+                                        View
+                                    </a>*@
+                                <a href="@Url.Action("GetMyFormsByName", "Dashboard", new { formName = Model.Data.NewlyAddedForms[i].UniqueFormName, formParentId = Model.Data.NewlyAddedForms[i].UniqueFormId, fullName = Model.Data.NewlyAddedForms[i].FormName,Department = Model.Data.NewlyAddedForms[i].Department,FormOwner = Model.Data.NewlyAddedForms[i].FormOwner,ControllerName = Model.Data.NewlyAddedForms[i].ControllerName })" class="sfo_icons_info">
+                                    View
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+                @if (Model.Data.NewlyAddedForms.ElementAtOrDefault(i + 1) != null)
+                {
+                    <div class="p_box">
+                        <div class="job_value value_position" style="color: #333333;">
+                            @Model.Data.NewlyAddedForms[i + 1].FormCount
+                        </div>
+                        <div class="job text-uppercase text_position searchHere" style="font-weight:bold">
+                            @Model.Data.NewlyAddedForms[i + 1].FormName
+                        </div>
+                        <div class="job text-uppercase added_form_icon">
+                            <div class="plus_icon_margin">
+                                @if (Model.Data.NewlyAddedForms[i + 1].FormName == "Bourier Request Form")
+                                {
+                                    <a class="sfo_icons_info" href="http://win-6cgsdmg51od:8080/sites/DCMS/Lists/CourierRequest/NewForm.aspx?Source=https://localhost:44382/Dashboard/Index">
+                                        Create new
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a class="sfo_icons_info" href="@Url.Action("CreateForm", "List" , new { uniqueFormName=Model.Data.NewlyAddedForms[i + 1].UniqueFormName, formParentId=Model.Data.NewlyAddedForms[i + 1].UniqueFormId, formName=Model.Data.NewlyAddedForms[i + 1].FormName, ControllerName=Model.Data.NewlyAddedForms[i + 1].ControllerName})">
+                                        Create new
+                                    </a>
+                                }
+                            </div>
+                            <div>
+                                @*<a href="@Url.Action("GetMyForms", "Dashboard", new { formName = item.UniqueFormName, fullName = item.FormName })" class="sfo_icons_info">
+                                        View
+                                    </a>*@
+                                <a href="@Url.Action("GetMyFormsByName", "Dashboard", new { formName = Model.Data.NewlyAddedForms[i + 1].UniqueFormName, formParentId = Model.Data.NewlyAddedForms[i + 1].UniqueFormId, fullName = Model.Data.NewlyAddedForms[i + 1].FormName,Department = Model.Data.NewlyAddedForms[i + 1].Department,FormOwner = Model.Data.NewlyAddedForms[i + 1].FormOwner ,ControllerName = Model.Data.NewlyAddedForms[i + 1].ControllerName})" class="sfo_icons_info">
+                                    View
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    i++;
+                }
+                @{rowCount++;}
+            </div>
+        </div>
+
+    }
+}
+
+
+

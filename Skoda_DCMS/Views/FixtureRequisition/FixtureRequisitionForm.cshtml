@@ -1,0 +1,2491 @@
+﻿
+@{
+    ViewBag.Title = "Fixture Requisition Form";
+    int FormId = 0, AppRowId = 0, ApprovalType = 0; bool IsEdit = true; bool IsNew = true;
+    bool IsNewMode = true, IsEditMode = false, IsViewMode = false;
+    var user = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    var SecurityDesgnString = "Security";
+    Skoda_DCMS.Models.FixtureRequisitionData QFRF = null;
+    dynamic FlagRedirect = null;
+    var currentUser = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    List<Skoda_DCMS.Models.ApprovalDataModel>
+    appList = new List<Skoda_DCMS.Models.ApprovalDataModel>
+        ();
+    int? tableCount = 0;
+    string disabled = "", slctDisabled = "";
+    var CurrentUserDesgn = "";
+    long? CurrentUserLevel = 0;
+    if (ViewBag != null && !ViewBag.IsNewMode)
+    {
+        IsNew = ViewBag.IsNew;
+        IsEdit = ViewBag.IsEdit;
+        IsNewMode = ViewBag.IsNewMode;
+        IsEditMode = ViewBag.IsEditMode;
+        IsViewMode = ViewBag.IsViewMode;
+        disabled = IsViewMode ? "readonly" : "";
+        slctDisabled = IsViewMode ? "disabled" : "";
+        QFRF = ViewBag.Model.one[0] as Skoda_DCMS.Models.FixtureRequisitionData;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        appList = ViewBag.Model?.three as List<Skoda_DCMS.Models.ApprovalDataModel>
+    ;
+        CurrentUserDesgn = appList?.Where(x => x.ApproverUserName == currentUser.UserName).Select(x => x.Designation).FirstOrDefault();
+        CurrentUserLevel = appList?.Where(x => x.ApproverUserName == currentUser.UserName && x.ApproverStatus == "Pending").Select(x => x.Level).FirstOrDefault();
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+        if (IsViewMode)
+        {
+            var Ap = appList?.Where(x =>
+            x.ApproverUserName.ToLower() == currentUser.UserName.ToLower()
+            && x.ApproverStatus.ToLower() == "pending"
+            ).FirstOrDefault();
+        }
+    }
+}
+<!DOCTYPE html>
+<style>
+    /*New design css start here*/
+    .astColor {
+        color: red;
+    }
+
+    .astColor1 {
+        color: red;
+    }
+
+    .textTrans {
+        width: 100%;
+        max-width: 99%;
+        border-radius: 5px;
+        margin-right: 0px;
+        border: 1px solid !important;
+    }
+
+    .empDetailsBg {
+        background-color: #fffbef;
+    }
+
+    #accordion select {
+        color: #000;
+        width: 100% !important;
+        max-width: 97%;
+        height: 45px;
+        background-color: #FFFFFF;
+        border: 1px solid #BFBFBF;
+        box-sizing: border-box;
+        border-radius: 5px;
+        background-image: url(data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>);
+        background-repeat: no-repeat;
+        background-position: right .75rem center;
+        background-size: 16px 12px;
+    }
+
+    #accordion input[type='text'] {
+        width: 100% !important;
+        max-width: 97%;
+        height: 45px;
+        /*background-color: #F8F8F8;*/
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px;
+    }
+
+    #accordion input[type='number'] {
+        width: 100% !important;
+        max-width: 97%;
+        height: 45px;
+        /*background-color: #F8F8F8;*/
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px;
+    }
+
+    #accordion input[type='date'] {
+        width: 100% !important;
+        max-width: 97%;
+        height: 45px;
+        background-color: #FFFFFF;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px;
+    }
+
+    #accordion label {
+        font-size: 16px;
+        line-height: 22px;
+        font-weight: 600;
+        color: #201F1F;
+    }
+
+    #accordion table tr td {
+        border: none !important;
+        font-size: 16px;
+        line-height: 19px;
+        color: #201F1F;
+        background-color: white;
+        padding: 10px 0;
+    }
+
+    #accordion label {
+        display: block;
+    }
+
+    #accordion .card-header {
+        background: rgb(4 59 100) !important;
+        border-radius: 5px 5px 0px 0px;
+        position: relative;
+        margin-top: 15px;
+    }
+
+        #accordion .card-header.collapsed h5:after {
+            content: '+';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        #accordion .card-header h5:after {
+            content: '-';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+    #accordion h5 button {
+        font-size: 18px;
+        line-height: 22px;
+        /* identical to box height */
+        padding-left: 0px;
+        display: flex;
+        align-items: center;
+        text-transform: uppercase;
+        /* Text_white */
+
+        color: #FFFFFF;
+    }
+
+        #accordion h5 button:focus {
+            box-shadow: none;
+        }
+
+    .empDetailsFields label {
+        display: block !important;
+        margin-bottom: 0px;
+    }
+
+    .empDetailsFields .row label {
+        display: block;
+        margin-bottom: 0px;
+    }
+
+        .empDetailsFields .row label:nth-child(1) {
+            font-style: normal;
+            font-weight: normal !important;
+            font-size: 12px;
+            line-height: 18px;
+            color: #A9A9A9 !important;
+        }
+
+        .empDetailsFields .row label:nth-child(2) {
+            font-style: normal;
+            font-weight: normal;
+            font-size: 18px;
+            line-height: 22px;
+            color: #201F1F;
+        }
+
+    .firstLastName {
+        font-style: normal;
+        font-weight: normal;
+        font-size: 20px;
+        line-height: 24px;
+        /* identical to box height */
+
+        display: flex;
+        align-items: center;
+        color: #201F1F;
+    }
+
+    .submit-btn {
+        background: #3D3D3D;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #FFFFFF;
+        border-color: transparent !important;
+    }
+
+    .cancl-btn {
+        background: #FAE99B;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        border-color: transparent !important;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #212221;
+        margin-left: 10px;
+    }
+
+
+
+
+    .card-footer {
+        display: flex;
+        background-color: transparent !important;
+    }
+
+    .photo-form {
+        width: 100%;
+    }
+
+    .ui-front {
+        z-index: 9999999 !important;
+    }
+    /*Animation CSS Starts*/
+
+    div.input-block {
+        position: relative;
+    }
+
+        div.input-block input {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 188px;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block textarea {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #495055;
+            width: 100%;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            background-color: #fff;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block span.placeholder {
+            position: absolute;
+            margin: 17px 0;
+            padding: 0 4px;
+            font-family: Roboto, sans-serif;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            top: -6px;
+            left: 15px;
+            transition: all 0.2s;
+            transform-origin: 0% 0%;
+            background: none;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        div.input-block textarea:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: #fff !important;
+        }
+
+        div.input-block textarea:valid + span.placeholder,
+        div.input-block textarea:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px) !important;
+            background: #fff !important;
+        }
+
+        div.input-block input:valid + span.placeholder,
+        div.input-block input:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: rgb(219,238,213);
+        }
+
+
+        div.input-block input.spanUpperSide + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: rgb(219,238,213);
+        }
+
+        div.input-block input:read-only + span.placeholder,
+        div.input-block input:read-only + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background: rgb(219,238,213);
+        }
+
+
+    div.inputSelect span.placeholder {
+        position: absolute;
+        margin: 17px 0;
+        padding: 0 4px;
+        font-family: Roboto, sans-serif;
+        color: #000;
+        display: flex;
+        align-items: center;
+        font-size: 1rem;
+        top: -6px;
+        left: 15px;
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+        background: none;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    div.inputSelect select:focus + span.placeholder {
+        transform: scale(0.8) translateY(-30px);
+        background: rgb(219,238,213);
+        z-index: 9;
+    }
+
+    div.inputSelect select:not([value=""]):valid + span.placeholder {
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+    }
+
+
+
+    div.input-block input:focus + span.placeholder {
+        color: #284B63;
+    }
+
+    .breadcrumb {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+        padding: 1rem 1rem 0;
+        margin-bottom: 0;
+        list-style: none;
+        background-color: #FFFFFF;
+        border-radius: .25rem;
+    }
+
+    body.nav-sm .container.body .left_col {
+        width: 63px;
+        padding: 0;
+        position: fixed;
+        height: 100%;
+        z-index: 8;
+    }
+
+    .card {
+        position: relative;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        min-width: 0;
+        word-wrap: break-word;
+        background-color: #fff;
+        background-clip: border-box;
+        border: 0px;
+        border-radius: .25rem;
+    }
+
+    .dropdown-toggle::after {
+        display: none;
+        width: 0;
+        height: 0;
+        margin-left: .255em;
+        vertical-align: .255em;
+        content: "";
+        border-top: .3em solid;
+        border-right: .3em solid transparent;
+        border-bottom: 0;
+        border-left: .3em solid transparent;
+    }
+
+    input.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213);
+    }
+
+    inputSelect.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213) !important;
+    }
+
+    select.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background-color: rgb(219,238,213) !important;
+        z-index: 9;
+    }
+
+    textarea.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    @@media only screen and (min-width: 992px) {
+        div.input-block span.placeholder {
+            font-size: 15px;
+        }
+
+        div.inputSelect span.placeholder {
+            font-size: 14px;
+        }
+    }
+
+    #add_to_me {
+        text-align: left !important;
+    }
+
+    .TransView {
+        background-color: white !important;
+    }
+
+    .mt06rem {
+        margin-top: 0.6rem;
+    }
+
+    .chkPosition {
+        position: relative;
+        left: -11px;
+    }
+
+    .pl06rem {
+        padding-left: 0.6rem;
+    }
+
+    .mlSpaceChk {
+        margin-left: 2.1rem;
+    }
+
+    .leftSpace {
+        left: 29px !important;
+    }
+
+    .showBorder {
+        border: 1px solid #dee2e6;
+    }
+
+    .forLblWidth {
+        width: 20.5%;
+    }
+
+    .forTdLbl {
+        width: 14.5%;
+    }
+
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        margin: 0;
+    }
+</style>
+<div class="container">
+    <div class="right_col bg-transparent" role="main">
+        <div class="main_container">
+            <form id="QFRForm" method="post">
+                <div>
+                    <div class="breadcrumb-container">
+                        <div>
+                            @if (IsEditMode || IsViewMode)
+                            {
+                                <div>
+                                    <input type="hidden" id="FormId" name="FormId" value="@(FormId)" />
+                                    <input type="hidden" id="FormSrId" name="FormSrId" value="@(QFRF.Id)" />
+                                    <input type="hidden" id="AppRowId" name="AppRowId" value="@(AppRowId)" />
+                                    @*<input type="hidden" name="ApplicationCategoryDataCurr" id="ApplicationCategoryDataCurr" value="@(URCF.ApplicationCategoryData.Count)" />*@
+                                </div>
+                            }
+                            <ol class="breadcrumb">
+                                <li>
+                                    <a href="/Dashboard?formName=NGCF">
+                                        Dashboard
+                                    </a>
+                                </li>
+                                <li>
+                                    Fixture Requisition Form
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="row breadcrumb-container table-bordered  mr-1 ml-1" style="background-color: rgb(219,238,213) !important; ">
+                        <div class="col-md-2 col-lg-2">
+                            <span class="placeholder">Date : @(IsViewMode || IsEditMode ? (Convert.ToDateTime(appList.FirstOrDefault().FormId.CreatedDate).ToShortDateString()) : DateTime.Now.ToShortDateString())</span>
+                        </div>
+                        <div class="col-md-8 col-lg-8 mt-2 mb-1 form-heading" style="text-align:center; margin-top:5px">
+                            <span>Fixture Requisition Form</span>
+                        </div>
+                        <div class="col-md-2 col-lg-2">
+                            @if (IsViewMode || IsEditMode)
+                            {
+                                <span class="placeholder white_space_nowrap"> Form Id : @(IsViewMode || IsEditMode ? ("QFRF" + FormId ?? "") : "" )</span>
+                            }
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="heading d-none" id="headingErr">
+                    <h1 id="" class="info-header">Following fields are mandatory. Please fill in information for<br></h1>
+                    <div id="add_to_me" class="header-list" style="color:red;"></div>
+                </div>
+                <!-- ACCORDIAN STRUCTURE START HERE-->
+                @* Submitter Section *@
+                @{
+                    Html.RenderPartial("_NewSubmitterDetailsWithModel", (ViewBag as object));
+                }
+
+                @* Applicant Section *@
+                @{
+                    Html.RenderPartial("_NewApplicantDetailsWithModel", (ViewBag as object));
+                }
+
+                <div id="accordion">
+                    <div class="card">
+                        <div class="card-header collapsed" id="headingThree" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                            <h5 class="mb-0">
+                                <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                    <img src="~/assets/img/transactionIcon.svg" width="24" height="24" class="mr-2">Transaction Fields
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseThree" class="collapse" aria-labelledby="headingThree">
+                            <div class="card-body actionTab">
+                                <div class="row mt-4">
+                                    <div class="col-md-4 col-lg-4 col-12 input-block">
+                                        <input type="text" class="w-100 txtDisable" name="FixtureName" id="txtFixtureName" value="@(QFRF?.FixtureName)" @(disabled) required="">
+                                        <span class="placeholder">Fixture Name<span class="astColor">*</span></span>
+                                    </div>
+
+                                    <div class="col-md-4 col-lg-4 col-12 input-block">
+                                        <input type="text" class="w-100 txtDisable" name="FixtureNo" id="txtFixtureNo" value="@(QFRF?.FixtureNo)" @(disabled) required="">
+                                        <span class="placeholder">Fixture No.<span class="astColor">*</span></span>
+                                    </div>
+
+                                    <div class="col-md-4 col-lg-4 col-12 inputSelect">
+                                        <select name="ProjectName" class="spanUpperSide" id="drpProjectName" required>
+                                            <option style="display: none"></option>
+                                            <option value="Value 1">Value 1</option>
+                                            <option value="Value 2">Value 2</option>
+
+                                        </select>
+                                        <span class="placeholder">Model/Project Name<span class="astColor">*</span></span>
+                                    </div>
+
+                                </div>
+                                <div class="row mt-4">
+                                    <div class="col-md-6 col-lg-6 col-12 input-block">
+
+                                        <label class="f-600 col-md-12 col-lg-12">Fixture Required<span class="astColor">*</span></label>
+                                        <div class="col-md-6 col-lg-6 col-12 input-block">
+                                            <label class="f-600">From</label>
+                                            <input type="date" class="w-100" name="FromDate" id="txtFromDate" value="@(QFRF?.FromDate?.ToString("yyyy-MM-dd"))" required="" onchange="DateValidation()">
+                                        </div>
+                                        <div class="col-md-6 col-lg-6 col-12 inputSelect">
+                                            <label class="f-600">To</label>
+                                            <input type="date" class="w-100" name="ToDate" id="txtToDate" value="@(QFRF?.ToDate?.ToString("yyyy-MM-dd"))" required="" onchange="DateValidation()">
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="row w-100 mt-2">
+                                    <div class="row w-100">
+                                        <div class="form-group col-md-12 d-flex align-items-center col-lg-12 col-12">
+                                            <label id="lblRequestType" class="f-600" style="margin-left:23px; position: relative; top:10px;">
+                                                Reason for fixture requisition <span class="astColor">*</span>
+                                            </label>
+                                        </div>
+
+                                        <div class="form-group col-md-12 col-lg-12 d-flex align-items-end col-12">
+                                            <textarea class="form-group" id="txtReason" name="Reason" rows="4" style="margin-left: 20px;"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- <div class="row mt-3">
+                                    <div class="col-md-12 col-lg-12 col-12 input-block">
+                                        <textarea class=" txtDisable" cols="90" rows="3" name="txtBusinessNeed" id="txtBusinessNeed" maxlength="500" required></textarea>
+                                        <span class="placeholder">Reason for fixture requisition <span class="astColor">*</span></span>
+                                    </div>
+                                </div> -->
+                                <div class="row mt-3">
+                                    <div class="col-md-12 col-lg-12 col-12 input-block">
+                                        <table class="w-100 mx-auto table table-border form-border text-center" id="maintable" style="table-layout: fixed;">
+                                            <thead class="form-head-1" style="margin-left:inherit !important;">
+                                                <tr>
+                                                    <th colspan="5">Taking from Measurement Room</th>
+                                                </tr>
+                                                <tr>
+                                                    <th style="width: 50px !important;">Sr. No.</th>
+                                                    <th style="width: 122px !important;">Check point</th>
+                                                    <th style="width: 100px !important;">Ok</th>
+                                                    <th style="width: 100px !important;">Not Ok</th>
+                                                    <th style="width: 114px !important;">Remarks</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="form-border tableSoftware" id="softwareBody">
+                                                <tr id="row1" class="tr_input">
+                                                    <td>1</td>
+                                                    <td><label>RPS Pins</label></td>
+                                                    <td class="text-center">
+                                                        <input type="checkbox" name="chkRps" id="chkRpsok" value="Ok" onclick="getActionType()">
+                                                        @*<span class="checkmark"></span>*@
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <input type="checkbox" name="chkRps" id="chkRpsNok" value="NOk" onclick="getActionType()">
+                                                        @*<span class="checkmark"></span>*@
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <input type="text" name="RpsPinRemark" id="txt_rpsremarks" value="@(QFRF?.RpsPinRemark)" @(disabled)>
+                                                        <input type="hidden" name="RpsPin" id="chkRpsPin" value="">
+                                                    </td>
+                                                </tr>
+                                                <tr id="row1" class="tr_input">
+                                                    <td>2</td>
+                                                    <td><label>Clamps</label></td>
+                                                    <td class="text-center">
+                                                        <input type="checkbox" class="inpDisable" name="chkClam" id="chkClamok" value="Ok" onclick="getActionType()">
+                                                        @*<span class="checkmark"></span>*@
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <input type="checkbox" class="inpDisable" name="chkClam" id="chkClamNok" value="NOk" onclick="getActionType()">
+                                                        @*<span class="checkmark"></span>*@
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <input type="text" name="ClampsRemark" id="txt_clampsremarks" value="@(QFRF?.ClampsRemark)" @(disabled)>
+                                                        <input type="hidden" name="Clamps" id="chkClamps" value="">
+                                                    </td>
+                                                </tr>
+                                                <tr id="row1" class="tr_input">
+                                                    <td>3</td>
+                                                    <td><label>Wheels</label></td>
+                                                    <td class="text-center">
+                                                        <input type="checkbox" class="inpDisable" name="chkWheel" id="chkWheelok" value="Ok" onclick="getActionType()">
+                                                        @*<span class="checkmark"></span>*@
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <input type="checkbox" class="inpDisable" name="chkWheel" id="chkWheelNok" value="NOk" onclick="getActionType()">
+                                                        @*<span class="checkmark"></span>*@
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <input type="text" name="WheelsRemark" id="txt_wheelsremarks" value="@(QFRF?.WheelsRemark)" @(disabled)>
+                                                        <input type="hidden" name="Wheels" id="chkWheels" value="">
+                                                    </td>
+                                                </tr>
+                                                <tr id="row1" class="tr_input">
+                                                    <td>4</td>
+                                                    <td><label>RPS Sticker</label></td>
+                                                    <td class="text-center">
+                                                        <input type="checkbox" class="inpDisable" name="chkStick" id="chkStickok" value="Ok" onclick="getActionType()">
+                                                        @*<span class="checkmark"></span>*@
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <input type="checkbox" class="inpDisable" name="chkStick" id="chkStickNok" value="NOk" onclick="getActionType()">
+                                                        @*<span class="checkmark"></span>*@
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <input type="text" name="RpsStickRemark" id="txt_RpsStickremarks" value="@(QFRF?.RpsStickRemark)" @(disabled)>
+                                                        <input type="hidden" name="RpsStick" id="chkRpsStick" value="">
+                                                    </td>
+                                                </tr>
+                                                <tr id="row1" class="tr_input">
+                                                    <td>5</td>
+                                                    <td><label>Lose element</label></td>
+                                                    <td class="text-center">
+                                                        <input type="checkbox" class="inpDisable" name="chkLose" id="chkLoseok" value="Ok" onclick="getActionType()">
+                                                        @*<span class="checkmark"></span>*@
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <input type="checkbox" class="inpDisable" name="chkLose" id="chkLoseNok" value="NOk" onclick="getActionType()">
+                                                        @*<span class="checkmark"></span>*@
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <input type="text" name="LoseRemark" id="txt_Loseremarks" value="@(QFRF?.LoseRemark)" @(disabled)>
+                                                        <input type="hidden" name="LoseElement" id="chkLoseElement" value="">
+                                                    </td>
+                                                </tr>
+                                                <tr id="row1" class="tr_input">
+                                                    <td>6</td>
+                                                    <td><label>Mylers</label></td>
+                                                    <td class="text-center">
+                                                        <input type="checkbox" class="inpDisable" name="chkMyler" id="chkMylerok" value="Ok" onclick="getActionType()">
+                                                        @*<span class="checkmark"></span>*@
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <input type="checkbox" class="inpDisable" name="chkMyler" id="chkMylerNok" value="NOk" onclick="getActionType()">
+                                                        @*<span class="checkmark"></span>*@
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <input type="text" name="MylerRemark" id="txt_Mylerremarks" value="@(QFRF?.MylerRemark)" @(disabled)>
+                                                        <input type="hidden" name="Mylers" id="chkMylers" value="">
+                                                    </td>
+                                                </tr>
+                                                <tr id="row1" class="tr_input">
+                                                    <td>7</td>
+                                                    <td><label>Pin Threads</label></td>
+                                                    <td class="text-center">
+                                                        <input type="checkbox" class="inpDisable" name="chkPin" id="chkPinok" value="Ok" onclick="getActionType()">
+                                                        @*<span class="checkmark"></span>*@
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <input type="checkbox" class="inpDisable" name="chkPin" id="chkPinNok" value="NOk" onclick="getActionType()">
+                                                        @*<span class="checkmark"></span>*@
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <input type="text" name="PinRemark" id="txt_Pinremarks" value="@(QFRF?.PinRemark)" @(disabled)>
+                                                        <input type="hidden" name="PinThreads" id="chkPinThreads" value="">
+                                                    </td>
+                                                </tr>
+                                                <tr id="row1" class="tr_input">
+                                                    <td>8</td>
+                                                    <td><label>Resting Pads</label></td>
+                                                    <td class="text-center">
+                                                        <input type="checkbox" class="inpDisable" name="chkPads" id="chkPadsok" value="Ok" onclick="getActionType()">
+                                                        @*<span class="checkmark"></span>*@
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <input type="checkbox" class="inpDisable" name="chkPads" id="chkPadsNok" value="NOk" onclick="getActionType()">
+                                                        @*<span class="checkmark"></span>*@
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <input type="text" name="PadsRemark" id="txt_Padsremarks" value="@(QFRF?.PadsRemark)" @(disabled)>
+                                                        <input type="hidden" name="RestingPads" id="chkRestingPads" value="">
+                                                    </td>
+                                                </tr>
+                                                <tr id="row1" class="tr_input">
+                                                    <td>9</td>
+                                                    <td><label>Sliders</label></td>
+                                                    <td class="text-center">
+                                                        <input type="checkbox" class="inpDisable" name="chkSlide" id="chkSlideok" value="Ok" onclick="getActionType()">
+                                                        @*<span class="checkmark"></span>*@
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <input type="checkbox" class="inpDisable" name="chkSlide" id="chkSlideNok" value="NOk" onclick="getActionType()">
+                                                        @*<span class="checkmark"></span>*@
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <input type="text" name="SlidersRemark" id="txt_Slidersremarks" value="@(QFRF?.SlidersRemark)" @(disabled)>
+                                                        <input type="hidden" name="Sliders" id="chkSliders" value="">
+                                                    </td>
+                                                </tr>
+                                                <tr id="row1" class="tr_input">
+                                                    <td>10</td>
+                                                    <td><label>Kugel</label></td>
+                                                    <td class="text-center">
+                                                        <input type="checkbox" class="inpDisable" name="chkKugel" id="chkKugelok" value="Ok" onclick="getActionType()">
+                                                        @*<span class="checkmark"></span>*@
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <input type="checkbox" class="inpDisable" name="chkKugel" id="chkKugelNok" value="NOk" onclick="getActionType()">
+                                                        @*<span class="checkmark"></span>*@
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <input type="text" name="KugelRemark" id="txt_Kugelremarks" value="@(QFRF?.KugelRemark)" @(disabled)>
+                                                        <input type="hidden" name="Kugel" id="chkKugel" value="">
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+
+                @* Approval Section And Action Section *@
+                @if (IsViewMode || IsEditMode)
+                {
+                    //Approval Section
+                    <div id="accordion">
+                        <div class="card">
+                            <div class="card-header collapsed" id="headingFour" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                                <h5 class="mb-0">
+                                    <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                                        <img src="~/assets/img/approvalTracking.svg" width="24" height="24" class="mr-2" />Approval Tracking
+                                    </button>
+                                </h5>
+                            </div>
+                            <div id="collapseFour" class="collapse" aria-labelledby="headingFour">
+                                <div class="card-body">
+                                    <div class="form-row">
+                                        <div class="col-12">
+                                            <table class="table w-100 td-border showBorder">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Name</th>
+                                                        <th>Role</th>
+                                                        <th style="display: @(appList.Any(x => !string.IsNullOrEmpty(x.ExtraDetails)) ? " " : " none")">Content</th>
+                                                        <th>Processed on</th>
+                                                        <th>Status</th>
+                                                        <th class="text-center">Comments</th>
+                                                        <th class="text-center">Approval Level</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @if (IsViewMode || IsEditMode)
+                                                    {
+                                                        Html.RenderPartial("_ApprovalTracking", appList);
+                                                    }
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="accordion">
+                        <div class="card">
+                            <div class="card-header collapsed" id="headingFive" data-toggle="collapse" data-target="#collapseFive" aria-expanded="true" aria-controls="collapseFive">
+                                <h5 class="mb-0">
+                                    <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFive" aria-expanded="true" aria-controls="collapseFive">
+                                        <img src="~/assets/img/approvalTracking.svg" width="24" height="24" class="mr-2" /> Action
+                                    </button>
+                                </h5>
+                            </div>
+
+                            <div id="collapseFive" class="collapse" aria-labelledby="headingFive">
+                                <div class="card-body actionTab">
+                                    <table class="w-100 mx-auto table table-border form-border text-center" id="maintable" style="table-layout: fixed;">
+                                        <thead class="form-head-1" style="margin-left:inherit !important;">
+                                            <tr><th colspan="5">Receiving in Measurement Room</th></tr>
+                                            <tr>
+                                                <th style="width: 50px !important;">Sr. No.</th>
+                                                <th style="width: 122px !important;">Check point</th>
+                                                <th style="width: 100px !important;">OK</th>
+                                                <th style="width: 100px !important;">NOK</th>
+                                                <th style="width: 114px !important;">Remarks</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="form-border tableSoftware" id="softwareBody">
+                                            <tr id="row1" class="tr_input tr1">
+                                                <td>1</td>
+                                                <td><label>RPS Pins</label></td>
+                                                <td class="text-center">
+                                                    <input type="checkbox" name="AchkRps" id="AchkRpsok" value="Ok" onclick="getActionType()">
+                                                    @*<span class="checkmark"></span>*@
+                                                </td>
+                                                <td class="text-center">
+                                                    <input type="checkbox" name="AchkRps" id="AchkRpsNok" value="NOk" onclick="getActionType()">
+                                                    @*<span class="checkmark"></span>*@
+                                                </td>
+                                                <td class="text-center">
+                                                    <input type="text" name="ARpsPinRemark" id="txt_Arpsremarks" value="@(QFRF?.ARpsPinRemark)">
+                                                    <input type="hidden" name="ARpsPin" id="AchkRpsPin" value="">
+                                                </td>
+                                            </tr>
+                                            <tr id="row1" class="tr_input tr2">
+                                                <td>2</td>
+                                                <td><label>Clamps</label></td>
+                                                <td class="text-center">
+                                                    <input type="checkbox" class="inpDisable" name="AchkClam" id="AchkClamok" value="Ok" onclick="getActionType()">
+                                                    @*<span class="checkmark"></span>*@
+                                                </td>
+                                                <td class="text-center">
+                                                    <input type="checkbox" class="inpDisable" name="AchkClam" id="AchkClamNok" value="NOk" onclick="getActionType()">
+                                                    @*<span class="checkmark"></span>*@
+                                                </td>
+                                                <td class="text-center">
+                                                    <input type="text" name="AClampsRemark" id="txt_Aclampsremarks" value="@(QFRF?.AClampsRemark)">
+                                                    <input type="hidden" name="AClamps" id="AchkClamps" value="">
+                                                </td>
+                                            </tr>
+                                            <tr id="row1" class="tr_input tr3">
+                                                <td>3</td>
+                                                <td><label>Wheels</label></td>
+                                                <td class="text-center">
+                                                    <input type="checkbox" class="inpDisable" name="AchkWheel" id="AchkWheelok" value="Ok" onclick="getActionType()">
+                                                    @*<span class="checkmark"></span>*@
+                                                </td>
+                                                <td class="text-center">
+                                                    <input type="checkbox" class="inpDisable" name="AchkWheel" id="AchkWheelNok" value="NOk" onclick="getActionType()">
+                                                    @*<span class="checkmark"></span>*@
+                                                </td>
+                                                <td class="text-center">
+                                                    <input type="text" name="AWheelsRemark" id="txt_Awheelsremarks" value="@(QFRF?.AWheelsRemark)">
+                                                    <input type="hidden" name="AWheels" id="AchkWheels" value="">
+                                                </td>
+                                            </tr>
+                                            <tr id="row1" class="tr_input tr4">
+                                                <td>4</td>
+                                                <td><label>RPS Sticker</label></td>
+                                                <td class="text-center">
+                                                    <input type="checkbox" class="inpDisable" name="AchkStick" id="AchkStickok" value="Ok" onclick="getActionType()">
+                                                    @*<span class="checkmark"></span>*@
+                                                </td>
+                                                <td class="text-center">
+                                                    <input type="checkbox" class="inpDisable" name="AchkStick" id="AchkStickNok" value="NOk" onclick="getActionType()">
+                                                    @*<span class="checkmark"></span>*@
+                                                </td>
+                                                <td class="text-center">
+                                                    <input type="text" name="ARpsStickRemark" id="txt_ARpsStickremarks" value="@(QFRF?.ARpsStickRemark)">
+                                                    <input type="hidden" name="ARpsStick" id="AchkRpsStick" value="">
+                                                </td>
+                                            </tr>
+                                            <tr id="row1" class="tr_input tr5">
+                                                <td>5</td>
+                                                <td><label>Lose element</label></td>
+                                                <td class="text-center">
+                                                    <input type="checkbox" class="inpDisable" name="AchkLose" id="AchkLoseok" value="Ok" onclick="getActionType()">
+                                                    @*<span class="checkmark"></span>*@
+                                                </td>
+                                                <td class="text-center">
+                                                    <input type="checkbox" class="inpDisable" name="AchkLose" id="AchkLoseNok" value="NOk" onclick="getActionType()">
+                                                    @*<span class="checkmark"></span>*@
+                                                </td>
+                                                <td class="text-center">
+                                                    <input type="text" name="ALoseRemark" id="txt_ALoseremarks" value="@(QFRF?.ALoseRemark)">
+                                                    <input type="hidden" name="ALoseElement" id="AchkLoseElement" value="">
+                                                </td>
+                                            </tr>
+                                            <tr id="row1" class="tr_input tr6">
+                                                <td>6</td>
+                                                <td><label>Mylers</label></td>
+                                                <td class="text-center">
+                                                    <input type="checkbox" class="inpDisable" name="AchkMyler" id="AchkMylerok" value="Ok" onclick="getActionType()">
+                                                    @*<span class="checkmark"></span>*@
+                                                </td>
+                                                <td class="text-center">
+                                                    <input type="checkbox" class="inpDisable" name="AchkMyler" id="AchkMylerNok" value="NOk" onclick="getActionType()">
+                                                    @*<span class="checkmark"></span>*@
+                                                </td>
+                                                <td class="text-center">
+                                                    <input type="text" name="AMylerRemark" id="txt_AMylerremarks" value="@(QFRF?.AMylerRemark)">
+                                                    <input type="hidden" name="AMylers" id="AchkMylers" value="">
+                                                </td>
+                                            </tr>
+                                            <tr id="row1" class="tr_input tr7">
+                                                <td>7</td>
+                                                <td><label>Pin Threads</label></td>
+                                                <td class="text-center">
+                                                    <input type="checkbox" class="inpDisable" name="AchkPin" id="AchkPinok" value="Ok" onclick="getActionType()">
+                                                    @*<span class="checkmark"></span>*@
+                                                </td>
+                                                <td class="text-center">
+                                                    <input type="checkbox" class="inpDisable" name="AchkPin" id="AchkPinNok" value="NOk" onclick="getActionType()">
+                                                    @*<span class="checkmark"></span>*@
+                                                </td>
+                                                <td class="text-center">
+                                                    <input type="text" name="APinRemark" id="txt_APinremarks" value="@(QFRF?.APinRemark)">
+                                                    <input type="hidden" name="APinThreads" id="AchkPinThreads" value="">
+                                                </td>
+                                            </tr>
+                                            <tr id="row1" class="tr_input tr8">
+                                                <td>8</td>
+                                                <td><label>Resting Pads</label></td>
+                                                <td class="text-center">
+                                                    <input type="checkbox" class="inpDisable" name="AchkPads" id="AchkPadsok" value="Ok" onclick="getActionType()">
+                                                    @*<span class="checkmark"></span>*@
+                                                </td>
+                                                <td class="text-center">
+                                                    <input type="checkbox" class="inpDisable" name="AchkPads" id="AchkPadsNok" value="NOk" onclick="getActionType()">
+                                                    @*<span class="checkmark"></span>*@
+                                                </td>
+                                                <td class="text-center">
+                                                    <input type="text" name="APadsRemark" id="txt_APadsremarks" value="@(QFRF?.APadsRemark)">
+                                                    <input type="hidden" name="ARestingPads" id="AchkRestingPads" value="">
+                                                </td>
+                                            </tr>
+                                            <tr id="row1" class="tr_input tr9">
+                                                <td>9</td>
+                                                <td><label>Sliders</label></td>
+                                                <td class="text-center">
+                                                    <input type="checkbox" class="inpDisable" name="AchkSlide" id="AchkSlideok" value="Ok" onclick="getActionType()">
+                                                    @*<span class="checkmark"></span>*@
+                                                </td>
+                                                <td class="text-center">
+                                                    <input type="checkbox" class="inpDisable" name="AchkSlide" id="AchkSlideNok" value="NOk" onclick="getActionType()">
+                                                    @*<span class="checkmark"></span>*@
+                                                </td>
+                                                <td class="text-center">
+                                                    <input type="text" name="ASlidersRemark" id="txt_ASlidersremarks" value="@(QFRF?.ASlidersRemark)">
+                                                    <input type="hidden" name="ASliders" id="AchkSliders" value="">
+                                                </td>
+                                            </tr>
+                                            <tr id="row1" class="tr_input tr10">
+                                                <td>10</td>
+                                                <td><label>Kugel</label></td>
+                                                <td class="text-center">
+                                                    <input type="checkbox" class="inpDisable" name="AchkKugel" id="AchkKugelok" value="Ok" onclick="getActionType()">
+                                                    @*<span class="checkmark"></span>*@
+                                                </td>
+                                                <td class="text-center">
+                                                    <input type="checkbox" class="inpDisable" name="AchkKugel" id="AchkKugelNok" value="NOk" onclick="getActionType()">
+                                                    @*<span class="checkmark"></span>*@
+                                                </td>
+                                                <td class="text-center">
+                                                    <input type="text" name="AKugelRemark" id="txt_AKugelremarks" value="@(QFRF?.AKugelRemark)">
+                                                    <input type="hidden" name="AKugel" id="AchkKugel" value="">
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                @* Buttons *@
+                @if (IsNewMode)
+                {
+                    <div class="card-footer align-content-center">
+                        <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                            Submit
+                        </button>
+                        <button type="reset" class="btn btn-danger btn-sm cancl-btn" id="btnCancel">
+                            Cancel
+                        </button>
+                    </div>
+                }
+                else if (IsEditMode)
+                {
+                    <div class="card-footer align-content-center">
+                        <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                            Re-Submit
+                        </button>
+                        <button type="reset" class="btn btn-danger btn-sm cancl-btn" id="btnCancel">
+                            Cancel
+                        </button>
+                    </div>
+                }
+
+            </form>
+
+            <div>
+                <p class="text-left f-600">SF_II_024</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="successModel" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header modelHeader">
+                <span class="modal-title modalMsgTitle" id="modalTitle"></span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label id="modalBody" class="lableMsg">  </label>
+                <input type="hidden" id="tab" value="0" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="submitBomBtn publishBtn" id="modalOkButton" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+        var spinner = $('#loader');
+        var currentUserDesgn = @Html.Raw(Json.Encode(CurrentUserDesgn));
+        var IsNew = @Html.Raw(Json.Encode(IsNew));
+        var IsEdit = @Html.Raw(Json.Encode(IsEdit));
+        var IsNewMode = @Html.Raw(Json.Encode(IsNewMode));
+        var IsEditMode = @Html.Raw(Json.Encode(IsEditMode));
+        var IsViewMode = @Html.Raw(Json.Encode(IsViewMode));
+        var QFRF = @Html.Raw(Json.Encode(QFRF));
+        var appRowId = @Html.Raw(Json.Encode(AppRowId));
+        var approvalType =@Html.Raw(Json.Encode(ApprovalType));
+        var SecurityDesgnString = @Html.Raw(Json.Encode(SecurityDesgnString));
+        var FlagRedirect = @Html.Raw(Json.Encode(FlagRedirect));
+        pageLoad();
+        var errorCount = 0;
+        var errors = "";
+        pageLoad();
+    var globalVariable;
+    $(document).ready(function () {
+        // aaprovaer lecvel =2 then actiontype open
+        if (IsNewMode) {
+            var d = new Date();
+
+
+            var month = d.getMonth() + 1;
+            var day = d.getDate();
+
+            var output = d.getFullYear() + '-' + (('' + month).length < 2 ? '0' : '') + month + '-' + (('' + day).length < 2 ? '0' : '') + day;
+
+            $("#txtHandoverDate").val(output);
+            $("#txtHandoverDate").prop("disabled", "disabled");
+            $('input[id="chkPer"]').prop('checked', true);
+        }
+
+        if (IsViewMode) {
+            $("#drpProjectName").val(QFRF.ProjectName);
+            $("#drpProjectName").prop("disabled", true);;
+            if (QFRF.RpsPin == "Ok") {
+                $('input[id="chkRpsok"]').prop('checked', true);
+                $('input[id="chkRpsNok"]').prop("disabled", true);
+                $('input[id="chkRpsNok"]').prop("disabled", true);
+                $("#chkRpsPin").val('Ok');
+                $(".tr1").show();
+
+            } else if (QFRF.RpsPin == "NotOK") {
+                $('input[id="chkRpsNok"]').prop('checked', true);
+                $('input[id="chkRpsNok"]').prop("disabled", true);
+                $('input[id="chkRpsok"]').prop("disabled", true);
+                $("#chkRpsPin").val('NotOK');
+                $(".tr1").hide();
+            } else {
+                $('input[id="chkRpsNok"]').prop("disabled", true);
+                $('input[id="chkRpsok"]').prop("disabled", true);
+                $(".tr1").hide();
+            }
+
+            if (QFRF.Clamps == "Ok") {
+                $('input[id="chkClamok"]').prop('checked', true);
+                $('input[id="chkClamok"]').prop("disabled", true);
+                $('input[id="chkClamNok"]').prop("disabled", true);
+                $("#chkClamps").val('Ok');
+                $(".tr2").show();
+
+            }
+            else if (QFRF.Clamps == "NotOK") {
+                $('input[id="chkClamNok"]').prop('checked', true);
+                $('input[id="chkClamNok"]').prop("disabled", true);
+                $('input[id="chkClamok"]').prop("disabled", true);
+                $("#chkClamps").val('NotOK');
+                $(".tr2").hide();
+            } else {
+                $('input[id="chkClamNok"]').prop("disabled", true);
+                $('input[id="chkClamok"]').prop("disabled", true);
+                $(".tr2").hide();
+            }
+            if (QFRF.Wheels == "Ok") {
+                $('input[id="chkWheelok"]').prop('checked', true);
+                $('input[id="chkWheelok"]').prop("disabled", true);
+                $('input[id="chkWheelNok"]').prop("disabled", true);
+                $("#chkWheels").val('Ok');
+                $(".tr3").show();
+
+            }
+            else if (QFRF.Wheels == "NotOK") {
+                $('input[id="chkWheelNok"]').prop('checked', true);
+                $('input[id="chkWheelNok"]').prop("disabled", true);
+                $('input[id="chkWheelok"]').prop("disabled", true);
+                $("#chkWheels").val('NotOK');
+                $(".tr3").hide();
+            } else {
+                $('input[id="chkWheelNok"]').prop("disabled", true);
+                $('input[id="chkWheelok"]').prop("disabled", true);
+                $(".tr3").hide();
+            }
+            if (QFRF.RpsStick == "Ok") {
+                $('input[id="chkStickok"]').prop('checked', true);
+                $('input[id="chkStickok"]').prop("disabled", true);
+                $('input[id="chkStickNok"]').prop("disabled", true);
+                $("#chkRpsStick").val('Ok');
+                $(".tr4").show();
+
+            }
+            else if (QFRF.RpsStick == "NotOK") {
+                $('input[id="chkStickNok"]').prop('checked', true);
+                $('input[id="chkStickNok"]').prop("disabled", true);
+                $('input[id="chkStickok"]').prop("disabled", true);
+                $("#chkRpsStick").val('NotOK');
+                $(".tr4").hide();
+            } else {
+                $('input[id="chkStickNok"]').prop("disabled", true);
+                $('input[id="chkStickok"]').prop("disabled", true);
+                $(".tr4").hide();
+            }
+            if (QFRF.LoseElement == "Ok") {
+                $('input[id="chkLoseok"]').prop('checked', true);
+                $('input[id="chkLoseok"]').prop("disabled", true);
+                $('input[id="chkLoseNok"]').prop("disabled", true);
+                $("#chkLoseElement").val('Ok');
+                $(".tr5").show();
+
+            }
+            else if (QFRF.LoseElement == "NotOK") {
+                $('input[id="chkLoseNok"]').prop('checked', true);
+                $('input[id="chkLoseNok"]').prop("disabled", true);
+                $('input[id="chkLoseok"]').prop("disabled", true);
+                $("#chkLoseElement").val('NotOK');
+                $(".tr5").hide();
+            } else {
+                $('input[id="chkLoseNok"]').prop("disabled", true);
+                $('input[id="chkLoseok"]').prop("disabled", true);
+                $(".tr5").hide();
+            }
+            if (QFRF.Mylers == "Ok") {
+                $('input[id="chkMylerok"]').prop('checked', true);
+                $('input[id="chkMylerok"]').prop("disabled", true);
+                $('input[id="chkMylerNok"]').prop("disabled", true);
+                $("#chkMylers").val('Ok');
+                $(".tr6").show();
+
+            }
+            else if (QFRF.Mylers == "NotOK") {
+                $('input[id="chkMylerNok"]').prop('checked', true);
+                $('input[id="chkMylerNok"]').prop("disabled", true);
+                $('input[id="chkMylerok"]').prop("disabled", true);
+                $("#chkMylers").val('NotOK');
+                $(".tr6").hide();
+            } else {
+                $('input[id="chkMylerNok"]').prop("disabled", true);
+                $('input[id="chkMylerok"]').prop("disabled", true);
+                $(".tr6").hide();
+            }
+            if (QFRF.RestingPads == "Ok") {
+                $('input[id="chkPadsok"]').prop('checked', true);
+                $('input[id="chkPadsok"]').prop("disabled", true);
+                $('input[id="chkPadsNok"]').prop("disabled", true);
+                $("#chkRestingPads").val('Ok');
+                $(".tr8").show();
+
+            }
+            else if (QFRF.RestingPads == "NotOK") {
+                $('input[id="chkPadsNok"]').prop('checked', true);
+                $('input[id="chkPadsNok"]').prop("disabled", true);
+                $('input[id="chkPadsok"]').prop("disabled", true);
+                $("#chkRestingPads").val('NotOK');
+                $(".tr8").hide();
+            } else {
+                $('input[id="chkPadsNok"]').prop("disabled", true);
+                $('input[id="chkPadsok"]').prop("disabled", true);
+                $(".tr8").hide();
+            }
+            if (QFRF.PinThreads == "Ok") {
+                $('input[id="chkPinok"]').prop('checked', true);
+                $('input[id="chkPinok"]').prop("disabled", true);
+                $('input[id="chkPinNok"]').prop("disabled", true);
+                $("#chkPinThreads").val('Ok');
+                $(".tr7").show();
+            }
+            else if (QFRF.PinThreads == "NotOK") {
+                $('input[id="chkPinNok"]').prop('checked', true);
+                $('input[id="chkPinNok"]').prop("disabled", true);
+                $('input[id="chkPinok"]').prop("disabled", true);
+                $("#chkPinThreads").val('NotOK');
+                $(".tr7").hide();
+            } else {
+                $('input[id="chkPinNok"]').prop("disabled", true);
+                $('input[id="chkPinok"]').prop("disabled", true);
+                $(".tr7").hide();
+            }
+            if (QFRF.Sliders == "Ok") {
+                $('input[id="chkSlideok"]').prop('checked', true);
+                $('input[id="chkSlideok"]').prop("disabled", true);
+                $('input[id="chkSlideNok"]').prop("disabled", true);
+                $("#chkSliders").val('Ok');
+                $(".tr9").show();
+            }
+            else if (QFRF.Sliders == "NotOK") {
+                $('input[id="chkSlideNok"]').prop('checked', true);
+                $('input[id="chkSlideNok"]').prop("disabled", true);
+                $('input[id="chkSlideok"]').prop("disabled", true);
+                $("#chkSliders").val('NotOK');
+                $(".tr9").hide();
+            } else {
+                $('input[id="chkSlideNok"]').prop("disabled", true);
+                $('input[id="chkSlideok"]').prop("disabled", true);
+                $(".tr9").hide();
+            }
+            if (QFRF.Kugel == "Ok") {
+                $('input[id="chkKugelok"]').prop('checked', true);
+                $('input[id="chkKugelok"]').prop("disabled", true);
+                $('input[id="chkKugelNok"]').prop("disabled", true);
+                $("#chkKugel").val('Ok');
+                $(".tr10").show();
+
+            }
+            else if (QFRF.Kugel == "NotOK") {
+                $('input[id="chkKugelNok"]').prop('checked', true);
+                $('input[id="chkKugelNok"]').prop("disabled", true);
+                $('input[id="chkKugelok"]').prop("disabled", true);
+                $("#chkKugel").val('NotOK');
+                $(".tr10").hide();
+            } else {
+                $('input[id="chkKugelNok"]').prop("disabled", true);
+                $('input[id="chkKugelok"]').prop("disabled", true);
+                $(".tr10").hide();
+            }
+            $("#txtReason").val(QFRF.Reason)
+            $("#txtReason").prop("disabled", "disabled");
+            $("#txtFromDate").prop("disabled", "disabled");
+            $("#txtToDate").prop("disabled", "disabled");
+        }
+
+        if (!IsViewMode) {
+
+            if (IsEditMode) {
+                $("#drpProjectName").val(QFRF.ProjectName);
+                if (QFRF.RpsPin == "Ok") {
+                    $('input[id="chkRpsok"]').prop('checked', true);
+                    $("#chkRpsPin").val('Ok');
+                    $(".tr1").show();
+
+                } else if (QFRF.RpsPin == "NotOK") {
+                    $('input[id="chkRpsNok"]').prop('checked', true);
+                    $("#chkRpsPin").val('NotOK');
+                    $(".tr1").hide();
+                }
+                if (QFRF.Clamps == "Ok") {
+                    $('input[id="chkClamok"]').prop('checked', true);
+                    $("#chkClamps").val('Ok');
+                    $(".tr2").show();
+
+                } else if (QFRF.Clamps == "NotOK") {
+                    $('input[id="chkClamNok"]').prop('checked', true);
+                    $("#chkClamps").val('NotOK');
+                    $(".tr2").hide();
+                }
+                if (QFRF.Wheels == "Ok") {
+                    $('input[id="chkWheelok"]').prop('checked', true);
+                    $("#chkWheels").val('Ok');
+                    $(".tr3").show();
+
+                } else if (QFRF.Wheels == "NotOK") {
+                    $('input[id="chkWheelNok"]').prop('checked', true);
+                    $("#chkWheels").val('NotOK');
+                    $(".tr3").hide();
+                }
+                if (QFRF.RpsStick == "Ok") {
+                    $('input[id="chkStickok"]').prop('checked', true);
+                    $("#chkRpsStick").val('Ok');
+                    $(".tr4").show();
+
+                } else if (QFRF.RpsStick == "NotOK") {
+                    $('input[id="chkStickNok"]').prop('checked', true);
+                    $("#chkRpsStick").val('NotOK');
+                    $(".tr4").hide();
+                }
+                if (QFRF.LoseElement == "Ok") {
+                    $('input[id="chkLoseok"]').prop('checked', true);
+                    $("#chkLoseElement").val('Ok');
+                    $(".tr5").show();
+
+                }
+                else if (QFRF.LoseElement == "NotOK") {
+                    $('input[id="chkLoseNok"]').prop('checked', true);
+                    $("#chkLoseElement").val('NotOK');
+                    $(".tr5").hide();
+                }
+                if (QFRF.Mylers == "Ok") {
+                    $('input[id="chkMylerok"]').prop('checked', true);
+                    $("#chkMylers").val('Ok');
+                    $(".tr6").show();
+
+                }
+                else if (QFRF.Mylers == "NotOK") {
+                    $('input[id="chkMylerNok"]').prop('checked', true);
+                    $("#chkMylers").val('NotOK');
+                    $(".tr6").hide();
+                }
+                if (QFRF.RestingPads == "Ok") {
+                    $('input[id="chkPadsok"]').prop('checked', true);
+                    $("#chkRestingPads").val('Ok');
+                    $(".tr8").show();
+
+                }
+                else if (QFRF.RestingPads == "NotOK") {
+                    $('input[id="chkPadsNok"]').prop('checked', true);
+                    $("#chkRestingPads").val('NotOK');
+                    $(".tr8").hide();
+                }
+                if (QFRF.PinThreads == "Ok") {
+                    $('input[id="chkPinok"]').prop('checked', true);
+                    $("#chkPinThreads").val('Ok');
+                    $(".tr7").show();
+                }
+                else if (QFRF.PinThreads == "NotOK") {
+                    $('input[id="chkPinNok"]').prop('checked', true);
+                    $("#chkPinThreads").val('NotOK');
+                    $(".tr7").hide();
+                }
+                if (QFRF.Sliders == "Ok") {
+                    $('input[id="chkSlideok"]').prop('checked', true);
+                    $("#chkSliders").val('Ok');
+                    $(".tr9").show();
+                }
+                else if (QFRF.Sliders == "NotOK") {
+                    $('input[id="chkSlideNok"]').prop('checked', true);
+                    $("#chkSliders").val('NotOK');
+                    $(".tr9").hide();
+                }
+                if (QFRF.Kugel == "Ok") {
+                    $('input[id="chkKugelok"]').prop('checked', true);
+                    $("#chkKugel").val('Ok');
+                    $(".tr10").show();
+
+                }
+                else if (QFRF.Kugel == "NotOK") {
+                    $('input[id="chkKugelNok"]').prop('checked', true);
+                    $("#chkKugel").val('NotOK');
+                    $(".tr10").hide();
+                }
+                $("#txtReason").val(QFRF.Reason);
+            }
+
+            if (IsNewMode) {
+
+                $("#externalCompany").hide();
+                $(".inpIsNewDisable").attr("readonly", "readonly");
+            }
+        }
+
+         if (@CurrentUserLevel != 2) {
+                $('input[id="AchkKugelNok"]').prop("disabled", true);
+                $('input[id="AchkKugelok"]').prop("disabled", true);
+                $('input[id="AchkSlideok"]').prop("disabled", true);
+                $('input[id="AchkSlideNok"]').prop("disabled", true);
+                $('input[id="AchkPinok"]').prop("disabled", true);
+                $('input[id="AchkPinNok"]').prop("disabled", true);
+                $('input[id="AchkMylerok"]').prop("disabled", true);
+                $('input[id="AchkMylerNok"]').prop("disabled", true);
+                $('input[id="AchkLoseok"]').prop("disabled", true);
+                $('input[id="AchkLoseNok"]').prop("disabled", true);
+                $('input[id="AchkStickok"]').prop("disabled", true);
+                $('input[id="AchkStickNok"]').prop("disabled", true);
+                $('input[id="AchkClamok"]').prop("disabled", true);
+                $('input[id="AchkClamNok"]').prop("disabled", true);
+                $('input[id="AchkRpsok"]').prop("disabled", true);
+                $('input[id="AchkRpsNok"]').prop("disabled", true);
+             $('input[id="AchkPadsok"]').prop("disabled", true);
+             $('input[id="AchkPadsNok"]').prop("disabled", true);
+             $('input[id="AchkWheelok"]').prop("disabled", true);
+             $('input[id="AchkWheelNok"]').prop("disabled", true);
+             $('input[id="txt_AKugelremarks"]').prop("disabled", true);
+             $('input[id="txt_ASlidersremarks"]').prop("disabled", true);
+             $('input[id="txt_APadsremarks"]').prop("disabled", true);
+             $('input[id="txt_APinremarks"]').prop("disabled", true);
+             $('input[id="txt_AMylerremarks"]').prop("disabled", true);
+             $('input[id="txt_ALoseremarks"]').prop("disabled", true);
+             $('input[id="txt_ARpsStickremarks"]').prop("disabled", true);
+             $('input[id="txt_Awheelsremarks"]').prop("disabled", true);
+             $('input[id="txt_Aclampsremarks"]').prop("disabled", true);
+             $('input[id="txt_Arpsremarks"]').prop("disabled", true);
+             if (QFRF.ARpsPin == "Ok") {
+                 $('input[id="AchkRpsok"]').prop('checked', true);
+                 $("#AchkRpsPin").val('Ok');
+
+             }
+             else if (QFRF.ARpsPin == "NotOK") {
+                 $('input[id="AchkRpsNok"]').prop('checked', true);
+                 $("#AchkRpsPin").val('NotOK');
+             }
+
+             if (QFRF.AClamps == "Ok") {
+                 $('input[id="AchkClamok"]').prop('checked', true);
+                 $("#AchkClamps").val('Ok');
+
+             }
+             else if (QFRF.AClamps == "NotOK") {
+                 $('input[id="AchkClamNok"]').prop('checked', true);
+                 $("#AchkClamps").val('NotOK');
+             }
+
+             if (QFRF.AWheels == "Ok") {
+                 $('input[id="AchkWheelok"]').prop('checked', true);
+                 $("#AchkWheels").val('Ok');
+
+             }
+             else if (QFRF.AWheels == "NotOK") {
+                 $('input[id="AchkWheelNok"]').prop('checked', true);
+                 $("#AchkWheels").val('NotOK');
+             }
+
+             if (QFRF.ARpsStick == "Ok") {
+                 $('input[id="AchkStickok"]').prop('checked', true);
+                 $("#AchkRpsStick").val('Ok');
+
+             }
+             else if (QFRF.ARpsStick == "NotOK") {
+                 $('input[id="AchkStickNok"]').prop('checked', true);
+                 $("#AchkRpsStick").val('NotOK');
+             }
+
+             if (QFRF.ALoseElement == "Ok") {
+                 $('input[id="AchkLoseok"]').prop('checked', true);
+                 $("#AchkLoseElement").val('Ok');
+             }
+             else if (QFRF.ALoseElement == "NotOK") {
+                 $('input[id="AchkLoseNok"]').prop('checked', true)
+                 $("#AchkLoseElement").val('NotOK');
+             }
+             if (QFRF.AMylers == "Ok") {
+                 $('input[id="AchkMylerok"]').prop('checked', true);
+                 $("#AchkMylers").val('Ok');
+             }
+             else if (QFRF.AMylers == "NotOK") {
+                 $('input[id="AchkMylerNok"]').prop('checked', true);
+                 $("#AchkMylers").val('NotOK');
+             }
+             if (QFRF.ARestingPads == "Ok") {
+                 $('input[id="AchkPadsok"]').prop('checked', true);
+                 $("#AchkRestingPads").val('Ok');
+             }
+             else if (QFRF.ARestingPads == "NotOK") {
+                 $('input[id="AchkPadsNok"]').prop('checked', true);
+                 $("#AchkRestingPads").val('NotOK');
+             }
+             if (QFRF.APinThreads == "Ok") {
+                 $('input[id="AchkPinok"]').prop('checked', true);
+                 $("#AchkPinThreads").val('Ok');
+             }
+             else if (QFRF.APinThreads == "NotOK") {
+                 $('input[id="AchkPinNok"]').prop('checked', true);
+                 $("#AchkPinThreads").val('NotOK');
+             }
+             if (QFRF.ASliders == "Ok") {
+                 $('input[id="AchkSlideok"]').prop('checked', true);
+                 $("#AchkSliders").val('Ok');
+             }
+             else if (QFRF.ASliders == "NotOK") {
+                 $('input[id="AchkSlideNok"]').prop('checked', true);
+                 $("#AchkSliders").val('NotOK');
+             }
+             if (QFRF.AKugel == "Ok") {
+                 $('input[id="AchkKugelok"]').prop('checked', true);
+                 $("#AchkKugel").val('Ok');
+             }
+             else if (QFRF.AKugel == "NotOK") {
+                 $('input[id="AchkKugelNok"]').prop('checked', true);
+                 $("#AchkKugel").val('NotOK');
+             }
+
+            }
+    });
+
+        function getActionType() {
+
+
+        if (!IsViewMode) {
+            if ($("#chkRpsok").prop("checked") == true) {
+                $('input[id="chkRpsNok"]').prop('checked', false).change();
+                $("#chkRpsPin").val('Ok');
+            }
+            if ($("#chkRpsNok").prop("checked") == true) {
+                $('input[id="chkRpsok"]').prop("checked", false).change();
+                $("#chkRpsPin").val('NotOK');
+            }
+
+            if ($("#chkClamok").prop("checked") == true) {
+                $('input[id="chkClamNok"]').prop('checked', false).change();
+                $("#chkClamps").val('Ok');
+            }
+            if ($("#chkClamNok").prop("checked") == true) {
+                $('input[id="chkClamok"]').prop('checked', false).change();
+                $("#chkClamps").val('NotOK');
+            }
+
+            if ($("#chkWheelok").prop("checked") == true) {
+                $('input[id="chkWheelNok"]').prop('checked', false).change();
+                $("#chkWheels").val('Ok');
+            }
+            if ($("#chkWheelNok").prop("checked") == true) {
+                $('input[id="chkWheelok"]').prop('checked', false).change();
+                $("#chkWheels").val('NotOK');
+            }
+
+            if ($("#chkStickok").prop("checked") == true) {
+                $('input[id="chkStickNok"]').prop('checked', false).change();
+                $("#chkRpsStick").val('Ok');
+            }
+            if ($("#chkStickNok").prop("checked") == true) {
+                $('input[id="chkStickok"]').prop('checked', false).change();
+                $("#chkRpsStick").val('NotOK');
+            }
+
+            if ($("#chkLoseok").prop("checked") == true) {
+                $('input[id="chkLoseNok"]').prop('checked', false).change();
+                $("#chkLoseElement").val('Ok');
+            }
+            if ($("#chkLoseNok").prop("checked") == true) {
+                $('input[id="chkLoseok"]').prop('checked', false).change();
+                $("#chkLoseElement").val('NotOK');
+            }
+
+            if ($("#chkMylerok").prop("checked") == true) {
+                $('input[id="chkMylerNok"]').prop('checked', false).change();
+                $("#chkMylers").val('Ok');
+            }
+            if ($("#chkMylerNok").prop("checked") == true) {
+                $('input[id="chkMylerok"]').prop('checked', false).change();
+                $("#chkMylers").val('NotOK');
+            }
+
+            if ($("#chkPinok").prop("checked") == true) {
+                $('input[id="chkPinNok"]').prop('checked', false).change();
+                $("#chkPinThreads").val('Ok');
+            }
+            if ($("#chkPinNok").prop("checked") == true) {
+                $('input[id="chkPinok"]').prop('checked', false).change();
+                $("#chkPinThreads").val('NotOK');
+            }
+
+            if ($("#chkPadsok").prop("checked") == true) {
+                $('input[id="chkPadsNok"]').prop('checked', false).change();
+                $("#chkRestingPads").val('Ok');
+            }
+            if ($("#chkPadsNok").prop("checked") == true) {
+                $('input[id="chkPadsok"]').prop('checked', false).change();
+                $("#chkRestingPads").val('NotOK');
+            }
+
+            if ($("#chkSlideok").prop("checked") == true) {
+                $('input[id="chkSlideNok"]').prop('checked', false).change();
+                $("#chkSliders").val('Ok');
+            }
+            if ($("#chkSlideNok").prop("checked") == true) {
+                $('input[id="chkSlideok"]').prop('checked', false).change();
+                $("#chkSliders").val('NotOK');
+            }
+
+            if ($("#chkKugelok").prop("checked") == true) {
+                $('input[id="chkKugelNok"]').prop('checked', false).change();
+                $("#chkKugel").val('Ok');
+            }
+            if ($("#chkKugelNok").prop("checked") == true) {
+                $('input[id="chkKugelok"]').prop('checked', false).change();
+                $("#chkKugel").val('NotOK');
+            }
+
+
+        }
+              if (@CurrentUserLevel == 2) {
+                  if ($("#AchkRpsok").prop("checked") == true) {
+                      $('input[id="AchkRpsNok"]').prop('checked', false).change();
+                      $("#AchkRpsPin").val('Ok');
+                  }
+                  if ($("#AchkRpsNok").prop("checked") == true) {
+                      $('input[id="AchkRpsok"]').prop("checked", false).change();
+                      $("#AchkRpsPin").val('NotOK');
+                  }
+
+                  if ($("#AchkClamok").prop("checked") == true) {
+                      $('input[id="AchkClamNok"]').prop('checked', false).change();
+                      $("#AchkClamps").val('Ok');
+                  }
+                  if ($("#AchkClamNok").prop("checked") == true) {
+                      $('input[id="AchkClamok"]').prop('checked', false).change();
+                      $("#AchkClamps").val('NotOK');
+                  }
+
+                  if ($("#AchkWheelok").prop("checked") == true) {
+                      $('input[id="AchkWheelNok"]').prop('checked', false).change();
+                      $("#AchkWheels").val('Ok');
+                  }
+                  if ($("#AchkWheelNok").prop("checked") == true) {
+                      $('input[id="AchkWheelok"]').prop('checked', false).change();
+                      $("#AchkWheels").val('NotOK');
+                  }
+
+                  if ($("#AchkStickok").prop("checked") == true) {
+                      $('input[id="AchkStickNok"]').prop('checked', false).change();
+                      $("#AchkRpsStick").val('Ok');
+                  }
+                  if ($("#AchkStickNok").prop("checked") == true) {
+                      $('input[id="AchkStickok"]').prop('checked', false).change();
+                      $("#AchkRpsStick").val('NotOK');
+                  }
+
+                  if ($("#AchkLoseok").prop("checked") == true) {
+                      $('input[id="AchkLoseNok"]').prop('checked', false).change();
+                      $("#AchkLoseElement").val('Ok');
+                  }
+                  if ($("#AchkLoseNok").prop("checked") == true) {
+                      $('input[id="AchkLoseok"]').prop('checked', false).change();
+                      $("#AchkLoseElement").val('NotOK');
+                  }
+
+                  if ($("#AchkMylerok").prop("checked") == true) {
+                      $('input[id="AchkMylerNok"]').prop('checked', false).change();
+                      $("#AchkMylers").val('Ok');
+                  }
+                  if ($("#AchkMylerNok").prop("checked") == true) {
+                      $('input[id="AchkMylerok"]').prop('checked', false).change();
+                      $("#AchkMylers").val('NotOK');
+                  }
+
+                  if ($("#AchkPinok").prop("checked") == true) {
+                      $('input[id="AchkPinNok"]').prop('checked', false).change();
+                      $("#AchkPinThreads").val('Ok');
+                  }
+                  if ($("#AchkPinNok").prop("checked") == true) {
+                      $('input[id="AchkPinok"]').prop('checked', false).change();
+                      $("#AchkPinThreads").val('NotOK');
+                  }
+
+                  if ($("#AchkPadsok").prop("checked") == true) {
+                      $('input[id="AchkPadsNok"]').prop('checked', false).change();
+                      $("#AchkRestingPads").val('Ok');
+                  }
+                  if ($("#AchkPadsNok").prop("checked") == true) {
+                      $('input[id="AchkPadsok"]').prop('checked', false).change();
+                      $("#AchkRestingPads").val('NotOK');
+                  }
+
+                  if ($("#AchkSlideok").prop("checked") == true) {
+                      $('input[id="AchkSlideNok"]').prop('checked', false).change();
+                      $("#AchkSliders").val('Ok');
+                  }
+                  if ($("#AchkSlideNok").prop("checked") == true) {
+                      $('input[id="AchkSlideok"]').prop('checked', false).change();
+                      $("#AchkSliders").val('NotOK');
+                  }
+
+                  if ($("#AchkKugelok").prop("checked") == true) {
+                      $('input[id="AchkKugelNok"]').prop('checked', false).change();
+                      $("#AchkKugel").val('Ok');
+                  }
+                  if ($("#AchkKugelNok").prop("checked") == true) {
+                      $('input[id="AchkKugelok"]').prop('checked', false).change();
+                      $("#AchkKugel").val('NotOK');
+                  }
+            }
+    }
+
+        function pageLoad() {
+
+        spinner.hide();
+        $("#headingErr").addClass('d-none');
+        $("#rdOnBehalfOptionOthersLabel").text('Blue Collar Employee');
+        //if (IsViewMode || IsEditMode) {
+        //    $("#txtAddressofConsignee").addClass('spanUpperSide');
+        //    $("#txtAddressofReceiver").addClass('spanUpperSide');
+        //    $("#txtBusinessNeed").addClass('spanUpperSide');
+
+        //    GetWeightDimension();
+        //}
+        //else if (IsViewMode) {
+        //    $("#divRequestSubmissionFor").addClass('d-none');
+        //}
+        }
+
+        function allowNumbersOnly(e) {
+        var code = (e.which) ? e.which : e.keyCode;
+        if (code > 31 && (code < 48 || code > 57)) {
+        e.preventDefault();
+        }
+        }
+
+        function successQMCRModal(txt) {
+        //
+        $('#modalTitle').html('Success');
+        if (txt == "approve") {
+        $('#modalBody').html('Form has been approved!');
+        }
+        else if (txt == "reject") {
+        $('#modalBody').html('Form has been rejected!');
+        }
+        else if (txt == "enquire") {
+        $('#modalBody').html('Form has been enquired!');
+        }
+        else if (txt == "cancelled") {
+        $('#modalBody').html('Form has been cancelled!');
+        }
+        else {
+        if (IsEditMode) {
+            $('#modalBody').html('Your form with ID: QFRF' + txt + ' has been re-submitted! Kindly use this for future reference');
+        }
+        else {
+            $('#modalBody').html('Your form with ID: QFRF' + txt + ' has been submitted! Kindly use this for future reference');
+        }
+
+        }
+        FlagRedirect = txt;
+        //$("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+        }
+
+        function failureModal(txt) {
+        if (txt == null) {
+        $('#modalBody').html('Some error occurred!');
+        }
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html(txt);
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+        }
+
+        function permissionModal() {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html('No permssion granted since the device is not SAVWIPL owned!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+        }
+
+        function requiredModal(text) {
+        $('#modalTitle').html('Required!');
+        $('#modalBody').html(text);
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+        }
+
+        function validityModal(txt) {
+        ////
+        if (txt == 'approve') {
+        DisplayAlert('error', 'Error', 'Please select the Type of Car');
+        }
+        else if (txt == 'reject') {
+        DisplayAlert('error', 'Warning', 'Please type in the reason for rejecting the form');
+        }
+        else if (txt == 'enquire') {
+        DisplayAlert('error', 'Warning', 'Please type in the reason for enquiring the form');
+        }
+
+        }
+
+    $("#btnSubmit").on('click', function (e) {
+        $('#loader').show();
+
+        validateSubmitter();
+        validateApplicant();
+        getActionType();
+
+        var txtFixtureName = $("#txtFixtureName").val();
+        if (txtFixtureName == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Fixture Name" + "</li>";
+            errorCount++;
+        }
+
+        var txtFixtureNo = $("#txtFixtureNo").val();
+        if (txtFixtureNo == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Fixture No" + "</li>";
+            errorCount++;
+        }
+
+
+        var drpProjectName = $("#drpProjectName").val();
+        if (drpProjectName == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Project Name" + "</li>";
+            errorCount++;
+        }
+
+        var txtFromDate = $("#txtFromDate").val();
+        if (txtFromDate == "") {
+            errors += "<li id='error" + errorCount + "'>" + "From Date" + "</li>";
+            errorCount++;
+        }
+
+        var txtToDate = $("#txtToDate").val();
+        if (txtToDate == "") {
+            errors += "<li id='error" + errorCount + "'>" + "To Date" + "</li>";
+            errorCount++;
+        }
+
+        var txtReason = $("#txtReason").val();
+        if (txtReason == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Reason" + "</li>";
+            errorCount++;
+        }
+
+        var chkRpsPin = $("#chkRpsPin").val();
+        //if (chkRpsPin == "") {
+        //    errors += "<li id='error" + errorCount + "'>" + "Rps Pin" + "</li>";
+        //    errorCount++;
+        //}
+        if (chkRpsPin != "") {
+            var txt_rpsremarks = $("#txt_rpsremarks").val();
+            if (txt_rpsremarks == "") {
+                errors += "<li id='error" + errorCount + "'>" + "RpsPin Remark" + "</li>";
+                errorCount++;
+            }
+        }
+
+        var chkClamps = $("#chkClamps").val();
+        //if (chkClamps == "") {
+        //    errors += "<li id='error" + errorCount + "'>" + "Clamps" + "</li>";
+        //    errorCount++;
+        //}
+        if (chkClamps != "") {
+            var txt_clampsremarks = $("#txt_clampsremarks").val();
+            if (txt_clampsremarks == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Clamps Remarks" + "</li>";
+                errorCount++;
+            }
+        }
+
+        var chkWheels = $("#chkWheels").val();
+        //if (chkWheels == "") {
+        //    errors += "<li id='error" + errorCount + "'>" + "Wheels" + "</li>";
+        //    errorCount++;
+        //}
+        if (chkWheels != "") {
+            var txt_wheelsremarks = $("#txt_wheelsremarks").val();
+            if (txt_wheelsremarks == "") {
+                errors += "<li id='error" + errorCount + "'>" + "wheels Remarks" + "</li>";
+                errorCount++;
+            }
+        }
+
+        var chkRpsStick = $("#chkRpsStick").val();
+        //if (chkRpsStick == "") {
+        //    errors += "<li id='error" + errorCount + "'>" + "Rps Stick" + "</li>";
+        //    errorCount++;
+        //}
+        if (chkRpsStick != "") {
+            var txt_RpsStickremarks = $("#txt_RpsStickremarks").val();
+            if (txt_RpsStickremarks == "") {
+                errors += "<li id='error" + errorCount + "'>" + "RpsStick Remarks" + "</li>";
+                errorCount++;
+            }
+        }
+
+        var chkLoseElement = $("#chkLoseElement").val();
+        //if (chkLoseElement == "") {
+        //    errors += "<li id='error" + errorCount + "'>" + "Lose Element" + "</li>";
+        //    errorCount++;
+        //}
+        if (chkLoseElement != "") {
+            var txt_Loseremarks = $("#txt_Loseremarks").val();
+            if (txt_Loseremarks == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Lose Remarks" + "</li>";
+                errorCount++;
+            }
+        }
+
+
+        var chkMylers = $("#chkMylers").val();
+        //if (chkMylers == "") {
+        //    errors += "<li id='error" + errorCount + "'>" + "Mylers" + "</li>";
+        //    errorCount++;
+        //}
+        if (chkMylers != "") {
+            var txt_Mylerremarks = $("#txt_Mylerremarks").val();
+            if (txt_Mylerremarks == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Myler Remarks" + "</li>";
+                errorCount++;
+            }
+        }
+
+
+        var chkPinThreads = $("#chkPinThreads").val();
+        //if (chkMylers == "") {
+        //    errors += "<li id='error" + errorCount + "'>" + "Mylers" + "</li>";
+        //    errorCount++;
+        //}
+        if (chkPinThreads != "") {
+            var txt_Pinremarks = $("#txt_Pinremarks").val();
+            if (txt_Pinremarks == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Pin Threads Remarks" + "</li>";
+                errorCount++;
+            }
+        }
+
+
+        var chkRestingPads = $("#chkRestingPads").val();
+        //if (chkRestingPads == "") {
+        //    errors += "<li id='error" + errorCount + "'>" + "Resting Pads" + "</li>";
+        //    errorCount++;
+        //}
+        if (chkRestingPads != "") {
+            var txt_Padsremarks = $("#txt_Padsremarks").val();
+            if (txt_Padsremarks == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Resting Pads Remarks" + "</li>";
+                errorCount++;
+            }
+        }
+
+
+        var chkSliders = $("#chkSliders").val();
+        //if (chkSliders == "") {
+        //    errors += "<li id='error" + errorCount + "'>" + "Sliders" + "</li>";
+        //    errorCount++;
+        //}
+        if (chkSliders != "") {
+            var txt_Slidersremarks = $("#txt_Slidersremarks").val();
+            if (txt_Slidersremarks == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Sliders Remarks" + "</li>";
+                errorCount++;
+            }
+        }
+
+
+        var chkKugel = $("#chkKugel").val();
+        //if (chkKugel == "") {
+        //    errors += "<li id='error" + errorCount + "'>" + "Kugel" + "</li>";
+        //    errorCount++;
+        //}
+        if (chkKugel != "") {
+            var txt_Kugelremarks = $("#txt_Kugelremarks").val();
+            if (txt_Kugelremarks == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Kugel Remarks" + "</li>";
+                errorCount++;
+            }
+        }
+
+        if (errors.length) {
+            $('#loader').hide();
+            errors = "<ol id='errorList'>" + errors + "</ol>";
+            $("#headingErr").removeClass('d-none');
+            document.getElementById("add_to_me").innerHTML = errors;
+            errors = "";
+            errorCount = 0;
+            if (IsEditMode) {
+                $("#myModalEdit").scrollTop(0);
+                $("#myModalRequest").scrollTop(0);
+            }
+            else {
+                $(window).scrollTop(0);
+            }
+            return false;
+        }
+        $("#headingErr").addClass('d-none');
+        document.getElementById("add_to_me").innerHTML = '';
+        $('#ddEmpDesignation').prop("disabled", false);
+        $('#txtOnBehalfdesignation').prop("disabled", false);
+        $("#pageLoader").removeClass('invisible');
+        $("#btnSubmit").text('Saving');
+        $("#btnSubmit").prop("disabled", true);
+        $("#btnCancel").prop("disabled", true);
+        $("#ddOtherNewEmpDesignation").prop("disabled", false);
+        $("input").prop('disabled', false);
+
+        //var form = {
+
+        //}
+        var serializedArray = $("#QFRForm").serializeArray();
+        var form = {
+
+        };
+
+        serializedArray.forEach((x, index) => {
+            form[x.name] = x.value;
+        });
+
+        console.log(serializedArray);
+        console.log(form);
+        //var form = $("#QFRF");
+        //var formData = new FormData(form[0]);
+        $.ajax({
+            url: '/FixtureRequisition/SaveQFRFForm',
+            type: 'POST',
+            data: form,
+            cache: false,
+            dataType: 'JSON',
+            //processData: false,
+            //contentType: false,
+            //type: 'POST',
+            //dataType: 'JSON',
+            //data: form,
+            //enctype: 'multipart/form-data',
+            success: (function (data) {
+                $('#loader').hide();
+                if (data.Status == 200) {
+                    $("#pageLoader").addClass('invisible');
+                    if (IsNew && IsEdit) {
+                        $("#btnSubmit").text('Submit');
+                    }
+                    else {
+                        $("#btnSubmit").text('Re-Submit');
+                    }
+                    $("#btnSubmit").prop("disabled", false);
+                    $("#btnCancel").prop("disabled", false);
+
+                    successQMCRModal(data.Message);
+                }
+                else {
+                    failureModal(data.Message);
+                    if (IsNew && IsEdit) {
+                        $("#btnSubmit").text('Submit');
+                    }
+                    else {
+                        $("#btnSubmit").text('Re-Submit');
+                    }
+                    $("#pageLoader").addClass('invisible');
+                    $("#btnSubmit").prop("disabled", false);
+                    $("#btnCancel").prop("disabled", false);
+                    console.log("failure");
+                }
+            }),
+            error: (function (data) {
+                $('#loader').hide();
+                failureModal();
+                console.log("error");
+                if (IsNew && IsEdit) {
+                    $("#btnSubmit").text('Submit');
+                }
+                else {
+                    $("#btnSubmit").text('Re-Submit');
+                }
+                $("#pageLoader").addClass('invisible');
+                $("#btnSubmit").prop("disabled", false);
+                $("#btnCancel").prop("disabled", false);
+            })
+        })
+        $("#tab").val(2);
+
+    });
+
+        $("#btnCancel").on('click', function (e) {
+        window.location = "../Dashboard";
+        });
+
+
+    function saveResponse(text) {
+
+        var status = '', comment = '';
+        comment = $("#comment-" + text).val();
+        switch (text) {
+        case 'approve': {
+        status = 'Approved';
+                
+        if (@CurrentUserLevel == "2") {
+            addRemainingData(status, appRowId, comment, approvalType, text);
+
+        }
+        else {
+        FormApproval(status, appRowId, comment, approvalType, text);
+        }
+        break;
+        }
+        case 'reject': {
+        status = 'Rejected';
+        if (comment == '') {
+        validityModal(text);
+        return;
+        }
+        else {
+        FormApproval(status, appRowId, comment, approvalType, text);
+        }
+        break;
+        }
+        case 'enquire': {
+        status = 'Enquired';
+        if (comment == '') {
+        validityModal(text);
+        return;
+        }
+        else {
+        FormApproval(status, appRowId, comment, approvalType, text);
+        }
+        break;
+        }
+        }
+
+        $("#tab").val(1);
+        }
+
+        function FormApproval(status, appRowId, comment, approvalType, text) {
+        //
+        spinner.show();
+        $.ajax({
+        url: '/List/SaveResponse',
+        type: 'POST',
+        data: { response: status, appRowId: appRowId, comment: comment, approvalType: approvalType },
+        dataType: 'JSON',
+        success: (function (data) {
+        if (data.Result == 1) {
+        successQMCRModal(text);
+        spinner.hide();
+        //setTimeout(FilterMyTasks, 5000);
+        spinner.hide();
+        }
+        else {
+        failureModal();
+        spinner.hide();
+        }
+        }),
+        error: (function (data) {
+        failureModal();
+        spinner.hide();
+        })
+        })
+
+        $("#tab").val(1);
+        }
+
+        $('#myModal').modal({ backdrop: 'static', keyboard: false })
+
+        $('#successModel').on('hidden.bs.modal', function () {
+        ////
+        var tab = $("#tab").val();
+        console.log(tab);
+        if (tab == 1) {
+        GetMyTaskTab();
+        }
+        else if (tab == 2) {
+        window.location = "../Dashboard?tab=" + tab;
+        }
+        })
+
+
+
+        $('input:checkbox[id="chkWeight"]').click(function () {
+        if ($(this).prop("checked") == true) {
+        $('input[id="chkWeight"]').prop('disabled', true);
+        $('input[id="chkDimension"]').prop('checked', false);
+        $('input[id="chkDimension"]').prop("disabled", false);
+        $("#chkWD").val('Weight');
+
+        }
+        });
+
+        $('input:checkbox[id="chkDimension"]').click(function () {
+        if ($(this).prop("checked") == true) {
+        $('input[id="chkDimension"]').prop('disabled', true);
+        $('input[id="chkWeight"]').prop("checked", false);
+        $('input[id="chkWeight"]').prop("disabled", false);
+        $("#chkWD").val('Dimension');
+        }
+        });
+
+
+    function allowAlphaNumericSpace(thisInput) {
+        var arr = thisInput.value.split('');
+
+        if (arr[0] === ".") {
+            thisInput.value = "";
+        }
+
+        //thisInput.value = thisInput.value.split(/[^e]/).join('');
+    }
+
+    function addRemainingData(status, appRowId, comment, approvalType, text) {
+
+        if (QFRF.RpsPin == "Ok") {
+            var chkRpsPin = $("#AchkRpsPin").val();
+            if (chkRpsPin == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Rps Pin" + "</li>";
+                errorCount++;
+            }
+
+            var txt_rpsremarks = $("#txt_Arpsremarks").val();
+            if (txt_rpsremarks == "") {
+                errors += "<li id='error" + errorCount + "'>" + "RpsPin Remark" + "</li>";
+                errorCount++;
+            }
+        }
+
+        if (QFRF.Clamps == "Ok") {
+            var chkClamps = $("#AchkClamps").val();
+            if (chkClamps == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Clamps" + "</li>";
+                errorCount++;
+            }
+
+            var txt_clampsremarks = $("#txt_Aclampsremarks").val();
+            if (txt_clampsremarks == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Clamps Remarks" + "</li>";
+                errorCount++;
+            }
+        }
+
+        if (QFRF.Wheels == "Ok") {
+            var chkWheels = $("#AchkWheels").val();
+            if (chkWheels == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Wheels" + "</li>";
+                errorCount++;
+            }
+
+            var txt_wheelsremarks = $("#txt_Awheelsremarks").val();
+            if (txt_wheelsremarks == "") {
+                errors += "<li id='error" + errorCount + "'>" + "wheels Remarks" + "</li>";
+                errorCount++;
+            }
+        }
+
+        if (QFRF.RpsStick == "Ok") {
+            var chkRpsStick = $("#AchkRpsStick").val();
+            if (chkRpsStick == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Rps Stick" + "</li>";
+                errorCount++;
+            }
+
+            var txt_RpsStickremarks = $("#txt_ARpsStickremarks").val();
+            if (txt_RpsStickremarks == "") {
+                errors += "<li id='error" + errorCount + "'>" + "RpsStick Remarks" + "</li>";
+                errorCount++;
+            }
+        }
+
+        if (QFRF.LoseElement == "Ok") {
+            var chkLoseElement = $("#AchkLoseElement").val();
+            if (chkLoseElement == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Lose Element" + "</li>";
+                errorCount++;
+            }
+
+            var txt_Loseremarks = $("#txt_ALoseremarks").val();
+            if (txt_Loseremarks == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Lose Remarks" + "</li>";
+                errorCount++;
+            }
+        }
+
+        if (QFRF.Mylers == "Ok") {
+            var chkMylers = $("#AchkMylers").val();
+            if (chkMylers == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Mylers" + "</li>";
+                errorCount++;
+            }
+
+            var txt_Mylerremarks = $("#txt_AMylerremarks").val();
+            if (txt_Mylerremarks == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Myler Remarks" + "</li>";
+                errorCount++;
+            }
+        }
+
+        if (QFRF.PinThreads == "Ok") {
+            var chkPinThreads = $("#AchkPinThreads").val();
+            if (chkPinThreads == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Mylers" + "</li>";
+                errorCount++;
+            }
+
+            var txt_Pinremarks = $("#txt_APinremarks").val();
+            if (txt_Pinremarks == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Pin Threads Remarks" + "</li>";
+                errorCount++;
+            }
+        }
+
+        if (QFRF.RestingPads == "Ok") {
+            var chkRestingPads = $("#AchkRestingPads").val();
+            if (chkRestingPads == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Resting Pads" + "</li>";
+                errorCount++;
+            }
+
+            var txt_Padsremarks = $("#txt_APadsremarks").val();
+            if (txt_Padsremarks == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Resting Pads Remarks" + "</li>";
+                errorCount++;
+            }
+        }
+
+        if (QFRF.Sliders == "Ok") {
+            var chkSliders = $("#AchkSliders").val();
+            if (chkSliders == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Sliders" + "</li>";
+                errorCount++;
+            }
+
+            var txt_Slidersremarks = $("#txt_ASlidersremarks").val();
+            if (txt_Slidersremarks == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Sliders Remarks" + "</li>";
+                errorCount++;
+            }
+        }
+
+        if (QFRF.Kugel == "Ok") {
+            var chkKugel = $("#AchkKugel").val();
+            if (chkKugel == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Kugel" + "</li>";
+                errorCount++;
+            }
+
+            var txt_Kugelremarks = $("#txt_AKugelremarks").val();
+            if (txt_Kugelremarks == "") {
+                errors += "<li id='error" + errorCount + "'>" + "Kugel Remarks" + "</li>";
+                errorCount++;
+            }
+        }
+        
+        if (errors.length) {
+            errors = "<ol id='errorList'>" + errors + "</ol>";
+            $("#headingErr").removeClass('d-none');
+            document.getElementById("add_to_me").innerHTML = errors;
+            errors = "";
+            errorCount = 0;
+            if (IsEditMode) {
+                $("#myModalEdit").scrollTop(0);
+                $("#myModalRequest").scrollTop(0);
+            }
+            else {
+                $(window).scrollTop(0);
+            }
+            return false;
+        }
+        var form = $("#QFRForm");
+        var formData = new FormData(form[0]);
+        $.ajax({
+            url: '/FixtureRequisition/UpdateData',
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            dataType: 'JSON',
+            data: formData,
+            enctype: 'multipart/form-data',
+            success: (function (data) {
+                if (data == 1) {
+                    FormApproval(status, appRowId, comment, approvalType, text);
+                }
+                else {
+                    failureModal(data.Message);
+
+                    console.log("failure");
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+
+
+            })
+        })
+
+    }
+
+    function DateValidation() {
+        var FromDate = document.getElementById("txtFromDate").value;
+        var ToDate = document.getElementById("txtToDate").value;
+        var date1 = new Date(FromDate);
+        var date2 = new Date(ToDate);
+        var Today = new Date();
+
+        if (date1 != "" && date2 != "") {
+            if (date1 >= date2) {
+                document.getElementById('txtToDate').style.borderColor = "red";
+                alert('Please enter valid Start Time and End Time');
+                //Swal.fire({
+                //    title: 'Error',
+                //    text: "To Date should not be less than from date ",
+                //    icon: 'error'
+                //})
+                $("#txtToDate").val('');
+                return false;
+
+            } else {
+                document.getElementById('txtToDate').style.borderColor = "Gainsboro";
+            }
+        }
+
+    }
+
+
+
+</script>

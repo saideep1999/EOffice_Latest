@@ -1,0 +1,845 @@
+﻿@{
+    bool IsNew = true;
+    dynamic BTF = null;
+    dynamic FlagRedirect = null;
+    bool IsEdit = true;
+    bool IsValidityCheck = true;
+    int FormId = 0, AppRowId = 0, ApprovalType = 0;
+    string AREAID = "";
+    Layout = ViewBag.Layout;
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IsNew = ViewBag.IsNew;
+        IsEdit = ViewBag.IsEdit;
+        BTF = ViewBag.Model;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        IsValidityCheck = ViewBag.IsValidityCheck != null ? (bool)ViewBag.IsValidityCheck : false;
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+    }
+    var currentUser = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    ViewBag.Title = "Bus Transportation Form";
+    int count=0;
+}
+@*<style>
+    .skd-9 {
+        background: url("./img/home.png") no-repeat;
+    }
+
+    .textareawidth {
+        max-width: 400px;
+    }
+</style>*@
+@*Loader*@
+<style type="text/css">
+    #loader {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        background: rgba(0,0,0,0.75) url(../../assets/img/loader4.gif) no-repeat center center;
+        z-index: 10000;
+    }
+</style>
+
+@*Loader*@
+<body class="nav-sm dash-body">
+
+    <div class="container body">
+        <form action="/List/SaveBusTransportationForm" id="BTForm" method="post">
+            <div class="main_container">
+                <!-- page content -->
+                <div class="right_col bg-transparent" role="main">
+                    <div class="container">
+                        <div class="container form-container">
+                            <div class="card-header pb-4 pt-4">
+                                @if (IsNew){
+                                    if(!IsEdit){
+                                        foreach (var item in BTF.one){
+                                        <div>
+                                            <input type="hidden" id="FormSrId" name="FormSrId" value="@(BTF.one[0].Id)" />
+                                            <input type="hidden" id="FormId" name="FormId" value="@(FormId)" />
+                                            <input type="hidden" id="AppRowId" name="AppRowId" value="@(AppRowId)" />
+                                        </div>
+                                        <table class="w-95 m-auto">
+                                            <tr>
+                                                <td>
+                                                    <table class="w-100 form-border">
+                                                        <tr>
+                                                            <td class="bb-0 topheaderCouries">MobiNext Technologies India Private Limited</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="bt-0 topheaderCouriesBorder">Bus Transportation Form</td>
+                                                        </tr>
+                                                    </table>
+                                                    <table class="w-100 form-outer-border">
+                                                        <tr>
+                                                            <td class="bb-0 topheaderCourierDate">Date :- <input class="inputTrans" type="text" value="@(BTF.one[0].Created.ToShortDateString())"></td>
+                                                        </tr>
+                                                    </table>
+                                                    <table class="w-100 form-border">
+                                                        <tr>
+                                                            <td class="bb-0 bt-0">
+                                                                I, the undersigned, would like to avail company's bus facility. I have understood the rules & regulations
+                                                                of the above facility and will abide by the same. I agree to the appropriate deduction from my salary:
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                    <table class="w-100 form-border">
+                                                        <tbody>
+                                                            <tr class="br-1">
+                                                                <td class="br-0 bt-0 bb-0">Employee No</td>
+                                                                <td class="br-0 bl-0 bt-0 bb-0">:- <input class="inputTrans" type="text" id="txtEmployeeNumber" name="txtEmployeeNumber" value="@(BTF.one[0].EmployeeNo)"></td>
+                                                            </tr>
+                                                            <tr class="br-1">
+                                                                <td class="br-0 bt-0 bb-0">Employee Name</td>
+                                                                <td class="br-0 bl-0 bt-0 bb-0">:- <input class="inputTrans" type="text" id="txtEmployeeName" name="txtEmployeeName" value="@(BTF.one[0].EmployeeName)"></td>
+                                                            </tr>
+                                                            <tr class="br-1">
+                                                                <td class="br-0 bb-0 bt-0">Department</td>
+                                                                <td class="br-0 bl-0 bb-0 bt-0">:- <input class="inputTrans" type="text" id="txtDepartment" name="txtDepartment" value="@(BTF.one[0].Department)"></td>
+                                                            </tr>
+                                                            <tr class="br-1">
+                                                                <td class="br-0 bb-0 bt-0">Address</td>
+                                                                <td class="br-0 bl-0 bb-0 bt-0"> <textarea class="textTrans" name="txtAddress" id="txtAddress" cols="60" rows="15">@(BTF.one[0].Address)</textarea></td>
+                                                            </tr>
+                                                            <tr class="br-1">
+                                                                <td class="bb-0 br-0 bt-0">Contact No.</td>
+                                                                <td class="br-0 bl-0 bb-0 bt-0">:- <input class="inputTrans" type="text" id="txtContactNumber" name="txtContactNumber" onkeypress="allowNumbersOnly(event)" value="@(BTF.one[0].ContactNumber)"></td>
+                                                            </tr>
+                                                            <tr class="br-1">
+                                                                <td class="bb-0 br-0 bt-0">
+                                                                    Transportation Required <br>
+                                                                    Yes / No.
+                                                                </td>
+                                                                <td class="bl-0 bb-0 bt-0 br-0">
+                                                                    :- <select class="selctTransport" id="drpTransportationRequired" name="drpTransportationRequired" id="drpTransportationRequired" name="drpTransportationRequired">
+                                                                        <option @(item.TransportationRequired=="Yes" ? "selected" : "" ) value="Yes">Yes</option>
+                                                                        <option @(item.TransportationRequired=="No" ? "selected" : "" ) value="No">No</option>
+                                                                        </select>
+                                                                </td>
+                                                            </tr>
+                                                            <tr class="br-1">
+                                                                <td class="br-0 bt-0 bb-0">Distance from Residence <br> to Pickup Point</td>
+                                                                <td class="bl-0 br-0 bt-0 bb-0">:-<input class="inputTrans" type="text" id="txtDistance" name="txtDistance" onkeypress="allowNumbersOnly(event)" value="@(BTF.one[0].Distance)"></td>
+
+                                                                <td class="br-0 bl-0 bt-0 bb-0">Pickup Point</td>
+                                                                    <td class="bl-0 bt-0 bb-0">
+                                                                        :- <select class="selctTransport" id="drpPickupPoint" name="drpPickupPoint" id="drpPickupPoint" name="drpPickupPoint">
+                                                                            <option @(item.PickupPoint=="A" ? "selected" : "" ) value="A">A</option>
+                                                                            <option @(item.PickupPoint=="B" ? "selected" : "" ) value="B">B</option>
+                                                                            <option @(item.PickupPoint=="C" ? "selected" : "" ) value="C">C</option>
+                                                                           </select>
+                                                                    </td>
+                                                            </tr>
+                                                            <tr class="br-1">
+                                                                <td class="br-0 bt-0 bb-0">Bus Route Name</td>
+                                                                <td class="bl-0 br-0 bt-0 bb-0">:-<input class="inputTrans" type="text" value="@(BTF.one[0].BusRouteName)" id="txtBusRouteName" name="txtBusRouteName"></td>
+
+                                                                <td class="br-0 bl-0 bt-0 bb-0">Bus Route No</td>
+                                                                <td class="bl-0 bt-0 bb-0">:-<input class="inputTrans" type="text" value="@(BTF.one[0].BusRouteNumber)" id="txtBusRouteNumber" name="txtBusRouteNumber" onkeypress="allowNumbersOnly(event)"></td>
+                                                            </tr>
+                                                            <tr class="br-1">
+                                                                <td class="br-0 bt-0 bb-0">SAVW / Contract Employee</td>
+                                                                    <td class="bl-0 br-0 bt-0 bb-0">
+                                                                        :- <select class="selctTransport" id="drpEmployeeType" name="drpEmployeeType">
+                                                                                <option @(item.EmployeeType == "SAVW" ? "selected" : "" ) value="SAVW">SAVW</option>
+                                                                                <option @(item.EmployeeType == "Contract Employee" ? "selected" : "" ) value="Contract Employee">Contract Employee</option>
+                                                                           </select>
+                                                                    </td>
+                                                                <td class="br-0 bl-0 bt-0 bb-0">Slab</td>
+                                                                <td class="bl-0 bt-0 bb-0">
+                                                                    :-<input class="inputTrans" type="text" value="@(BTF.one[0].Slab)" id="txtSlab" name="txtSlab">
+                                                                </td>
+                                                            </tr>
+                                                            <tr class="br-1">
+                                                                <td class="br-0 bt-0" id="hiddenApproverInformation"></td>
+                                                                @*<td class="bl-0 br-0 bt-0">:-<input class="inputTrans" type="text"></td>
+                                                                <td class="br-0 bl-0 bt-0">HR & Admin Sign</td>
+                                                                <td class="bl-0 bt-0">:-<input class="inputTrans" type="text"></td>*@
+                                                            </tr>
+                                                            <tr>
+                                                                <td colspan="4"><b>Authorization by HR</b></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Name: <input type="text" class="" name="name" style="width: 250px;" value="@(BTF.three[0].UserName)" readonly></td>
+                                                                <td colspan="2">Approver Comment: <textarea cols="50" rows="15" class="inpDisable textareawidth" readonly>@(BTF.three[0].Comment)</textarea></td>
+                                                                <td>Signature: <input class="Signature inpDisable" type="text" style="width: 250px;" value="@(BTF.three[0].ApproverStatus != "Pending" ? (BTF.three[0].ApproverStatus + " on " + Convert.ToDateTime(BTF.two[0].Modified).ToShortDateString() + " " + Convert.ToDateTime(BTF.two[0].Modified).ToShortTimeString()):"")" readonly></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td colspan="4"><b>Authorization by Admin</b></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Name: <input type="text" name="name" class="inpDisable" style="width: 250px;" value="@(BTF.three[1].UserName)" readonly></td>
+                                                                <td colspan="2">Approver Comment: <textarea cols="50" rows="15" class="inpDisable textareawidth" readonly>@(BTF.three[1].Comment)</textarea></td>
+                                                                <td>Signature: <input class="Signature inpDisable" type="text" style="width: 250px;" value="@(BTF.three[1].ApproverStatus != "Pending" ? (BTF.three[1].ApproverStatus + " on " + Convert.ToDateTime(BTF.two[1].Modified).ToShortDateString() + " " + Convert.ToDateTime(BTF.two[1].Modified).ToShortTimeString()):"")" readonly></td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        <table class="detail-sec-p">
+                                            <tr>
+                                                <td class="text-center">SF_SO/1_021.00</td>
+                                            </tr>
+                                        </table>
+                                        }
+                                    }
+
+                                    else{
+                                    <table class="w-95 m-auto">
+                                        <tr>
+                                            <td>
+                                                <table class="w-100 form-border">
+                                                    <tr>
+                                                        <td class="bb-0 topheaderCouries">MobiNext Technologies India Private Limited</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="bt-0 topheaderCouriesBorder">Bus Transportation Form</td>
+                                                    </tr>
+                                                </table>
+                                                <table class="w-100 form-outer-border">
+                                                    <tr>
+                                                        <td class="bb-0 topheaderCourierDate">Date :- <input class="inputTrans" type="text" value="@(DateTime.Now.ToShortDateString())" readonly></td>
+                                                    </tr>
+                                                </table>
+                                                <table class="w-100 form-border">
+                                                    <tr>
+                                                        <td class="bb-0 bt-0">
+                                                            I, the undersigned, would like to avail company's bus facility. I have understood the rules & regulations
+                                                            of the above facility and will abide by the same. I agree to the appropriate deduction from my salary:
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                                <table class="w-100 form-border">
+                                                    <tbody>
+                                                        <tr class="br-1">
+                                                            <td class="br-0 bt-0 bb-0">Employee No</td>
+                                                            <td class="br-0 bl-0 bt-0 bb-0">:- <input class="inputTrans" type="text" id="txtEmployeeNumber" name="txtEmployeeNumber"></td>
+                                                        </tr>
+                                                        <tr class="br-1">
+                                                            <td class="br-0 bt-0 bb-0">Employee Name</td>
+                                                            <td class="br-0 bl-0 bt-0 bb-0">:- <input class="inputTrans" type="text" id="txtEmployeeName" name="txtEmployeeName"></td>
+                                                        </tr>
+                                                        <tr class="br-1">
+                                                            <td class="br-0 bb-0 bt-0">Department</td>
+                                                            <td class="br-0 bl-0 bb-0 bt-0">:- <input class="inputTrans" type="text" id="txtDepartment" name="txtDepartment"></td>
+                                                        </tr>
+                                                        <tr class="br-1">
+                                                            <td class="br-0 bb-0 bt-0">Address</td>
+                                                            <td class="br-0 bl-0 bb-0 bt-0"> <textarea class="textTrans" name="txtAddress" id="txtAddress" cols="60" rows="15"></textarea></td>
+                                                        </tr>
+                                                        <tr class="br-1">
+                                                            <td class="bb-0 br-0 bt-0">Contact No.</td>
+                                                            <td class="br-0 bl-0 bb-0 bt-0">:- <input class="inputTrans" type="text" id="txtContactNumber" name="txtContactNumber" onkeypress="allowNumbersOnly(event)"></td>
+                                                        </tr>
+                                                        <tr class="br-1">
+                                                            <td class="bb-0 br-0 bt-0">
+                                                                Transportation Required <br>
+                                                                Yes / No.
+                                                            </td>
+                                                            <td class="bl-0 bb-0 bt-0 br-0">
+                                                                :- <select class="selctTransport" id="drpTransportationRequired" name="drpTransportationRequired">
+                                                                    <option value=-1 selected disabled>Select</option>
+                                                                    <option value="Yes">Yes</option>
+                                                                    <option value="No">No</option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+                                                        <tr class="br-1">
+                                                            <td class="br-0 bt-0 bb-0">Distance from Residence <br> to Pickup Point</td>
+                                                            <td class="bl-0 br-0 bt-0 bb-0">:-<input class="inputTrans" type="text" id="txtDistance" name="txtDistance" onkeypress="allowNumbersOnly(event)"></td>
+
+                                                            <td class="br-0 bl-0 bt-0 bb-0">Pickup Point</td>
+                                                            <td class="bl-0 bt-0 bb-0">
+                                                                :- <select class="selctTransport" id="drpPickupPoint" name="drpPickupPoint">
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+                                                        <tr class="br-1">
+                                                            <td class="br-0 bt-0 bb-0">Bus Route Name</td>
+                                                            <td class="bl-0 br-0 bt-0 bb-0">:-<input class="inputTrans" type="text" id="txtBusRouteName" name="txtBusRouteName"></td>
+
+                                                            <td class="br-0 bl-0 bt-0 bb-0">Bus Route No</td>
+                                                            <td class="bl-0 bt-0 bb-0">:-<input class="inputTrans" type="text" id="txtBusRouteNumber" name="txtBusRouteNumber" onkeypress="allowNumbersOnly(event)"></td>
+                                                        </tr>
+                                                        <tr class="br-1">
+                                                            <td class="br-0 bt-0 bb-0">SAVW / Contract Employee</td>
+                                                            <td class="bl-0 br-0 bt-0 bb-0">
+                                                                :-<select class="selctTransport" id="drpEmployeeType" name="drpEmployeeType">
+                                                                    <option value=-1 selected disabled>Select</option>
+                                                                    <option value="SAVW">SAVW</option>
+                                                                    <option value="Contract Employee">Contract Employee</option>
+                                                                </select>
+                                                            </td>
+                                                            <td class="br-0 bl-0 bt-0 bb-0">Slab</td>
+                                                            <td class="bl-0 bt-0 bb-0">
+                                                                :-<input class="inputTrans" type="text" id="txtSlab" name="txtSlab">
+                                                            </td>
+                                                        </tr>
+                                                        <tr class="br-1">
+                                                            <td class="br-0 bt-0" id="hiddenApproverInformation"></td>
+                                                            <td class="bl-0 br-0 bt-0"></td>
+                                                            <td class="br-0 bl-0 bt-0"></td>
+                                                            <td class="bl-0 bt-0"></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <table class="detail-sec-p">
+                                        <tr>
+                                            <td class="text-center">SF_SO/1_021.00</td>
+                                        </tr>
+                                    </table>
+                                    }
+                                }
+                                else{
+                                <table class="w-95 m-auto">
+                                    <tr>
+                                        <td>
+                                            <table class="w-100 form-border">
+                                                <tr>
+                                                    <td class="bb-0 topheaderCouries">MobiNext Technologies India Private Limited</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="bt-0 topheaderCouriesBorder">Bus Transportation Form</td>
+                                                </tr>
+                                            </table>
+                                            <table class="w-100 form-outer-border">
+                                                <tr>
+                                                    <td class="bb-0 topheaderCourierDate">Date :- <input class="inputTrans" type="text" value="@(BTF.one[0].Created.ToShortDateString())"></td>
+                                                </tr>
+                                            </table>
+                                            <table class="w-100 form-border">
+                                                <tr>
+                                                    <td class="bb-0 bt-0">
+                                                        I, the undersigned, would like to avail company's bus facility. I have understood the rules & regulations
+                                                        of the above facility and will abide by the same. I agree to the appropriate deduction from my salary:
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            <table class="w-100 form-border">
+                                                <tbody>
+                                                    <tr class="br-1">
+                                                        <td class="br-0 bt-0 bb-0">Employee No</td>
+                                                        <td class="br-0 bl-0 bt-0 bb-0">:- <input class="inputTrans inpDisable" type="text" value="@(BTF.one[0].EmployeeNo)"></td>
+                                                        <td class="br-0 bl-0 bt-0 bb-0"></td>
+                                                        <td class="bl-0 bt-0 bb-0"></td>
+                                                    </tr>
+                                                    <tr class="br-1">
+                                                        <td class="br-0 bt-0 bb-0">Employee Name</td>
+                                                        <td class="br-0 bl-0 bt-0 bb-0">:- <input class="inputTrans inpDisable" type="text" value="@(BTF.one[0].EmployeeName)"></td>
+                                                        <td class="br-0 bl-0 bt-0 bb-0"></td>
+                                                        <td class="bl-0 bt-0 bb-0"></td>
+                                                    </tr>
+                                                    <tr class="br-1">
+                                                        <td class="br-0 bb-0 bt-0">Department</td>
+                                                        <td class="br-0 bl-0 bb-0 bt-0">:- <input class="inputTrans inpDisable" type="text" value="@(BTF.one[0].Department)"></td>
+                                                        <td class="br-0 bl-0 bt-0 bb-0"></td>
+                                                        <td class="bl-0 bt-0 bb-0"></td>
+                                                    </tr>
+                                                    <tr class="br-1">
+                                                        <td class="br-0 bb-0 bt-0">Address</td>
+                                                        <td class="br-0 bl-0 bb-0 bt-0"> <textarea class="textTrans inpDisable" name="" id="" cols="60" rows="15">@(BTF.one[0].Address)</textarea></td>
+                                                        <td class="br-0 bl-0 bt-0 bb-0"></td>
+                                                        <td class="bl-0 bt-0 bb-0"></td>
+                                                    </tr>
+                                                    <tr class="br-1">
+                                                        <td class="bb-0 br-0 bt-0">Contact No.</td>
+                                                        <td class="br-0 bl-0 bb-0 bt-0">:- <input class="inputTrans inpDisable" type="text" value="@(BTF.one[0].ContactNumber)"></td>
+                                                        <td class="br-0 bl-0 bt-0 bb-0"></td>
+                                                        <td class="bl-0 bt-0 bb-0"></td>
+                                                    </tr>
+                                                    <tr class="br-1">
+                                                        <td class="bb-0 br-0 bt-0">
+                                                            Transportation Required <br>
+                                                            Yes / No.
+                                                        </td>
+                                                        <td class="bl-0 bb-0 bt-0 br-0">
+                                                            :- <input class="inputTrans inpDisable" type="text" value="@(BTF.one[0].TransportationRequired)">
+                                                        </td>
+                                                        <td class="br-0 bl-0 bt-0 bb-0"></td>
+                                                        <td class="bl-0 bt-0 bb-0"></td>
+                                                    </tr>
+                                                    <tr class="br-1">
+                                                        <td class="br-0 bt-0 bb-0">Distance from Residence <br> to Pickup Point</td>
+                                                        <td class="bl-0 br-0 bt-0 bb-0">:-<input class="inputTrans inpDisable" type="text" value="@(BTF.one[0].Distance)"></td>
+
+                                                        <td class="br-0 bl-0 bt-0 bb-0">Pickup Point</td>
+                                                        <td class="bl-0 bt-0 bb-0">
+                                                            :- <input class="inputTrans inpDisable" type="text" value="@(BTF.one[0].PickupPoint)">
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="br-1">
+                                                        <td class="br-0 bt-0 bb-0">Bus Route Name</td>
+                                                        <td class="bl-0 br-0 bt-0 bb-0">:-<input class="inputTrans inpDisable" type="text" value="@(BTF.one[0].BusRouteName)"></td>
+
+                                                        <td class="br-0 bl-0 bt-0 bb-0">Bus Route No</td>
+                                                        <td class="bl-0 bt-0 bb-0">:-<input class="inputTrans inpDisable" type="text" value="@(BTF.one[0].BusRouteNumber)"></td>
+                                                    </tr>
+                                                    <tr class="br-1">
+                                                        <td class="br-0 bt-0 bb-0">SAVW / Contract Employee</td>
+                                                        <td class="bl-0 br-0 bt-0 bb-0">
+                                                            :-<input class="inputTrans inpDisable" type="text" value="@(BTF.one[0].EmployeeType)">
+                                                        </td>
+                                                        <td class="br-0 bl-0 bt-0 bb-0">Slab</td>
+                                                        <td class="bl-0 bt-0 bb-0">
+                                                            :-<input class="inputTrans inpDisable" type="text" value="@(BTF.one[0].Slab)">
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="br-1">
+                                                        <td class="br-0 bt-0" id=""></td>
+                                                        <td class="bl-0 br-0 bt-0"></td>
+                                                        <td class="br-0 bl-0 bt-0"></td>
+                                                        <td class="bl-0 bt-0"></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <table class="w-100 form-border">
+                                                <tr>
+                                                    <td colspan="4"><b>Authorization by HR</b></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Name: <input type="text" class="inpDisable" name="name" style="width: 250px;" value="@(BTF.three[0].UserName)"></td>
+                                                    <td colspan="2">Approver Comment: <textarea cols="50" rows="15" class="inpDisable textareawidth">@(BTF.three[0].Comment)</textarea></td>
+                                                    <td>Signature: <input class="Signature inpDisable" type="text" style="width: 250px;" value="@(BTF.three[0].ApproverStatus != "Pending" ? (BTF.three[0].ApproverStatus + " on " + Convert.ToDateTime(BTF.two[0].Modified).ToShortDateString() + " " + Convert.ToDateTime(BTF.two[0].Modified).ToShortTimeString()):"")"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="4"><b>Authorization by Admin</b></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Name: <input type="text" name="name" class="inpDisable" style="width: 250px;" value="@(BTF.three[1].UserName)"></td>
+                                                    <td colspan="2">Approver Comment: <textarea cols="50" rows="15" class="inpDisable textareawidth">@(BTF.three[1].Comment)</textarea></td>
+                                                    <td>Signature: <input class="Signature inpDisable" type="text" style="width: 250px;" value="@(BTF.three[1].ApproverStatus != "Pending" ? (BTF.three[1].ApproverStatus + " on " + Convert.ToDateTime(BTF.two[1].Modified).ToShortDateString() + " " + Convert.ToDateTime(BTF.two[1].Modified).ToShortTimeString()):"")"></td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <table class="detail-sec-p">
+                                    <tr>
+                                        <td class="text-center">SF_SO/1_021.00</td>
+                                    </tr>
+                                </table>
+                                }
+                                @if (IsNew)
+                                {
+                                    if (!IsEdit)
+                                    {
+                                    <div class="card-footer align-content-center">
+                                        <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                                            Re-Submit
+                                        </button>
+                                        <button type="reset" class="btn btn-danger btn-sm cancl-btn">
+                                            Cancel
+                                        </button>
+                                    </div>
+                                    }
+                                    else
+                                    {
+                                    <div class="card-footer align-content-center">
+                                        <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                                            Submit
+                                        </button>
+                                        <button type="reset" class="btn btn-danger btn-sm cancl-btn">
+                                            Cancel
+                                        </button>
+                                    </div>
+                                    }
+                                }
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</body>
+
+<div class="modal fade" id="successModel" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header modelHeader">
+                <span class="modal-title modalMsgTitle" id="modalTitle"></span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label id="modalBody" class="lableMsg"></label>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="submitBomBtn publishBtn" id="modalOkButton">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var IsNew = @Html.Raw(Json.Encode(IsNew));
+    var IsEdit = @Html.Raw(Json.Encode(IsEdit));
+    var BTF = @Html.Raw(Json.Encode(BTF));
+    var appRowId = @Html.Raw(Json.Encode(AppRowId));
+    var approvalType =@Html.Raw(Json.Encode(ApprovalType));
+    var IsValidityCheck = @Html.Raw(Json.Encode(IsValidityCheck));
+    var FlagRedirect = @Html.Raw(Json.Encode(FlagRedirect));
+    var spinner = $('#loader');
+    pageLoad();
+
+    function pageLoad() {
+        spinner.hide();
+        var data = "";
+        if (!IsNew) {
+            //AreaSubArea();
+            $(".inpDisable").attr("disabled", "disabled");
+        }
+        if (!IsNew) {
+            $(".drpDisable").attr("disabled", "disabled");
+        }
+        if (IsNew) {
+            if (!IsEdit) {
+                GetRoute();
+                GetApprovers();
+            }
+            else {
+                func();
+                GetRoute();
+                GetApprovers();
+            }
+        }
+    };
+
+    function successModal(txt) {
+        ////
+        $('#modalTitle').html('Success');
+        if (txt == "approve") {
+            $('#modalBody').html('Form has been approved!');
+        }
+        else if (txt == "reject") {
+            $('#modalBody').html('Form has been rejected!');
+        }
+        else if (txt == "enquire") {
+            $('#modalBody').html('Form has been enquired!');
+        }
+        else if (txt == "cancelled") {
+            $('#modalBody').html('Form has been cancelled!');
+        }
+        else {
+            $('#modalBody').html('Your form with ID: BTF' + txt + ' has been submitted! Kindly use this for future reference');
+            
+        }
+        FlagRedirect = txt;
+        //$('#modalBody').html('Your form has been submitted!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    $("#modalOkButton").on('click', function () {
+        ////
+        if (FlagRedirect != null) {
+            window.location = "../Dashboard";
+        }
+    });
+
+    function failureModal() {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html('Some error occurred!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function requiredModal(text) {
+        $('#modalTitle').html('Required!');
+        $('#modalBody').html(text);
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function mobileLengthModal() {
+        $('#modalTitle').html('Required');
+        $('#modalBody').html('Please enter a 10-Digit Mobile No.!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function func() {
+        ////
+        var name = document.getElementById("txtEmployeeName");
+        var department = document.getElementById("txtDepartment");
+        var txtEmployeeNumber = document.getElementById("txtEmployeeNumber");
+
+        name.value = "@currentUser.FirstName"+ " " + "@currentUser.LastName";
+        department.value = "@currentUser.Department";
+        txtEmployeeNumber.value = "@currentUser.EmpNumber";
+    }
+
+    function allowNumbersOnly(e) {
+        var code = (e.which) ? e.which : e.keyCode;
+        if (code > 31 && (code < 48 || code > 57)) {
+            e.preventDefault();
+        }
+    } 
+
+    function GetRoute() {
+        ////
+        if (IsNew) {
+            if (!IsEdit) {
+                //
+                var value = JSON.stringify(BTF[0]);
+                var value_1 = JSON.parse(value);
+                var selectedPickupPoint = value_1.Value[0].BusRouteName;
+                console.log(selectedPickupPoint);
+
+                $.ajax({
+                    url: '/BusTransportation/RouteMaster',
+                    type: 'GET',
+                    data: {},
+                    dataType: 'JSON',
+                    success: (function (data) {
+                        //locdata = data;
+
+                        //console.log(data);
+                        var s = '<option value="-1" disabled>Please Select Pickup Point</option>';
+                        //var s = null
+                        for (var i = 0; i < data.length; i++) {
+                            if (data[i].BusRouteName == selectedPickupPoint) {
+                                s += '<option value="' + data[i].BusRouteName + '" ' + ' id="' + data[i].BusRouteName + '" selected>' + data[i].BusRouteName + '</option>';
+                            }
+                            else {
+                                s += '<option value="' + data[i].BusRouteName + '" ' + ' id="' + data[i].BusRouteName + '">' + data[i].BusRouteName + '</option>';
+                            }
+                        }
+                        $("#drpPickupPoint").html(s);
+
+
+                    }),
+                    error: (function (data) {
+                        //code
+                    })
+                })
+            }
+            else {
+                $.ajax({
+                    url: '/BusTransportation/RouteMaster',
+                    type: 'GET',
+                    data: {},
+                    dataType: 'JSON',
+                    success: (function (data) {
+                        locdata = data;
+
+                        //console.log(data);
+                        var s = '<option value="-1" selected disabled>Please Select Pickup Point</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            s += '<option value="' + data[i].BusRouteName + '" ' + ' id="' + data[i].BusRouteName + '">' + data[i].BusRouteName + '</option>';
+                        }
+                        $("#drpPickupPoint").html(s);
+
+
+                    }),
+                    error: (function (data) {
+                        //code
+                    })
+                })
+            }
+
+        }
+    }
+
+    function GetApprovers() {
+        $.ajax({
+            url: '/BusTransportation/GetBusTransportationFormApprovalList',
+            type: 'GET',
+            data: {},
+            dataType: 'JSON',
+            success: (function (data) {
+                ////
+                approverData = data;
+                console.log(data);
+                var row = "";
+                for (var i = 0; i < data.length; i++) {
+                    row += '<input type="hidden" id="hidden' + data[i].Department + 'Approver" name="hidden' + data[i].Department + 'Approver" value="' + data[i].ApproverEmailId + '">';
+                }
+                $("#hiddenApproverInformation").html(row);
+
+            }),
+            error: (function (data) {
+                //code
+            })
+        })
+
+    }
+
+    $("#btnSubmit").on('click', function (e) {
+        //
+
+        var employeeType = $("#drpEmployeeType option:selected").val();
+        var empName = document.getElementById("txtEmployeeName").value;
+        var empNo = document.getElementById("txtEmployeeNumber").value;
+        var empDept = document.getElementById("txtDepartment").value;
+        var empAddress = document.getElementById("txtAddress").value;
+        var empContact = $("#txtContactNumber").val().length;
+        var distance = document.getElementById("txtDistance").value;
+        var routeName = document.getElementById("txtBusRouteName").value;
+        var routeNumber = document.getElementById("txtBusRouteNumber").value;
+        var slab = document.getElementById("txtSlab").value;
+        var transprotRequired = $("#drpTransportationRequired option:selected").val();        
+        var pickupPoint = $("#drpPickupPoint option:selected").val();
+
+        if (employeeType == -1) {
+            requiredModal("Please select the Employee Type");
+            return false;
+        }
+
+        if (transprotRequired == -1) {
+            requiredModal("Please choose if you require transportation");
+            return false;
+        }
+
+        if (pickupPoint == -1) {
+            requiredModal("Please select the Pickup Point");
+            return false;
+        }
+
+        if (empName == "") {
+            requiredModal("Please enter the Employee Name");
+            return false;
+        }
+
+        if (empDept == "") {
+            requiredModal("Please enter the Employee Department");
+            return false;
+        }
+
+        if (empNo == "") {
+            requiredModal("Please enter the Employee Number");
+            return false;
+        }
+
+        if (empAddress == "") {
+            requiredModal("Please enter the Employee Address");
+            return false;
+        }
+
+        if (empContact < 10 || empContact > 10) {
+            mobileLengthModal();
+            return false;
+        }
+
+        if (distance == "") {
+            requiredModal("Please enter the Distance");
+            return false;
+        }
+
+        if (routeName == "") {
+            requiredModal("Please enter the Route Name");
+            return false;
+        } 
+
+        if (routeNumber == "") {
+            requiredModal("Please enter the Route Number");
+            return false;
+        }
+
+        if (slab == "") {
+            requiredModal("Please enter the Slab");
+            return false;
+        }
+
+        var form = $("#BTForm").serialize();
+        $.ajax({
+            url: '/BusTransportation/SaveBusTransportationForm',
+            type: 'POST',
+            data: form,
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data[0].Value == 1) {
+                    //
+                    successModal(data[1].Value);
+                    $("#BTForm").trigger("reset");
+                }
+                else {
+                    failureModal();
+                    $("#BTForm").trigger("reset");
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+                $("#BTForm").trigger("reset");
+            })
+        })
+    });
+
+    function saveResponse(text) {
+        var status = '', comment = '';
+        comment = $("#comment-" + text).val();
+        switch (text) {
+            case 'approve': {
+                status = 'Approved';
+                break;
+            }
+            case 'reject': {
+                status = 'Rejected';
+                if (comment == '') {
+                    validityModal(text);
+                    //alert("Please type in the reason for rejecting the form");
+                    return;
+                }
+                break;
+            }
+            case 'enquire': {
+                status = 'Enquired';
+                if (comment == '') {
+                    validityModal(text);
+                    return;
+                }
+                break;
+            }
+        }
+        spinner.show();
+        $.ajax({
+            url: '/List/SaveResponse',
+            type: 'POST',
+            data: { response: status, appRowId: appRowId, comment: comment, approvalType: approvalType },
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data == 1) {
+                    successModal(text);
+                    if (!IsValidityCheck) {
+                        ValidityUpdate();
+                    }
+                    $("#BTForm").trigger("reset");
+                    //FilterMyTasks(0, 0);
+                    setTimeout(FilterMyTasks, 8000)
+                    //setTimeout(ReloadMyTasks, 8000)
+                    spinner.hide();
+                }
+                else {
+                    failureModal();
+                    $("#BTForm").trigger("reset");
+                    spinner.hide();
+                }
+                ////
+                //setTimeout(FilterMyTasks(0, 0), 8000);
+                //window.location.reload();
+            }),
+            error: (function (data) {
+                failureModal();
+                $("#BTForm").trigger("reset");
+                spinner.hide();
+            })
+        })
+
+        return false;
+
+    }
+    
+</script>

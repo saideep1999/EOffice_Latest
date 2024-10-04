@@ -1,0 +1,709 @@
+﻿
+@model Skoda_DCMS.Models.DashboardModel
+@{
+    ViewBag.Title = "Report Dashboard";
+    //Layout = "~/Views/Shared/_Layout.cshtml";
+    var user = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    var pvToBeRendered = Model.Data.PartialViewName;
+    var UniqueFormName = Model.Data.UniqueFormName;
+    var UniqueFormId = Model.Data.FormParentId;
+    var FormName = Model.Data.FullFormName;
+}
+<link href="~/Content/c3.css" rel="stylesheet" />
+<script src="~/Scripts/c3.min.js"></script>
+<script src="~/Scripts/d3.min.js"></script>
+<style>
+
+    .c3-chart-arc text {
+        display: none;
+    }
+
+    #btnClr {
+        height: 40px;
+        width: 100%;
+    }
+
+    div.input-block {
+        position: relative;
+    }
+
+        div.input-block input {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #495055;
+            width: 100%;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+
+        div.input-block span.placeholder {
+            position: absolute;
+            margin: 17px 0;
+            padding: 0 4px;
+            font-family: Roboto, sans-serif;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            top: -6px;
+            left: 15px;
+            transition: all 0.2s;
+            transform-origin: 0% 0%;
+            background: none;
+            pointer-events: none;
+        }
+
+
+        div.input-block textarea:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background: #fff;
+        }
+
+        div.input-block input:valid + span.placeholder,
+        div.input-block input:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background: #fff;
+        }
+
+        div.input-block input:read-only + span.placeholder,
+        div.input-block input:read-only + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background: #fff;
+        }
+
+    div.inputSelect span.placeholder {
+        position: absolute;
+        margin: 13px 0;
+        padding: 0 4px;
+        font-family: Roboto, sans-serif;
+        color: #000;
+        display: flex;
+        align-items: center;
+        font-size: 1rem;
+        top: -6px;
+        left: 15px;
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+        background: none;
+        pointer-events: none;
+    }
+
+    div.inputSelect select:focus + span.placeholder {
+        transform: scale(0.8) translateY(-30px);
+        background: #fff;
+        z-index: 9;
+    }
+
+    div.inputSelect select:not([value=""]):valid + span.placeholder {
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+    }
+
+
+
+
+    div.input-block input:focus + span.placeholder {
+        color: #284B63;
+    }
+
+    .nav-tabs {
+        border-bottom: 1px solid #ddd;
+    }
+
+        .nav-tabs .nav-link:focus, .nav-tabs .nav-link:hover {
+            background-color: #043b64 !important;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .project-tab #tabs .nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {
+            color: #fff;
+            background-color: #043b64;
+            border-color: transparent transparent #f3f3f3;
+            font-weight: bold;
+        }
+
+
+    .dropdown-toggle::after {
+        display: none;
+        width: 0;
+        height: 0;
+        margin-left: .255em;
+        vertical-align: .255em;
+        content: "";
+        border-top: .3em solid;
+        border-right: .3em solid transparent;
+        border-bottom: 0;
+        border-left: .3em solid transparent;
+    }
+
+    select.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-20px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    .squareBorder {
+        cursor: pointer;
+    }
+
+    .w150 {
+        width: 150px;
+    }
+
+    .cancl-btn:hover {
+        background-image: none !important;
+    }
+
+    .cancl-btn:focus {
+        outline: none !important;
+        box-shadow: none !important;
+    }
+
+    .cancl-btn {
+        background-image: none !important;
+    }
+</style>
+<script type="text/javascript">
+
+    function checkSelect(id) {
+        if ($('#' + id).val() != '') {
+            $('#' + id).addClass('spanUpperSide');
+        }
+    }
+</script>
+<div class="container body">
+    <div class="main_container">
+        <div class="modal fade" id="myModal" role="dialog">
+            <div class="modal-dialog modal-xl">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header modal_header_block">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="viewForm"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- top navigation -->
+        <!-- page content -->
+        <div class="right_col" role="main">
+            <div class="eform-container container">
+
+                <div class="breadcrumb-container">
+                    <div>
+                        <ol class="breadcrumb">
+                            @for (int i = 0; i < Model.Data.BreadCrumbs.Count; i++)
+                            {
+                                <li>
+                                    @if (i == Model.Data.BreadCrumbs.Count - 1)
+                                    {
+                                        @Model.Data.BreadCrumbs[i].Key
+                                    }
+                                    else
+                                    {
+                                        <a href="@Model.Data.BreadCrumbs[i].Value">
+                                            @Model.Data.BreadCrumbs[i].Key
+                                        </a>
+                                    }
+                                </li>
+                            }
+
+                        </ol>
+                    </div>
+                </div>
+                <div class="form-main-container">
+                    <div class="row topContent">
+                        <div class="col-lg-9 col-md-7 padd_space">
+                            <i class="fa fa-signal"></i>
+                            @for (int i = 0; i < Model.Data.BreadCrumbs.Count; i++)
+                            {
+
+                                if (i == Model.Data.BreadCrumbs.Count - 1)
+                                {
+                                    @Model.Data.BreadCrumbs[i].Key
+                                }
+                                //if (Model.Data.Forms.Count != 0)
+                                //{
+                                //    UniqueFormName = Model.Data.Forms[0].UniqueFormName;
+                                //    UniqueFormId = Model.Data.Forms[0].FormParent.Id;
+                                //    FormName = Model.Data.Forms[0].FormName;
+                                //}
+                            }
+                        </div>
+
+                    </div>
+                </div>
+                <br />
+
+
+                <br />
+                <div class="container">
+                    <form class="row topForm">
+                        <div class="col-sm-2 col-md-2 col-12 inputSelect">
+                            <select class="form-control squareBorder spanUpperSide" name="ListForm" id="ListForm" onchange="GetMyReportFilter();GetGraphFilter();checkSelect('ListForm')"></select>
+                            <span class="placeholder" for="type">Form Name</span>
+                        </div>
+                        <div class="col-sm-2 col-md-2 col-12 inputSelect">
+
+                            <select class="form-control squareBorder" id="status" onchange="GetMyReportFilter();GetGraphFilter(); checkSelect('status')">
+                                <option value="" style="display:none"></option>
+                                <option value="">All</option>
+                                <option value="Submitted">Submitted</option>
+                                <option value="Approved">Approved</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Rejected">Rejected</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                            <span class="placeholder" for="type">Status </span>
+                        </div>
+                        <div class="col-sm-2 col-md-2 col-12 inputSelect">
+                            <select name="location" class="form-control squareBorder " id="location" onchange="GetMyReportFilter();GetGraphFilter();checkSelect('location')"></select>
+                            <span class="placeholder">Location</span>
+                        </div>
+                        <div class="col-sm-2 col-md-2 col-12 input-block">
+                            <input type="date" id="fromDate" name="fromDate" onchange="date_val(this.value)" class="form-control squareBorder">
+                            <span class="placeholder">From Date</span>
+                        </div>
+                        <div class="col-sm-2 col-md-2 col-12 input-block">
+                            <input type="date" id="DateRange" name="DateRange" class="form-control squareBorder" onchange="GetMyReportFilter();GetGraphFilter();">
+                            <span class="placeholder">To Date</span>
+                        </div>
+                        <div class="col-sm-1 col-md-1 col-12">
+                            <button type="button" class="btn btn-success btn-sm cancl-btn" id="btnClr" name="btnClr">CLEAR</button>
+                        </div>
+                    </form>
+
+                </div>
+
+                <div class="form-main-container">
+
+                    <div class="py-3">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <!-- <li class="ml-2">&nbsp;</li> -->
+                            <li class="nav-item active text-center w150" id="reportExcel">
+                                <a class="nav-link active" data-toggle="tab" href="#report" aria-expanded="true">Report </a>
+                            </li>
+                            <li class="nav-item w150 text-center" id="grpah">
+                                <a class="nav-link" data-toggle="tab" href="#graphical" aria-expanded="false">Pie Chart </a>
+                            </li>
+                            <li class="nav-item w150 text-center" id="grpahbarChart">
+                                <a class="nav-link" data-toggle="tab" onclick="fn_barChart()" href="#graphicalbarChart" aria-expanded="false">Bar Chart </a>
+                            </li>
+                            <li class="nav-item w150 text-center" id="grpahdonutChart">
+                                <a class="nav-link" data-toggle="tab" onclick="fn_donutChart()" href="#graphicaldonutChart" aria-expanded="false">Donut Chart </a>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content">
+                            <div class="form-main-container tab-pane active in" id="report">
+
+                                <div>
+                                    <div class="form-status-table" id="myReportTableView">
+                                        @{
+
+                                            Html.RenderPartial(pvToBeRendered, Model);
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Grapgical chart -->
+                            <div class="container tab-pane fade" id="graphical">
+
+                                <div id="pieChart"></div>
+
+                                <!--End Grapgical chart -->
+                            </div>
+
+                            <div class="container tab-pane fade" id="graphicalbarChart">
+
+                                <div id="barChart"></div>
+                                <!--End Grapgical chart -->
+                            </div>
+
+                            <div class="container tab-pane fade" id="graphicaldonutChart">
+                                <div id="donut"></div>
+                                <!--End Grapgical chart -->
+                            </div>
+
+                        </div>
+                    </div>
+                    <br />
+
+                </div>
+            </div>
+            <!-- /Add new process -->
+        </div>
+    </div>
+</div>
+
+
+
+<!-- .delegation -->
+<div class="modal fade" id="MydelList">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="w-100 d-flex">
+                    <h2 class="mb-0">Delegation</h2>
+                    <button type="button" class="close" data-dismiss="modal">
+                        ×
+                    </button>
+                </div>
+
+
+            </div>
+            <div class="modal-body">
+
+                @{
+                    Html.RenderPartial("DelegationList");
+                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger btn-sm cancl-btn" data-dismiss="modal">
+                    Close
+                </button>
+                @*<button type="button" class="btn btn-primary btn-sm submit-btn">
+                        Ok
+                    </button>*@
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- .Reset Password -->
+<div class="modal fade" id="ChangePassword">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="w-100 d-flex">
+                    <h2 class="mb-0">Password Change</h2>
+                    <button type="button" class="close" data-dismiss="modal">
+                        ×
+                    </button>
+                </div>
+
+
+            </div>
+            <div class="modal-body">
+
+                @{
+                    Html.RenderPartial("PasswordChange");
+                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger btn-sm cancl-btn" data-dismiss="modal">
+                    Close
+                </button>
+                @*<button type="button" class="btn btn-primary btn-sm submit-btn">
+                        Ok
+                    </button>*@
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var arrayForChartData = [];
+    var objectForChartData = {};
+    $(document).ready(function () {
+        ////
+        $(".nav-upper-options .TabActive").removeClass("TabActive");
+        $(".nav-upper-options .option3").addClass("TabActive");
+
+        //if (!$.fn.DataTable.isDataTable('#dtReportTable')) {
+        //    $('#dtReportTable').dataTable({
+        //        "bPaginate": true,
+        //        "bLengthChange": true,
+        //        "bFilter": true,
+        //        "bInfo": false,
+        //        "responsive": true,
+        //        "oLanguage": { "sSearch": "" },
+        //        "bAutoWidth": false,
+        //        language: {
+        //            searchPlaceholder: "Search",
+        //            paginate: {
+        //                next: '&#8811;', // or '→'
+        //                previous: '&#8810;' // or '←'
+        //            }
+        //        },
+        //        columnDefs: [{ type: 'date', 'targets': [5] }],
+        //        order: [[5, 'desc']],
+        //    });
+        //}
+        $.ajax({
+            type: "GET",
+            url: "/List/GetServiceDeskLocations",
+            contentType: "application/json; charset=utf-8",
+            datatype: 'json',
+            cache: false,
+            async: false,
+            success: function (data) {
+                console.log("Hi=" + data);
+                var s = '<option value="" selected="" style="display:none;"></option>';
+                for (var i = 0; i < data.length; i++) {
+                    s += '<option value="' + data[i].LocationName + '">' + data[i].LocationName + '</option>';
+                }
+                $("#location").html(s);
+            },
+            error: function () {
+
+            }
+        });
+
+
+        var formName = $("#ListForm").val();
+        $.ajax({
+            type: "GET",
+            url: "/Dashboard/PieChart",
+            data: { formName: formName },
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                successFunc(response);
+            },
+        });
+        function successFunc(jsondata) {
+            console.log(jsondata);
+            var data = {};
+            var FormStatuss = [];
+            jsondata.forEach(function (e) {
+                FormStatuss.push(e.FormStatus);
+                data[e.FormStatus] = e.FormCount;
+            })
+            arrayForChartData = FormStatuss;
+            objectForChartData = data;
+            var chart = c3.generate({
+                bindto: '#pieChart',
+                data: {
+                    json: [data],
+                    keys: {
+                        value: FormStatuss,
+                    },
+                    type: 'pie',
+                },
+                color: {
+                    pattern: ['#007bff', '#28a745', '#fd7e14', '#dc3545', '#6f42c1']
+                },
+                //pie: {
+                //    label: {
+                //        format: function (value, ratio, id) {
+                //            return value;
+                //        }
+                //    }
+                //}
+            });
+        }
+
+        $.ajax({
+            url: '/Dashboard/GetFormsList',
+            type: 'GET',
+            data: {},
+            dataType: 'JSON',
+            success: (function (data) {
+
+                var s = '<option value=""><option value="-1" selected>All</option>';
+                for (var i = 0; i < data.Forms.length; i++) {
+                    s += '<option value="' + data.Forms[i].UniqueFormName + '" UniqueFormName="' + data.Forms[i].UniqueFormName + '"' + '>' + data.Forms[i].FormName + '</option>';
+                }
+                $("#ListForm").html(s);
+
+            }),
+            error: (function (data) {
+                //code
+            })
+        })
+    });
+
+    function GetGraphFilter(e) {
+        ////
+        var formName = $("#ListForm option:selected").text();
+        var status = $("#status").val();
+        var fromDate = $("#fromDate").val();
+        var toDate = $("#DateRange").val();
+        var location = $("#location").val();
+        $.ajax({
+            type: "GET",
+            url: "/Dashboard/PieChart",
+            data: { formName: formName, fromDate: fromDate, toDate: toDate, status: status, location: location },
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                successFunc(response);
+            },
+        });
+        function successFunc(jsondata) {
+            ////
+            console.log(jsondata);
+            var data = {};
+            var FormStatuss = [];
+            jsondata.forEach(function (e) {
+                FormStatuss.push(e.FormStatus);
+                data[e.FormStatus] = e.FormCount;
+            })
+            var chart = c3.generate({
+                bindto: '#pieChart',
+                data: {
+                    json: [data],
+                    keys: {
+                        value: FormStatuss,
+                    },
+                    type: 'pie',
+                },
+                color: {
+                    pattern: ['#007bff', '#28a745', '#fd7e14', '#dc3545', '#6f42c1']
+                },
+                //pie: {
+                //    label: {
+                //        format: function (value, ratio, id) {
+                //            return value;
+                //        }
+                //    }
+                //}
+            });
+        }
+    }
+
+    function GetMyReportFilter(e) {
+        var formName = $("#ListForm").val();
+        var department = "";
+        var status = $("#status").val();
+        var fromDate = $("#fromDate").val();
+        var toDate = $("#DateRange").val();
+        var location = $("#location").val();
+
+        $("#myReportTableView").html("");
+        //$('#dtReportTable').dataTable().fnDestroy();
+        $.ajax({
+            url: '/Dashboard/GetMyReportFilter',
+            type: 'GET',
+            dataType: 'html',
+            data: { formName: formName, fromDate: fromDate, toDate: toDate, status: status, location: location },
+            success: (function (data) {
+                $('#dtReportTable').dataTable().fnDestroy();
+                MyReportTable();
+                $("#myReportTableView").html(data);
+
+            }),
+            error: (function (data) {
+                console.log("There was an issue while refreshing the table. Please reload the page");
+            })
+        })
+    }
+
+    function MyReportTable() {
+        $('#dtReportTable').dataTable({
+            "bPaginate": true,
+            "bLengthChange": true,
+            "bFilter": true,
+            "bInfo": false,
+            "responsive": true,
+            "oLanguage": { "sSearch": "" },
+            "bAutoWidth": false,
+            language: {
+                searchPlaceholder: "Search",
+                paginate: {
+                    next: '&#8811;', // or '→'
+                    previous: '&#8810;' // or '←'
+                }
+            },
+            columnDefs: [{ type: 'date', 'targets': [5] }],
+            order: [[5, 'desc']],
+        });
+    }
+
+    $('#btnClr').on('click', function () {
+        $("#ListForm").val('-1');
+        $("#status").val('');
+        $("#fromDate").val('');
+        $("#DateRange").val('');
+        $("#location").val('');
+        GetMyReportTab();
+    });
+
+    function date_val(e) {
+        var week_string = e;
+        console.log(week_string);
+        var parts = week_string.split("-");
+        var date = new Date(parts[0], parts[1] - 1, parts[2]);
+        var min_date = date;
+        min_date.setDate(min_date.getDate() + 1);
+        var initial_date = min_date.toISOString().split('T')[0];
+        document.getElementsByName("DateRange")[0].setAttribute("min", initial_date);
+    }
+
+    function fn_barChart() {
+
+
+        var chart = c3.generate({
+            bindto: '#barChart',
+            data: {
+                json: [objectForChartData],
+                keys: {
+                    value: arrayForChartData,
+                },
+                type: 'bar',
+            },
+            color: {
+                pattern: ['#007bff', '#28a745', '#fd7e14', '#dc3545', '#6f42c1']
+            },
+        });
+    }
+
+    function fn_pieChart() {
+
+        var chart = c3.generate({
+            bindto: '#pieChart',
+            data: {
+                json: [objectForChartData],
+                keys: {
+                    value: arrayForChartData,
+                },
+                type: 'pie',
+            },
+            color: {
+                pattern: ['#007bff', '#28a745', '#fd7e14', '#dc3545', '#6f42c1']
+            },
+            //pie: {
+            //    label: {
+            //        format: function (value, ratio, id) {
+            //            return value;
+            //        }
+            //    }
+            //}
+        });
+    }
+    function fn_donutChart() {
+        var chart = c3.generate({
+            bindto: '#donut',
+            data: {
+                json: [objectForChartData],
+                keys: {
+                    value: arrayForChartData,
+                },
+                type: 'donut',
+            },
+            color: {
+                pattern: ['#007bff', '#28a745', '#fd7e14', '#dc3545', '#6f42c1']
+            },
+            //pie: {
+            //    label: {
+            //        format: function (value, ratio, id) {
+            //            return value;
+            //        }
+            //    }
+            //}
+        });
+    }
+</script>
+

@@ -1,0 +1,234 @@
+﻿@model Skoda_DCMS.Models.DashboardModel
+@{
+    ViewBag.Title = "Admin Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var user = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    var pvToBeRendered = Model.Data.PartialViewName;
+    var UniqueFormName = Model.Data.UniqueFormName;
+    var UniqueFormId = Model.Data.FormParentId;
+    var FormName = Model.Data.FullFormName;
+}
+
+<div class="container body">
+    <div class="main_container">
+        <div class="modal fade" id="myModal" role="dialog">
+            <div class="modal-dialog modal-dialog-width">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header modal_header_block">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="viewForm"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- top navigation -->
+        <!-- page content -->
+        <div class="right_col" role="main">
+            <div class="eform-container container">
+
+                <div class="breadcrumb-container">
+                    <div>
+                        <ol class="breadcrumb">
+                            @for (int i = 0; i < Model.Data.BreadCrumbs.Count; i++)
+                            {
+                                <li>
+                                    @if (i == Model.Data.BreadCrumbs.Count - 1)
+                                    {
+                                        @Model.Data.BreadCrumbs[i].Key
+                                    }
+                                    else
+                                    {
+                                        <a href="@Model.Data.BreadCrumbs[i].Value">
+                                            @Model.Data.BreadCrumbs[i].Key
+                                        </a>
+                                    }
+                                </li>
+                            }
+                            @*<li class="active">@Model.Data.BreadCrumbTitleFirst</li>*@
+                        </ol>
+                    </div>
+                </div>
+                <div class="form-main-container">
+                    <div class="row topContent">
+                        <div class="col-lg-9 col-md-7 padd_space">
+
+                            @for (int i = 0; i < Model.Data.BreadCrumbs.Count; i++)
+                            {
+
+                                if (i == Model.Data.BreadCrumbs.Count - 1)
+                                {
+                                    @Model.Data.BreadCrumbs[i].Key
+                                }
+                                if (Model.Data.Forms.Count != 0)
+                                {
+                                    UniqueFormName = Model.Data.Forms[0].UniqueFormName;
+                                    UniqueFormId = Model.Data.Forms[0].FormParent.Id;
+                                    FormName = Model.Data.Forms[0].FormName;
+
+                                }
+                            }
+                        </div>
+                        <div class="col-lg-3 col-md-7 padd_space float-right text-right">
+                            HR  | ABC
+                        </div>
+
+
+                    </div>
+                </div>
+                <br />
+                <div class="container">
+                    <select class="formList" name="ListForm" id="ListForm" onchange="GetMyReportFilter()"></select>
+                </div>
+
+                <br />
+                <div class="form-main-container">
+
+                    <div class="py-3">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <!-- <li class="ml-2">&nbsp;</li> -->
+                            <li class="nav-item">
+                                <a class="nav-link active" data-toggle="tab" href="#Master1" role="tab">Master 1</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#Master2" role="tab">Master 2</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#Master3" role="tab">Master 3</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#Master4" role="tab">Master 4</a>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content">
+                            <div class="form-main-container tab-pane active in" id="Master1">
+
+                                <div>
+                                    <div class="form-status-table" id="Master1View">
+                                        @{
+
+                                            Html.RenderPartial("AdminMaster1View", Model);
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="Master2">
+                                
+                            </div>
+
+                            <div id="Master3">
+                                
+                            </div>
+
+                            <div id="Master4">
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /Add new process -->
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        ////
+        $('#dtAdminMaster1').dataTable({
+            "bPaginate": true,
+            "bLengthChange": true,
+            "bFilter": true,
+            "bInfo": false,
+            "order": [[5, 'desc']],
+            "responsive": true,
+            columnDefs: [
+                { type: 'date-dd-mm-yyyy', targets: 5 }
+            ],
+            "oLanguage": { "sSearch": "" },
+            "bAutoWidth": false,
+            language: {
+                searchPlaceholder: "Search",
+                paginate: {
+                    next: '&#8811;', // or '→'
+                    previous: '&#8810;' // or '←'
+                }
+            },
+        });
+
+        $.ajax({
+            url: '/Dashboard/GetFormsList',
+            type: 'GET',
+            data: {},
+            dataType: 'JSON',
+            success: (function (data) {
+
+                var s = '<option value="-1">Form List</option>';
+                for (var i = 0; i < data.Forms.length; i++) {
+                    s += '<option value="' + data.Forms[i].UniqueFormName + '" UniqueFormName="' + data.Forms[i].UniqueFormName + '"' + '>' + data.Forms[i].FormName + '</option>';
+                }
+                $("#ListForm").html(s);
+
+            }),
+            error: (function (data) {
+                //code
+            })
+        })
+
+    });
+
+    function GetMyReportFilter(e) {
+        //
+        var formName = $("#ListForm").val();
+        var department = "";
+        var status = $("#status").val();
+        var Created = $("#DateRange").val();
+        var location = $("#location").val();
+
+        $("#Master1View").html("");
+        $('#dtAdminMaster1').dataTable().fnDestroy();
+        $.ajax({
+            url: '/Dashboard/GetMyAdminFilter',
+            type: 'GET',
+            dataType: 'html',
+            data: { formName: formName, Created: Created, status: status, location: location },
+            success: (function (data) {
+                $('#dtAdminMaster1').dataTable().fnDestroy();
+                $("#Master1View").html(data);
+                MyReportTable();
+            }),
+            error: (function (data) {
+                console.log("There was an issue while refreshing the table. Please reload the page");
+            })
+        })
+    }
+
+    function MyReportTable() {
+        $('#dtAdminMaster1').dataTable({
+            "bPaginate": true,
+            "bLengthChange": true,
+            "bFilter": true,
+            "bInfo": false,
+            "order": [[5, 'desc']],
+            "responsive": true,
+            columnDefs: [
+                { type: 'date-dd-mm-yyyy', targets: 5 }
+            ],
+            "oLanguage": { "sSearch": "" },
+            "bAutoWidth": false,
+            language: {
+                searchPlaceholder: "Search",
+                paginate: {
+                    next: '&#8811;', // or '→'
+                    previous: '&#8810;' // or '←'
+                }
+            },
+        });
+    }
+
+</script>

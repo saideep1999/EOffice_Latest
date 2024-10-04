@@ -1,0 +1,663 @@
+﻿@model dynamic
+@{
+    ViewBag.Title = "Reissue ID Card Form";
+    var user = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    bool IsNew = true;
+    bool IsEdit = true;
+    dynamic RIDC = null;
+    Layout = ViewBag.Layout;
+    int RowId = 0, FormId = 0, AppRowId = 0, ApprovalType = 0;
+    List<Skoda_DCMS.Models.ApprovalDataModel> appList = new List<Skoda_DCMS.Models.ApprovalDataModel>();
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IsNew = ViewBag.IsNew;
+        IsEdit = ViewBag.IsEdit;
+        RIDC = ViewBag.Model;
+        RowId = ViewBag.RowId;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+        appList = ViewBag.Model?.three as List<Skoda_DCMS.Models.ApprovalDataModel>;
+    }
+}
+
+
+<!DOCTYPE html>
+<html>
+<head>
+
+    <style type="text/css">
+        *:visited, *:focus {
+            box-shadow: none;
+        }
+
+        input, select, input:focus, select:focus, textarea, textarea:focus {
+            border: 1px solid #000;
+        }
+
+        input, textarea {
+            padding: 5px;
+        }
+
+        .asset {
+            border: 1px solid black;
+            height: 20px;
+        }
+
+        .signature-table thead td {
+            border-bottom: 1px solid black;
+            border-left: 1px solid black;
+            border-collapse: collapse;
+        }
+
+        .signature-table tbody, .signature-table td {
+            border: none;
+            border-left: 1px solid black;
+            border-collapse: collapse;
+            padding: 5px;
+        }
+
+            .signature-table td:first-child {
+                border-left: none;
+            }
+
+        .signature-table {
+            border: 1px solid black;
+        }
+
+        @@font-face {
+            font-family: 'SKODANext-Black';
+            src: url('../../fonts/SKODANextfont/SKODANext-Black.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Bold.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Light.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Regular.ttf') format('truetype');
+        }
+
+        body {
+            font-family: 'SKODANext-Black';
+        }
+
+        .form_lbl {
+            color: #000;
+            font-weight: 600;
+        }
+
+        #formlbl {
+            width: 250px;
+        }
+
+        label {
+            font-family: "Trebuchet MS", Verdana, Halvetica, Arial;
+            font-size: 20px;
+            font-weight: normal;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+            table td,th {
+                padding-left: 10px;
+            }
+    </style>
+
+</head>
+<body>
+
+    <table style="width: 100%; font-size: 14px; color: #000; font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+        <tr>
+            <td>
+                <table style="width: 100%;" cellspadding="0" cellspacing="0">
+                    <tr>
+                        <td colspan="6" width="60%" style="text-align: right;">
+                            <img style="width: 50%;" src='@Server.MapPath("~/assets/img/SAVWIPL_Merger_Logo.JPG")'>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="6" align="center">
+                <h2 style="font-weight:bold"> SAVWIPL - Reissue ID Card </h2>
+            </td>
+        </tr>
+
+        <tr>
+            <td style="padding: 15px;">
+                <table cellspacing="0" border="" cellpadding="0" width="100%">
+                    @*@if (RIDC.one[0].RequestSubmissionFor == "Self")
+                    {*@
+                    <tr>
+                        <td colspan="6" align='left'>
+                            <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Submitter Details</u></b></h6>
+                        </td>
+                    </tr>
+                    <tr style="margin-top:5px;">
+                        <td style="width:20%; font-weight: bold;">
+                            Employee Name
+                        </td>
+                        <td style="width: 30%; font-weight: normal;" colspan="2" align='left'>
+                            <span style="height: 25px; width:85%; border-radius: 0; "> @(RIDC.one[0].EmployeeName)  </span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">
+                            Employee Code
+                        </td>
+                        <td style="width: 30%; font-weight: normal;" colspan="2" align='left'>
+                            <span style="height: 25px; width:85%; border-radius: 0; "> @(RIDC.one[0].EmployeeCode) </span>
+                        </td>
+
+                    </tr>
+                    <tr style="margin-top:5px;">
+                        <td style="width:20%; font-weight: bold;">
+                            Designatiion
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].EmployeeDesignation) </span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">
+                            Location
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].EmployeeLocation) </span>
+                        </td>
+
+                    </tr>
+                    <tr style="margin-top:5px;">
+                        <td style="width:20%; font-weight: bold;">
+                            Department
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].EmployeeDepartment) </span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">
+                            Contact Number
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].EmployeeContactNo) </span>
+                        </td>
+
+                    </tr>
+                    <tr style="margin-top:5px;">
+                        <td style="width:20%; font-weight: bold;">
+                            Cost Center Number
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].EmployeeCCCode)  </span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">
+                            UserID
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].EmployeeUserId)  </span>
+                        </td>
+
+                    </tr>
+                    @*}*@
+                    @*else
+                    {*@
+                    @if (RIDC.one[0].EmployeeType == "SAVWIPLEmployee")
+                    {
+                    <tr>
+                        <td colspan="6" align='left'>
+                            <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Applicants Details</u></b></h6>
+                        </td>
+                    </tr>
+                    <tr>
+
+                        <td style="width:20%; font-weight: bold;">
+                            Employee Name
+                        </td>
+                        <td style="width: 30%" colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeName)  </span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">
+                            Employee Code
+                        </td>
+                        <td style="width: 30%" colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeCode) </span>
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Designation
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeDesignation) </span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">
+                            Location
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeLocation) </span>
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Department
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeDepartment) </span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">
+                            Contact Number
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeContactNo) </span>
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Cost Center Number
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeCCCode)  </span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">
+                            UserID
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeUserId)  </span>
+                        </td>
+
+                    </tr>
+                    }
+                    else if (RIDC.one[0].EmployeeType == "New")
+                    {
+                    <tr>
+                        <td colspan="6" align='left'>
+                            <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Applicants Details</u></b></h6>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Employee Name
+                        </td>
+                        <td style="width: 30%" colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeName)  </span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">
+                            Employee Code
+                        </td>
+                        <td style="width: 30%" colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeCode) </span>
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Designation
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeDesignation) </span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">
+                            Location
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeLocation) </span>
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Department
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeDepartment) </span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">
+                            Contact Number
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeContactNo) </span>
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Cost Center Number
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeCCCode)  </span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">
+                            UserID
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeUserId)  </span>
+                        </td>
+
+                    </tr>
+                    }
+
+                    @*}*@
+                    <tr>
+                        <td colspan="6" align='left'>
+                            <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Transaction Field</u></b></h6>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Type of Card
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].TypeOfCard)  </span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">
+                            Date Of Joining
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].DateofJoining)  </span>
+                        </td>
+
+                    </tr>
+                    <tr>
+                        @if (RIDC.one[0].ReasonforReissue == "Others")
+                        {
+                            <td style="width:20%; font-weight: bold;">
+                                Reason For Reissue
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].ReasonforReissue)  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Other Reason
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherReason)  </span>
+                            </td>
+                        }
+                        else
+                        {
+                            <td style="width:20%; font-weight: bold;">
+                                Reason For Reissue
+                            </td>
+                            <td colspan="5" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].ReasonforReissue)  </span>
+                            </td>
+                        }
+
+                    </tr>
+                    @if (RIDC.one[0].AttachmentFiles.Attachments.Count != 0)
+                    {
+                        foreach (var attachment in RIDC.one[0].AttachmentFiles.Attachments)
+                        {
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Upload Photo
+                                </td>
+                                <td colspan="5" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @attachment.FileName  </span>
+                                </td>
+                            </tr>
+                            @*<a href=@System.Configuration.ConfigurationManager.AppSettings["SharepointSiteURL"]@attachment.ServerRelativeUrl download=@attachment.FileName target="_blank">@attachment.FileName </a>*@
+
+                        }
+                    }
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Buisness Function And Responsibility
+                        </td>
+                        <td colspan="5" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].BusinessNeed)  </span>
+                        </td>
+                    </tr>
+                    @if (appList.Count > 0)
+                    {
+                        if (appList.Any(x => x.ApproverStatus.Contains("Approved")))
+                        {
+                            <tr>
+                                <td colspan="6" align='left'>
+                                    <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Approval Tracking</u></b></h6>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">Name</td>
+                                <td colspan="2">Proccessed On</td>
+                                <td colspan="1">Status</td>
+                                <td colspan="1">Level</td>
+                            </tr>
+                            foreach (var item in appList)
+                            {
+                                <tr>
+                                    <td colspan="2">
+                                        <div style="margin-bottom: 10px; font-weight: normal;">
+                                            <div>@item.UserName</div>
+                                            <div>@item.Designation</div>
+                                        </div>
+                                    </td>
+                                    <td colspan="2" style="font-weight: normal;">
+                                        @if (item.Logic == "OR")
+                                        {
+                                            if (item.ApproverStatus != "Pending")
+                                            {
+                                                <div>
+                                                    @item.TimeStamp
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div>
+                                                @item.TimeStamp
+                                            </div>
+                                        }
+                                    </td>
+                                    <td colspan="1" style="font-weight: normal;">
+                                        @if (item.Logic == "OR")
+                                        {
+                                            if (item.ApproverStatus != "Pending")
+                                            {
+                                                <div>
+                                                    @item.ApproverStatus
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div>
+                                                @item.ApproverStatus
+                                            </div>
+                                        }
+                                    </td>
+                                    <td colspan="1" style="font-weight: normal;">
+                                        <div>
+                                            @item.Level
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+
+                        }
+
+                    }
+                    <tr>
+                        <td colspan="6" align='left'>
+                            <h6 style="margin-top:5px;margin-left:5px;color:black;font-weight:bold"><b>SF_II_024</b></h6>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+   
+
+    <!--<table style="width: 100%;" border="1" cellspacing="0" cellpadding="0">
+        <tr>
+        <tr>
+            <td>
+                <h4 style="margin-top:5px;margin-left:15px;color:black;">Transaction Field</h4>
+            </td>
+        </tr>
+        <td style="padding: 15px">
+
+            <table cellspacing="0" cellpadding="0" width="100%">
+
+                <tr>
+                    <td style="height: 15px;" colspan="6">
+                    </td>
+                </tr>
+                <tr>
+                    <td class="form_lbl" id="formlbl">
+                        <label>Type of Card</label>
+                    </td>
+                    <td>
+                        @if (RIDC.one[0].TypeOfCard == "PKI")
+                        {
+                            <input type="checkbox" id="PKI" name="chkTyprEmp" value="PKI" checked style="margin-left: -40px;">
+                            <label> PKI</label>
+                            <input type="checkbox" id="NONPKI" name="chkTyprEmp" value="NONPKI">
+                            <label> Non PKI</label>
+                        }
+                        else
+                        {
+                            <input type="checkbox" id="PKI" name="chkTyprEmp" value="PKI" style="margin-left: -40px;">
+                            <label> PKI</label>
+                            <input type="checkbox" id="NONPKI" name="chkTyprEmp" checked value="NONPKI">
+                            <label> Non PKI</label>
+                        }
+                    </td>
+                    <td class="form_lbl">
+                        <label style="width: 180px; margin-left: -10px;">&nbsp;Date Of Joining</label>
+                    </td>
+                    <td>
+                        <span style=" width: 85%; font-weight: normal; border-radius: 0; "> @(RIDC.one[0].DateofJoining)  </span>
+                        <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherNewUserId)  </span>-->
+                        @*<input type="date" style="height: 25px; width:200px; border-radius: 0; " value="19/01/2023" />*@
+                    <!--</td>
+                    <td class="form_lbl">
+                        <label style="width: 200px; margin-left: -40px;">&nbsp;Reason For Reissue</label>
+                    </td>
+                    <td>-->
+                        @*<span style=" width: 85%; font-weight: normal; border-radius: 0; "> @(RIDC.two[0].ReasonforReissue)  </span>*@
+                        <!--<span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].ReasonforReissue)  </span>
+                    </td>
+
+                </tr>
+
+                <tr>
+                    <td style="height: 15px;" colspan="6">
+                    </td>
+                </tr>
+                <tr>
+                    <td class="form_lbl">
+                        <label style="width:180px;">&nbsp;Other Reason</label>
+                    </td>
+                    <td>
+                        <input type="text" style="margin-left: -40px;" height: 25px; width:10px; border-radius: 0; " value="" />
+                    </td>
+                    <td class="form_lbl">
+                        <label style="width: 180px;">Upload Photo</label>
+                    </td>
+                    <td>
+                        <input type="file" id="myfile" name="myfile">
+                    </td>
+                </tr>
+                <tr>
+                    <td style="height: 15px;" colspan="6">
+                    </td>
+                </tr>
+                <tr>
+                    <td class="form_lbl">
+                        <label>Buisness Function And Responsibility</label>
+                    </td>
+                    <td>
+                        <textarea id="" name="" rows="5" cols="250" style="border:2px solid black;"></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="height: 15px;" colspan="6">
+                    </td>
+                </tr>
+
+
+
+            </table>
+        </td>
+        </tr>
+    </table>
+
+    @if (appList.Count > 0)
+    {
+        <table cellspacing="0" border="" cellpadding="0" width="100%">
+            <tr>
+                <td colspan="2">Name</td>
+                <td colspan="2">Proccessed On</td>
+                <td colspan="1">Status</td>
+                <td colspan="1">Level</td>
+            </tr>
+            @foreach (var item in appList)
+            {
+            <tr>
+                <td colspan="2">
+                    <div style="margin-bottom: 10px; font-weight: normal;">
+                        <div>@item.UserName</div>
+                        <div>@item.Designation</div>
+                    </div>
+                </td>
+                <td colspan="2" style="font-weight: normal;">
+                    @if (item.Logic == "OR")
+                    {
+                        if (item.ApproverStatus != "Pending")
+                        {
+                            <div>
+                                @item.TimeStamp
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div>
+                            @item.TimeStamp
+                        </div>
+                    }
+                </td>
+                <td colspan="1" style="font-weight: normal;">
+                    @if (item.Logic == "OR")
+                    {
+                        if (item.ApproverStatus != "Pending")
+                        {
+                            <div>
+                                @item.ApproverStatus
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div>
+                            @item.ApproverStatus
+                        </div>
+                    }
+                </td>
+                <td colspan="1" style="font-weight: normal;">
+                    <div>
+                        @item.Level
+                    </div>
+                </td>
+            </tr>
+            }
+        </table>
+    }-->
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

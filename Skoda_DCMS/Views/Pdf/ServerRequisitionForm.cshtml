@@ -1,0 +1,1584 @@
+﻿@model dynamic
+@{
+    ViewBag.Title = "Server Requisition Form";
+    var user = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    bool IsNew = true;
+    bool IsEdit = true;
+    dynamic FlagRedirect = null;
+    dynamic SRCF = null;
+    Layout = ViewBag.Layout;
+    int RowId = 0, FormId = 0, AppRowId = 0, ApprovalType = 0;
+    int FormSrId = 0;
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IsNew = ViewBag.IsNew;
+        IsEdit = ViewBag.IsEdit;
+        SRCF = ViewBag.Model;
+        RowId = ViewBag.RowId;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+        FormSrId = SRCF.one[0].Id;
+    }
+}
+
+<body>
+    <div class="right_col bg-transparent" role="main">
+        <div class="container">
+            <form id="SRCFForm" method="post">
+                @foreach (var item in SRCF.one)
+                {
+                    <div class="container form-container">
+                        <div class="card-header pb-4 pt-4">
+                            <table class="w-100 m-auto">
+                                <tr>
+                                    <td>
+                                        <table class="table mainTbl table-bordered form-table-container bg-color">
+                                            <tbody>
+                                                <tr>
+                                                    <td class="f-600 text-left pl-3">Classification</td>
+                                                    <td class="f-600 text-left pl-3">Internal</td>
+                                                    <td rowspan="2" class="text-right"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="f-600 text-left pl-3">Version</td>
+                                                    <td class="f-600 text-left pl-3">01</td>
+                                                    <!-- <td rowspan="2"></td> -->
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <table class="table mainTbl table-bordered form-table-container bg-color">
+                                            <tbody>
+                                                <tr>
+                                                    <td colspan="6" class="heading form-heading">
+                                                        <span>Server Requisition/Change Form</span>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <table class="table mainTbl table-bordered form-table-container-2 bg-color">
+                                            <tr>
+                                                <td class="w-20 allFormLables borderLTB">
+                                                    <label class="f-600">Request Submission For<span class="astColor">*</span></label>
+                                                </td>
+                                                <td colspan="2" class="borderLTB">
+                                                    <select name="drpRequestSubmissionFor" id="drpRequestSubmissionFor" class="choice" disabled="disabled" onchange="RequestSubmissionFor()">
+                                                        <option value="null">Choose</option>
+                                                        <option value="Self" @(item.RequestSubmissionFor == "Self" ? "selected" : "")> Self </option>
+                                                        <option value="OnBehalf" @(item.RequestSubmissionFor == "OnBehalf" ? "selected" : "")> On Behalf </option>
+                                                    </select>
+                                                </td>
+                                                <td colspan="2" class="allFormLables borderLTB">
+                                                    <label class="f-600"></label>
+                                                </td>
+                                                <td class="borderLTB text-left" colspan="2">
+                                                </td>
+                                            </tr>
+                                            <tr id="OtherEmpName" style="display: none;">
+                                                <td>
+                                                    <label id="lblOtherEmpName" class="control-label f-600">Name (Type at least 4 letters for faster results)</label>
+                                                    <input type="hidden" id="hiddentxtEmail" name="hiddentxtEmail" value="" />
+                                                </td>
+                                                <td colspan="2"><input type="text" name="txtOtherEmpname" id="txtOtherEmpname" class="form-control ui-autocomplete-input" required="required" autocomplete="off"></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="allFormLables borderLTB f-600">
+                                                    <label class="f-600">Employee Name<span class="astColor">*</span></label>
+                                                </td>
+                                                <td colspan="2" class="borderLTB">
+                                                    <input type="text" class="w-100 inpDisable" name="txtEmployeeName" id="txtEmployeeName" value="@(!IsNew ? (item.EmployeeName ?? "") : "")">
+                                                </td>
+
+                                                <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                    <label class="f-600">Department<span class="astColor">*</span></label>
+                                                </td>
+                                                <td class="borderLTB text-right" colspan="2">
+                                                    <input type="text" class="w-100 inpDisable" name="txtDepartment" id="txtDepartment" value="@(!IsNew ? (item.Department ?? "") : "")">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="allFormLables borderLTB f-600">
+                                                    <label class="f-600">Employee Code<span class="astColor">*</span></label>
+                                                </td>
+                                                <td colspan="2" class="borderLTB">
+                                                    <input type="text" class="w-100 inpDisable" name="txtEmployeeCode" id="txtEmployeeCode" value="@(!IsNew ? (item.EmployeeCode ?? "") : "")">
+                                                </td>
+                                                <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                    <label class="f-600">Cost Center No<span class="astColor">*</span></label>
+                                                </td>
+                                                <td class="borderLTB text-right" colspan="2">
+                                                    <input type="text" class="w-100 inpDisable" name="txtCostCenterNo" id="txtCostCenterNo" value="@(!IsNew ? (item.CostCenterNo ?? "") : "")">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="allFormLables borderLTB f-600">
+                                                    <label class="f-600">User ID<span class="astColor">*</span></label>
+                                                </td>
+                                                <td colspan="2" class="borderLTB">
+                                                    <input type="text" class="w-100 inpDisable" name="txtUserID" id="txtUserID" value="@(!IsNew ? (item.UserID ?? "") : "")">
+                                                </td>
+                                                <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                    <label class="f-600">Type of Employee<span class="astColor">*</span></label>
+                                                </td>
+                                                <td class="borderLTB text-right" colspan="2">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Internal</label>
+                                                        @if (SRCF.one[0].TypeofEmployee == "Internal")
+                                                        {
+                                                            <input type="checkbox" class="typeofemp" id="chkInternal" name="chkInternal" checked disabled>
+                                                        }
+                                                        else
+                                                        {
+                                                            <input type="checkbox" class="typeofemp" id="chkInternal" name="chkInternal" disabled>
+                                                        }
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="allFormLables borderLTB f-600">
+                                                    <label class="f-600">Designation<span class="astColor">*</span></label>
+                                                </td>
+                                                <td colspan="2" class="borderLTB">
+                                                    <input type="text" name="txtDesignation" id="txtDesignation" class="w-100 inpDisable" value="@(!IsNew ? (item.Designation ?? "") : "")">
+                                                </td>
+                                                <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                    <label class="f-600"></label>
+                                                </td>
+                                                <td class="borderLTB text-right" colspan="2">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">External</label>
+                                                        @if (SRCF.one[0].TypeofEmployee == "External")
+                                                        {
+                                                            <input type="checkbox" class="typeofemp" id="chkExternal" name="chkExternal" checked disabled>
+                                                        }
+                                                        else
+                                                        {
+                                                            <input type="checkbox" class="typeofemp" id="chkExternal" name="chkExternal" disabled>
+                                                        }
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="inpDisable" name="txtCompanyName" id="txtCompanyName" placeholder="Company Name" value="@(!IsNew ? (item.CompanyName ?? "") : "")">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="allFormLables borderLTB f-600">
+                                                    <label class="f-600">Contact No<span class="astColor">*</span></label>
+                                                </td>
+                                                <td colspan="2" class="borderLTB">
+                                                    <input type="text" class="w-100 inpDisable" name="txtContactNo" id="txtContactNo" value="@(!IsNew ? (item.ContactNo ?? "") : "")">
+                                                </td>
+                                                <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                </td>
+                                                <td class="borderLTB text-right" colspan="2">
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        <table class="table mainTbl table-bordered form-table-container-2 bg-color f-600">
+                                            <thead>
+                                                <tr>
+                                                    <td colspan="2">Requirement(To be Filled by Requester)</td>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <label class="checkbox-container">
+                                                            New Server Creation
+                                                            @if (SRCF.one[0].ServerCreationType == "New Server Creation")
+                                                            {
+                                                                <input type="checkbox" class="servercreation" id="chkNewServerCreation" name="chkNewServerCreation" checked disabled>
+                                                            }
+                                                            else
+                                                            {
+                                                                <input type="checkbox" class="servercreation" id="chkNewServerCreation" name="chkNewServerCreation" disabled>
+                                                            }
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                    </td>
+                                                    <td>
+                                                        <label class="checkbox-container">
+                                                            Existing Server Modification
+                                                            @if (SRCF.one[0].ServerCreationType == "Existing Server Modification")
+                                                            {
+                                                                <input type="checkbox" class="servercreation" id="chkExistingServer" name="chkExistingServer" checked disabled>
+                                                            }
+                                                            else
+                                                            {
+                                                                <input type="checkbox" class="servercreation" id="chkExistingServer" name="chkExistingServer" disabled>
+                                                            }
+                                                            <span class="checkmark"></span>
+                                                        </label>
+                                                    </td>
+                                                    <td id="hiddenApproverInformation"></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
+                                        <table class="table mainTbl table-bordered form-table-container-2 bg-color">
+                                            <tr>
+                                                <td class="allFormLables borderLTB f-600">
+                                                    <label class="f-600">Server Owner Name<span class="astColor">*</span></label>
+                                                </td>
+                                                <td colspan="2" class="borderLTB">
+                                                    <input type="text" name="txtServerOwnerName" id="txtServerOwnerName" class="w-100 inpDisable" value="@(!IsNew ? (item.ServerOwnerName ?? "") : "")">
+                                                </td>
+                                                <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                    <label class="f-600">Admin Account<span class="astColor">*</span></label>
+                                                </td>
+                                                <td class="borderLTB text-right" colspan="2">
+                                                    <input type="text" name="txtAdminAccount" id="txtAdminAccount" class="w-100 inpDisable" value="@(!IsNew ? (item.AdminAccount ?? "") : "")">
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        <table class="table mainTbl table-bordered form-table-container-2 bg-color">
+                                            <tr>
+                                                <td class="allFormLables borderLTB f-600" style="width: 22%;">
+                                                    <label class="f-600">Server Role / Apps Name<span class="astColor">*</span></label>
+                                                </td>
+                                                <td colspan="2" class="borderLTB">
+                                                    <input type="text" name="txtServerRole" id="txtServerRole" class="w-100 inpDisable" value="@(!IsNew ? (item.ServerRole ?? "") : "")">
+                                                </td>
+                                                <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                    <label class="f-600">Server Environment<span class="astColor">*</span></label>
+                                                </td>
+                                                <td class="borderLTB text-right" colspan="2">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Office</label>
+                                                        @if (SRCF.one[0].ServerEnvironment == "Office")
+                                                        {
+                                                            <input type="checkbox" class="serverenv" id="chkOffice" name="chkOffice" checked disabled>
+                                                        }
+                                                        else
+                                                        {
+                                                            <input type="checkbox" class="serverenv" id="chkOffice" name="chkOffice" disabled>
+                                                        }
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </td>
+                                                <td class="borderLTB text-right" colspan="2">
+                                                    <label class="checkbox-container">
+                                                        <label class="f-600">Production</label>
+                                                        @if (SRCF.one[0].ServerEnvironment == "Production")
+                                                        {
+                                                            <input type="checkbox" class="serverenv" id="chkProduction" name="chkProduction" checked disabled>
+                                                        }
+                                                        else
+                                                        {
+                                                            <input type="checkbox" class="serverenv" id="chkProduction" name="chkProduction" disabled>
+                                                        }
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        <table class="table mainTbl table-bordered form-table-container-2 bg-color f-600">
+                                            <tr>
+                                                <td class="allFormLables borderLTB f-600" style="width: 22%;">
+                                                    <label class="f-600">Server Hardware<span class="astColor">*</span></label>
+                                                </td>
+                                                <td colspan="2" class="borderLTB">
+                                                    <label class="checkbox-container">
+                                                        Virtual
+                                                        @if (SRCF.one[0].ServerHardware == "Virtual")
+                                                        {
+                                                            <input type="checkbox" class="serverhardware" id="chkVirtual" name="chkVirtual" checked disabled>
+                                                        }
+                                                        else
+                                                        {
+                                                            <input type="checkbox" class="serverhardware" id="chkVirtual" name="chkVirtual" disabled>
+                                                        }
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </td>
+                                                <td colspan="2" class="w-30 allFormLables borderLTB f-600 align">
+                                                    <label class="checkbox-container">
+                                                        Physical
+                                                        @if (SRCF.one[0].ServerHardware == "Physical")
+                                                        {
+                                                            <input type="checkbox" class="serverhardware" id="chkPhysical" name="chkPhysical" checked disabled>
+                                                        }
+                                                        else
+                                                        {
+                                                            <input type="checkbox" class="serverhardware" id="chkPhysical" name="chkPhysical" disabled>
+                                                        }
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="allFormLables borderLTB f-600">
+                                                    <label class="f-600">RAM<span class="astColor">*</span></label>
+                                                </td>
+                                                <td colspan="2" class="borderLTB">
+                                                    <input type="text" name="txtRAM" id="txtRAM" class="inpDisable" value="@(!IsNew ? (item.RAM ?? "") : "")">
+                                                </td>
+                                                <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                    <label class="f-600">
+                                                        CPU: No of CPU / Cores<span class="astColor">*</span>
+                                                        <input type="text" name="txtNoOfCPU" id="txtNoOfCPU" class="w-20 inpDisable" value="@(!IsNew ? (item.NoofCPU ?? "") : "")">
+
+                                                    </label>
+                                                </td>
+                                                <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                    <label class="f-600">
+                                                        No of Network Ports<span class="astColor">*</span>
+                                                        <input type="text" name="txtNoOfNetworkPorts" id="txtNoOfNetworkPorts" class="w-20 inpDisable" value="@(!IsNew ? (item.NoofNetworkPorts ?? "") : "")">
+                                                    </label>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="allFormLables borderLTB f-600">
+                                                    <label class="f-600">Storage Details<span class="astColor">*</span></label>
+                                                </td>
+
+                                                <td colspan="4" class="allFormLables borderLTB f-600 align">
+                                                    <label class="f-600">HDD or Extra disk-space (excluding OS partition)<span class="astColor">*</span></label>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="allFormLables borderLTB f-600" colspan="6">
+                                                    <label class="f-600">*Note: OS partition by default is 100 GB and Page file Partition will be allocated according to RAM Size<span class="astColor">*</span></label>
+                                                </td>
+                                                <td colspan="2" class="borderLTB">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="allFormLables borderLTB f-600">
+                                                    <label class="f-600">
+                                                        Size<span class="astColor">*</span>
+                                                        <input type="text" name="txtSize" id="txtSize" class="w-80 inpDisable" value="@(!IsNew ? (item.StorageSize ?? "") : "")">
+
+                                                    </label>
+                                                </td>
+
+                                                <td class="borderLTB text-right" colspan="2">
+                                                    <label class="f-600"><input type="text" name="txtTwoRoom" id="txtTwoRoom" class="w-15 inpDisable" value="@(!IsNew ? (item.TwoRoom ?? "") : "")">Two Room<span class="astColor">*</span></label>
+                                                </td>
+                                                <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                </td>
+                                                <td class="borderLTB text-right" colspan="2">
+                                                    <label class="f-600 text-left"><input type="text" name="txtNonTwoRoom" id="txtNonTwoRoom" class="w-15 inpDisable" value="@(!IsNew ? (item.NonTwoRoom ?? "") : "")">Non-Two Room</label>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="allFormLables borderLTB f-600">
+                                                    <label class="f-600">Operating System Details:<span class="astColor">*</span></label>
+                                                </td>
+                                                <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                    <label class="checkbox-container">
+                                                        Windows
+                                                        @if (SRCF.one[0].OperatingSystem == "Windows")
+                                                        {
+                                                            <input type="checkbox" class="operatingsystem" id="chkWindows" name="chkWindows" checked disabled>
+                                                        }
+                                                        else
+                                                        {
+                                                            <input type="checkbox" class="operatingsystem" id="chkWindows" name="chkWindows" disabled>
+                                                        }
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </td>
+                                                <td class="borderLTB text-right" colspan="2">
+                                                    <label class="checkbox-container">
+                                                        Others OS
+                                                        @if (SRCF.one[0].OperatingSystem == "Others OS")
+                                                        {
+                                                            <input type="checkbox" class="operatingsystem" id="chkOthersOS" name="chkOthersOS" checked disabled>
+                                                        }
+                                                        else
+                                                        {
+                                                            <input type="checkbox" class="operatingsystem" id="chkOthersOS" name="chkOthersOS" disabled>
+                                                        }
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </td>
+
+                                            </tr>
+                                            <tr>
+                                                <td class="allFormLables borderLTB f-600">
+                                                    <label class="f-600">OS Name<span class="astColor">*</span></label>
+                                                </td>
+                                                <td colspan="2" class="borderLTB">
+                                                    <input type="text" name="txtOSName" id="txtOSName" class="inpDisable" value="@(!IsNew ? (item.OSName ?? "") : "")">
+                                                </td>
+                                                <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                    <label class="f-600">Edition<span class="astColor">*</span></label>
+                                                    <input type="text" name="txtOSEdition" id="txtOSEdition" class="inpDisable" value="@(!IsNew ? (item.OSEdition ?? "") : "")">
+                                                </td>
+                                                <td class="borderLTB text-right" colspan="2">
+                                                    <label class="f-600">Architecture<span class="astColor">*</span></label>
+                                                </td>
+                                                <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                    <input class="inpDisable" type="text" name="txtArchitecture" id="txtArchitecture" value="@(!IsNew ? (item.Architecture ?? "") : "")">
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        <table class="table mainTbl table-bordered form-table-container-2 bg-color f-600">
+                                            <tr>
+                                                <td class="allFormLables borderLTB f-600">
+                                                    <label class="f-600">Database Details<span class="astColor">*</span></label>
+                                                </td>
+                                                <td colspan="2" class="borderLTB">
+                                                    <label class="f-600">DB Name<span class="astColor">*</span></label>
+                                                </td>
+                                                <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                    <input type="text" name="txtDBName" id="txtDBName" class="inpDisable" value="@(!IsNew ? (item.DBName ?? "") : "")">
+                                                </td>
+                                                <td class="borderLTB text-right" colspan="2">
+                                                    <label class="f-600">Edition<span class="astColor">*</span></label>
+                                                </td>
+                                                <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                    <input type="text" name="txtDBEdition" id="txtDBEdition" class="inpDisable" value="@(!IsNew ? (item.DBEdition ?? "") : "")">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="allFormLables borderLTB f-600">
+                                                    <label class="f-600">Server Criticality:<span class="astColor">*</span></label>
+                                                </td>
+                                                <td colspan="2" class="borderLTB">
+                                                    <input type="text" name="txtServerCriticality" id="txtServerCriticality" class="inpDisable" value="@(!IsNew ? (item.ServerCriticality ?? "") : "")">
+                                                </td>
+                                                <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                </td>
+                                                <td class="borderLTB text-right" colspan="2">
+                                                </td>
+
+                                            </tr>
+                                        </table>
+                                        <table class="table mainTbl table-bordered form-table-container-2 bg-color f-600">
+                                            <tr>
+                                                <td class="w-15 f-600">Server Type<span class="astColor">*</span></td>
+                                                <td class="w-20 per-checkbox">
+                                                    <label class="checkbox-container">
+                                                        Permanent
+                                                        @if (SRCF.one[0].ServerType == "Permanent")
+                                                        {
+                                                            <input type="checkbox" class="servertype" id="chkPermanent" name="chkPermanent" checked disabled>
+                                                        }
+                                                        else
+                                                        {
+                                                            <input type="checkbox" class="servertype" id="chkPermanent" name="chkPermanent" disabled>
+                                                        }
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </td>
+                                                <td class="w-10 align">
+                                                    <label class="checkbox-container">
+                                                        Temporary
+                                                        @if (SRCF.one[0].ServerType == "Temporary")
+                                                        {
+                                                            <input type="checkbox" class="servertype" id="chkTemporary" name="chkTemporary" checked disabled>
+                                                        }
+                                                        else
+                                                        {
+                                                            <input type="checkbox" class="servertype" id="chkTemporary" name="chkTemporary" disabled>
+                                                        }
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </td>
+                                                <td> <input type="hidden" name="chkServerType" id="chkServerType" /></td>
+
+                                                <td id="tdTemporaryfromlbl">if Temporary from</td>
+                                                <td id="tdtxtTemporaryfrom"><input type="text" id="txtTemporaryfrom" name="txtTemporaryfrom" class="inpDisable" value="@(!IsNew ? (item.Temporaryfrom.ToShortDateString() ?? "") : "")"></td>
+                                                <td id="tdTemporarytolbl">to</td>
+                                                <td id="tdtxtTemporaryto" class="br-1"><input type="text" id="txtTemporaryTo" name="txtTemporaryTo" class="inpDisable" value="@(!IsNew ? (item.TemporaryTo.ToShortDateString() ?? "") : "")"></td>
+                                            </tr>
+                                        </table>
+                                        <table class="table mainTbl table-bordered form-table-container-2 bg-color f-600">
+                                            <tr>
+                                                <td class="w-15">Server Backup:</td>
+                                                <td class="w-15">Backup Required</td>
+                                                <td>
+                                                    <label class="checkbox-container">
+                                                        Yes
+                                                        @if (SRCF.one[0].BackupRequired == "Yes")
+                                                        {
+                                                            <input type="checkbox" class="serverbackup" id="chkYes" name="chkYes" checked disabled>
+                                                        }
+                                                        else
+                                                        {
+                                                            <input type="checkbox" class="serverbackup" id="chkYes" name="chkYes" disabled>
+                                                        }
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </td>
+                                                <td colspan="5">*Note: If yes, please fill Data Backup Request Form</td>
+                                                <td>
+                                                    <label class="checkbox-container">
+                                                        No
+                                                        @if (SRCF.one[0].BackupRequired == "No")
+                                                        {
+                                                            <input type="checkbox" class="serverbackup" id="chkNo" name="chkNo" checked disabled>
+                                                        }
+                                                        else
+                                                        {
+                                                            <input type="checkbox" class="serverbackup" id="chkNo" name="chkNo" disabled>
+                                                        }
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </td>
+                                                <input type="hidden" name="chkServerBackup" id="chkServerBackup" />
+                                            </tr>
+                                        </table>
+                                        <table class="table mainTbl table-bordered form-table-container-2 bg-color">
+
+                                            <tr>
+                                                <td colspan="6" class="allFormLables borderLTB f-600">
+                                                    <span>Reason for Server Requisition:<span class="astColor">*</span></span>
+                                                </td>
+
+                                            </tr>
+                                            <tr>
+                                                <td colspan="6" class="allFormLables borderLTB f-600">
+                                                    <textarea name="txtReasonforServer" id="txtReasonforServer" cols="60" rows="10" class="w-100 textTrans inpDisable">@(!IsNew ? (item.ReasonForServerRequisition ?? "") : "")</textarea>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-left f-600">SF_II_021.04</p>
+                    </div>
+                    <div class="container form-container">
+                        <div class="card-header pb-4 pt-4">
+                            <div class="alignRight">
+                                @*<img class="skodaImg" src="img/skodalogoimg.png">*@
+                            </div>
+                            @if (!IsNew)
+                            {
+                                var appList = SRCF.three as List<Skoda_DCMS.Models.ApprovalDataModel>;
+                                var cnt = appList.Count();
+                                var mcnt = cnt;
+                                if (cnt == 8)
+                                {
+                                    mcnt = 7;
+                                }
+                                else if (cnt == 6)
+                                {
+                                    mcnt = 5;
+                                }
+                                if (mcnt == 7)
+                                {
+                                    @*Local & Live Code*@
+                                    <table class="table mainTbl table table-bordered table-sm dataTable no-footer bg-color">
+
+                                        <tr class="bg-color-2">
+                                            <td colspan="6" class="authorize-container photogrph_header">Authorization by HOD of Requester</td>
+                                        </tr>
+                                        <tr class="bg-color-2">
+                                            <td colspan="1" class="authorize-td">
+                                                <label class="f-600">Name:</label>
+                                                <input type="text" name="" class="w-100 inpDisable inpIsNewDisable input-width-1" value="@(!IsNew ? (SRCF.three[0].UserName ?? "") : "")">
+                                            </td>
+                                            <td class="authorize-td comment-box-2" colspan="2">
+                                                <div class="form-group">
+                                                    <label class="f-600 align" for="comment">Approver Comment:</label>
+                                                    <textarea class="form-control textTrans" rows="12" id="comment" disabled>@(!IsNew ? (SRCF.three[0].Comment ?? "") : "")</textarea>
+                                                </div>
+                                            </td>
+                                            <td class="authorize-td" colspan="2">
+                                                <label class="f-600 signature-box-1">Signature:</label>
+                                                <input type="text" name="" class="w-100 inpDisable inpIsNewDisable input-width-1" value="@(!IsNew && SRCF.three[0].ApproverStatus != "Pending" ? (SRCF.three[0].ApproverStatus + " on " + Convert.ToDateTime(SRCF.two[0].Modified).ToShortDateString() + " " + Convert.ToDateTime(SRCF.two[0].Modified).ToShortTimeString()) : "" )">
+                                            </td>
+                                        </tr>
+                                        <tr class="bg-color-2">
+                                            <td colspan="6" class="authorize-container photogrph_header">Authorization by IT - Server Manager Head</td>
+                                        </tr>
+                                        <tr class="bg-color-2">
+                                            <td colspan="1" class="authorize-td">
+                                                <label class="f-600">Name:</label>
+                                                <input type="text" name="" class="w-100 inpDisable inpIsNewDisable input-width-1" value="@(!IsNew ? (SRCF.three[1].UserName ?? "") : "")">
+                                            </td>
+                                            <td class="authorize-td comment-box-2" colspan="2">
+                                                <div class="form-group">
+                                                    <label for="comment" class="">Approver Comment:</label>
+                                                    <textarea class="form-control textTrans" rows="12" id="comment" disabled>@(!IsNew ? (SRCF.three[1].Comment ?? "") : "")</textarea>
+                                                </div>
+                                            </td>
+                                            <td class="authorize-td" colspan="2">
+                                                <label class="f-600 signature-box-1">Signature:</label>
+                                                <input type="text" name="" class="w-100 inpDisable inpIsNewDisable input-width-1" value="@(!IsNew && SRCF.three[0].ApproverStatus != "Pending" ? (SRCF.three[1].ApproverStatus + " on " + Convert.ToDateTime(SRCF.two[0].Modified).ToShortDateString() + " " + Convert.ToDateTime(SRCF.two[0].Modified).ToShortTimeString()) : "" )">
+                                            </td>
+                                        </tr>
+                                        <tr class="bg-color-2">
+                                            <td colspan="1" class="authorize-td">
+                                                <label class="f-600">Name:</label>
+                                                <input type="text" name="" class="w-100 inpDisable inpIsNewDisable input-width-1" value="@(!IsNew ? (SRCF.three[2].UserName ?? "") : "")">
+                                            </td>
+                                            <td class="authorize-td comment-box-2" colspan="2">
+                                                <div class="form-group">
+                                                    <label for="comment" class="">Approver Comment:</label>
+                                                    <textarea class="form-control textTrans" rows="12" id="comment" disabled>@(!IsNew ? (SRCF.three[2].Comment ?? "") : "")</textarea>
+                                                </div>
+                                            </td>
+                                            <td class="authorize-td" colspan="2">
+                                                <label class="f-600 signature-box-1">Signature:</label>
+                                                <input type="text" name="" class="w-100 inpDisable inpIsNewDisable input-width-1" value="@(!IsNew && SRCF.three[0].ApproverStatus != "Pending" ? (SRCF.three[2].ApproverStatus + " on " + Convert.ToDateTime(SRCF.two[0].Modified).ToShortDateString() + " " + Convert.ToDateTime(SRCF.two[0].Modified).ToShortTimeString()) : "" )">
+                                            </td>
+                                        </tr>
+                                        <tr class="bg-color-2">
+                                            <td colspan="1" class="authorize-td">
+                                                <label class="f-600">Name:</label>
+                                                <input type="text" name="" class="w-100 inpDisable inpIsNewDisable input-width-1" value="@(!IsNew ? (SRCF.three[3].UserName ?? "") : "")">
+                                            </td>
+                                            <td class="authorize-td comment-box-2" colspan="2">
+                                                <div class="form-group">
+                                                    <label for="comment" class="">Approver Comment:</label>
+                                                    <textarea class="form-control textTrans" rows="12" id="comment" disabled>@(!IsNew ? (SRCF.three[3].Comment ?? "") : "")</textarea>
+                                                </div>
+                                            </td>
+                                            <td class="authorize-td" colspan="2">
+                                                <label class="f-600 signature-box-1">Signature:</label>
+                                                <input type="text" name="" class="w-100 inpDisable inpIsNewDisable input-width-1" value="@(!IsNew && SRCF.three[0].ApproverStatus != "Pending" ? (SRCF.three[3].ApproverStatus + " on " + Convert.ToDateTime(SRCF.two[0].Modified).ToShortDateString() + " " + Convert.ToDateTime(SRCF.two[0].Modified).ToShortTimeString()) : "" )">
+                                            </td>
+                                        </tr>
+                                        <tr class="bg-color-2">
+                                            <td colspan="6" class="authorize-container photogrph_header">Authorization by IT Infrastructure</td>
+                                        </tr>
+                                        <tr class="bg-color-2">
+                                            <td colspan="1" class="authorize-td">
+                                                <label class="f-600">Name:</label>
+                                                <input type="text" name="" class="w-100 inpDisable inpIsNewDisable input-width-1" value="@(!IsNew ? (SRCF.three[4].UserName ?? "") : "")">
+                                            </td>
+                                            <td class="authorize-td comment-box-2" colspan="2">
+                                                <div class="form-group">
+                                                    <label for="comment" class="">Approver Comment:</label>
+                                                    <textarea class="form-control textTrans" rows="12" id="comment" disabled>@(!IsNew ? (SRCF.three[4].Comment ?? "") : "")</textarea>
+                                                </div>
+                                            </td>
+                                            <td class="authorize-td" colspan="2">
+                                                <label class="f-600 signature-box-1">Signature:</label>
+                                                <input type="text" name="" class="w-100 inpDisable inpIsNewDisable input-width-1" value="@(!IsNew && SRCF.three[0].ApproverStatus != "Pending" ? (SRCF.three[4].ApproverStatus + " on " + Convert.ToDateTime(SRCF.two[0].Modified).ToShortDateString() + " " + Convert.ToDateTime(SRCF.two[0].Modified).ToShortTimeString()) : "" )">
+                                            </td>
+                                        </tr>
+                                        <tr class="bg-color-2">
+                                            <td colspan="6" class="authorize-container photogrph_header">Authorization by IT - License Manager</td>
+                                        </tr>
+                                        <tr class="bg-color-2">
+                                            <td colspan="1" class="authorize-td">
+                                                <label class="f-600">Name:</label>
+                                                <input type="text" name="" class="w-100 inpDisable inpIsNewDisable input-width-1" value="@(!IsNew ? (SRCF.three[5].UserName ?? "") : "")">
+                                            </td>
+                                            <td class="authorize-td comment-box-2" colspan="2">
+                                                <div class="form-group">
+                                                    <label for="comment" class="">Approver Comment:</label>
+                                                    <textarea class="form-control textTrans" rows="12" id="comment" disabled>@(!IsNew ? (SRCF.three[5].Comment ?? "") : "")</textarea>
+                                                </div>
+                                            </td>
+                                            <td class="authorize-td" colspan="2">
+                                                <label class="f-600 signature-box-1">Signature:</label>
+                                                <input type="text" name="" class="w-100 inpDisable inpIsNewDisable input-width-1" value="@(!IsNew && SRCF.three[0].ApproverStatus != "Pending" ? (SRCF.three[5].ApproverStatus + " on " + Convert.ToDateTime(SRCF.two[0].Modified).ToShortDateString() + " " + Convert.ToDateTime(SRCF.two[0].Modified).ToShortTimeString()) : "" )">
+                                            </td>
+                                        </tr>
+                                        <tr class="bg-color-2">
+                                            <td colspan="1" class="authorize-td">
+                                                <label class="f-600">Name:</label>
+                                                <input type="text" name="" class="w-100 inpDisable inpIsNewDisable input-width-1" value="@(!IsNew ? (SRCF.three[6].UserName ?? "") : "")">
+                                            </td>
+                                            <td class="authorize-td comment-box-2" colspan="2">
+                                                <div class="form-group">
+                                                    <label for="comment" class="">Approver Comment:</label>
+                                                    <textarea class="form-control textTrans" rows="12" id="comment" disabled>@(!IsNew ? (SRCF.three[6].Comment ?? "") : "")</textarea>
+                                                </div>
+                                            </td>
+                                            <td class="authorize-td" colspan="2">
+                                                <label class="f-600 signature-box-1">Signature:</label>
+                                                <input type="text" name="" class="w-100 inpDisable inpIsNewDisable input-width-1" value="@(!IsNew && SRCF.three[0].ApproverStatus != "Pending" ? (SRCF.three[6].ApproverStatus + " on " + Convert.ToDateTime(SRCF.two[0].Modified).ToShortDateString() + " " + Convert.ToDateTime(SRCF.two[0].Modified).ToShortTimeString()) : "" )">
+                                            </td>
+                                        </tr>
+
+                                    </table>
+                                }
+                                else if (mcnt == 5)
+                                {
+                                    @*UAT Code*@
+                                    <table class="table mainTbl table table-bordered table-sm dataTable no-footer bg-color">
+
+                                        <tr class="bg-color-2">
+                                            <td colspan="6" class="authorize-container photogrph_header">Authorization by HOD of Requester</td>
+                                        </tr>
+                                        <tr class="bg-color-2">
+                                            <td colspan="1" class="authorize-td">
+                                                <label class="f-600">Name:</label>
+                                                <input type="text" name="" class="w-100 inpDisable inpIsNewDisable input-width-1" value="@(!IsNew ? (SRCF.three[0].UserName ?? ""): "")">
+                                            </td>
+                                            <td class="authorize-td comment-box-2" colspan="2">
+                                                <div class="form-group">
+                                                    <label class="f-600 align" for="comment">Approver Comment:</label>
+                                                    <textarea class="form-control textTrans" rows="10" id="comment" disabled>@(!IsNew ? (SRCF.three[0].Comment ?? ""): "")</textarea>
+                                                </div>
+                                            </td>
+                                            <td class="authorize-td" colspan="2">
+                                                <label class="f-600 signature-box-1">Signature:</label>
+                                                <input type="text" name="" class="w-100 inpDisable inpIsNewDisable input-width-1" value="@(!IsNew && SRCF.three[0].ApproverStatus != "Pending" ? (SRCF.three[0].ApproverStatus + " on " + Convert.ToDateTime(SRCF.two[0].Modified).ToShortDateString()+" " +Convert.ToDateTime(SRCF.two[0].Modified).ToShortTimeString()) : "" )">
+                                            </td>
+                                        </tr>
+                                        <tr class="bg-color-2">
+                                            <td colspan="6" class="authorize-container photogrph_header">Authorization by IT - Server Manager Head</td>
+                                        </tr>
+                                        <tr class="bg-color-2">
+                                            <td colspan="1" class="authorize-td">
+                                                <label class="f-600">Name:</label>
+                                                <input type="text" name="" class="w-100 inpDisable inpIsNewDisable input-width-1" value="@(!IsNew ? (SRCF.three[1].UserName ?? ""): "")">
+                                            </td>
+                                            <td class="authorize-td comment-box-2" colspan="2">
+                                                <div class="form-group">
+                                                    <label for="comment" class="">Approver Comment:</label>
+                                                    <textarea class="form-control textTrans" rows="10" id="comment" disabled>@(!IsNew ? (SRCF.three[1].Comment ?? ""): "")</textarea>
+                                                </div>
+                                            </td>
+                                            <td class="authorize-td" colspan="2">
+                                                <label class="f-600 signature-box-1">Signature:</label>
+                                                <input type="text" name="" class="w-100 inpDisable inpIsNewDisable input-width-1" value="@(!IsNew && SRCF.three[0].ApproverStatus != "Pending" ? (SRCF.three[1].ApproverStatus + " on " + Convert.ToDateTime(SRCF.two[0].Modified).ToShortDateString()+" " +Convert.ToDateTime(SRCF.two[0].Modified).ToShortTimeString()) : "" )">
+                                            </td>
+                                        </tr>
+                                        <tr class="bg-color-2">
+                                            <td colspan="1" class="authorize-td">
+                                                <label class="f-600">Name:</label>
+                                                <input type="text" name="" class="w-100 inpDisable inpIsNewDisable input-width-1" value="@(!IsNew ? (SRCF.three[2].UserName ?? ""): "")">
+                                            </td>
+                                            <td class="authorize-td comment-box-2" colspan="2">
+                                                <div class="form-group">
+                                                    <label for="comment" class="">Approver Comment:</label>
+                                                    <textarea class="form-control textTrans" rows="10" id="comment" disabled>@(!IsNew ? (SRCF.three[2].Comment ?? ""): "")</textarea>
+                                                </div>
+                                            </td>
+                                            <td class="authorize-td" colspan="2">
+                                                <label class="f-600 signature-box-1">Signature:</label>
+                                                <input type="text" name="" class="w-100 inpDisable inpIsNewDisable input-width-1" value="@(!IsNew && SRCF.three[0].ApproverStatus != "Pending" ? (SRCF.three[2].ApproverStatus + " on " + Convert.ToDateTime(SRCF.two[0].Modified).ToShortDateString()+" " +Convert.ToDateTime(SRCF.two[0].Modified).ToShortTimeString()) : "" )">
+                                            </td>
+                                        </tr>
+
+                                        <tr class="bg-color-2">
+                                            <td colspan="6" class="authorize-container photogrph_header">Authorization by IT Infrastructure</td>
+                                        </tr>
+                                        <tr class="bg-color-2">
+                                            <td colspan="1" class="authorize-td">
+                                                <label class="f-600">Name:</label>
+                                                <input type="text" name="" class="w-100 inpDisable inpIsNewDisable input-width-1" value="@(!IsNew ? (SRCF.three[3].UserName ?? ""): "")">
+                                            </td>
+                                            <td class="authorize-td comment-box-2" colspan="2">
+                                                <div class="form-group">
+                                                    <label for="comment" class="">Approver Comment:</label>
+                                                    <textarea class="form-control textTrans" rows="10" id="comment" disabled>@(!IsNew ? (SRCF.three[3].Comment ?? ""): "")</textarea>
+                                                </div>
+                                            </td>
+                                            <td class="authorize-td" colspan="2">
+                                                <label class="f-600 signature-box-1">Signature:</label>
+                                                <input type="text" name="" class="w-100 inpDisable inpIsNewDisable input-width-1" value="@(!IsNew && SRCF.three[0].ApproverStatus != "Pending" ? (SRCF.three[3].ApproverStatus + " on " + Convert.ToDateTime(SRCF.two[0].Modified).ToShortDateString()+" " +Convert.ToDateTime(SRCF.two[0].Modified).ToShortTimeString()) : "" )">
+                                            </td>
+                                        </tr>
+                                        <tr class="bg-color-2">
+                                            <td colspan="6" class="authorize-container photogrph_header">Authorization by IT - License Manager</td>
+                                        </tr>
+                                        <tr class="bg-color-2">
+                                            <td colspan="1" class="authorize-td">
+                                                <label class="f-600">Name:</label>
+                                                <input type="text" name="" class="w-100 inpDisable inpIsNewDisable input-width-1" value="@(!IsNew ? (SRCF.three[4].UserName ?? ""): "")">
+                                            </td>
+                                            <td class="authorize-td comment-box-2" colspan="2">
+                                                <div class="form-group">
+                                                    <label for="comment" class="">Approver Comment:</label>
+                                                    <textarea class="form-control textTrans" rows="10" id="comment" disabled>@(!IsNew ? (SRCF.three[4].Comment ?? ""): "")</textarea>
+                                                </div>
+                                            </td>
+                                            <td class="authorize-td" colspan="2">
+                                                <label class="f-600 signature-box-1">Signature:</label>
+                                                <input type="text" name="" class="w-100 inpDisable inpIsNewDisable input-width-1" value="@(!IsNew && SRCF.three[0].ApproverStatus != "Pending" ? (SRCF.three[4].ApproverStatus + " on " + Convert.ToDateTime(SRCF.two[0].Modified).ToShortDateString()+" " +Convert.ToDateTime(SRCF.two[0].Modified).ToShortTimeString()) : "" )">
+                                            </td>
+                                        </tr>
+
+                                    </table>
+                                }
+
+                            }
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-left f-600">SF_II_021.04</p>
+                    </div>
+                }
+
+                @if (IsNew)
+                {
+                    if (!IsEdit)
+                    {
+                        <div class="card-footer align-content-center">
+                            <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                                Re-Submit
+                            </button>
+                            <button type="reset" class="btn btn-danger btn-sm cancl-btn">
+                                Cancel
+                            </button>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="card-footer align-content-center">
+                            <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                                Submit
+                            </button>
+                            <button type="reset" class="btn btn-danger btn-sm cancl-btn">
+                                Cancel
+                            </button>
+                        </div>
+                    }
+                }
+            </form>
+
+        </div>
+    </div>
+</body>
+<div class="modal fade" id="successModel" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header modelHeader">
+                <span class="modal-title modalMsgTitle" id="modalTitle"></span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label id="modalBody" class="lableMsg">  </label>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="submitBomBtn publishBtn" id="modalOkButton">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    //var spinner = $('#loader');
+    var formID = @Html.Raw(Json.Encode(FormId));
+    var RowId = @Html.Raw(Json.Encode(RowId));
+    var isNew = @Html.Raw(Json.Encode(IsNew));
+    var srcf = @Html.Raw(Json.Encode(SRCF));
+    var appRowId = @Html.Raw(Json.Encode(AppRowId));
+    var approvalType =@Html.Raw(Json.Encode(ApprovalType));
+    var isEdit = @Html.Raw(Json.Encode(IsEdit));
+    var FlagRedirect = @Html.Raw(Json.Encode(FlagRedirect));
+
+    pageLoad();
+
+    function pageLoad() {
+        GetApprovers();
+        getEmployeeType();
+        getServerCreationType();
+        getServerEnvironment();
+        getServerHardware();
+        getOperatingSystem();
+        getServerType();
+        getServerBackup();
+        $("#txtCompanyName").hide();
+        if ($("#chkPermanent").prop("checked") == true) {
+            $("#txtTemporaryfrom").val("");
+            $("#txtTemporaryTo").val("");
+            $("#tdTemporaryfromlbl").hide();
+            $("#tdTemporarytolbl").hide();
+            $("#tdtxtTemporaryfrom").hide();
+            $("#tdtxtTemporaryto").hide();
+        }
+
+        if (!isNew) {
+            $(".inpDisable").attr("disabled", "disabled");
+            $(".txtDisable").prop("readonly", true);
+        }
+        if (!isEdit) {
+            $(".inpDisable").attr("disabled", false);
+            $(".txtDisable").prop("readonly", false);
+        }
+    }
+
+    function date_val() {
+        var week_string = document.getElementsByName("txtTemporaryfrom")[0].value;
+        console.log(week_string);
+        var parts = week_string.split("-");
+        var date = new Date(parts[0], parts[1] - 1, parts[2]);
+        var min_date = date;
+        min_date.setDate(min_date.getDate() + 1);
+        var initial_date = min_date.toISOString().split('T')[0];
+        document.getElementsByName("txtTemporaryTo")[0].setAttribute("min", initial_date);
+    }
+
+    function successModal(txt) {
+        ////
+        $('#modalTitle').html('Success');
+        if (txt == "approve") {
+            $('#modalBody').html('Form has been approved!');
+            FlagRedirect = txt;// For Email Update
+        }
+        else if (txt == "reject") {
+            $('#modalBody').html('Form has been rejected!');
+            FlagRedirect = txt;
+        }
+        else if (txt == "enquire") {
+            $('#modalBody').html('Form has been enquired!');
+            FlagRedirect = txt;
+        }
+        else if (txt == "cancelled") {
+            $('#modalBody').html('Form has been cancelled!');
+            FlagRedirect = txt;
+        } else {
+            $('#modalBody').html('Your form with ID: SRCF' + txt + ' has been submitted! Kindly use this for future reference');
+            FlagRedirect = txt;// For Email Update
+        }
+        // $("#modalOkButton").attr('data-dismiss', 'modal');//Commented For Email Update
+        $("#successModel").modal('show');
+    }
+
+    function failureModal() {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html('Some error occurred!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function validityModal(txt) {
+        ////
+        if (txt == 'approve') {
+            //DisplayAlert('error', 'Error', 'Please select the Type of Car');
+        }
+        else if (txt == 'reject') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for rejecting the form');
+        }
+        else if (txt == 'enquire') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for enquiring the form');
+        }
+
+    }
+
+    function requiredModal(text) {
+        $('#modalTitle').html('Required');
+        $('#modalBody').html(text + '!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function allowNumbersOnly(e) {
+        var code = (e.which) ? e.which : e.keyCode;
+        if (code > 31 && (code < 48 || code > 57)) {
+            e.preventDefault();
+        }
+    }
+
+    function alphaOnly(e) {
+        var key = e.keyCode;
+        if (key > 32 && (key < 65 || key > 122 || key == 91 || key == 92 || key == 93 || key == 94 || key == 95 || key == 96)) {
+            e.preventDefault();
+        }
+    }
+
+     function RequestSubmissionFor() {
+         var drpRequestSubmissionFor = $("#drpRequestSubmissionFor").val();
+         if (drpRequestSubmissionFor == "OnBehalf") {
+            $("#OtherEmpName").show();
+            $("#txtOtherEmpname").val('');
+            $("#txtEmployeeCode").val("");
+             $("#txtCostCenterNo").val("");
+             $("#txtUserID").val("");
+            $("#txtEmployeeName").val("");
+            $("#txtDepartment").val("");
+             $("#txtContactNo").val("");
+            $('input[id="chkInternal"]').prop("checked", false);
+            $('input[id="chkExternal"]').prop("checked", false);
+            $('input[id="chkInternal"]').prop("disabled", false);
+            $('input[id="chkExternal"]').prop("disabled", false);
+             $("#chkEmployeeType").val('Internal');
+             $("#txtCompanyName").hide();
+        }
+         else if (drpRequestSubmissionFor == "Self") {
+            $("#OtherEmpName").hide();
+            $("#txtEmployeeCode").val("@user.EmpNumber");
+             $("#txtCostCenterNo").val("@user.CostCenter");
+             $("#txtUserID").val("@user.UserId");
+            $("#txtEmployeeName").val("@user.UserName");
+            $("#txtDepartment").val("@user.Department");
+             $("#txtContactNo").val("");
+             $('input[id="chkInternal"]').prop("checked", true);
+            $('input[id="chkExternal"]').prop("checked", false);
+            $("#chkEmployeeType").val('Internal');
+            //$("#ExternalOrganizationName").hide();
+            // $("#ExternalOtherOrganizationName").hide();
+            // $("#lblExternalOrganizationName").hide();
+            // $("#lblExternalOtherOrganizationName").hide();
+             $("#txtCompanyName").hide();
+        }
+        else {
+            $("#OtherEmpName").hide();
+            $("#txtEmployeeCode").val("");
+             $("#txtCostCenterNo").val("");
+             $("#txtUserID").val("");
+            $("#txtEmployeeName").val("");
+            $("#txtDepartment").val("");
+             $("#txtContactNo").val("");
+            $('input[id="chkInternal"]').prop("checked", false);
+            $('input[id="chkExternal"]').prop("checked", false);
+            $('input[id="chkInternal"]').prop("disabled", false);
+            $('input[id="chkExternal"]').prop("disabled", false);
+            //$("#ExternalOrganizationName").hide();
+            // $("#ExternalOtherOrganizationName").hide();
+            // $("#lblExternalOrganizationName").hide();
+            // $("#lblExternalOtherOrganizationName").hide();
+             $("#txtCompanyName").hide();
+             }
+    }
+
+    $("#txtOtherEmpname").autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                url: "/List/GetEmployeeDetails",
+                dataType: "json",
+                cache: false,
+                async: false,
+                data: {
+                    searchText: $("#txtOtherEmpname").val()
+                },
+                success: function (data) {
+                    ////
+                    response($.map(data, function (item) {
+                        console.log(data, 'data');
+                        return { label: item.FirstName, value: item.FirstName, raw: item };
+                    }));
+                }
+            });
+        },
+        search: function (event, ui) {
+            var value = $("#txtOtherEmpname").val();
+            // If less than three chars, cancel the search event
+            if (value.length < 4) {
+                event.preventDefault();
+            }
+        },
+        min_length: 4,
+        delay: 0,
+        select: function (event, ui) {
+            ////
+            var empOtherDetails = ui.item['raw'];
+            //Get the other details like Cost Center Code, Employee Number from DB.
+            $.ajax({
+                url: "/List/GetExistingEmployeeDetails",
+                dataType: "json",
+                cache: false,
+                async: false,
+                data: {
+                    otherEmpUserId: empOtherDetails.Email,
+                },
+                success: function (data) {
+                    console.log(data, 'data');
+                    $('#txtEmployeeCode').val(data.EmpNumber);
+                    $('#txtDepartment').val(data.Department);
+                    $('#txtEmployeeName').val(data.UserName);
+                    $('#txtCostCenterNo').val(data.CostCenter);
+                    $('#txtUserID').val(data.UserId);
+                    $('#txtContactNo').val(data.PhoneNumber);
+                    $('input[id="chkInternal"]').prop("checked", true);
+                    $('input[id="chkInternal"]').prop("disabled", true);
+                    $('#hiddentxtEmail').val(data.Email);
+                }
+            });
+        }
+    });
+
+    function mobileLengthModal() {
+      $('#modalTitle').html('Required');
+      $('#modalBody').html('Please enter a 10-Digit Contact No.!');
+      $("#modalOkButton").attr('data-dismiss', 'modal');
+      $("#successModel").modal('show');
+    }
+
+    function getEmployeeType() {
+        ////
+        $('input:checkbox[id="chkInternal"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                console.log("Internal");
+                $("#chkEmployeeType").val('Internal');
+                $('input[id="chkInternal"]').prop('disabled', true);
+                $('input[id="chkExternal"]').prop('checked', false);
+                $('input[id="chkExternal"]').prop("disabled", false);
+                $("#txtCompanyName").hide();
+
+                //$("#ExternalOrganizationName").hide();
+                //$("#lblExternalOrganizationName").hide();
+                //$("#ExternalOtherOrganizationName").hide();
+                //$("#lblExternalOtherOrganizationName").hide();
+
+                //$("#drpRequestSubmissionFor").prop("selectedIndex", 0).val();
+
+                //if (isEdit) {
+                //    $("#txtOtherEmpname").val("");
+                //    $("#txtEmployeeCode").val("");
+                //    $("#txtCostcenterCode").val("");
+                //    $("#txtUserId").val("");
+                //    $("#txtEmployeeName").val("");
+                //    $("#txtContactNo").val("");
+                //    $("#txtDepartment").val("");
+                //    $("#txtLevel").val("");
+                //    $("#ddEmpDesignation").prop("selectedIndex", 0).val();
+                //    $("#ddEmpLocation").prop("selectedIndex", 0).val();
+                //}
+            }
+        });
+
+        $('input:checkbox[id="chkExternal"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                $("#chkEmployeeType").val('External');
+                $('input[id="chkExternal"]').prop('disabled', true);
+                $('input[id="chkInternal"]').prop("checked", false);
+                $('input[id="chkInternal"]').prop("disabled", false);
+                $("#txtCompanyName").val("");
+                $("#txtCompanyName").show();
+                ////hide / value empty
+                //if (isEdit) {
+                //    $("#OtherEmpName").hide();
+                //    $("#txtEmployeeCode").val("");
+                //    $("#txtCostcenterCode").val("");
+                //    $("#txtUserId").val("");
+                //    $("#txtEmployeeName").val("");
+                //    $("#txtDepartment").val("");
+                //    $("#txtContactNo").val("");
+                //}
+                ////show
+                //$("#ExternalOrganizationName").show();
+                //$("#lblExternalOrganizationName").show();
+                //$("#drpRequestSubmissionFor").prop("selectedIndex", 2).val();
+                //$("#ddExternalOrganizationName").prop("selectedIndex", 0).val();
+                //$("#ddEmpDesignation").prop("selectedIndex", 0).val();
+                //$("#txtOtherEmpname").val("");
+            }
+        });
+    }
+
+    function getServerCreationType() {
+        ////
+        $('input:checkbox[id="chkNewServerCreation"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                $('input[id="chkNewServerCreation"]').prop('disabled', true);
+                $('input[id="chkExistingServer"]').prop('checked', false);
+                $('input[id="chkExistingServer"]').prop("disabled", false);
+                $("#chkServerCreationType").val('New Server Creation');
+
+            }
+        });
+
+        $('input:checkbox[id="chkExistingServer"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                $("#chkServerCreationType").val('Existing Server Modification');
+                $('input[id="chkExistingServer"]').prop('disabled', true);
+                $('input[id="chkNewServerCreation"]').prop("checked", false);
+                $('input[id="chkNewServerCreation"]').prop("disabled", false);
+            }
+        });
+    }
+
+    function getServerEnvironment() {
+        ////
+        $('input:checkbox[id="chkOffice"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                $('input[id="chkOffice"]').prop('disabled', true);
+                $('input[id="chkProduction"]').prop('checked', false);
+                $('input[id="chkProduction"]').prop("disabled", false);
+                $("#chkServerEnvironment").val('Office');
+
+            }
+        });
+
+        $('input:checkbox[id="chkProduction"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                $("#chkServerEnvironment").val('Production');
+                $('input[id="chkProduction"]').prop('disabled', true);
+                $('input[id="chkOffice"]').prop("checked", false);
+                $('input[id="chkOffice"]').prop("disabled", false);
+            }
+        });
+    }
+
+    function getServerHardware() {
+        ////
+        $('input:checkbox[id="chkVirtual"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                $('input[id="chkVirtual"]').prop('disabled', true);
+                $('input[id="chkPhysical"]').prop('checked', false);
+                $('input[id="chkPhysical"]').prop("disabled", false);
+                $("#chkServerHardware").val('Virtual');
+
+            }
+        });
+
+        $('input:checkbox[id="chkPhysical"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                $("#chkServerHardware").val('Physical');
+                $('input[id="chkPhysical"]').prop('disabled', true);
+                $('input[id="chkVirtual"]').prop("checked", false);
+                $('input[id="chkVirtual"]').prop("disabled", false);
+            }
+        });
+    }
+
+    function getOperatingSystem() {
+        ////
+        $('input:checkbox[id="chkWindows"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                $('input[id="chkWindows"]').prop('disabled', true);
+                $('input[id="chkOthersOS"]').prop('checked', false);
+                $('input[id="chkOthersOS"]').prop("disabled", false);
+                $("#chkOperatingSystem").val('Windows');
+
+            }
+        });
+
+        $('input:checkbox[id="chkOthersOS"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                $("#chkOperatingSystem").val('Others OS');
+                $('input[id="chkOthersOS"]').prop('disabled', true);
+                $('input[id="chkWindows"]').prop("checked", false);
+                $('input[id="chkWindows"]').prop("disabled", false);
+            }
+        });
+    }
+
+    function getServerType() {
+        $('input:checkbox[id="chkPermanent"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                $('input[id="chkPermanent"]').prop('disabled', true);
+                $('input[id="chkTemporary"]').prop('checked', false);
+                $('input[id="chkTemporary"]').prop("disabled", false);
+                $("#chkServerType").val('Permanent');
+                $("#tdTemporaryfromlbl").hide();
+                $("#tdTemporarytolbl").hide();
+                $("#tdtxtTemporaryfrom").hide();
+                $("#tdtxtTemporaryto").hide();
+            }
+        });
+
+        $('input:checkbox[id="chkTemporary"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                $("#chkServerType").val('Temporary');
+                $('input[id="chkTemporary"]').prop('disabled', true);
+                $('input[id="chkPermanent"]').prop("checked", false);
+                $('input[id="chkPermanent"]').prop("disabled", false);
+                $("#txtTemporaryfrom").val("");
+                $("#txtTemporaryTo").val("");
+                $("#tdTemporaryfromlbl").show();
+                $("#tdTemporarytolbl").show();
+                $("#tdtxtTemporaryfrom").show();
+                $("#tdtxtTemporaryto").show();
+            }
+        });
+    }
+
+    function getServerBackup() {
+        ////
+        $('input:checkbox[id="chkYes"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                $('input[id="chkYes"]').prop('disabled', true);
+                $('input[id="chkNo"]').prop('checked', false);
+                $('input[id="chkNo"]').prop("disabled", false);
+                $("#chkServerBackup").val('Yes');
+
+            }
+        });
+
+        $('input:checkbox[id="chkNo"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                $("#chkServerBackup").val('No');
+                $('input[id="chkNo"]').prop('disabled', true);
+                $('input[id="chkYes"]').prop("checked", false);
+                $('input[id="chkYes"]').prop("disabled", false);
+            }
+        });
+    }
+
+    function GetApprovers() {
+        ////
+        $.ajax({
+            url: '/ServerRequisition/GetServerReqApprovalList',
+            type: 'GET',
+            data: {},
+            dataType: 'JSON',
+            success: (function (data) {
+                ////
+                approverData = data;
+                console.log(data);
+                var row = "";
+                for (var i = 0; i < data.length; i++) {
+                    row += '<input type="hidden" id="hidden' + data[i].Department + 'Approver" name="hidden' + data[i].Department + 'Approver" value="' + data[i].ApproverEmailId + '">';
+                }
+                $("#hiddenApproverInformation").html(row);
+
+            }),
+            error: (function (data) {
+                //code
+            })
+        })
+
+    }
+
+    $("#btnSubmit").on('click', function (e) {
+        //
+
+        var requestSubmissionFor = document.getElementById("drpRequestSubmissionFor").selectedIndex;
+        console.log(requestSubmissionFor);
+        if (requestSubmissionFor == 0) {
+            requiredModal("Please select the Request Submission For");
+            return false;
+        }
+
+        var txtEmployeeName = document.getElementById("txtEmployeeName").value;
+        if (txtEmployeeName == "") {
+            requiredModal("Please enter the Employee Name");
+            return false;
+        }
+        var txtDepartment = document.getElementById("txtDepartment").value;
+        if (txtDepartment == "") {
+            requiredModal("Please enter the Department");
+            return false;
+        }
+        var txtEmployeeCode = document.getElementById("txtEmployeeCode").value;
+        if (txtEmployeeCode == "") {
+            requiredModal("Please enter the Employee Code");
+            return false;
+        }
+        var txtCostCenterNo = document.getElementById("txtCostCenterNo").value;
+        if (txtCostCenterNo == "") {
+            requiredModal("Please enter the Cost Center No");
+            return false;
+        }
+        var txtUserID = document.getElementById("txtUserID").value;
+        if (txtUserID == "") {
+            requiredModal("Please enter the User ID");
+            return false;
+        }
+        if ($('.typeofemp:checkbox:checked').length == 0) {
+            requiredModal("Please select the Type of Employee");
+            return false;
+        }
+        var txtLevel = document.getElementById("txtLevel").value;
+        if (txtLevel == "") {
+            requiredModal("Please enter the Level");
+            return false;
+        }
+        var txtContactNo = document.getElementById("txtContactNo").value;
+        if (txtContactNo == "") {
+            requiredModal("Please enter the Contact No");
+            return false;
+        }
+        var mobileLen = $("#txtContactNo").val().length;
+        if (mobileLen < 10 || mobileLen > 10) {
+            mobileLengthModal();
+            return false;
+        }
+        if ($('.servercreation:checkbox:checked').length == 0) {
+            requiredModal("Please select the Server Creation Type");
+            return false;
+        }
+        var txtServerOwnerName = document.getElementById("txtServerOwnerName").value;
+        if (txtServerOwnerName == "") {
+            requiredModal("Please enter the Server Owner Name");
+            return false;
+        }
+        var txtAdminAccount = document.getElementById("txtAdminAccount").value;
+        if (txtAdminAccount == "") {
+            requiredModal("Please enter the Admin Account");
+            return false;
+        }
+        var txtServerRole = document.getElementById("txtServerRole").value;
+        if (txtServerRole == "") {
+            requiredModal("Please enter the Server Role / Apps Name");
+            return false;
+        }
+        if ($('.serverenv:checkbox:checked').length == 0) {
+            requiredModal("Please select the Server Environment");
+            return false;
+        }
+        if ($('.serverhardware:checkbox:checked').length == 0) {
+            requiredModal("Please select the Server Hardware");
+            return false;
+        }
+        var txtRAM = document.getElementById("txtRAM").value;
+        if (txtRAM == "") {
+            requiredModal("Please enter the RAM");
+            return false;
+        }
+        var txtNoOfCPU = document.getElementById("txtNoOfCPU").value;
+        if (txtNoOfCPU == "") {
+            requiredModal("Please enter the CPU: No. of CPU / Cores");
+            return false;
+        }
+        var txtNoOfNetworkPorts = document.getElementById("txtNoOfNetworkPorts").value;
+        if (txtNoOfNetworkPorts == "") {
+            requiredModal("Please enter the No. of Network Ports");
+            return false;
+        }
+        var txtSize = document.getElementById("txtSize").value;
+        if (txtSize == "") {
+            requiredModal("Please enter the Size");
+            return false;
+        }
+        var txtTwoRoom = document.getElementById("txtTwoRoom").value;
+        if (txtTwoRoom == "") {
+            requiredModal("Please enter the Two Room");
+            return false;
+        }
+        var txtNonTwoRoom = document.getElementById("txtNonTwoRoom").value;
+        if (txtNonTwoRoom == "") {
+            requiredModal("Please enter the Non Two Room");
+            return false;
+        }
+        if ($('.operatingsystem:checkbox:checked').length == 0) {
+            requiredModal("Please select the Operating System");
+            return false;
+        }
+        var txtOSName = document.getElementById("txtOSName").value;
+        if (txtOSName == "") {
+            requiredModal("Please enter the OS Name");
+            return false;
+        }
+        var txtOSEdition = document.getElementById("txtOSEdition").value;
+        if (txtOSEdition == "") {
+            requiredModal("Please enter the OS Edition");
+            return false;
+        }
+        var txtArchitecture = document.getElementById("txtArchitecture").value;
+        if (txtArchitecture == "") {
+            requiredModal("Please enter the Architecture");
+            return false;
+        }
+        var txtDBName = document.getElementById("txtDBName").value;
+        if (txtDBName == "") {
+            requiredModal("Please enter the DB Name");
+            return false;
+        }
+        var txtDBEdition = document.getElementById("txtDBEdition").value;
+        if (txtDBEdition == "") {
+            requiredModal("Please enter the DB Edition");
+            return false;
+        }
+        var txtServerCriticality = document.getElementById("txtServerCriticality").value;
+        if (txtServerCriticality == "") {
+            requiredModal("Please enter the Server Criticality");
+            return false;
+        }
+        if ($('.servertype:checkbox:checked').length == 0) {
+            requiredModal("Please select the Server Type");
+            return false;
+        }
+        if ($("#chkTemporary").prop("checked") == true) {
+            var dateTempFrom = document.forms["SRCFForm"]["txtTemporaryfrom"].value;
+            var dateTempTo = document.forms["SRCFForm"]["txtTemporaryTo"].value;
+
+            if (dateTempFrom == "") {
+                requiredModal("Please select the Temporary From Date");
+                return false;
+            }
+            if (dateTempTo == "") {
+                requiredModal("Please select the Temporary To Date");
+                return false;
+            }
+        }
+
+        if ($('.serverbackup:checkbox:checked').length == 0) {
+            requiredModal("Please select the Server Backup");
+            return false;
+        }
+        var txtReasonforServer = document.getElementById("txtReasonforServer").value;
+        if (txtReasonforServer == "") {
+            requiredModal("Please enter the Reason for Server Requisition");
+            return false;
+        }
+
+        $("#pageLoader").removeClass('invisible');
+        var form = $("#SRCFForm");
+        var formData = new FormData(form[0]);
+        console.log(form);
+
+        $.ajax({
+            url: '/ServerRequisition/SaveServerRequisition',
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            data: formData,
+            enctype: 'multipart/form-data',
+            success: (function (data) {
+                if (data[0].Value == 1) {
+                    console.log(data);
+                    $("#pageLoader").addClass('invisible');
+                    successModal(data[1].Value);
+                }
+                else {
+                    failureModal();
+                    $("#pageLoader").addClass('invisible');
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+                $("#pageLoader").addClass('invisible');
+            })
+        })
+    });
+
+    function saveResponse(text) {
+        //
+
+        var status = '', comment = '';
+        comment = $("#comment-" + text).val();
+        switch (text) {
+            case 'approve': {
+                status = 'Approved';
+                if (comment != '') {
+                    //validityModal(text);
+                    //return;
+                }
+                break;
+            }
+            case 'reject': {
+                status = 'Rejected';
+                if (comment == '') {
+                    validityModal(text);
+                    return;
+                }
+                break;
+            }
+            case 'enquire': {
+                status = 'Enquired';
+                if (comment == '') {
+                    validityModal(text);
+                    return;
+                }
+                break;
+            }
+        }
+
+        $.ajax({
+            url: '/List/SaveResponse',
+            type: 'POST',
+            data: { response: status, appRowId: appRowId, comment: comment, approvalType: approvalType },
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data == 1) {
+                    successModal(text);
+                    setTimeout(FilterMyTasks, 5000);
+                }
+                else {
+                    failureModal();
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+            })
+        })
+    }
+
+    $("#modalOkButton").on('click', function () {
+        //
+        if (FlagRedirect != null) {
+            window.location = "../Dashboard";
+        }
+    });
+
+</script>

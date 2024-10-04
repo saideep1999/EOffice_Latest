@@ -1,0 +1,109 @@
+﻿@model Skoda_DCMS.Models.DashboardModel
+@{
+    var currentUser = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    ViewBag.Title = "FinalEmailTrigger";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>User Details</h2>
+<body>
+    <div class="right_col bg-transparent" role="main">
+        <div>
+            <form action="/FinalEmailTrigger/SendEmail" method="post" id="FinalEmailForm">
+                <label>Form Id</label>
+                <input id="txtFormId" name="txtFormId" autocomplete="off" /><br />
+                <label>RowId</label>
+                <input id="txtRowId" name="txtRowId" autocomplete="off" /><br />
+                <label>Response</label>
+                <input id="txtApproverResponse" name="txtApproverResponse" autocomplete="off" /><br />
+                <label>Level</label>
+                <input id="txtLevel" name="txtLevel" autocomplete="off" /><br />
+                <label>App RowId</label>
+                <input id="txtAppRowId" name="txtAppRowId" autocomplete="off" /><br />
+                <label>Form Short Name</label>
+                <input id="txtformShortName" name="txtformShortName" autocomplete="off" /><br />
+                <label>Form Name</label>
+                <input id="txtformName" name="txtformName" autocomplete="off" /><br />
+
+                <button id="btnSubmit" type="button">Sent Mail With Approver</button>
+                <button id="btnSentMail" type="button">Sent Mail Without Approver</button>
+                <br /><br />
+
+            </form>
+        </div>
+    </div>
+</body>
+<script>
+    $(document).ready(function () {
+
+        $("#btnSubmit").on('click', function (e) {
+            
+            $("#pageLoader").removeClass('invisible');
+
+            var form = $("#FinalEmailForm");
+            var formData = new FormData(form[0]);
+
+            $.ajax({
+                url: '/FinalEmailTrigger/SendFinalEmail',
+                processData: false,
+                contentType: false,
+                type: 'POST',
+                data: formData,
+                enctype: 'multipart/form-data',
+                success: (function (data) {
+                    console.log(data);
+                    if (data.Result == 1) {
+                        $("#pageLoader").addClass('invisible');
+                        alert('Data Updated Successfully.')
+                    }
+                    else {
+                        $("#pageLoader").addClass('invisible');
+                        console.log('error');
+                    }
+                }),
+                error: (function (data) {
+                    $("#pageLoader").addClass('invisible');
+                    console.log('error');
+                })
+            })
+
+        });
+
+        $("#btnSentMail").on('click', function (e) {
+            
+            $("#pageLoader").removeClass('invisible');
+
+            var form = $("#FinalEmailForm");
+            var formData = new FormData(form[0]);
+
+            $.ajax({
+                url: '/FinalEmailTrigger/SendFinalEmailWithoutApprover',
+                processData: false,
+                contentType: false,
+                type: 'POST',
+                data: formData,
+                enctype: 'multipart/form-data',
+                success: (function (data) {
+                    console.log(data);
+                    if (data.Result == 1) {
+                        $("#pageLoader").addClass('invisible');
+                        alert('Data Updated Successfully.')
+                    }
+                    else {
+                        $("#pageLoader").addClass('invisible');
+                        console.log('error');
+                    }
+                }),
+                error: (function (data) {
+                    $("#pageLoader").addClass('invisible');
+                    console.log('error');
+                })
+            })
+
+        });
+    });
+</script>
+
+
+
+

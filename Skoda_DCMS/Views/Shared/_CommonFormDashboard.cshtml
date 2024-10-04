@@ -1,0 +1,261 @@
+﻿@model Skoda_DCMS.Models.DashboardModel
+
+<table id="dtBasicExample" class="table table-striped table-bordered table-sm display nowrap" cellspacing="0" width="100%">
+    <thead>
+        <tr class="status-table-row">
+            <th class="th-sm">
+                ID
+                <span class="caret-icon">
+                    <a href="" class="caret-up">
+                        <i class="fa fa-caret-up"></i>
+                    </a>
+                    <a href="" class="caret-down">
+                        <i class="fa fa-caret-down"></i>
+                    </a>
+                </span>
+            </th>
+            <th class="th-sm">
+                Form Name
+                <span class="caret-icon">
+                    <a href="" class="caret-up">
+                        <i class="fa fa-caret-up"></i>
+                    </a>
+                    <a href="" class="caret-down">
+                        <i class="fa fa-caret-down"></i>
+                    </a>
+                </span>
+            </th>
+            <th class="th-sm">
+                Request From (User Name)
+                <span class="caret-icon">
+                    <a href="" class="caret-up">
+                        <i class="fa fa-caret-up"></i>
+                    </a>
+                    <a href="" class="caret-down">
+                        <i class="fa fa-caret-down"></i>
+                    </a>
+                </span>
+            </th>
+            <th class="th-sm">
+                Business need
+                <span class="caret-icon">
+                    <a href="" class="caret-up">
+                        <i class="fa fa-caret-up"></i>
+                    </a>
+                    <a href="" class="caret-down">
+                        <i class="fa fa-caret-down"></i>
+                    </a>
+                </span>
+            </th>
+            <th class="th-sm">
+                Status
+                <span class="caret-icon">
+                    <a href="" class="caret-up">
+                        <i class="fa fa-caret-up"></i>
+                    </a>
+                    <a href="" class="caret-down">
+                        <i class="fa fa-caret-down"></i>
+                    </a>
+                </span>
+            </th>
+            <th class="th-sm">
+                Received  Date
+                <span class="caret-icon">
+                    <a href="" class="caret-up">
+                        <i class="fa fa-caret-up"></i>
+                    </a>
+                    <a href="" class="caret-down">
+                        <i class="fa fa-caret-down"></i>
+                    </a>
+                </span>
+            </th>
+            <th class="th-sm">
+                Action
+                <span class="caret-icon">
+                    <a href="" class="caret-up">
+                        <i class="fa fa-caret-up"></i>
+                    </a>
+                    <a href="" class="caret-down">
+                        <i class="fa fa-caret-down"></i>
+                    </a>
+                </span>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Data.Forms)
+        {
+            <tr>
+                <td class="align-middle">@($"{item.UniqueFormName}{item.UniqueFormId}")</td>
+                <td class="align-middle">@item.FormName</td>
+                @if (item.Author != null)
+                {
+                    <td class="align-middle">@item.Author.Submitter</td>
+                }
+                else
+                {
+                    <td class="align-middle">@item.Author</td>
+                }
+                <td class="align-middle">@($"{item.Status} - {item.FormName}")</td>
+                @*<td>Business need</td>*@
+                <td>
+                    <div class="container" style="text-align: center;">
+                        <!-- Trigger the modal with a button -->
+                        <button type="button" class="btn btn-xs btn-default" data-toggle="modal" data-target="#myModal2">@(item.Status ?? "Unknown")</button>
+                    </div>
+                </td>
+
+                <td data-order="@item.FormCreatedDate.ToString("MMddyyyy HH:mm")">
+                    @item.FormCreatedDate.ToString("dd-MM-yyyy")
+                </td>
+                @*<td>working on techical issue</td>*@
+                @*<td>
+                        <div class="container" style="text-align: center;">
+
+                            <button type="button" class="btn btn-xs btn-default" onclick="GoToViewForm('@item.UniqueFormName',@item.DataRowId,@item.UniqueFormId,@item.Id)">View form</button>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="container" style="text-align: center;">
+                            <button type="button" class="btn btn-xs btn-default" data-toggle="modal" data-target="#myModal1">edit form</button>
+                        </div>
+                    </td>
+                    <td>
+                        <a href=@Url.Action("PrintIndex","List",new { formName = item.UniqueFormName, formId=item.UniqueFormId, rowId=item.RowId, appRowId=item.Id}) class="txt-primary download-icon">
+                            <i class="fa fa-download" aria-hidden="true"></i>
+                        </a>
+                    </td>*@
+                <td>
+                    <div class="container" style="text-align: center;">
+                        <!-- Trigger the modal with a button -->
+                        <button type="button" class="btn btn-xs btn-default"
+                                @*onclick="GoToViewForm('@item.UniqueFormName',@item.RowId,@item.UniqueFormId,@item.Id,'@item.ControllerName')">*@
+                                onclick="GoToViewForm('@item.UniqueFormName',@item.DataRowId,@item.UniqueFormId,@item.Id,'@item.ControllerName')">
+                            <i class="fa fa-eye" aria-hidden="true"></i>
+                        </button>
+
+                        @*<button type="button" class="btn btn-xs btn-default" data-toggle="modal"
+                                    data-target="#myModal1">
+                                <i class="fa fa-edit"></i>
+                            </button>*@
+
+                        <button type="button" class="btn btn-xs btn-default">
+                            <a href=@Url.Action("PrintIndex","List",new { formName = item.UniqueFormName, formId=item.UniqueFormId, rowId=item.DataRowId, appRowId=item.Id}) class="txt-primary download-icon">
+                                <i class="fa fa-download"></i>
+                            </a>
+                        </button>
+
+
+                        <button type="button" class="btn btn-xs btn-default" onclick="GoToCancelForm(@item.UniqueFormId)">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+
+        }
+
+    </tbody>
+</table>
+
+<script>
+
+    function GoToViewForm(formName, rowId, formId, appRowId, ControllerName) {
+        
+        console.log('here');
+        console.log(formId);
+        $("#pageLoader").removeClass('invisible');
+        $.ajax({
+            url: '/List/ViewFilledFormNew',
+            type: 'GET',
+            data: { formName: formName, rowId: rowId, formId: formId, appRowId: appRowId, ControllerName: ControllerName },
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data.isValid) {
+                    console.log(data);
+                    $("#viewForm").html(data.view);
+                    $("#myModal").modal('show');
+                    $("#pageLoader").addClass('invisible');
+                }
+                else {
+                    $("#pageLoader").addClass('invisible');
+                    alert("There was an issue while opening the form. Please contact your administrator");
+                }
+            }),
+            error: (function (data) {
+                $("#loader").addClass('invisible');
+            })
+        })
+    }
+
+    $(document).ready(function () {
+        ////
+        $('#dtBasicExample').dataTable({
+            "bPaginate": true,
+            "bLengthChange": true,
+            "bFilter": true,
+            "bInfo": false,
+            "order": [[5, 'desc']],
+            /* "order": [[1, 'desc']],*/
+            //"rowReorder": {
+            //    selector: 'td:nth-child(2)'
+            //},
+            "responsive": true,
+            columnDefs: [
+                { type: 'date-dd-mm-yyyy HH:mm', targets: 5 }
+            ],
+            "oLanguage": { "sSearch": "" },
+            "bAutoWidth": false,
+            language: {
+                searchPlaceholder: "Search",
+                paginate: {
+                    next: '&#8811;', // or '→'
+                    previous: '&#8810;' // or '←'
+                }
+            },
+        });
+    });
+    function GoToCancelForm(formId) {
+        ////
+        //console.log('gotocancelform');
+        //console.log(formId);
+        //$("#pageLoader").removeClass('invisible');
+        $.ajax({
+            url: '/List/CancelForm',
+            type: 'POST',
+            data: { formId: formId },
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data == 1) {
+                    //console.log(data);
+                    successModal();
+                    //console.log('Modal Triggered');
+                    //setTimeout(window.location.reload, 5000)
+                    setTimeout(function () {// wait for 5 secs(2)
+                        location.reload(); // then reload the page.(3)
+                    }, 4000);
+                    //console.log('Refresh Triggered');
+                }
+                else {
+                    if (data == 2) {
+                        //console.log('failure2modal');
+                        failure2Modal()
+                    }
+                    else {
+                        failureModal();
+                    }
+                    //$("#pageLoader").addClass('invisible');
+                    //alert("There was an issue while opening the form. Please contact your administrator");
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+                //$("#loader").addClass('invisible');
+            })
+        })
+    }
+
+
+
+
+</script>

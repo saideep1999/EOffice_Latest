@@ -1,0 +1,30 @@
+﻿@model Skoda_DCMS.Models.DashboardModel
+<table class="" id="Dept_table">
+    <thead>
+        <tr>
+            <th class="text-left">Department</th>
+            <th class="text-left">Total Forms</th>
+        </tr>
+    </thead>
+    <tbody id="">     
+        @foreach (var item in Model.Data.DepartmentList)
+        {
+            <tr class="">
+                <td>
+                    <a href="@Url.Action("GetDepartmentWiseForms","Dashboard", new { department= item.Item1 })">
+                        @item.Item1
+                    </a>
+                </td>
+
+                <td>
+                    <a href="@Url.Action("GetDepartmentWiseForms","Dashboard", new { department= item.Item1 })">
+                        @item.Item2
+                    </a>
+                </td>
+            </tr>
+
+        }
+
+    </tbody>
+</table>
+

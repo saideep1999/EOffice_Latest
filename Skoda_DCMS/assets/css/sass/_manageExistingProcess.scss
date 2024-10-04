@@ -1,0 +1,183 @@
+
+// Manage Existing Process
+
+.breadcrumb {
+
+    background-color: transparent;
+    margin-top: 20px;
+
+}
+.text_limit{    
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    max-width: 250px;
+}
+.btn-teal{
+    background-color: $teal;
+    border-color:$teal;
+    color: #fff;
+    &:focus,
+    &:hover{
+        background-color: $teal;
+        border-color:$teal; 
+        color: #fff;
+    }
+}
+.btn_action{     
+    padding: 6px 20px;    
+}
+.status_published{
+    color: #0090d7;
+
+}
+
+.manage{    
+    &_tbl{
+        display: table;
+        width: 100%;
+        background-color: #fff;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        border: 1px solid #f2eeee;
+    }
+    &_cell{
+        display:table-cell;
+        padding: 16px 10px;
+        line-height: normal;        
+        vertical-align: middle; 
+        font-family: Verdana;
+        font-size: 14px;
+        color: #253439;
+        &_5,
+        &_6{
+            width:10%;
+        }
+        &_2{
+            width:15%;
+        }
+        &_4{
+            width:20%;
+        }
+        &_3{
+            width:20%;
+        }
+        &_1{
+            width:20%;
+        }
+        .col_label{
+            font-size: 12px;
+            color: rgba(130, 152, 163, 0.75);
+        }   
+        .btn-group{
+            float: right;
+        }    
+        .dropdown-menu {
+            left: initial;
+            right: 0;
+            padding: 20px 0;
+            width: 165px;
+            text-align: left;
+            li{
+                a{
+                    font-size: 12px;
+                    padding: 12px 20px;
+                }
+            }
+        }
+    }
+}
+.ico{
+    &_view{
+        &:after{
+            background-image: url(../img/view_ico@2x.png);
+        }
+    }
+    &_edit{
+        &:after{
+            background-image: url(../img/edit_ico@2x.png);
+            background-size: 18px !important;
+            background-position: left !important;
+        }
+    }
+    &_obso{
+        &:after{
+            background-image: url(../img/obsolete_ico@2x.png);
+            background-size: 15px !important;
+            background-position: left !important;
+        }
+    }
+    &_publish{
+        &:after{
+            background-image: url(../img/publish_ico@2x.png);
+            background-size: 15px !important;
+            background-position: left !important;
+        }
+    }
+    &_unpublish{
+        &:after{
+            background-image: url(../img/unpublish_ico@2x.png);
+            background-size: 15px !important;
+            background-position: left !important;
+        }
+    }
+    &:after{
+        content: '';
+        width: 20px;
+        height: 20px;
+        display: inline-block;
+        vertical-align: middle;        
+        background-repeat: no-repeat;
+        background-size: contain;
+        background-position: left;
+        margin-right: 10px;
+    }
+}
+.page_pagination-wrp{
+    text-align: center;
+}
+
+.pagination > .active > a, .pagination > .active > a:focus, .pagination > .active > a:hover, .pagination > .active > span, .pagination > .active > span:focus, .pagination > .active > span:hover {
+
+    background-color: $marine-blue-two;
+    border-color: $marine-blue-two;
+}
+.pagination > li > a, .pagination > li > span {
+    padding: 1px 7px;
+    margin-left: 7px;
+    border-radius: 5px;
+}
+
+
+// table view
+.manage_tabled_view th.manage_cell {
+    padding: 15px 10px;
+    font-family: Verdana;
+  font-size: 14px;
+  color: rgba(66, 66, 66, 0.75);
+  font-weight: normal;
+}
+.manage_tabled_view{
+    &.table-striped > tbody > tr:nth-of-type(2n) {
+        background-color: #f5f8fa;
+    }
+    &.table-striped > tbody > tr:nth-of-type(2n+1) {
+        background-color: #fff;
+    }
+    .manage_cell {        
+        padding: 7px 10px;
+    }
+    .btn_action {
+        padding: 2px 20px;
+        border-radius: 0;
+    }
+    .status_published{
+        color: #004865;
+    }
+}
+.manage_wrp{
+    min-height: 709px;
+}
+.page_pagination-wrp.text-right{
+    text-align: right;
+}

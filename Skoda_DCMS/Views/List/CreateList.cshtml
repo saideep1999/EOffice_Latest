@@ -1,0 +1,121 @@
+﻿
+@{
+    ViewBag.Title = "Create List";
+}
+
+<div class="card main-hdng-info ml-5 mr-5">
+    <div class="card-header">
+        <strong class="txt-info txt-fnt">Create List Form</strong>
+    </div>
+</div>
+<div class="card card-border ml-5 mr-5">
+    <div class="card-header card-bg">
+        <strong class="txt-info txt-fnt">Submitter List Detail</strong>
+    </div>
+    <div class="card-body card-block">
+
+        @using (Html.BeginForm("CreateList", "List", FormMethod.Post, new { @class = "form-horizontal" }))
+        {
+            <table class="form-group form-container tableList">
+                <tr class="row">
+                    <td class="col-lg-12">
+                        <label for="">
+                            <strong class="txt-info txt-fnt">List Name</strong>
+                            <span class="text-icon-clr">
+                                *
+                            </span>
+                        </label>
+                    </td>
+                </tr>
+                <tr class="row">
+                    <td class="col-lg-4">
+                        <input type="text" class="form-control form-control-hgt" name="listName">
+                    </td>
+                </tr>
+                <tr class="row mt-4">
+                    <th class="col-lg-4">
+                        <label for="">
+                            <strong class="txt-info txt-fnt">
+                                Field Name
+                            </strong>
+                            <span class="text-icon-clr">
+                                *
+                            </span>
+                        </label>
+                    </th>
+                    <th class="col-lg-4">
+                        <label for="">
+                            <strong class="txt-info txt-fnt">
+                                Field Type
+                            </strong>
+                            <span class="text-icon-clr">
+                                *
+                            </span>
+                        </label>
+                    </th>
+                </tr>
+                @for (int i = 0; i < 9; i++)
+                {
+                    <tr class="row">
+                        <td class="col-lg-4">
+                            <input type="text" class="form-control form-control-hgt" name="fieldName" id="fieldName_@i">
+                        </td>
+                        <td class="col-lg-4">
+                            <select name="fieldType" id="fieldType_@i" onchange="FieldChoice(this.value, @i)" class="form-control-sm form-control">
+                                <option>Please select</option>
+                                <option>Text</option>
+                                <option>Number</option>
+                                <option>DateTime</option>
+                                <option>Choice</option>
+                            </select>
+                        </td>
+                        <td class="col-lg-4">
+                            <input type="text" class="form-control form-control-hgt" placeholder="Text seperated by ;" name="txtChoice" id="txtChoice_@i" style="display:none;">
+                        </td>
+                    </tr>
+                }
+            </table>
+            <div class="card-footer">
+                <button type="button" class="btn btn-sm submit-btn" onclick="AddFields()">
+                    Add more fields
+                </button>
+                <button type="submit" class="btn btn-primary btn-sm submit-btn">
+                    Submit
+                </button>
+                <button type="reset" class="btn btn-danger btn-sm cancl-btn">
+                    Cancel
+                </button>
+            </div>
+        }
+    </div>
+</div>
+
+
+
+<script>
+
+    function AddFields() {
+        var oldCount = $('.tableList tr').length;
+        var newCount = oldCount + 1;
+        var row = '<tr class="row"><td class="col-lg-4"><input type="text" class="form-control form-control-hgt" name="fieldName" id="fieldName_' + newCount + '" /></td>'
+            + ' <td class="col-lg-4"><select name="fieldType" id="fieldType_' + newCount + '" onchange = "FieldChoice(this.value, ' + newCount + ')" class="form-control-sm form-control" >'
+            + ' <option>Please select</option><option>Text</option><option>Number</option><option>DateTime</option><option>Choice</option></select></td>'
+            + ' <td class="col-lg-4"><input type="text" class="form-control form-control-hgt" placeholder="Text seperated by ;" name="txtChoice" id="txtChoice_' + newCount + '" style="display:none;" />'
+            + '</td></tr>';
+
+        $(".tableList tr:last").after(row);
+    };
+
+    function FieldChoice(value, index) {
+        if (value == "Choice") {
+            var id = "#txtChoice_" + index;
+            $(id).removeAttr("style", "display:none");
+        }
+        else {
+            var id = "#txtChoice_" + index;
+            $(id).attr("style", "display:none");
+        }
+    }
+
+</script>
+

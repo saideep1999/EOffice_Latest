@@ -1,0 +1,1433 @@
+﻿@model dynamic
+@{ bool IsNew = true;
+    dynamic Order = null;
+    int RowId = 0, FormId = 0, AppRowId = 0, ApprovalType = 0;
+    bool IsEdit = true;
+    dynamic FlagRedirect = null;
+    Layout = ViewBag.Layout;
+    var FormData = (Skoda_DCMS.Models.FormData)ViewBag.FormData ?? new Skoda_DCMS.Models.FormData();
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IsNew = ViewBag.IsNew;
+        Order = ViewBag.Model;
+        RowId = ViewBag.RowId;
+        FormId = ViewBag.FormId;
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+        AppRowId = ViewBag.AppRowId;
+        IsEdit = ViewBag.IsEdit;
+    }
+    var currentUser = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"]; }
+
+@*Loader*@
+<style type="text/css">
+    #loader {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        background: rgba(0,0,0,0.75) url(../../assets/img/loader4.gif) no-repeat center center;
+        z-index: 10000;
+    }
+</style>
+
+@*Loader*@
+
+<div class="right_col table_order">
+    <div class="container-fluid" id="container-wrapper">
+        <div class="d-sm-flex align-items-center justify-content-between mb-2 mt-2">
+            <div class="col-lg-8">
+                @*<h1 class="h3 mb-0 text-center text-hdng-info">Suggestion for Order</h1>*@
+                <h1 class="h3 mb-0 text-center text-hdng-info font-weight-bold">Suggestion for Order</h1>
+            </div>
+            <div class="col-lg-4">
+                @*<img src="~/assets/img/logo.png" alt="logoimage" class="logo-image">*@
+                <img src="~/img/SAVWIPL_Merger_Logo.JPG" class="img_style" />
+            </div>
+        </div>
+        @using (Html.BeginForm("SaveOrder", "List", FormMethod.Post, new { @id = "sfoForm" }))
+        {
+            <table class="suggestion_form_table">
+                <tbody>
+                    <tr class="card card-1 card-row card-1">
+                        <td class="card-body">
+                            <input type="hidden" name="uniqueFormName" value="@FormData.UniqueFormName">
+                            <input type="hidden" name="formName" value="@FormData.FormName">
+                            <input type="hidden" name="formParentId" value="@FormData.Id">
+                            @if (!IsEdit)
+                            {
+                                <input type="hidden" id="FormSrId" name="FormSrId" value="@(RowId)" />
+                                <input type="hidden" id="FormId" name="FormId" value="@(FormId)" />
+                                <input type="hidden" id="AppRowId" name="AppRowId" value="@(AppRowId)" />
+                                <input type="hidden" name="orderItemsTotal" id="orderItemsTotal" value="@(Order.two.Length)" />
+                            }
+                            <table class="table table-responsive table_style">
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <label>Department:</label>
+                                            <input type="text" class="inpDisable" name="txtDept" value="@(!IsNew||!IsEdit ? (Order.one.Department ?? "") : currentUser.Department)" readonly>
+                                        </td>
+                                        <td>
+                                            <label class="">Shopping Cart Number:</label>
+                                            <input type="text" class="inpDisable" name="txtShopCart" placeholder="" value="@(!IsNew||!IsEdit ? (Order.one.ShopCartNumber ?? "") : "")">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="">Concerned Section / Facility:</label>
+                                            <input type="text" class="inpDisable" name="txtSection" placeholder="" value="@(!IsNew||!IsEdit ? (Order.one.ConcernSection ?? "") : "")">
+                                        </td>
+                                        <td>
+                                            <label class="">Date:</label>
+                                            <input type="text" class="inpDisable" name="txtDate" value="@(!IsNew||!IsEdit ? (Convert.ToDateTime(Order.one.Date).ToString(" dd MMM, yyyy") ?? "" ) : DateTime.Now.ToShortDateString())" readonly>
+                                            @if (!IsNew || !IsEdit)
+                                            {
+                                                <label class="">Date of Approval:</label>
+                                                <input type="text" class="inpDisable" name="txtApprovalDate" value="@(Order.one.FormId.Status=="Approved" ? (Convert.ToDateTime(Order.one.FormId.Modified).ToString(" dd MMM, yyyy") ?? "" ) : "")" readonly>
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="">Budget:</label>
+                                            @if (Order.one.Currency == "Rupee")
+                                            {
+                                                <label id="rupeeLabel">₹</label>
+                                            }
+                                            else if (Order.one.Currency == "Dollar")
+                                            {
+                                                <label id="dollarLabel">$</label>
+                                            }
+                                            else if (Order.one.Currency == "Euro")
+                                            {
+                                                <label id="euroLabel">€</label>
+                                            }
+                                            else if (Order.one.Currency == "Pound")
+                                            {
+                                                <label id="poundLabel">£</label>
+                                            }
+                                            else if (Order.one.Currency == "Chinese Yuan")
+                                            {
+                                                <label id="chineseYuanLabel">CH¥</label>
+                                            }
+                                            else if (Order.one.Currency == "Japanese Yen")
+                                            {
+                                                <label id="japaneseYenLabel">¥</label>
+                                            }
+                                            else if (Order.one.Currency == "Korean Won")
+                                            {
+                                                <label id="koreanWonLabel">₩</label>
+                                            }
+                                            else if (Order.one.Currency == "Czech Koruna")
+                                            {
+                                                <label id="czechKorunaLabel">Kč</label>
+                                            }
+                                            <input type="text" class="inpDisable" name="txtBudget" id="txtBudget" placeholder="" value="@(Order.one.Budget)">
+                                        </td>
+                                        @if (!IsNew)
+                                        {
+                                            <td>
+                                                <label class="">Currency:</label>
+
+                                                <input type="text" class="inpDisable" id="drpCurrency" name="drpCurrency" value="@(!IsNew ? (Order.one.Currency ?? " ") : " ")">
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td class="suggestion_td">
+                                                <label class="">Currency:</label>
+                                                <select class='validate drpDisable' name="drpCurrency" id="drpCurrency" onchange="hideConvert()" required>
+                                                    <option selected value="-1" disabled>Choose currency</option>
+                                                    <option value="Rupee">Rupee</option>
+                                                    <option value="Dollar">Dollar</option>
+                                                    <option value="Euro">Euro</option>
+                                                    <option value="Pound">Pound</option>
+                                                    <option value="Chinese Yuan">Chinese Yuan</option>
+                                                    <option value="Japanese Yen">Japanese Yen</option>
+                                                    <option value="Korean Won">Korean Won</option>
+                                                    <option value="Czech Koruna">Czech Koruna</option>
+                                                </select>
+                                            </td>
+                                        }
+                                    </tr>
+                                    <tr>
+                                        <td class="desc-td">
+                                            <label class="">Description:</label>
+                                            <span class="textareadescription" role="textbox" id="txtDesc" name="txtDesc" onclick="" @(IsNew || !IsEdit ? "contenteditable" : "")>@(!IsNew||!IsEdit ? (Order.one.Description ?? " ") : " ")</span>
+                                            <input type="hidden" value="" name="inputTextDesc" id="inputTextDesc" />
+                                        </td>
+                                        @if (!IsNew)
+                                        {
+                                            <td>
+                                                <label class="">Conversion Value:</label>
+                                                <input type="text" class="inpDisable" id="txtConvert" name="txtConvert" value="@(!(Order.one.Currency=="Rupee") ? (Order.one.ConversionValue ?? "" ) : "" )">
+                                            </td>
+                                        }
+                                        else if (!IsEdit)
+                                        {
+                                            <td>
+                                                <label class="">Conversion Value:</label>
+                                                <input type="text" class="inpDisable" id="txtConvert" name="txtConvert" value="@(!(Order.one.Currency=="Rupee") ? (Order.one.ConversionValue ?? "" ) : "" )" onkeypress="allowNumbersOnly(event)">
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td>
+                                                <label class="">Conversion Value:</label>
+                                                <input type="text" class="inpDisable" id="txtConvert" name="txtConvert" placeholder="" value="" onkeypress="allowNumbersOnly(event)">
+                                            </td>
+                                        }
+                                    </tr>
+                                    <tr>
+                                        @if (!IsNew)
+                                        {
+                                            <td class="desc-td">
+                                                <label class="">Deviation Note:</label>
+                                                <input type="checkbox" value="" name="checkBoxDeviationNote" id="checkBoxDeviationNote" checked disabled />  Tick the box if you wish to upload a deviation note.
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td class="desc-td">
+                                                <label class="">Deviation Note:</label>
+                                                <input type="checkbox" value="" name="checkBoxDeviationNote" id="checkBoxDeviationNote" />  Tick the box if you wish to upload a deviation note.
+                                            </td>
+                                        }
+                                        @if (!IsNew)
+                                        {
+                                            if (Order.one.AttachmentFiles.results.Count != 0)
+                                            {
+                                                foreach (var attachment in Order.one.AttachmentFiles.results)
+                                                {
+                                                    <td>
+                                                        <label class="">Deviation Note Upload:</label>
+                                                        <a href=@System.Configuration.ConfigurationManager.AppSettings["SharepointSiteURL"]@attachment.ServerRelativeUrl download=@attachment.FileName target="_blank">@attachment.FileName </a>
+                                                    </td>
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <td id="dnfFileUpload">
+                                                <input type="file" id="fileToUpload" name="fileToUpload" />
+                                            </td>
+                                        }
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="row">
+                <div class="col-lg-12 mb-4">
+                    <!-- Simple Tables -->
+                    <div class="card card-1">
+                        <div class="table-responsive">
+                            <table class="table align-items-center table-flush table-bordered text-center">
+                                <thead class="thead-light">
+                                    <tr class="table-border-info bdr-right">
+                                        <th>Sr. No.</th>
+                                        <th>
+                                            Available Offers
+                                            <br>
+                                            (Supplier Name)
+                                        </th>
+                                        <th>Technically <br> Acceptance <br> (Ok / Not Ok)</th>
+                                        <th>Currency</th>
+                                        <th>Offer Price</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody class="sr-no tableSupplier" id="tbody">
+                                    @if (!IsNew)
+                                    {
+                                        var count = 1;
+                                        foreach (var item in Order.two)
+                                        {
+                                            <tr class="bdr-right bg-clr1">
+                                                <td>@count</td>
+                                                <td>
+                                                    <input type="text" class="form-control inpDisable" name="txtSuppName" value="@item.SupplierName">
+                                                </td>
+                                                <td class="comment-td">
+                                                    <input type="text" class="form-control inpDisable" name="drpAccept" value="@item.TechAcceptance">
+
+                                                    <input type="text" class="form-control inpDisable" name="txtComment" value="@item.Comments">
+
+                                                </td>
+                                                <td class="offerprice-col">
+                                                    <input type="text" class="form-control inpDisable" name="drpOfferCurrency" value="@item.Currency">
+                                                </td>
+                                                <td class="offerprice-col">
+                                                    <input type="text" class="form-control inpDisable" name="txtPrice" value="@item.OfferPrice">
+                                                </td>
+                                                <td></td>
+                                            </tr>
+                                            count++;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (!IsEdit)
+                                        {
+                                            var count = 1;
+
+                                            foreach (var item in Order.two)
+                                            {
+                                                <tr class="bdr-right bg-clr1" id='@("row"+count)'>
+                                                    <td class="sNo">@count</td>
+                                                    <td>
+                                                        <input type="text" class="form-control inpValidate" name="txtSuppName" placeholder="" value="@item.SupplierName">
+
+                                                    </td>
+                                                    <td class="comment-td">
+                                                        <select class='form-control mb-2 validate' name="drpAccept" id='@("drpAccept"+count)' onchange="">
+                                                            <option value="Ok" @(item.TechAcceptance == "Ok" ? "selected" : "" )>Ok</option>
+                                                            <option value="Not Ok" @(item.TechAcceptance == "Not Ok" ? "selected" : "" )>Not Ok</option>
+                                                            <option value="Offer not Submitted" @(item.TechAcceptance == "Offer not Submitted" ? "selected" : "" )>Offer not Submitted</option>
+                                                            <option value="No Response" @(item.TechAcceptance == "No Response" ? "selected" : "" )>No Response</option>
+                                                            <option value="Regret To Quote" @(item.TechAcceptance == "Regret To Quote" ? "selected" : "" )>Regret To Quote</option>
+                                                            <option value="Other" @(item.TechAcceptance == "Other" ? "selected" : "")>Other</option>
+                                                        </select>
+                                                        <span class="textareacomments" role="textbox" id='@("spanComment"+count)' name="spanComment" onkeyup="assignComment(@count)" onchange="" contenteditable></span>
+                                                        <input type="hidden" id='@("txtComment"+count)' class="form-control" name="txtComment" value="">
+                                                    </td>
+                                                    <td class="suggestion_td">
+                                                        <select class='validate drpDisable' name="drpOfferCurrency" id='@("drpOfferCurrency"+count)' required>
+                                                            <option @(item.Currency == "Rupee" ? "selected" : "" ) value="Rupee">Rupee</option>
+                                                            <option @(item.Currency == "Dollar" ? "selected" : "" ) value="Dollar">Dollar</option>
+                                                            <option @(item.Currency == "Euro" ? "selected" : "" ) value="Euro">Euro</option>
+                                                            <option @(item.Currency == "Pound" ? "selected" : "" ) value="Pound">Pound</option>
+                                                            <option @(item.Currency == "Chinese Yuan" ? "selected" : "" ) value="Chinese Yuan">Chinese Yuan</option>
+                                                            <option @(item.Currency == "Japanese Yen" ? "selected" : "" ) value="Japanese Yen">Japanese Yen</option>
+                                                            <option @(item.Currency == "Korean Won" ? "selected" : "" ) value="Korean Won">Korean Won</option>
+                                                            <option @(item.Currency == "Czech Koruna" ? "selected" : "" ) value="Czech Koruna">Czech Koruna</option>
+                                                        </select>
+                                                    </td>
+                                                    <td class="offerprice-col">
+                                                        <input type="text" class="form-control inpValidate" id='@("txtOfferPrice"+count)' name="txtPrice" placeholder="" onkeypress="allowNumbersOnly(event)" onkeyup="commaSeperator(event)" value="@item.OfferPrice">
+                                                    </td>
+                                                    <td style="background-color:white; max-width:60px; border-bottom:none; vertical-align:central;">
+
+                                                        <input class="remove-btn remove" type="image" src="~/assets/img/remove.png"
+                                                               alt="Remove" style="max-width: 50%; background-color: white;">
+                                                    </td>
+                                                </tr>
+                                                count++;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            for (int i = 1; i < 2; i++)
+                                            {
+                                                <tr class="bdr-right bg-clr1" id='@("row"+i)'>
+                                                    <td class="sNo">@i</td>
+                                                    <td>
+                                                        <input type="text" class="form-control inpValidate" name="txtSuppName" placeholder="">
+                                                    </td>
+                                                    <td class="comment-td">
+                                                        <select class='form-control mb-2 validate' name="drpAccept" id='@("drpAccept"+i)' onchange="">
+                                                            <option selected value="" disabled>Choose</option>
+                                                            <option value="Ok">Ok</option>
+                                                            <option value="Not Ok">Not Ok</option>
+                                                            <option value="Offer not Submitted">Offer not Submitted</option>
+                                                            <option value="No Response">No Response</option>
+                                                            <option value="Regret To Quote">Regret To Quote</option>
+                                                            @*<option value="Partially Technically OK">Partially Technically OK</option>*@
+                                                            <option value="Other">Other</option>
+                                                        </select>
+                                                        <span class="textareacomments" role="textbox" id='@("spanComment"+i)' name="spanComment" onkeyup="assignComment(@i)" onchange="" contenteditable></span>
+                                                        <input type="hidden" id='@("txtComment"+i)' class="form-control" name="txtComment" value="">
+                                                    </td>
+                                                    <td class="suggestion_td">
+                                                        <select class='validate drpDisable' name="drpOfferCurrency" id='@("drpOfferCurrency"+i)' required>
+                                                            <option selected value="-1" disabled>Choose currency</option>
+                                                            <option value="Rupee">Rupee</option>
+                                                            <option value="Dollar">Dollar</option>
+                                                            <option value="Euro">Euro</option>
+                                                            <option value="Pound">Pound</option>
+                                                            <option value="Chinese Yuan">Chinese Yuan</option>
+                                                            <option value="Japanese Yen">Japanese Yen</option>
+                                                            <option value="Korean Won">Korean Won</option>
+                                                            <option value="Czech Koruna">Czech Koruna</option>
+                                                        </select>
+                                                    </td>
+                                                    <td class="offerprice-col">
+                                                        <input type="text" class="form-control inpValidate" id='@("txtOfferPrice"+i)' name="txtPrice" placeholder="" onkeypress="allowNumbersOnly(event)" onkeyup="commaSeperator(event)">
+                                                    </td>
+                                                    <td style="background-color:white; max-width:60px; border-bottom:none; vertical-align:central;">
+
+                                                        <input class="remove-btn remove" type="image" src="~/assets/img/remove.png"
+                                                               alt="Remove" style="max-width: 50%; background-color: white;">
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                            @if (IsNew || !IsEdit)
+                            {
+                                <div class="card-footer">
+                                    <button type="button" class="btn btn-sm btn-success submit-btn d-flex float-right mb-2" onclick="AddRows()">
+                                        + Add supplier
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                        <div class="card-footer table-footer-para">
+                            <p class="text-center font-weight-bold mt-2">
+                                For more offers & details, please refer ANNEXURE -1
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12 mb-4">
+                    <!-- Simple Tables -->
+                    <div class="card card-1">
+                        <div class="table-responsive">
+                            <table class="table align-items-center table-flush table-bordered">
+                                <thead class="thead-light">
+                                </thead>
+                                <tbody class="sr-no">
+                                    <tr class="bdr-right bg-clr1">
+                                        <td class="annexure-text-area">
+                                            Reasons for Technical Disqualification / Not Ok Supplier(s)
+                                        </td>
+                                        <td>NA</td>
+                                        <td>
+                                            <textarea class="form-control inpDisable" rows="15" name="txtTechDisqualify">@(!IsNew||!IsEdit ? (Order.one.TechDisqualify ?? "") : "")</textarea>
+                                        </td>
+                                    </tr>
+                                    <tr class="bdr-right bg-clr1">
+                                        <td>
+                                            Additional Comments
+                                        </td>
+                                        <td></td>
+                                        <td>
+                                            <textarea class="form-control inpDisable" rows="15" name="txtSuggOrder">@(!IsNew||!IsEdit ? (Order.one.SuggestOrder ?? "") : "")</textarea>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row table_sfo">
+                <div class="col-lg-12 mb-4">
+                    <!-- Simple Tables -->
+                    <div class="card card-1">
+                        <div class="table-responsive">
+                            <table class="table align-items-center tbl-bdr-1 text-center">
+                                <thead>
+                                    <tr>
+                                        <th>Initiator</th>
+                                        <th>
+                                            Head of Section
+                                            <br>
+                                            (AGM and Above)
+                                        </th>
+
+                                        @if (!IsNew && Order.four.Count > 1)
+                                        {
+                                            <th>
+                                                Head of Department
+                                                <br>
+                                                (GM and Above)
+                                            </th>
+                                        }
+                                        @if (!IsNew && Order.four.Count > 2)
+                                        {
+                                            <th>
+                                                Director and above
+                                            </th>
+                                        }
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="tbl-row-bdr-2 tbl-bdy-border">
+                                        <td>
+                                            <label name="txtInit">@(!IsNew ? Order.one.FirstName+" "+Order.one.Surname : currentUser.UserName) </label>
+                                        </td>
+                                        <td>
+                                            <label name="txtHead1">@(!IsNew ? (Order.four[0].UserName ?? ""): "Signature")</label>
+                                        </td>
+
+                                        @if (!IsNew && Order.four.Count > 1)
+                                        {
+                                            <td>
+                                                <label name="txtHead2"> @(!IsNew ? (Order.four[1].UserName ?? "") : "Signature")</label>
+                                            </td>
+                                        }
+                                        @if (!IsNew && Order.four.Count > 2)
+                                        {
+                                            <td>
+                                                <label name="txtHead3"> @(!IsNew ? (Order.four[2].UserName ?? "") : "Signature")</label>
+                                            </td>
+                                        }
+                                    </tr>
+                                    <tr class="date-row tbl-row-bdr-2">
+                                        <td class="date-row-info">
+                                            <span class="year-info">
+                                                <label name="lblInitDate"> @(!IsNew ? ("Initiated on " + (Convert.ToDateTime(Order.three[0].FormId.Created).ToString("dd MMM, yyyy"))) : "") </label>
+                                            </span>
+                                        </td>
+                                        <td class="date-row-info">
+                                            <span class="year-info">
+                                                <label name="txtHead1Date"> @(!IsNew && Order.four[0].ApproverStatus != "Pending" ? (Order.four[0].ApproverStatus + " on " + Convert.ToDateTime(Order.three[0].Modified).ToString("dd MMM, yyyy")) : "") </label>
+                                            </span>
+                                        </td>
+                                        @if (!IsNew && Order.four.Count > 1)
+                                        {
+                                            <td class="date-row-info">
+                                                <span class="year-info">
+                                                    <label name="txtHead2Date"> @(!IsNew && Order.four[1].ApproverStatus != "Pending" ? (Order.four[1].ApproverStatus + " on " + Convert.ToDateTime(Order.three[1].Modified).ToString("dd MMM, yyyy")) : "") </label>
+                                                </span>
+                                            </td>
+                                        }
+                                        @if (!IsNew && Order.four.Count > 2)
+                                        {
+                                            <td class="date-row-info">
+                                                <span class="year-info">
+                                                    <label name="txtHead3Date"> @(!IsNew && Order.four[2].ApproverStatus != "Pending" ? (Order.four[2].ApproverStatus + " on " + Convert.ToDateTime(Order.three[2].Modified).ToString("dd MMM, yyyy")) : "") </label>
+                                                </span>
+                                            </td>
+                                        }
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8 col-sm-8">
+                    <h4>Note</h4>
+                    <p>1. Approval Up to INR 10,00,000</p>
+                    <p>2. Approval Above INR 10,00,000</p>
+                    <p>3. Approval Above INR 10,000,000</p>
+                    <p>**Unless next Hierarchical level is </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12 col-sm-12 txt-black-clr">
+                    This is digital form, that can be filled and digitally sign by your PKI card. Please do not take print out.
+                </div>
+            </div>
+            if (IsNew || !IsEdit)
+            {
+                <div class="card-footer align-content-center">
+                    <button type="button" class="btn btn-primary btn-sm submit-btn inpDisable" id="btnSubmit">
+                        Submit
+                    </button>
+                    <button type="reset" class="btn btn-danger btn-sm cancl-btn inpDisable">
+                        Cancel
+                    </button>
+                </div> } @*else
+                {
+
+                }*@}
+    </div>
+</div>
+
+<!-- Scroll to top -->
+<a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+</a>
+
+<div class="modal fade" id="successModel" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content sfo_modal_popup">
+            <div class="modal-header modelHeader">
+                <span class="modal-title modalMsgTitle" id="modalTitle"></span>
+                <button type="button" class="close closs-icon-info font-weight-bold" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label id="modalBody" class="lableMsg"></label>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="submitBomBtn publishBtn btn-error-2" id="modalOkButton">Ok</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+
+    //$("#dept").html("Department New");
+    var isNew = @Html.Raw(Json.Encode(IsNew));
+    var IsEdit = @Html.Raw(Json.Encode(IsEdit));
+    var order = @Html.Raw(Json.Encode(Order));
+    var appRowId = @Html.Raw(Json.Encode(AppRowId));
+    var approvalType = @Html.Raw(Json.Encode(ApprovalType));
+    var FlagRedirect = @Html.Raw(Json.Encode(FlagRedirect));
+    //
+    if (isNew) {
+        if (!IsEdit) {
+            var total = parseInt(document.getElementById("orderItemsTotal").value);
+            console.log(typeof (total));
+            var drpArray = [];
+            var txtArray = [];
+            var offerPriceArray = [];
+            for (i = 1; i <= total; i++) {
+                drpArray.push('drpAccept' + i);
+                txtArray.push('txtComment' + i);
+                offerPriceArray.push('txtOfferPrice' + i);
+            }
+        }
+        else {
+            var drpArray = ['drpAccept1'];
+            var txtArray = ['txtComment1'];
+            var offerPriceArray = ['txtOfferPrice1'];
+        }
+    }
+    var spinner = $('#loader');
+    pageLoad();
+    function pageLoad() {
+        var data = "";
+        spinner.hide();
+        $("#txtConvert").hide();
+        if (!isNew) {
+            var value = order[0].Value["Currency"];
+            $("#drpCurrency").val(value);
+            //$("#drpCurrency").prop("disabled", true);
+            $(".inpDisable").attr("disabled", "disabled");
+            $(".drpDisable").attr("disabled", "disabled");
+
+            var budget = order[0].Value["Budget"];
+            formattedBudget = budget.toLocaleString("en");
+            $("#txtBudget").val(formattedBudget);
+            $(".drpDisable").attr("disabled", "disabled");
+            dropValue = document.getElementById("drpCurrency").value;
+            console.log(dropValue);
+            if (value == "") {
+                $("#txtConvert").hide();
+                $("#euroLabel").hide();
+                $("#dollarLabel").hide();
+                $("#rupeeLabel").hide();
+                $("#poundLabel").hide();
+                $("#chineseYuanLabel").hide();
+                $("#japaneseYenLabel").hide();
+                $("#koreanWonLabel").hide();
+                $("#czechKorunaLabel").hide();
+            }
+            else if (value == "Rupee") {
+                $("#txtConvert").hide();
+                $("#rupeeLabel").show();
+                $("#euroLabel").hide();
+                $("#dollarLabel").hide();
+                $("#poundLabel").hide();
+                $("#chineseYuanLabel").hide();
+                $("#japaneseYenLabel").hide();
+                $("#koreanWonLabel").hide();
+                $("#czechKorunaLabel").hide();
+            }
+            else if (value == "Dollar") {
+                $("#dollarLabel").show();
+                $("#txtConvert").show();
+                $("#euroLabel").hide();
+                $("#rupeeLabel").hide();
+                $("#poundLabel").hide();
+                $("#chineseYuanLabel").hide();
+                $("#japaneseYenLabel").hide();
+                $("#koreanWonLabel").hide();
+                $("#czechKorunaLabel").hide();
+            }
+            else if (value == "Euro") {
+                $("#euroLabel").show();
+                $("#txtConvert").show();
+                $("#dollarLabel").hide();
+                $("#rupeeLabel").hide();
+                $("#poundLabel").hide();
+                $("#chineseYuanLabel").hide();
+                $("#japaneseYenLabel").hide();
+                $("#koreanWonLabel").hide();
+                $("#czechKorunaLabel").hide();
+            }
+            else if (value == "Pound") {
+                $("#euroLabel").hide();
+                $("#txtConvert").show();
+                $("#dollarLabel").hide();
+                $("#rupeeLabel").hide();
+                $("#poundLabel").show();
+                $("#chineseYuanLabel").hide();
+                $("#japaneseYenLabel").hide();
+                $("#koreanWonLabel").hide();
+                $("#czechKorunaLabel").hide();
+            }
+            else if (value == "Chinese Yuan") {
+                $("#euroLabel").hide();
+                $("#txtConvert").show();
+                $("#dollarLabel").hide();
+                $("#rupeeLabel").hide();
+                $("#poundLabel").hide();
+                $("#chineseYuanLabel").show();
+                $("#japaneseYenLabel").hide();
+                $("#koreanWonLabel").hide();
+                $("#czechKorunaLabel").hide();
+            }
+            else if (value == "Japanese Yen") {
+                $("#euroLabel").hide();
+                $("#txtConvert").show();
+                $("#dollarLabel").hide();
+                $("#rupeeLabel").hide();
+                $("#poundLabel").hide();
+                $("#chineseYuanLabel").hide();
+                $("#japaneseYenLabel").show();
+                $("#koreanWonLabel").hide();
+                $("#czechKorunaLabel").hide();
+            }
+            else if (value == "Korean Won") {
+                $("#euroLabel").hide();
+                $("#txtConvert").show();
+                $("#dollarLabel").hide();
+                $("#rupeeLabel").hide();
+                $("#poundLabel").hide();
+                $("#chineseYuanLabel").hide();
+                $("#japaneseYenLabel").hide();
+                $("#koreanWonLabel").show();
+                $("#czechKorunaLabel").hide();
+            }
+            else if (value == "Czech Koruna") {
+                $("#euroLabel").hide();
+                $("#txtConvert").show();
+                $("#dollarLabel").hide();
+                $("#rupeeLabel").hide();
+                $("#poundLabel").hide();
+                $("#chineseYuanLabel").hide();
+                $("#japaneseYenLabel").hide();
+                $("#koreanWonLabel").hide();
+                $("#czechKorunaLabel").show();
+
+            }
+        }
+        if (!isNew) {
+           // //
+
+        }
+        if (isNew) {
+            if (!IsEdit) {
+                //
+                var value = order[0].Value["Currency"];
+                $("#drpCurrency").val(value);
+
+                var budget = order[0].Value["Budget"];
+                formattedBudget = budget.toLocaleString("en");
+                $("#txtBudget").val(formattedBudget);
+
+                dropValue = document.getElementById("drpCurrency").value;
+                console.log(dropValue);
+                if (value == "") {
+                    $("#txtConvert").hide();
+                    $("#euroLabel").hide();
+                    $("#dollarLabel").hide();
+                    $("#rupeeLabel").hide();
+                    $("#poundLabel").hide();
+                    $("#chineseYuanLabel").hide();
+                    $("#japaneseYenLabel").hide();
+                    $("#koreanWonLabel").hide();
+                    $("#czechKorunaLabel").hide();
+                }
+                else if (value == "Rupee") {
+                    $("#txtConvert").hide();
+                    $("#rupeeLabel").show();
+                    $("#euroLabel").hide();
+                    $("#dollarLabel").hide();
+                    $("#poundLabel").hide();
+                    $("#chineseYuanLabel").hide();
+                    $("#japaneseYenLabel").hide();
+                    $("#koreanWonLabel").hide();
+                    $("#czechKorunaLabel").hide();
+                }
+                else if (value == "Dollar") {
+                    $("#dollarLabel").show();
+                    $("#txtConvert").show();
+                    $("#euroLabel").hide();
+                    $("#rupeeLabel").hide();
+                    $("#poundLabel").hide();
+                    $("#chineseYuanLabel").hide();
+                    $("#japaneseYenLabel").hide();
+                    $("#koreanWonLabel").hide();
+                    $("#czechKorunaLabel").hide();
+                }
+                else if (value == "Euro") {
+                    $("#euroLabel").show();
+                    $("#txtConvert").show();
+                    $("#dollarLabel").hide();
+                    $("#rupeeLabel").hide();
+                    $("#poundLabel").hide();
+                    $("#chineseYuanLabel").hide();
+                    $("#japaneseYenLabel").hide();
+                    $("#koreanWonLabel").hide();
+                    $("#czechKorunaLabel").hide();
+                }
+                else if (value == "Pound") {
+                    $("#euroLabel").hide();
+                    $("#txtConvert").show();
+                    $("#dollarLabel").hide();
+                    $("#rupeeLabel").hide();
+                    $("#poundLabel").show();
+                    $("#chineseYuanLabel").hide();
+                    $("#japaneseYenLabel").hide();
+                    $("#koreanWonLabel").hide();
+                    $("#czechKorunaLabel").hide();
+                }
+                else if (value == "Chinese Yuan") {
+                    $("#euroLabel").hide();
+                    $("#txtConvert").show();
+                    $("#dollarLabel").hide();
+                    $("#rupeeLabel").hide();
+                    $("#poundLabel").hide();
+                    $("#chineseYuanLabel").show();
+                    $("#japaneseYenLabel").hide();
+                    $("#koreanWonLabel").hide();
+                    $("#czechKorunaLabel").hide();
+                }
+                else if (value == "Japanese Yen") {
+                    $("#euroLabel").hide();
+                    $("#txtConvert").show();
+                    $("#dollarLabel").hide();
+                    $("#rupeeLabel").hide();
+                    $("#poundLabel").hide();
+                    $("#chineseYuanLabel").hide();
+                    $("#japaneseYenLabel").show();
+                    $("#koreanWonLabel").hide();
+                    $("#czechKorunaLabel").hide();
+                }
+                else if (value == "Korean Won") {
+                    $("#euroLabel").hide();
+                    $("#txtConvert").show();
+                    $("#dollarLabel").hide();
+                    $("#rupeeLabel").hide();
+                    $("#poundLabel").hide();
+                    $("#chineseYuanLabel").hide();
+                    $("#japaneseYenLabel").hide();
+                    $("#koreanWonLabel").show();
+                    $("#czechKorunaLabel").hide();
+                }
+                else if (value == "Czech Koruna") {
+                    $("#euroLabel").hide();
+                    $("#txtConvert").show();
+                    $("#dollarLabel").hide();
+                    $("#rupeeLabel").hide();
+                    $("#poundLabel").hide();
+                    $("#chineseYuanLabel").hide();
+                    $("#japaneseYenLabel").hide();
+                    $("#koreanWonLabel").hide();
+                    $("#czechKorunaLabel").show();
+                }
+
+
+            }
+            else {
+                $("#dnfFileUpload").hide();
+                $("#euroLabel").hide();
+                $("#dollarLabel").hide();
+                $("#rupeeLabel").hide();
+                $("#poundLabel").hide();
+                $("#chineseYuanLabel").hide();
+                $("#japaneseYenLabel").hide();
+                $("#koreanWonLabel").hide();
+                $("#czechKorunaLabel").hide();
+            }
+        }
+    };
+
+    function successModal(txt) {
+        ////
+        $('#modalTitle').html('Success');
+        if (txt == "approve") {
+            $('#modalBody').html('Form has been approved!');
+        }
+        else if (txt == "reject") {
+            $('#modalBody').html('Form has been rejected!');
+        }
+        else if (txt == "enquire") {
+            $('#modalBody').html('Form has been enquired!');
+        }
+        else if (txt == "cancelled") {
+            $('#modalBody').html('Form has been cancelled!');
+        }
+        else {
+            $('#modalBody').html('Your form with ID: SFO' + txt + ' has been submitted! Kindly use this for future reference');
+        }
+        FlagRedirect = txt;
+        //$('#modalBody').html('Your form has been submitted!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function failureModal() {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html('Some error occurred!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function fillFormModal() {
+        $('#modalTitle').html('Required');
+        $('#modalBody').html('Kindly fill all the mandatory fields!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function currencyModal() {
+        $('#modalTitle').html('Required');
+        $('#modalBody').html('Kindly choose the currency!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+    function requiredModal() {
+        $('#modalTitle').html('Required');
+        $('#modalBody').html('Ateast 1 Supplier details are mandatory!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function removeVal() {
+        $('.validate').each(function () {
+            $(this).removeClass('error');
+        });
+        $(".tableSupplier tr").find('input').each(function () {
+            $(this).removeClass('error');
+        });
+    }
+
+    function AddRows() {
+        //var oldCount = $('.tableSupplier tr').length;
+        //var newCount = oldCount + 1;
+        var newCount = rowIdx + 1;
+        var row = '<tr class="bdr-right bg-clr1" id="row' + newCount + '"><td class="sNo">' + newCount + '</td> <td><input type="text"'
+            + ' class="form-control inpValidate" name="txtSuppName" placeholder=""></td>'
+            + ' <td class="comment-td"><select class="form-control mb-2 validate" name="drpAccept" id="drpAccept' + newCount + '">'
+            + '<option selected>Choose</option><option value="Offer not Submitted">Offer not Submitted</option><option value="No Response">No Response</option><option value="Regret To Quote">Regret To Quote</option><option value="Other">Other</option> '
+            + '</select><span class="textareacomments" role="textbox" id="spanComment' + newCount + '" name="spanComment" onkeyup="assignComment(' + newCount + ')" contenteditable></span><input type="hidden" id="txtComment' + newCount + '" name="txtComment" value=""></td>'
+            + '<td class="suggestion_td"><select class="validate drpDisable" name = "drpOfferCurrency" id = "drpOfferCurrency' + newCount+ '" required><option selected value="-1" disabled>Choose currency</option><option value="Rupee">Rupee</option>'
+            + '<option value="Dollar">Dollar</option><option value="Euro">Euro</option><option value="Pound">Pound</option><option value="Chinese Yuan">Chinese Yuan</option><option value="Japanese Yen">Japanese Yen</option><option value="Korean Won">Korean Won</option><option value="Czech Koruna">Czech Koruna</option></select ></td>'
+            + '<td class="offerprice-col"><input type="text" class="form-control inpValidate" name="txtPrice" id="txtOfferPrice' + newCount + '" placeholder="" onkeypress="allowNumbersOnly(event)" onkeyup="commaSeperator(event)"></td>'
+            + '<td style="background-color:white; max-width:60px; border-bottom:none; vertical-align:central;">'
+            + '<input class="remove-btn remove" type="image" src="/assets/img/remove.png" alt="Remove" style="max-width: 50%; background-color: white;">'
+            + '</td></tr>';
+
+        $(".tableSupplier tr:last").after(row);
+        drpArray.push('drpAccept' + newCount);
+        txtArray.push('txtComment' + newCount);
+        offerPriceArray.push('txtOfferPrice' + newCount);
+        //console.log(drpArray);
+        //console.log(txtArray);
+        rowIdx++;
+        srNo++;
+        //console.log(rowIdx);
+    };
+
+    function allowNumbersOnly(e) {
+        var code = (e.which) ? e.which : e.keyCode;
+        console.log(code);
+        if (code > 31 && (code < 45 || code > 57)) {
+            e.preventDefault();
+        }
+    }
+
+    function assignDesc() {
+        console.log($("#txtDesc").text())
+        $("#inputTextDesc").val($("#txtDesc").text());
+    }
+
+    function assignComment(i) {
+        $("#txtComment" + i).val($("#spanComment" + i).text());
+
+    }
+
+    function hideConvert() {
+        value = document.getElementById("drpCurrency").value;
+        console.log(value);
+        if (value == -1) {
+            $("#txtConvert").hide();
+            $("#euroLabel").hide();
+            $("#dollarLabel").hide();
+            $("#rupeeLabel").hide();
+            $("#poundLabel").hide();
+            $("#chineseYuanLabel").hide();
+            $("#japaneseYenLabel").hide();
+            $("#koreanWonLabel").hide();
+            $("#czechKorunaLabel").hide();
+        }
+        else if (value == "Rupee") {
+            $("#txtConvert").hide();
+            $("#rupeeLabel").show();
+            $("#euroLabel").hide();
+            $("#dollarLabel").hide();
+            $("#poundLabel").hide();
+            $("#chineseYuanLabel").hide();
+            $("#japaneseYenLabel").hide();
+            $("#koreanWonLabel").hide();
+            $("#czechKorunaLabel").hide();
+        }
+        else if (value == "Dollar") {
+            $("#dollarLabel").show();
+            $("#txtConvert").show();
+            $("#euroLabel").hide();
+            $("#rupeeLabel").hide();
+            $("#poundLabel").hide();
+            $("#chineseYuanLabel").hide();
+            $("#japaneseYenLabel").hide();
+            $("#koreanWonLabel").hide();
+            $("#czechKorunaLabel").hide();
+        }
+        else if (value == "Euro") {
+            $("#euroLabel").show();
+            $("#txtConvert").show();
+            $("#dollarLabel").hide();
+            $("#rupeeLabel").hide();
+            $("#poundLabel").hide();
+            $("#chineseYuanLabel").hide();
+            $("#japaneseYenLabel").hide();
+            $("#koreanWonLabel").hide();
+            $("#czechKorunaLabel").hide();
+        }
+        else if (value == "Pound") {
+            $("#euroLabel").hide();
+            $("#txtConvert").show();
+            $("#dollarLabel").hide();
+            $("#rupeeLabel").hide();
+            $("#poundLabel").show();
+            $("#chineseYuanLabel").hide();
+            $("#japaneseYenLabel").hide();
+            $("#koreanWonLabel").hide();
+            $("#czechKorunaLabel").hide();
+        }
+        else if (value == "Chinese Yuan") {
+            $("#euroLabel").hide();
+            $("#txtConvert").show();
+            $("#dollarLabel").hide();
+            $("#rupeeLabel").hide();
+            $("#poundLabel").hide();
+            $("#chineseYuanLabel").show();
+            $("#japaneseYenLabel").hide();
+            $("#koreanWonLabel").hide();
+            $("#czechKorunaLabel").hide();
+        }
+        else if (value == "Japanese Yen") {
+            $("#euroLabel").hide();
+            $("#txtConvert").show();
+            $("#dollarLabel").hide();
+            $("#rupeeLabel").hide();
+            $("#poundLabel").hide();
+            $("#chineseYuanLabel").hide();
+            $("#japaneseYenLabel").show();
+            $("#koreanWonLabel").hide();
+            $("#czechKorunaLabel").hide();
+        }
+        else if (value == "Korean Won") {
+            $("#euroLabel").hide();
+            $("#txtConvert").show();
+            $("#dollarLabel").hide();
+            $("#rupeeLabel").hide();
+            $("#poundLabel").hide();
+            $("#chineseYuanLabel").hide();
+            $("#japaneseYenLabel").hide();
+            $("#koreanWonLabel").show();
+            $("#czechKorunaLabel").hide();
+        }
+        else if (value == "Czech Koruna") {
+            $("#euroLabel").hide();
+            $("#txtConvert").show();
+            $("#dollarLabel").hide();
+            $("#rupeeLabel").hide();
+            $("#poundLabel").hide();
+            $("#chineseYuanLabel").hide();
+            $("#japaneseYenLabel").hide();
+            $("#koreanWonLabel").hide();
+            $("#czechKorunaLabel").show();
+        }
+    }
+
+    $('#txtBudget').keyup(function (event) {
+        // skip for arrow keys
+        if (event.which >= 37 && event.which <= 40) return;
+
+        // format number
+        $(this).val(function (index,value) {
+            return value.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        });
+    });
+
+    $("#checkBoxDeviationNote").change(function () {
+        if (this.checked)
+            $("#dnfFileUpload").show();
+        else
+            $("#dnfFileUpload").hide();
+    });
+
+    function commaSeperator(event) {
+        ////
+        for (i = 0; i < offerPriceArray.length; i++) {
+            $('#' + offerPriceArray[i]).keyup(function (event) {
+                // skip for arrow keys
+                if (event.which >= 37 && event.which <= 40) return;
+
+                // format number
+                $(this).val(function (index, value) {
+                    return value.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                });
+            });
+        }
+
+    }
+
+    $("#btnSubmit").on('click', function (e) {
+        //alert('clicked');
+        e.preventDefault();
+        ////
+        assignDesc();
+        var isEmpty = false;
+        var currency = $("#drpCurrency option:selected").text();
+        //console.log(currency);
+        //console.log(typeof (currency));
+        if (currency == "Choose currency") {
+            currencyModal();
+            return false;
+        }
+        //
+        if (document.getElementById("checkBoxDeviationNote").checked) {
+            var fileToUpload = $("#fileToUpload").val();
+            if (fileToUpload == "") {
+                isEmpty = true;
+
+            }
+        }
+        $('.validate').each(function () {
+            if (this.value == '') {
+                isEmpty = true;
+                $(this).addClass('error');
+            }
+        });
+
+        $(".tableSupplier tr:first").find('.inpValidate').each(function () {
+            if (this.value == '') {
+                isEmpty = true;
+                $(this).addClass('error');
+            }
+        });
+
+        //var count = 1;
+        $(".tableSupplier tr").each(function () {
+            ////
+            var i;
+            for (i = 0; i < drpArray.length; i++) {
+                console.log(drpArray.length);
+                //console.log(drpArray[i]);
+                ////
+                var drpId = "#" + drpArray[i];
+                var txtId = "#" + txtArray[i];
+                var drpAccept = $(this).find(drpId).val();
+                var comment = $(this).find(txtId).val();
+                if (drpAccept == "Other" && comment == '') {
+                    isEmpty = true;
+                }
+            }
+        });
+
+        var length = document.getElementsByName("txtPrice").length;
+        for (i = 0; i < length-1; i++) {
+
+            var example = document.getElementsByName("txtPrice")[i].value + "|";
+            console.log(example);
+            document.getElementsByName("txtPrice")[i].value = example;
+
+        }
+
+
+        /*$(".tableSupplier tr").each(function (index, tr) {
+            //
+            var comment = '';
+            console.log(index);
+            console.log(tr);
+            var drpAccept = $(this).find("#drpAccept").val();
+            if (drpAccept == "Not Ok") {
+                comment = $(this).find('#txtComment' + index).val();
+            }
+            if (drpAccept == 2 && comment == '') {
+                isEmpty = true;
+            }
+        });*/
+
+        if (isEmpty == true) {
+            fillFormModal();
+            return false;
+        }
+
+        var form = $("#sfoForm");
+        var formData = new FormData(form[0]);
+        $.ajax({
+            url: '/SFOOrder/SaveOrder',
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            data: formData,
+            enctype: 'multipart/form-data',
+            success: (function (data) {
+                if (data[0].Value == 1) {
+                   // //
+                    successModal(data[1].Value);
+                    $("#sfoForm").trigger("reset");
+                    removeVal();
+                }
+                else {
+                    failureModal();
+                    $("#sfoForm").trigger("reset");
+                    removeVal();
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+                $("#sfoForm").trigger("reset");
+                removeVal();
+            })
+        })
+    });
+
+    $(document).ready(function () {
+        if (!isNew) {
+
+            var ar = document.getElementByClassName('autoResize');
+            ar.style.height = 'auto';
+            ar.style.height = text.scrollHeight + 'px';
+
+
+        }
+        if (isNew) {
+
+            if (!IsEdit) {
+                var total = parseInt(document.getElementById("orderItemsTotal").value);
+                rowIdx = total;
+                srNo = total;
+            }
+            else {
+                rowIdx = 1;
+                srNo = 1;
+            }
+        }
+
+
+        $('#tbody').on('click', '.remove', function () {
+            ////
+            var delRow = $(this).closest('tr').attr('id');
+            console.log(delRow+" a");
+            var delRowNo = parseInt(delRow.substring(3));
+            console.log(delRowNo + " b");
+            if ((delRow == "row1") && (delRowNo == 1)) {
+                requiredModal();
+                return false;
+            }
+            else {
+                var delDropVal = 'drpAccept' + delRowNo;
+                var delTextVal = 'txtComment' + delRowNo;
+                drpArray = drpArray.filter(item => item != delDropVal);
+                txtArray = txtArray.filter(item => item != delTextVal);
+
+                console.log(drpArray);
+                console.log(txtArray);
+
+                var child = $(this).closest('tr').nextAll();
+                console.log(child);
+                child.each(function () {
+                    ////
+                    // Getting <tr> id.
+                    var id = $(this).attr('id');
+                    console.log(id);
+
+                    //  Getting the <p> inside the .row-index class.
+                    var idx = $(this).children('.row-index').children('p');
+                    console.log(idx);
+
+                    // Gets the row number from <tr> id.
+                    var dig = parseInt(id.substring(3));
+                    console.log(dig);
+
+                    // Modifying row index.
+                    idx.html(`row${dig - 1}`);
+
+                    // Modifying row id.
+                    $(this).attr('id', `row${dig - 1}`);
+
+                    //assigning updated serial number
+                    ////
+                    updatedDig = dig - 1;
+                    console.log(updatedDig);
+                    $('#row' + updatedDig + ' .sNo').html(updatedDig);
+
+                });
+
+                // Removing the current row.
+                $(this).closest('tr').remove();
+                // Decreasing total number of rows by 1.
+                rowIdx--;
+                //console.log(rowIdx);
+            }
+        });
+    });
+
+
+    /*function RemoveBtn(count) {
+        $('#row' + count).remove();
+        var rowCount = $('.tableSupplier tr').length;
+        for (var i = 1; i <= rowCount; i++) {
+            var x = count + 1;
+            $('#row' + x).attr("id", "row" + count);
+            $('#row' + count + ' .sNo').html(count);
+            count++;
+        }
+    }*/
+
+    function validityModal(txt) {
+        ////
+        if (txt == 'approve') {
+            DisplayAlert('error', 'Warning', 'Please choose both validity dates');
+        }
+        else if (txt == 'reject') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for rejecting the form');
+        }
+        else if (txt == 'enquire') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for enquiring the form');
+        }
+    }
+    function saveResponse(text) {
+        var status = '', comment = '';
+        comment = $("#comment-" + text).val();
+        switch (text) {
+            case 'approve': {
+                status = 'Approved';
+                break;
+            }
+            case 'reject': {
+                status = 'Rejected';
+                if (comment == '') {
+                    validityModal(text);
+                    return;
+                }
+                break;
+            }
+            case 'enquire': {
+                status = 'Enquired';
+                if (comment == '') {
+                    validityModal(text);
+                    return;
+                }
+                break;
+            }
+        }
+        $.ajax({
+            url: '/List/SaveResponse',
+            type: 'POST',
+            data: { response: status, appRowId: appRowId, comment: comment, approvalType: approvalType},
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data == 1) {
+                    successModal(text);
+                    $("#sfoForm").trigger("reset");
+                    removeVal();
+                    //setTimeout(ReloadMyTasks, 8000)
+                    setTimeout(FilterMyTasks, 5000)
+                    spinner.hide();
+                }
+                else {
+                    failureModal();
+                    $("#sfoForm").trigger("reset");
+                    removeVal();
+                    spinner.hide();
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+                $("#sfoForm").trigger("reset");
+                removeVal();
+                spinner.hide();
+            })
+        })
+    }
+
+    $("textarea").each(function () {
+        this.setAttribute("style", "height:" + (this.scrollHeight) + "px;overflow-y:hidden;");
+    }).on("input", function () {
+        this.style.height = "auto";
+        this.style.height = (this.scrollHeight) + "px";
+    });
+
+    //function AcceptComment(i, ele) {
+    //    var index = ele.selectedIndex;
+    //    if (index == 2) {
+    //        $("#spanComment" + i).attr("required", "required");
+    //        $("#spanComment" + i).addClass('error');
+    //    }
+    //    else {
+    //        $("#spanComment" + i).removeAttr("required","required");
+    //        $("#spanComment" + i).removeClass('error');
+    //    }
+    //}
+
+    //function CheckComment(i) {
+    //    var dropdown = document.getElementById("drpAccept" + i);
+    //    var selection = dropdown.value;
+    //    console.log(selection);
+    //    if (selection=="Not Ok") {
+    //        if ($.trim($("#spanComment" + i).val()) == '') {
+    //            $("#spanComment" + i).addClass('error');
+    //        }
+    //        else {
+    //            $("#spanComment" + i).removeClass('error');
+    //        }
+    //    }
+    //}
+    //function Convert() {
+    //    var currency = document.getElementById("drpCurrency").value;
+    //    //console.log(currency);
+
+    //    var budget = document.getElementById("txtBudget").value;
+    //    console.log(budget);
+    //    var conversionValue = document.getElementById("txtConvert").value;
+    //    console.log(conversionValue);
+    //    document.getElementById("txtConversionResult").value = budget * conversionValue;
+    //}
+    //function IsRupee() {
+    //    var currency = document.getElementById("drpCurrency").value;
+    //    console.log(currency);
+    //    if (currency == "Rupee") {
+    //        document.getElementById("txtConvert").readOnly = true;
+    //        document.getElementById("txtConvert").value = 1;
+
+    //    }
+    //    else if (currency == "Dollar" || currency == "Euro") {
+    //        document.getElementById("txtConvert").readOnly = false;
+    //        document.getElementById("txtConvert").value = "";
+
+    //    }
+
+    //}
+
+    //$("#modalOkButton").on('click', function () {
+    //    ////
+    //    if (FlagRedirect != null) {
+    //        window.location = "../Dashboard";
+    //    }
+    //});
+
+    //function addCommaSeparator(event) {
+    //    var x = document.getElementById("txtBudget").value;
+    //    console.log(x);
+    //}
+</script>
+
+

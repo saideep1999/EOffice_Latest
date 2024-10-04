@@ -1,0 +1,2162 @@
+﻿@{
+    bool IsNew = true;
+    dynamic DAF = null;
+    bool IsValidityCheck = true;
+    dynamic FlagRedirect = null;
+    bool IsEdit = true;
+    bool IsOHC = true;
+    int FormId = 0, AppRowId = 0, ApprovalType = 0;
+    Layout = ViewBag.Layout;
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IsNew = ViewBag.IsNew;
+        DAF = ViewBag.Model;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+        IsValidityCheck = ViewBag.IsValidityCheck != null ? (bool)ViewBag.IsValidityCheck : false;
+        IsEdit = ViewBag.IsEdit;
+
+    }
+    var currentUser = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    ViewBag.Title = "Driving Authorization Form";
+    int count = 0;
+}
+
+@*Loader*@
+<style type="text/css">
+
+    .bg-color td, .bg-color th {
+        border: 1px solid #dee2e6;
+        background-color: rgb(219,238,213) !important;
+    }
+
+    .bg-color-2 td {
+        background-color: rgba(75,168,46,0.4) !important;
+        border: 1px solid rgba(75,168,46,0.1) !important;
+    }
+
+    .bg-color-2 th {
+        background-color: rgba(75,168,46,0.4) !important;
+        border: 1px solid rgba(75,168,46,0.1) !important;
+    }
+
+    #OtherEmpName #txtOtherEmpname {
+        max-width: 86%;
+        border-radius: 0;
+        height: 20%;
+        font-size: 12px;
+    }
+
+    empl-input-select {
+        width: 41%;
+        padding: 4px;
+    }
+
+    empl-input-1 {
+        width: 45%;
+        padding: 4px;
+    }
+
+    empl-date {
+        width: 41%;
+    }
+
+    #loader {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        
+        z-index: 10000;
+    }
+
+    .OCRForder {
+        border: 1px solid #dee2e6;
+    }
+</style>
+
+@*Loader*@
+<body>
+    <div class="right_col bg-transparent" role="main">
+        <div class="container">
+
+            <div class="breadcrumb-container">
+                <div>
+                    <ol class="breadcrumb pl-0">
+                        <li>
+                            <a href="/Dashboard?formName=DAF">
+                                Dashboard
+                            </a>
+                        </li>
+                        <li class="active">Driving Authorization Form</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="container radius-5 border-info mb-5">
+                <div class="row topContent">
+                    <div class="col-lg-6 col-md-6 ">
+                        <h4 class="font-h4 f-500 pl-2">Driving Authorization Form</h4>
+                    </div>
+                    <div class="col-lg-6 col-md-6 text-right">
+                        <h4 class="font-h4 f-500">
+                            Form Department | Owner
+                        </h4>
+                    </div>
+
+                </div>
+            </div>
+
+            <form action="/List/SaveDAF" id="DrivingForm" method="post">
+                @if (IsNew)
+                {
+                    if (!IsEdit)
+                    {
+                        foreach (var item in DAF.one)
+                        {
+                            <input type="hidden" id="FormSrId" name="FormSrId" value="@(DAF.one[0].Id)" />
+                            <input type="hidden" id="FormId" name="FormId" value="@(FormId)" />
+                            <input type="hidden" id="AppRowId" name="AppRowId" value="@(AppRowId)" />
+                            <div class="container form-container">
+                                <div class="card-header pb-4 pt-4">
+                                    <table class="w-100 m-auto">
+                                        <tr>
+                                            <td>
+                                                <table class="table mainTbl table-bordered form-table-container bg-color">
+                                                    <tr>
+                                                        <td colspan="6" class="heading form-heading">
+                                                            <span> MobiNext Technologies India Private Limited</span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="6" class="heading form-heading-1">
+                                                            <span>Application for Driving Authorization</span>
+                                                        </td>
+                                                    </tr>
+
+                                                </table>
+
+                                                <table class="table mainTbl table-bordered form-table-container-2 bg-color">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td class="w-20 allFormLables borderLTB f-600">
+                                                                <label class="f-600">Employee Type</label>
+                                                            </td>
+                                                            <td colspan="2" class="borderLTB">
+                                                                <select name="drpEmployeeType" id="drpEmployeeType" class="drpDisable">
+                                                                    <option value="0" selected>Choose</option>
+                                                                    <option @(item.EmployeeType == "Internal" ? "selected" : "" ) value="Internal">Internal</option>
+                                                                    <option @(item.EmployeeType == "External" ? "selected" : "" ) value="External">External</option>
+                                                                </select>
+                                                            </td>
+                                                            <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                                <label class="f-600">Form ID</label>
+                                                            </td>
+                                                            <td class="borderLTB text-right" colspan="2">
+                                                                <input type="text" name="txtFormId" class="w-100 inpDisable" value="@(!IsNew ||!IsEdit ? ("DAF"+FormId ?? "" ) : "" )" readonly>
+                                                            </td>
+
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="w-20 allFormLables borderLTB f-600">
+                                                                <label class="f-600">Name of the Driver</label>
+                                                            </td>
+                                                            <td colspan="2" class="borderLTB">
+                                                                <input class="w-100 inpDisable" id="txtDriverName" name="txtDriverName" type="text" value="@(!IsNew ||!IsEdit ? (DAF.one[0].DriverName ?? "") : "")">
+                                                            </td>
+                                                            <td colspan="2" class="allFormLables borderLTB align">
+                                                                <p class="photoBox">
+                                                                    <span class="f-600">Photo</span>
+                                                                </p>
+                                                            </td>
+                                                            <td class="borderLTB text-right" colspan="2">
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="allFormLables borderLTB">
+                                                                <label class="f-600">Employee No</label>
+                                                            </td>
+                                                            <td colspan="2" class="borderLTB">
+                                                                <input class="w-100 inpDisable" id="txtEmployeeNumber" name="txtEmployeeNumber" type="text" value="@(!IsNew ||!IsEdit ? (DAF.one[0].EmployeeNumber ?? "") : "")">
+                                                            </td>
+                                                            <td colspan="2" class="allFormLables borderLTB align">
+                                                            </td>
+                                                            <td class="borderLTB text-right" colspan="2">
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="allFormLables borderLTB">
+                                                                <label class="f-600">Department</label>
+                                                            </td>
+                                                            <td colspan="2" class="borderLTB">
+                                                                <select class="drpDisable" name="drpDepartment" id="drpDepartment"></select>
+                                                            </td>
+                                                            <td colspan="2" class="allFormLables borderLTB align">
+                                                                <label class="f-600">Sub-Department</label>
+                                                            </td>
+                                                            <td class="borderLTB text-right" colspan="2">
+                                                                <select class="drpDisable" name="drpSubDepartment" id="drpSubDepartment"></select>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="allFormLables borderLTB">
+                                                                <label class="f-600">Date of Birth</label>
+                                                            </td>
+                                                            <td colspan="2" class="borderLTB">
+                                                                <input type="date" name="txtDateofBirth" class="w-100 inpDisable" id="txtDateofBirth" onclick="" value="@(!IsNew ||!IsEdit ? (DAF.one[0].DateofBirth.ToString("yyyy-MM-dd")  ?? "") : "")">
+                                                            </td>
+                                                            <td colspan="2" class="allFormLables borderLTB align">
+                                                                <label class="f-600">License No</label>
+                                                            </td>
+                                                            <td class="borderLTB text-right" colspan="2">
+                                                                <input class="w-100 inpDisable" id="txtLicenceNumber" name="txtLicenceNumber" type="text" value="@(!IsNew ||!IsEdit ? (DAF.one[0].LicenceNumber ?? "") : "")">
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="allFormLables borderLTB">
+                                                                <label class="f-600">Valid From</label>
+                                                            </td>
+                                                            <td colspan="2" class="borderLTB">
+                                                                <input type="text" id="txtValidFrom" name="txtValidFrom" placeholder="/ /" class="w-100 border-none surname" value="@(!IsNew ? (DAF.one[0].ValidFrom.ToShortDateString() ?? " ") : DateTime.Now.ToShortDateString())" readonly>
+                                                            </td>
+                                                            <td colspan="2" class="allFormLables borderLTB align">
+                                                                <label class="f-600">Valid Till</label>
+                                                            </td>
+                                                            <td class="borderLTB text-right" colspan="2">
+                                                                <input type="date" class="w-100 inpDisable" id="txtValidTill" name="txtValidTill" onclick="" value="@(!IsNew ||!IsEdit ? (DAF.one[0].ValidTill.ToString("yyyy-MM-dd") ?? "") : DateTime.Now.ToShortDateString())">
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="allFormLables borderLTB">
+                                                                <label class="f-600">Driving Experience</label>
+                                                            </td>
+                                                            <td colspan="2" class="borderLTB">
+                                                                <input class="w-100 inpDisable" id="txtDrivingExperience" name="txtDrivingExperience" type="text" value="@(!IsNew ||!IsEdit ? (DAF.one[0].DrivingExperience ?? "") : "")"><label class="f-600">Years</label>
+                                                            </td>
+                                                            <td colspan="2" class="allFormLables borderLTB align">
+                                                                <label class="f-600">Mobile</label>
+                                                            </td>
+                                                            <td class="borderLTB text-right" colspan="2">
+                                                                <input class="w-100 inpDisable" id="txtMobile" name="txtMobile" type="text" value="@(!IsNew ||!IsEdit ? (DAF.one[0].Mobile ?? "") : "")">
+                                                            </td>
+                                                        </tr>
+                                                </table>
+                                                <table class="table mainTbl table-bordered form-table-container-2 bg-color">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td colspan="6" class="allFormLables borderLTB f-600">
+                                                                <span>Vehicles Driven</span>
+                                                            </td>
+
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="6" class="allFormLables borderLTB f-600">
+                                                                <textarea name="txtVehiclesDriven" cols="60" rows="7" class="inpDisable textTrans" id="txtVehiclesDriven" rows="5" cols="120">@(!IsNew||!IsEdit ? (DAF.one[0].VehiclesDriven ?? "") : "")</textarea>
+
+                                                            </td>
+
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="6" class="allFormLables borderLTB f-600">
+                                                                <span>Address</span>
+                                                            </td>
+
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="6" class="allFormLables borderLTB f-600">
+                                                                <textarea name="txtAddress" cols="60" rows="7" class="inpDisable textTrans " id="txtAddress">@(!IsNew||!IsEdit ? (DAF.one[0].Address ?? "") : "")</textarea>
+                                                            </td>
+                                                        </tr>
+
+                                                        @if (DAF.one[0].attachmentDAFlist.attachmentDAFData.Count != 0)
+                                                        {
+                                                            foreach (var attachment in DAF.one[0].attachmentDAFlist.attachmentDAFData)
+                                                            {
+                                                                <tr>
+                                                                    <td class="allFormLables borderLTB">
+                                                                        <label class="f-600">File Upload</label>
+                                                                    </td>
+                                                                    <td colspan="2" class="borderLTB">
+                                                                        <input type="file" id="fileToUpload" name="fileToUpload" />
+                                                                        <input type="hidden" id="attachedfile" name="attachedfile" value="@System.Configuration.ConfigurationManager.AppSettings["SharepointSiteURL"]@attachment.ServerRelativeUrl" />
+                                                                        <input type="hidden" id="attachedfileName" name="attachedfileName" value="@attachment.FileName" />
+                                                                        <a href=@System.Configuration.ConfigurationManager.AppSettings["SharepointSiteURL"]@attachment.ServerRelativeUrl download=@attachment.FileName target="_blank">@attachment.FileName </a>
+                                                                    </td>
+                                                                    <td colspan="2" class="allFormLables borderLTB align">
+                                                                    </td>
+                                                                    <td class="borderLTB text-right" colspan="2">
+                                                                    </td>
+                                                                </tr>
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            <tr>
+                                                                <td class="allFormLables borderLTB">
+                                                                    <label class="f-600">File Upload</label>
+                                                                </td>
+                                                                <td colspan="2" class="borderLTB">
+                                                                    <input type="text" id="fileToUpload" name="fileToUpload" disabled />
+                                                                </td>
+                                                                <td colspan="2" class="allFormLables borderLTB align">
+                                                                </td>
+                                                                <td class="borderLTB text-right" colspan="2">
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
+
+                                                @*<table class="w-100 form-outer-border detail-sec-p">
+                                                        <tr>
+                                                            <td>I will strictly observe all the external & internal rules & regulations laid down for driving.</td>
+                                                        </tr>
+                                                    </table>
+                                                    <table class="w-100 form-outer-border detail-sec-p">
+                                                        <tr>
+                                                            <td><b>Authorization for Driving:</b></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>To, <br>Safety Department,</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                Applicant is in need of a Driving Authorization for official purpose. Please issue him the authorization for:
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                Internal <br> Test Track <br> External <br> Material Handling
+                                                            </td>
+                                                        </tr>
+                                                    </table>*@
+
+                                                <table class="w-100 form-border detail-sec-p">
+                                                    @if (!IsNew)
+                                                    {
+                                                        <tr>
+                                                            <td colspan="3" class="f-600">Authorization by HOD</td>
+                                                            <td class="display-none"></td>
+                                                            <td class="display-none"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="2">
+                                                                Name: <input type="text" name="" class="w-100 inpDisable inpIsNewDisable input-width-1" value="@(!IsNew ? (DAF.three[0].UserName ?? ""): "")">
+                                                            </td>
+                                                            <td>
+                                                                <div class="form-group">
+                                                                    <label for="comment" class="">Approver Comment:</label>
+                                                                    <textarea class="form-control mx-auto" rows="5" id="comment" disabled>@(!IsNew ? (DAF.three[0].Comment ?? " "): " ")</textarea>
+                                                                </div>
+                                                            </td>
+                                                            <td class="display-none"></td>
+                                                            <td style="word-wrap: break-word;width:25%;">Signature: <input type="text" name="" class="w-100 inpDisable inpIsNewDisable input-width-1" value="@(!IsNew && DAF.three[0].ApproverStatus != "Pending" ? (DAF.three[0].ApproverStatus + " on " + Convert.ToDateTime(DAF.two[0].Modified).ToShortDateString()+" " +Convert.ToDateTime(DAF.two[0].Modified).ToShortTimeString()) : "" )"></td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td colspan="3" class="f-600">Authorization by Safety</td>
+                                                            <td class="display-none"></td>
+                                                            <td class="display-none"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>I will strictly observe all the external & internal rules & regulations laid down for driving.</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><b>Authorization for Driving:</b></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>To, <br>Safety Department,</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                Applicant is in need of a Driving Authorization for official purpose. Please issue him the authorization for:
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                Internal <br> Test Track <br> External <br> Material Handling
+                                                            </td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td><b>Applicant is well aware about the:</b></td>
+                                                        </tr>
+                                                        <tr class="br-1">
+                                                            <td class="br-0 bt-0 bb-0">
+                                                                Driver’s & passenger’s safety <br> Parking manners/judgment. <br> Turning radius judgment. <br>
+                                                                Reversing the vehicle. <br>
+                                                                Safety belt usage & Seat Positioning. <br> Usage of mirrors. <br>
+                                                                Usage of Turn Indicators and other electrical functions. <br> Cluster Warning Indicators.
+                                                            </td>
+                                                        </tr>
+                                                        @*<tr class="br-1">
+                                                                <td class="w-30 br-0 bt-0 bb-0">Remarks</td>
+                                                                <td class="bl-0 br-0 bt-0 bb-0">:<input class="txt_input" type="text"></td>
+                                                            </tr>
+                                                            <tr class="br-1">
+                                                                <td class="w-30 br-0 bt-0 ">
+                                                                    Signature of Safety <br> Manager
+                                                                    With Name & <br> Date
+                                                                </td>
+                                                                <td class="bl-0 br-0 bt-0">:<input class="txt_input" type="text"></td>
+                                                            </tr>*@
+                                                        <tr>
+                                                            <td colspan="2">
+                                                                Name: <input type="text" name="" class="inpDisable inpIsNewDisable input-width-1" value="@(!IsNew ? (DAF.three[1].UserName ?? ""): "")">
+                                                            </td>
+                                                            <td>
+                                                                <div class="form-group">
+                                                                    <label for="comment" class="">Approver Comment:</label>
+                                                                    <textarea class="textTrans form-control mx-auto" rows="5" id="comment" disabled>@(!IsNew ? (DAF.three[1].Comment ?? " "): " ")</textarea>
+                                                                </div>
+                                                            </td>
+                                                            <td class="display-none"></td>
+                                                            <td style="word-wrap: break-word;width:25%;">Signature: <input type="text" name="" class="inpDisable inpIsNewDisable input-width-1" value="@(!IsNew && DAF.three[1].ApproverStatus != "Pending" ? (DAF.three[1].ApproverStatus + " on " +  Convert.ToDateTime(DAF.two[1].Modified).ToShortDateString()+" " +Convert.ToDateTime(DAF.two[1].Modified).ToShortTimeString()) : "" )"></td>
+                                                        </tr>
+                                                    }
+                                                </table>
+
+
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <div>
+                                        <p class="text-left f-600">SF_G/S_015.00</p>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="container form-container">
+                                <div class="card-header pb-4 pt-4">
+                                    <table class="w-100 m-auto">
+                                        <tr>
+                                            <td>
+                                                <table class="table mainTbl table-bordered form-table-container bg-color">
+                                                    <tr>
+                                                        <td colspan="6" class="heading form-heading">
+                                                            <span> MobiNext Technologies India Private Limited</span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="6" class="heading form-heading-1">
+                                                            <span>Application for Driving Authorization</span>
+                                                        </td>
+                                                    </tr>
+
+                                                </table>
+                                                <table class="table mainTbl table-bordered form-table-container-2 bg-color f-600" id="CompanyDoctor">
+
+                                                    <tr>
+                                                        <td>To be Certified by Company Doctor:(To be Filled by OHC)</td>
+                                                    </tr>
+
+                                                    @if (!IsValidityCheck)
+                                                    {
+                                                        <tr>
+                                                            <td class="w-20">Blood Group</td>
+                                                            <td>
+                                                                <select class="w-100 selectInput" name="drpBloodGroup" id="drpBloodGroup">
+                                                                    <option value="0" selected disabled>Select</option>
+                                                                    <option value="O-">O-</option>
+                                                                    <option value="O+">O+</option>
+                                                                    <option value="A-">A-</option>
+                                                                    <option value="A+">A+</option>
+                                                                    <option value="B-">B-</option>
+                                                                    <option value="B+">B+</option>
+                                                                    <option value="AB-">AB-</option>
+                                                                    <option value="AB+">AB+</option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Eye Sight</td>
+                                                            <td>
+                                                                <select class="w-100 selectInput" name="drpEyeSight" id="drpEyeSight">
+                                                                    <option value="0" selected disabled>Select</option>
+                                                                    <option value="OK">OK</option>
+                                                                    <option value="NOK">NOK</option>
+                                                                </select>
+                                                            </td>
+                                                            <td>LT<input class="txt_input inputRight" id="txtLT" name="txtLT" type="text"></td>
+                                                            <td>RT<input class="txt_input inputRight" id="txtRT" name="txtRT" type="text"></td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>History of Epilepsy</td>
+                                                            <td>
+                                                                <select class="w-100 selectInput" name="drpHistoryofEpilepsy" id="drpHistoryofEpilepsy">
+                                                                    <option value="0" selected disabled>Select</option>
+                                                                    <option value="OK">OK</option>
+                                                                    <option value="NOTK">Not OK</option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Remarks</td>
+                                                            <td><textarea class="textTrans inputText" id="txtRemarks" name="txtRemarks"></textarea></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Certification</td>
+                                                            <td>
+                                                                <select class="selectInput" name="drpCertification" id="drpCertification">
+                                                                    <option value="0" selected disabled>Select</option>
+                                                                    <option value="PASS">PASS</option>
+                                                                    <option value="FAIL">FAIL</option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                    else
+                                                    {
+                                                        <tr>
+                                                            <td class="w-20">Blood Group</td>
+                                                            <td>
+                                                                <input type="text" class="w-100 inpDisable" name="drpBloodGroup" id="drpBloodGroup" value="@(!IsNew ? (DAF.one[0].BloodGroup ?? "") : "")" readonly />
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Eye Sight</td>
+                                                            <td>
+                                                                <input type="text" class="w-100 inpDisable" name="drpEyeSight" id="drpEyeSight" value="@(!IsNew ? (DAF.one[0].EyeSight ?? "") : "")" readonly />
+                                                            </td>
+                                                            <td>LT<input readonly class="inpDisable inputRight" id="txtLT" name="txtLT" type="text" value="@(!IsNew ? (DAF.one[0].LT ?? "") : "")"></td>
+                                                            <td>RT<input readonly class="inpDisable inputRight" id="txtRT" name="txtRT" type="text" value="@(!IsNew ? (DAF.one[0].RT ?? "") : "")"></td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>History of Epilepsy</td>
+                                                            <td>
+                                                                <input type="text" readonly class="w-100 inpDisable" name="drpHistoryofEpilepsy" id="drpHistoryofEpilepsy" value="@(!IsNew ? (DAF.one[0].HistoryofEpilepsy ?? " ") : " ")" />
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Remarks</td>
+                                                            <td>
+                                                                <textarea name="txtRemarks" readonly class="w-100 inpDisable" id="txtRemarks" rows="5" cols="50">@(!IsNew || !IsEdit ? (DAF.one[0].Remarks ?? "") : "")</textarea>
+
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Certification</td>
+                                                            <td>
+                                                                <input type="text" readonly class="w-100 inpDisable" name="drpCertification" id="drpCertification" value="@(!IsNew ? (DAF.one[0].Certification ?? " ") : " ")" />
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                    @*<tr class="br-1">
+                                                            <td class="br-0">Signature of Doctor <br> With Name,Date & Stamp</td>
+                                                            <td class="bl-0 br-0"><textarea class="inputText"></textarea></td>
+                                                        </tr>*@
+                                                    @*<tr>
+                                                            <td colspan="3" class="f-600">Authorization by OHC(Company Doctor)</td>
+                                                            <td class="display-none"></td>
+                                                            <td class="display-none"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="2">
+                                                                Name: <input type="text" name="" class="inpDisable inpIsNewDisable input-width-1" value="@(!IsNew ? (DAF.three[2].UserName ?? ""): "")">
+                                                            </td>
+                                                            <td>
+                                                                <div class="form-group">
+                                                                    <label for="comment" class="">Approver Comment:</label>
+                                                                    <textarea class="form-control mx-auto" rows="5" id="comment" disabled>@(!IsNew ? (DAF.three[2].Comment ?? " "): " ")</textarea>
+                                                                </div>
+                                                            </td>
+                                                            <td class="display-none"></td>
+                                                            <td style="word-wrap: break-word;width:25%;">Signature: <input type="text" name="" class="inpDisable inpIsNewDisable input-width-1" value="@(!IsNew && DAF.three[2].ApproverStatus != "Pending" ? (DAF.three[2].ApproverStatus + " on " +  Convert.ToDateTime(DAF.two[1].Modified).ToShortDateString()+" " +Convert.ToDateTime(DAF.two[1].Modified).ToShortTimeString()) : "" )"></td>
+                                                        </tr>*@
+
+
+                                                    @if (!IsNew)
+                                                    {
+
+                                                        <tr>
+                                                            <td colspan="3" class="f-600">Authorization by Security </td>
+                                                            <td class="display-none"></td>
+                                                            <td class="display-none"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="2">
+                                                                Name: <input type="text" name="" class="inpDisable inpIsNewDisable input-width-1" value="@(!IsNew ? (DAF.three[3].UserName ?? ""): "")">
+                                                            </td>
+                                                            <td>
+                                                                <div class="form-group">
+                                                                    <label for="comment" class="">Approver Comment:</label>
+                                                                    <textarea class="form-control mx-auto" rows="5" id="comment" disabled>@(!IsNew ? (DAF.three[3].Comment ?? " "): " ")</textarea>
+                                                                </div>
+                                                            </td>
+                                                            <td class="display-none"></td>
+                                                            <td style="word-wrap: break-word;width:25%;">Signature: <input type="text" name="" class="inpDisable inpIsNewDisable input-width-1" value="@(!IsNew && DAF.three[0].ApproverStatus != "Pending" ? (DAF.three[3].ApproverStatus + " on " + Convert.ToDateTime(DAF.two[0].Modified).ToShortDateString()+" " +Convert.ToDateTime(DAF.two[0].Modified).ToShortTimeString()) : "" )"></td>
+                                                        </tr>
+                                                    }
+
+
+                                                </table>
+
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <div>
+                                        <p class="text-left f-600">SF_G/S_015.00</p>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        }
+                    }
+                    else
+                    {
+                        <div class="container form-container">
+                            <div class="card-header pb-4 pt-4">
+                                <table class="w-100 m-auto">
+                                    <tr>
+                                        <td>
+                                            <table class="table mainTbl table-bordered form-table-container bg-color">
+                                                <tr>
+                                                    <td colspan="6" class="heading form-heading">
+                                                        <span> MobiNext Technologies India Private Limited</span>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="6" class="heading form-heading-1">
+                                                        <span>Application for Driving Authorization</span>
+                                                    </td>
+                                                </tr>
+
+                                            </table>
+                                            <table class="table mainTbl table-bordered form-table-container-2 bg-color">
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="w-20 allFormLables borderLTB f-600">
+                                                            <label class="f-600">Request Submission For:</label>
+                                                        </td>
+                                                        <td colspan="2" class="borderLTB">
+                                                            <select name="drpRequestSubType" id="drpRequestSubType" class="drpSize" onchange="RequestSubmission()">
+                                                                <option value="null" selected>Choose</option>
+                                                                <option value="Self">Self</option>
+                                                                <option value="OnBehalf">On Behalf</option>
+                                                            </select>
+                                                        </td>
+                                                        <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                            <label class="f-600">Date</label>
+                                                        </td>
+                                                        <td class="borderLTB text-right" colspan="2">
+                                                            <input type="text" name="txtDate" placeholder="/ /" class="w-100 inpDisable" value="@(!IsNew || !IsEdit ? (Convert.ToDateTime(DAF.two[0].FormId.Created).ToShortDateString()) : DateTime.Now.ToShortDateString())" readonly>
+                                                        </td>
+
+                                                    </tr>
+
+                                                    <tr id="TREmployeeType">
+                                                        <td class="allFormLables borderLTB">
+                                                            <label class="f-600">Employee Type</label>
+                                                        </td>
+                                                        <td colspan="2" class="borderLTB">
+                                                            <select name="drpEmployeeType" id="drpEmployeeType" onchange="func()">
+                                                                <option value="0" selected>Choose</option>
+                                                                <option value="Internal">Internal</option>
+                                                                <option value="External">External</option>
+                                                            </select>
+                                                        </td>
+                                                        <td colspan="2" class="allFormLables borderLTB align">
+                                                            <label class="f-600">Employee Search</label>
+                                                        </td>
+                                                        <td class="borderLTB text-right" colspan="2">
+                                                            <input type="text" name="txtOtherEmpname" id="txtOtherEmpname" placeholder="Type at least 4 letters" class="w-100 inpDisable emp-name-input d-inline" required="required">
+                                                            <input type="hidden" id="hiddentxtEmail" name="hiddentxtEmail" value="" />
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="allFormLables borderLTB">
+                                                            <label class="f-600">Name of the Driver</label>
+                                                        </td>
+                                                        <td colspan="2" class="borderLTB">
+                                                            <input class="w-100 txt_input" id="txtDriverName" name="txtDriverName" autocomplete="off" onkeypress="alphaOnly(event)" type="text">
+                                                        </td>
+                                                        <td colspan="2" class="allFormLables borderLTB align">
+                                                            <p class="photoBox">
+                                                                <span class="f-600">Photo</span>
+                                                            </p>
+                                                        </td>
+                                                        <td class="borderLTB text-right" colspan="2">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="allFormLables borderLTB">
+                                                            <label class="f-600">Employee No</label>
+                                                        </td>
+                                                        <td colspan="2" class="borderLTB">
+                                                            <input class="w-100 txt_input" id="txtEmployeeNumber" autocomplete="off" onkeypress="allowNumbersOnly(event)" name="txtEmployeeNumber" type="text">
+                                                        </td>
+                                                        <td colspan="2" class="allFormLables borderLTB align">
+                                                        </td>
+                                                        <td class="borderLTB text-right" colspan="2">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="allFormLables borderLTB">
+                                                            <label class="f-600">Department</label>
+                                                        </td>
+                                                        <td colspan="2" class="borderLTB">
+                                                            <select class="drpDisable" name="drpDepartment" id="drpDepartment"></select>
+                                                        </td>
+                                                        <td colspan="2" class="allFormLables borderLTB align">
+                                                            <label class="f-600">Sub-Department</label>
+                                                        </td>
+                                                        <td class="borderLTB text-right" colspan="2">
+                                                            <select class="drpDisable" name="drpSubDepartment" id="drpSubDepartment"></select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="allFormLables borderLTB">
+                                                            <label class="f-600">Date of Birth</label>
+                                                        </td>
+                                                        <td colspan="2" class="borderLTB">
+                                                            <input type="date" name="txtDateofBirth" class="w-100 inpDisable" id="txtDateofBirth" onclick="" value="@(!IsNew ? (DAF.one[0].DateofBirth ?? " ") : " ")">
+                                                        </td>
+                                                        <td colspan="2" class="allFormLables borderLTB align">
+                                                            <label class="f-600">License No</label>
+                                                        </td>
+                                                        <td class="borderLTB text-right" colspan="2">
+                                                            <input class="w-100 txt_input" id="txtLicenceNumber" autocomplete="off" name="txtLicenceNumber" type="text">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="allFormLables borderLTB">
+                                                            <label class="f-600">Valid From</label>
+                                                        </td>
+                                                        <td colspan="2" class="borderLTB">
+                                                            <input type="text" id="txtValidFrom" name="txtValidFrom" placeholder="/ /" class="w-100" value="@(!IsNew ? (DAF.one[0].ValidFrom.ToShortDateString() ?? " ") : DateTime.Now.ToShortDateString())" readonly>
+                                                        </td>
+                                                        <td colspan="2" class="allFormLables borderLTB align">
+                                                            <label class="f-600">Valid Till</label>
+                                                        </td>
+                                                        <td class="borderLTB text-right" colspan="2">
+                                                            <input class="w-100 inpDisable" id="txtValidTill" name="txtValidTill" onclick="date_val_end()" value="@(!IsNew ? (DAF.one[0].ValidTill ?? " ") : " ")" type="date">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="allFormLables borderLTB">
+                                                            <label class="f-600">Driving Experience</label>
+                                                        </td>
+                                                        <td colspan="2" class="borderLTB">
+                                                            <input class="w-100 txt_input" id="txtDrivingExperience" autocomplete="off" onkeypress="allowNumbersOnly(event)" name="txtDrivingExperience" type="text"> <label class="f-600">Years</label>
+                                                        </td>
+                                                        <td colspan="2" class="allFormLables borderLTB align">
+                                                            <label class="f-600">Mobile</label>
+                                                        </td>
+                                                        <td class="borderLTB text-right" colspan="2">
+                                                            <input class="w-100 txt_input inputRight" id="txtMobile" autocomplete="off" name="txtMobile" onkeypress="allowNumbersOnly(event)" type="text">
+                                                        </td>
+                                                    </tr>
+                                            </table>
+                                            <table class="table mainTbl table-bordered form-table-container-2 bg-color">
+                                                <tbody>
+                                                    <tr>
+                                                        <td colspan="6" class="allFormLables borderLTB f-600">
+                                                            <span>Vehicles Driven</span>
+                                                        </td>
+
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="6" class="allFormLables borderLTB f-600">
+                                                            <textarea class="textTrans inputText" cols="60" rows="5" id="txtVehiclesDriven" name="txtVehiclesDriven"></textarea>
+
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="6" class="allFormLables borderLTB f-600">
+                                                            <span>Address</span>
+                                                        </td>
+
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="6" class="allFormLables borderLTB f-600">
+                                                            <textarea class="inputText textTrans" cols="60" rows="5" id="txtAddress" name="txtAddress"></textarea>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="allFormLables borderLTB">
+                                                            <label class="f-600">File Upload</label>
+                                                        </td>
+                                                        <td colspan="2" class="borderLTB">
+                                                            <input type="file" id="fileToUpload" name="fileToUpload" />
+                                                        </td>
+                                                        <td colspan="2" class="allFormLables borderLTB align">
+                                                        </td>
+                                                        <td class="borderLTB text-right" colspan="2">
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+
+                                            <table class="table mainTbl table-bordered form-table-container-2 bg-color detail-sec-p f-600">
+                                                <tr>
+                                                    <td>I will strictly observe all the external & internal rules & regulations laid down for driving.</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><b>Authorization for Driving:</b></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>To, <br>Safety Department,</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        Applicant is in need of a Driving Authorization for official purpose. Please issue him the authorization for:
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        Internal <br> Test Track <br> External <br> Material Handling
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            <table class="table mainTbl table-bordered form-table-container-2 bg-color detail-sec-p">
+                                                <tr>
+                                                    <td class="f-600">HOD Signature</td>
+                                                    <td class="f-600">Name</td>
+                                                    <td class="f-600 text-left pl-2">Date</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><input class="w-100 txt_input" type="text" readonly></td>
+                                                    <td><input class="w-100 txt_input" type="text" readonly></td>
+                                                    <td><input class="w-100 txt_input" type="date" readonly></td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <div>
+                                    <p class="text-left f-600">SF_G/S_015.00</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="container form-container" id="CompanyDoctor">
+                            <div class="card-header pb-4 pt-4">
+                                <table class="w-100 m-auto">
+                                    <tr>
+                                        <td>
+                                            <table class="table mainTbl table-bordered form-table-container bg-color">
+                                                <tr>
+                                                    <td colspan="6" class="heading form-heading">
+                                                        <span> MobiNext Technologies India Private Limited</span>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="6" class="heading form-heading-1">
+                                                        <span>Application for Driving Authorization</span>
+                                                    </td>
+                                                </tr>
+
+                                            </table>
+                                            <table class="table mainTbl table-bordered form-table-container-2 bg-color detail-sec-p f-600">
+                                                <tr>
+                                                    <td>To be Certified by Company Doctor:(To be Filled by OHC)</td>
+                                                </tr>
+                                                @if (!IsValidityCheck)
+                                                {
+                                                    <tr>
+                                                        <td>Blood Group</td>
+                                                        <td>
+                                                            <select class="w-100 selectInput" name="drpBloodGroup" id="drpBloodGroup">
+                                                                <option value="0" selected disabled>Select</option>
+                                                                <option value="O-">O-</option>
+                                                                <option value="O+">O+</option>
+                                                                <option value="A-">A-</option>
+                                                                <option value="A+">A+</option>
+                                                                <option value="B-">B-</option>
+                                                                <option value="B+">B+</option>
+                                                                <option value="AB-">AB-</option>
+                                                                <option value="AB+">AB+</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Eye Sight</td>
+                                                        <td>
+                                                            <select class="w-100 selectInput" name="drpEyeSight" id="drpEyeSight">
+                                                                <option value="0" selected disabled>Select</option>
+                                                                <option value="OK">OK</option>
+                                                                <option value="NOTK">Not OK</option>
+                                                            </select>
+                                                        </td>
+                                                        <td>LT<input class="txt_input inputRight" id="txtLT" name="txtLT" type="text"></td>
+                                                        <td>RT<input class="txt_input inputRight" id="txtRT" name="txtRT" type="text"></td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>History of Epilepsy</td>
+                                                        <td>
+                                                            <select class="w-100 selectInput" name="drpHistoryofEpilepsy" id="drpHistoryofEpilepsy">
+                                                                <option value="0" selected disabled>Select</option>
+                                                                <option value="OK">OK</option>
+                                                                <option value="NOK">NOK</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="w-30">Remarks</td>
+                                                        <td><textarea class="inputText" id="txtRemarks" name="txtRemarks"></textarea></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Certification</td>
+                                                        <td>
+                                                            <select class="w-100 selectInput" name="drpCertification" id="drpCertification">
+                                                                <option value="0" selected disabled>Select</option>
+                                                                <option value="PASS">PASS</option>
+                                                                <option value="FAIL">FAIL</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                                else
+                                                {
+                                                    <tr>
+                                                        <td>Blood Group</td>
+                                                        <td>
+                                                            <input type="text" class="w-100 inpDisable" name="drpBloodGroup" id="drpBloodGroup" value="@(!IsNew ? (DAF.one[0].BloodGroup ?? " ") : " ")" readonly />
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Eye Sight</td>
+                                                        <td>
+                                                            <input type="text" class="w-100 inpDisable" name="drpEyeSight" id="drpEyeSight" value="@(!IsNew ? (DAF.one[0].EyeSight ?? " ") : " ")" readonly />
+                                                        </td>
+                                                        <td>LT<input class="inpDisable inputRight" id="txtLT" name="txtLT" type="text" value="@(!IsNew ? (DAF.one[0].LT ?? " ") : " ")" readonly></td>
+                                                        <td>RT<input class="inpDisable inputRight" id="txtRT" name="txtRT" type="text" value="@(!IsNew ? (DAF.one[0].RT ?? " ") : " ")" readonly></td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>History of Epilepsy</td>
+                                                        <td>
+                                                            <input type="text" class="w-100 inpDisable" name="drpHistoryofEpilepsy" id="drpHistoryofEpilepsy" value="@(!IsNew ? (DAF.one[0].HistoryofEpilepsy ?? " ") : " ")" readonly />
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Remarks</td>
+                                                        <td>
+                                                            <textarea name="txtRemarks" class="textTrans inpDisable" id="txtRemarks" rows="7" cols="40" readonly>@(!IsNew || !IsEdit ? (DAF.one[0].Remarks ?? "") : "" )</textarea>
+
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Certification</td>
+                                                        <td>
+                                                            <input type="text" class="w-100 inpDisable" name="drpCertification" id="drpCertification" value="@(!IsNew ? (DAF.one[0].Certification ?? " ") : " ")" readonly />
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </table>
+
+                                            <table class="table mainTbl table-bordered form-table-container-2 bg-color detail-sec-p f-600">
+                                                <tr>
+                                                    <td>Applicant is well aware about the:</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="w-25">
+                                                        Driver’s & passenger’s safety <br> Parking manners/judgment. <br> Turning radius judgment. <br>
+                                                        Reversing the vehicle. <br>
+                                                        Safety belt usage & Seat Positioning. <br> Usage of mirrors. <br>
+                                                        Usage of Turn Indicators and other electrical functions. <br> Cluster Warning Indicators.
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Remarks</td>
+                                                    <td><input class="w-100 txt_input" type="text"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        Signature of Safety <br> Manager
+                                                        With Name & <br> Date
+                                                    </td>
+                                                    <td><input class="w-100 txt_input" type="text"></td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <div>
+                                    <p class="text-left f-600">SF_G/S_015.00</p>
+                                </div>
+
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    foreach (var item in DAF.one)
+                    {
+                        <input type="hidden" id="FormSrId" name="FormSrId" value="@(DAF.one[0].Id)" />
+                        <input type="hidden" id="FormId" name="FormId" value="@(FormId)" />
+                        <input type="hidden" id="AppRowId" name="AppRowId" value="@(AppRowId)" />
+                        <div class="container form-container">
+                            <div class="card-header pb-4 pt-4">
+                                <table class="w-100 m-auto">
+                                    <tr>
+                                        <td>
+                                            <table class="table mainTbl table-bordered form-table-container bg-color">
+                                                <tr>
+                                                    <td colspan="6" class="heading form-heading">
+                                                        <span> MobiNext Technologies India Private Limited</span>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="6" class="heading form-heading-1">
+                                                        <span>Application for Driving Authorization</span>
+                                                    </td>
+                                                </tr>
+
+                                            </table>
+
+                                            <table class="table mainTbl table-bordered form-table-container-2 bg-color">
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="w-20 allFormLables borderLTB f-600">
+                                                            <label class="f-600">Employee Type</label>
+                                                        </td>
+                                                        <td colspan="2" class="borderLTB">
+                                                            <select name="drpEmployeeType" id="drpEmployeeType" class="w-100 drpDisable">
+                                                                <option value="0" selected>Choose</option>
+                                                                <option @(item.EmployeeType == "Internal" ? "selected" : "" ) value="Internal">Internal</option>
+                                                                <option @(item.EmployeeType == "External" ? "selected" : "" ) value="External">External</option>
+                                                            </select>
+                                                        </td>
+                                                        <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                            <label class="f-600">Form ID</label>
+                                                        </td>
+                                                        <td class="borderLTB text-right" colspan="2">
+                                                            <input type="text" name="txtFormId" class="w-100 inpDisable" value="@(!IsNew ||!IsEdit ? ("DAF"+FormId ?? "" ) : "" )" readonly>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="w-20 allFormLables borderLTB f-600">
+                                                            <label class="f-600">Name of the Driver</label>
+                                                        </td>
+                                                        <td colspan="2" class="borderLTB">
+                                                            <input class="w-100 inpDisable" id="txtDriverName" name="txtDriverName" type="text" value="@(!IsNew ? (DAF.one[0].DriverName ?? " ") : "")">
+                                                        </td>
+                                                        <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                            <label class="f-600">DATE</label>
+                                                        </td>
+                                                        <td class="borderLTB text-right" colspan="2">
+                                                            <input type="text" name="txtDate" placeholder="/ /" class="w-100 inpDisable" value="@(!IsNew ||!IsEdit ? (Convert.ToDateTime(DAF.two[0].FormId.Created).ToShortDateString()) : DateTime.Now.ToShortDateString())" readonly>
+                                                        </td>
+
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="w-20 allFormLables borderLTB f-600">
+                                                            <label class="f-600">Employee No</label>
+                                                        </td>
+                                                        <td colspan="2" class="borderLTB">
+                                                            <input class="w-100 inpDisable" id="txtEmployeeNumber" name="txtEmployeeNumber" type="text" value="@(!IsNew ? (DAF.one[0].EmployeeNumber ?? "") : "")">
+                                                        </td>
+                                                        <td colspan="2" class="allFormLables borderLTB align">
+                                                            <p class="photoBox">
+                                                                <span class="f-600">Photo</span>
+                                                            </p>
+                                                        </td>
+                                                        <td class="borderLTB text-right" colspan="2">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="w-20 allFormLables borderLTB f-600">
+                                                            <label class="f-600">Department</label>
+                                                        </td>
+                                                        <td colspan="2" class="borderLTB">
+                                                            <input type="text" class="w-100 inpDisable" name="drpDepartment" id="drpDepartment" value="@(!IsNew ? (DAF.one[0].Department ?? " ") : " ")" />
+                                                        </td>
+                                                        <td colspan="2" class="allFormLables borderLTB align">
+                                                            <label class="f-600">Sub Department</label>
+                                                        </td>
+                                                        <td class="borderLTB text-right" colspan="2">
+                                                            <input type="text" class="w-100 inpDisable" name="drpSubDepartment" id="drpSubDepartment" value="@(!IsNew ? (DAF.one[0].SubDepartment ?? " ") : " ")" />
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="w-20 allFormLables borderLTB f-600">
+                                                            <label class="f-600">Date of Birth</label>
+                                                        </td>
+                                                        <td colspan="2" class="borderLTB">
+                                                            <input type="text" name="txtDateofBirth" class="w-100 inpDisable" id="txtDateofBirth" onclick="" value="@(!IsNew ? (DAF.one[0].DateofBirth.ToShortDateString() ?? " ") : " ")">
+                                                        </td>
+                                                        <td colspan="2" class="allFormLables borderLTB align">
+                                                            <label class="f-600">License No</label>
+                                                        </td>
+                                                        <td class="borderLTB text-right" colspan="2">
+                                                            <input class="w-100 inpDisable" id="txtLicenceNumber" name="txtLicenceNumber" type="text" value="@(!IsNew ? (DAF.one[0].LicenceNumber ?? "") : "")">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="w-20 allFormLables borderLTB f-600">
+                                                            <label class="f-600">Valid From</label>
+                                                        </td>
+                                                        <td colspan="2" class="borderLTB">
+                                                            <input class="w-100 inpDisable" id="txtValidFrom" name="txtValidFrom" onclick="" value="@(!IsNew ? (DAF.one[0].ValidFrom.ToShortDateString() ?? " ") : DateTime.Now.ToShortDateString())" type="text">
+                                                        </td>
+                                                        <td colspan="2" class="allFormLables borderLTB align">
+                                                            <label class="f-600">Valid Till</label>
+                                                        </td>
+                                                        <td class="borderLTB text-right" colspan="2">
+                                                            <input class="w-100 inpDisable" id="txtValidTill" name="txtValidTill" onclick="" value="@(!IsNew ? (DAF.one[0].ValidTill.ToShortDateString() ?? " ") : DateTime.Now.ToShortDateString())" type="text">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="w-20 allFormLables borderLTB f-600">
+                                                            <label class="f-600">Driving Experience</label>
+                                                        </td>
+                                                        <td colspan="2" class="borderLTB">
+                                                            <input class="w-100 inpDisable" id="txtDrivingExperience" name="txtDrivingExperience" type="text" value="@(!IsNew ? (DAF.one[0].DrivingExperience ?? "") : "")"><label class="f-600">Years</label>
+                                                        </td>
+                                                        <td colspan="2" class="allFormLables borderLTB align">
+                                                            <label class="f-600">Mobile</label>
+                                                        </td>
+                                                        <td class="borderLTB text-right" colspan="2">
+                                                            <input class="w-100 inpDisable" id="txtMobile" name="txtMobile" type="text" value="@(!IsNew ? (DAF.one[0].Mobile ?? "") : "")">
+                                                        </td>
+                                                    </tr>
+                                            </table>
+                                            <table class="table mainTbl table-bordered form-table-container-2 bg-color">
+                                                <tbody>
+                                                    <tr>
+                                                        <td colspan="6" class="allFormLables borderLTB f-600">
+                                                            <span>Vehicles Driven</span>
+                                                        </td>
+
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="6" class="allFormLables borderLTB f-600">
+                                                            <textarea name="txtVehiclesDriven" class="inpDisable textTrans" id="txtVehiclesDriven" cols="60" rows="7">@(!IsNew||!IsEdit ? (DAF.one[0].VehiclesDriven ?? "") : "")</textarea>
+                                                        </td>
+
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="6" class="allFormLables borderLTB f-600">
+                                                            <span>Address</span>
+                                                        </td>
+
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="6" class="allFormLables borderLTB f-600">
+                                                            <textarea name="txtAddress" class="inpDisable textTrans" id="txtPurpose" cols="60" rows="7">@(!IsNew||!IsEdit ? (DAF.one[0].Address ?? "") : "")</textarea>
+                                                        </td>
+                                                    </tr>
+
+                                                    @if (DAF.one[0].attachmentDAFlist.attachmentDAFData.Count != 0)
+                                                    {
+                                                        foreach (var attachment in DAF.one[0].attachmentDAFlist.attachmentDAFData)
+                                                        {
+                                                            <tr>
+                                                                <td class="allFormLables borderLTB">
+                                                                    <label class="f-600">File Upload</label>
+                                                                </td>
+                                                                <td colspan="2" class="borderLTB">
+                                                                    <a href=@System.Configuration.ConfigurationManager.AppSettings["SharepointSiteURL"]@attachment.ServerRelativeUrl download=@attachment.FileName target="_blank">@attachment.FileName </a>
+                                                                </td>
+                                                                <td colspan="2" class="allFormLables borderLTB align">
+                                                                </td>
+                                                                <td class="borderLTB text-right" colspan="2">
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <tr>
+                                                            <td class="allFormLables borderLTB">
+                                                                <label class="f-600">File Upload</label>
+                                                            </td>
+                                                            <td colspan="2" class="borderLTB">
+                                                                <input type="text" id="fileToUpload" name="fileToUpload" disabled />
+                                                            </td>
+                                                            <td colspan="2" class="allFormLables borderLTB align">
+                                                            </td>
+                                                            <td class="borderLTB text-right" colspan="2">
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                            @*<table class="w-100 form-outer-border detail-sec-p">
+                                                    <tr>
+                                                        <td>I will strictly observe all the external & internal rules & regulations laid down for driving.</td>
+                                                    </tr>
+                                                </table>
+                                                <table class="w-100 form-outer-border detail-sec-p">
+                                                    <tr>
+                                                        <td><b>Authorization for Driving:</b></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>To, <br>Safety Department,</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            Applicant is in need of a Driving Authorization for official purpose. Please issue him the authorization for:
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            Internal <br> Test Track <br> External <br> Material Handling
+                                                        </td>
+                                                    </tr>
+                                                </table>*@
+                                            <table class="table mainTbl table table-bordered table-sm dataTable no-footer bg-color-2 f-600">
+                                                <tbody>
+                                                    @if (!IsNew)
+                                                    {
+                                                        <table class="table mainTbl table table-bordered table-sm dataTable no-footer bg-color-2">
+                                                            <tr class="bg-color-2">
+                                                                <td colspan="6" class="authorize-container photogrph_header">Authorization by HOD</td>
+
+                                                            </tr>
+                                                            <tr class="bg-color-2">
+                                                                <td colspan="1" class="authorize-td">
+                                                                    <label class="f-600">Name:</label>
+                                                                    <input type="text" name="" class="w-100 inpDisable inpIsNewDisable input-width-1" value="@(!IsNew ? (DAF.three[0].UserName ?? "") : "")">
+
+                                                                </td>
+                                                                <td class="authorize-td comment-box-2" colspan="2">
+                                                                    <div class="form-group">
+                                                                        <label class="f-600 align" for="comment">Approver Comment:</label>
+                                                                        <textarea class="textTrans form-control" rows="7" id="comment" disabled>@(!IsNew ? (DAF.three[0].Comment ?? " ") : " ")</textarea>
+
+                                                                    </div>
+                                                                </td>
+                                                                <td class="authorize-td" colspan="2">
+                                                                    <label class="f-600 signature-box-1">Signature:</label>
+                                                                    <input type="text" name="" class="w-100 inpDisable inpIsNewDisable input-width-1" value="@(!IsNew && DAF.three[0].ApproverStatus != "Pending" ? (DAF.three[0].ApproverStatus + " on " + Convert.ToDateTime(DAF.two[0].Modified).ToShortDateString() + " " + Convert.ToDateTime(DAF.two[0].Modified).ToShortTimeString()) : "" )">
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+
+                                                        <tr class="bg-color-2">
+                                                            <td colspan="6" class="authorize-container photogrph_header">Authorization by Safety</td>
+
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="f-600">I will strictly observe all the external & internal rules & regulations laid down for driving.</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="f-600">Authorization for Driving:</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="f-600">To, <br>Safety Department,</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="f-600">
+                                                                Applicant is in need of a Driving Authorization for official purpose. Please issue him the authorization for:
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="f-600">
+                                                                Internal <br> Test Track <br> External <br> Material Handling
+                                                            </td>
+                                                        </tr>
+
+                                                        <tr class="f-600">
+                                                            <td>Applicant is well aware about the:</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="f-600">
+                                                                Driver’s & passenger’s safety <br> Parking manners/judgment. <br> Turning radius judgment. <br>
+                                                                Reversing the vehicle. <br>
+                                                                Safety belt usage & Seat Positioning. <br> Usage of mirrors. <br>
+                                                                Usage of Turn Indicators and other electrical functions. <br> Cluster Warning Indicators.
+                                                            </td>
+                                                        </tr>
+                                                        <table class="table mainTbl table table-bordered table-sm dataTable no-footer bg-color-2">
+                                                            <tr class="bg-color-2">
+                                                                <td colspan="1" class="authorize-td">
+                                                                    <label class="f-600">Name:</label>
+                                                                    <input type="text" name="" class="w-100 inpDisable inpIsNewDisable input-width-1" value="@(!IsNew ? (DAF.three[1].UserName ?? ""): "")">
+                                                                </td>
+                                                                <td class="authorize-td comment-box-2" colspan="2">
+                                                                    <div class="form-group">
+                                                                        <label class="f-600 align" for="comment">Approver Comment:</label>
+                                                                        <textarea class="textTrans form-control" rows="7" id="comment" disabled>@(!IsNew ? (DAF.three[1].Comment ?? " "): " ")</textarea>
+                                                                    </div>
+                                                                </td>
+
+                                                                <td class="authorize-td" colspan="2">
+                                                                    <label class="f-600 signature-box-1">Signature:</label>
+                                                                    <input type="text" name="" class="w-100 inpDisable inpIsNewDisable input-width-1" value="@(!IsNew && DAF.three[1].ApproverStatus != "Pending" ? (DAF.three[1].ApproverStatus + " on " +  Convert.ToDateTime(DAF.two[1].Modified).ToShortDateString()+" " +Convert.ToDateTime(DAF.two[1].Modified).ToShortTimeString()) : "" )">
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <div>
+                                    <p class="text-left f-600">SF_G/S_015.00</p>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="container form-container">
+                            <div class="card-header pb-4 pt-4">
+                                <table class="w-100 m-auto">
+                                    <tr>
+                                        <td>
+                                            <table class="table mainTbl table-bordered form-table-container bg-color">
+                                                <tr>
+                                                    <td colspan="6" class="heading form-heading">
+                                                        <span> MobiNext Technologies India Private Limited</span>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="6" class="heading form-heading-1">
+                                                        <span>Application for Driving Authorization</span>
+                                                    </td>
+                                                </tr>
+
+                                            </table>
+                                            <table class="table mainTbl table-bordered form-table-container-2 bg-color detail-sec-p f-600" id="CompanyDoctor">
+                                                <tbody>
+                                                    <tr>
+                                                        <td>To be Certified by Company Doctor:(To be Filled by OHC)</td>
+                                                    </tr>
+                                                    @if (!IsValidityCheck)
+                                                    {
+                                                        <tr>
+                                                            <td>Blood Group</td>
+                                                            <td>
+                                                                <select class="w-100 selectInput" name="drpBloodGroup" id="drpBloodGroup">
+                                                                    <option value="0" selected disabled>Select</option>
+                                                                    <option value="O-">O-</option>
+                                                                    <option value="O+">O+</option>
+                                                                    <option value="A-">A-</option>
+                                                                    <option value="A+">A+</option>
+                                                                    <option value="B-">B-</option>
+                                                                    <option value="B+">B+</option>
+                                                                    <option value="AB-">AB-</option>
+                                                                    <option value="AB+">AB+</option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Eye Sight</td>
+                                                            <td>
+                                                                <select class="w-100 selectInput" name="drpEyeSight" id="drpEyeSight">
+                                                                    <option value="0" selected disabled>Select</option>
+                                                                    <option value="OK">OK</option>
+                                                                    <option value="NOTK">Not OK</option>
+                                                                </select>
+                                                            </td>
+                                                            <td>LT<input class="txt_input inputRight" id="txtLT" name="txtLT" type="text"></td>
+                                                            <td>RT<input class="txt_input inputRight" id="txtRT" name="txtRT" type="text"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>History of Epilepsy</td>
+                                                            <td>
+                                                                <select class="w-100 selectInput" name="drpHistoryofEpilepsy" id="drpHistoryofEpilepsy">
+                                                                    <option value="0" selected disabled>Select</option>
+                                                                    <option value="OK">OK</option>
+                                                                    <option value="NOTK">Not OK</option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Remarks</td>
+                                                            <td>
+                                                                <textarea class="textTrans inpDisable" id="txtRemarks" rows="3" cols="40" name="txtRemarks"></textarea>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Certification</td>
+                                                            <td>
+                                                                <select class="w-100 selectInput" name="drpCertification" id="drpCertification">
+                                                                    <option value="0" selected disabled>Select</option>
+                                                                    <option value="PASS">PASS</option>
+                                                                    <option value="FAIL">FAIL</option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                    else
+                                                    {
+                                                        <tr>
+                                                            <td>Blood Group</td>
+                                                            <td>
+                                                                <input type="text" class="w-100 inpDisable" name="drpBloodGroup" id="drpBloodGroup" value="@(!IsNew ? (DAF.one[0].BloodGroup ?? " ") : " ")" />
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Eye Sight</td>
+                                                            <td>
+                                                                <input type="text" class="w-100 inpDisable" name="drpEyeSight" id="drpEyeSight" value="@(!IsNew ? (DAF.one[0].EyeSight ?? " ") : " ")" />
+                                                            </td>
+                                                            <td>LT<input class="inpDisable inputRight" id="txtLT" name="txtLT" type="text" value="@(!IsNew ? (DAF.one[0].LT ?? " ") : " ")"></td>
+                                                            <td>RT<input class="inpDisable inputRight" id="txtRT" name="txtRT" type="text" value="@(!IsNew ? (DAF.one[0].RT ?? " ") : " ")"></td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>History of Epilepsy</td>
+                                                            <td>
+                                                                <input type="text" class="w-100 inpDisable" name="drpHistoryofEpilepsy" id="drpHistoryofEpilepsy" value="@(!IsNew ? (DAF.one[0].HistoryofEpilepsy ?? " ") : " ")" />
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Remarks</td>
+                                                            <td>
+                                                                <textarea name="txtRemarks" class="textTrans inpDisable" id="txtRemarks" rows="3" cols="40">@(!IsNew || !IsEdit ? (DAF.one[0].Remarks ?? "") : "")</textarea>
+
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Certification</td>
+                                                            <td>
+                                                                <input type="text" class="w-100 inpDisable" name="drpCertification" id="drpCertification" value="@(!IsNew ? (DAF.one[0].Certification ?? " ") : " ")" />
+                                                            </td>
+                                                        </tr>
+                                                        <table class="table mainTbl table table-bordered table-sm dataTable no-footer bg-color-2">
+                                                            <tr class="bg-color-2">
+                                                                <td colspan="6" class="authorize-container photogrph_header">Authorization by OHC(Company Doctor)</td>
+
+                                                            </tr>
+
+                                                            <tr class="bg-color-2">
+                                                                <td colspan="1" class="authorize-td">
+                                                                    <label class="f-600">Name:</label>
+                                                                    <input type="text" name="" class="w-100 inpDisable inpIsNewDisable input-width-1" value="@(!IsNew ? (DAF.three[2].UserName ?? "") : "")">
+                                                                </td>
+                                                                <td class="authorize-td comment-box-2" colspan="2">
+                                                                    <div class="form-group">
+                                                                        <label class="f-600 align" for="comment">Approver Comment:</label>
+                                                                        <textarea class="textTrans form-control mx-auto" rows="3" id="comment" disabled>@(!IsNew ? (DAF.three[2].Comment ?? " ") : " ")</textarea>
+                                                                    </div>
+                                                                </td>
+                                                                <td class="authorize-td" colspan="2">
+                                                                    <label class="f-600 signature-box-1">Signature:</label>
+                                                                    <input type="text" name="" class="w-100 inpDisable inpIsNewDisable input-width-1" value="@(!IsNew && DAF.three[2].ApproverStatus != "Pending" ? (DAF.three[2].ApproverStatus + " on " + Convert.ToDateTime(DAF.two[1].Modified).ToShortDateString() + " " + Convert.ToDateTime(DAF.two[1].Modified).ToShortTimeString()) : "" )">
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    }
+                                                </tbody>
+
+                                                @if (!IsNew)
+                                                {
+                                                    <table class="table mainTbl table table-bordered table-sm dataTable no-footer bg-color-2">
+                                                        <tr class="bg-color-2">
+                                                            <td colspan="6" class="authorize-container photogrph_header">Authorization by Security</td>
+                                                        </tr>
+                                                        <tr class="bg-color-2">
+                                                            <td colspan="1" class="authorize-td">
+                                                                <label class="f-600">Name:</label>
+                                                                <input type="text" name="" class="w-100 inpDisable inpIsNewDisable input-width-1" value="@(!IsNew ? (DAF.three[3].UserName ?? ""): "")">
+                                                            </td>
+                                                            <td class="authorize-td comment-box-2" colspan="2">
+                                                                <div class="form-group">
+                                                                    <label class="f-600 align" for="comment">Approver Comment:</label>
+                                                                    <textarea class="textTrans form-control mx-auto" rows="3" id="comment" disabled>@(!IsNew ? (DAF.three[3].Comment ?? " "): " ")</textarea>
+                                                                </div>
+                                                            </td>
+                                                            <td class="authorize-td" colspan="2">
+                                                                <label class="f-600 signature-box-1">Signature:</label>
+                                                                <input type="text" name="" class="w-100 inpDisable inpIsNewDisable input-width-1" value="@(!IsNew && DAF.three[0].ApproverStatus != "Pending" ? (DAF.three[3].ApproverStatus + " on " + Convert.ToDateTime(DAF.two[0].Modified).ToShortDateString()+" " +Convert.ToDateTime(DAF.two[0].Modified).ToShortTimeString()) : "" )">
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                }
+
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <div>
+                                    <p class="text-left f-600">SF_G/S_015.00</p>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    }
+                }
+
+                @if (IsNew)
+                {
+                    if (!IsEdit)
+                    {
+                        <div class="card-footer align-content-center">
+                            <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                                Re-Submit
+                            </button>
+                            <button type="reset" class="btn btn-danger btn-sm cancl-btn">
+                                Cancel
+                            </button>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="card-footer align-content-center">
+                            <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                                Submit
+                            </button>
+                            <button type="reset" class="btn btn-danger btn-sm cancl-btn">
+                                Cancel
+                            </button>
+                        </div>
+                    }
+                }
+            </form>
+        </div>
+    </div>
+</body>
+
+<div class="modal fade" id="successModel" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header modelHeader">
+                <span class="modal-title modalMsgTitle" id="modalTitle"></span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label id="modalBody" class="lableMsg">  </label>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="submitBomBtn publishBtn" id="modalOkButton">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    var spinner = $('#loader');
+    var IsNew = @Html.Raw(Json.Encode(IsNew));
+    var DAF = @Html.Raw(Json.Encode(DAF));
+    var appRowId = @Html.Raw(Json.Encode(AppRowId));
+    var approvalType =@Html.Raw(Json.Encode(ApprovalType));
+    var IsEdit = @Html.Raw(Json.Encode(IsEdit));
+    var IsValidityCheck = @Html.Raw(Json.Encode(IsValidityCheck));
+    var FlagRedirect = @Html.Raw(Json.Encode(FlagRedirect));
+    pageLoad();
+
+    function pageLoad() {
+        spinner.hide();
+        var data = "";
+        if (!IsNew) {
+
+            $(".inpDisable").attr("disabled", "disabled");
+        }
+        if (!IsNew) {
+
+            $(".drpDisable").attr("disabled", "disabled");
+        }
+        if (IsNew) {
+            //$("#CompanyDoctor").hide();
+            getDepartment();
+            getSubDepartment();
+            $(".inpIsNewDisable").attr("disabled", "disabled");
+        }
+        if (!IsEdit) {
+            getDepartment();
+            getSubDepartment();
+        }
+    };
+
+    function getDepartment() {
+        //
+        if (IsNew) {
+            if (!IsEdit) {
+                var value = JSON.stringify(DAF[0]);
+                var value_1 = JSON.parse(value);
+                var selectedLocation = value_1.Value[0].Department;
+                console.log(selectedLocation);
+
+                $.ajax({
+                    url: '/List/Department',
+                    type: 'GET',
+                    data: {},
+                    dataType: 'JSON',
+                    success: (function (data) {
+                        //locdata = data;
+
+                        //console.log(data);
+                        var s = '<option value="-1">Please Select Department</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            if (data[i].Department == selectedLocation) {
+                                s += '<option value="' + data[i].Department + '" id="' + data[i].Id + '" selected>' + data[i].Department + '</option>';
+                            }
+                            else {
+                                s += '<option value="' + data[i].Department + '" id="' + data[i].Id + '">' + data[i].Department + '</option>';
+                            }
+                        }
+                        $("#drpDepartment").html(s);
+
+
+                    }),
+                    error: (function (data) {
+                        //code
+                    })
+                })
+            }
+            else {
+                $.ajax({
+                    url: '/List/Department',
+                    type: 'GET',
+                    data: {},
+                    dataType: 'JSON',
+                    success: (function (data) {
+                        locdata = data;
+
+                        //console.log(data);
+                        var s = '<option value="-1">Please Select Department</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            s += '<option value="' + data[i].Department + '" id="' + data[i].Id + '">' + data[i].Department + '</option>';
+                        }
+                        $("#drpDepartment").html(s);
+
+
+                    }),
+                    error: (function (data) {
+                        //code
+                    })
+                })
+            }
+        }
+
+    }
+
+    function getSubDepartment() {
+        if (IsNew) {
+            if (!IsEdit) {
+                var value = JSON.stringify(DAF[0]);
+                var value_1 = JSON.parse(value);
+                var selectedLocation = value_1.Value[0].Department;
+                console.log(selectedLocation);
+
+                $.ajax({
+                    url: '/List/Department',
+                    type: 'GET',
+                    data: {},
+                    dataType: 'JSON',
+                    success: (function (data) {
+                        //locdata = data;
+
+                        //console.log(data);
+                        var s = '<option value="-1">Please Select Sub Department</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            if (data[i].Department == selectedLocation) {
+                                s += '<option value="' + data[i].Department + '" id="' + data[i].Id + '" selected>' + data[i].Department + '</option>';
+                            }
+                            else {
+                                s += '<option value="' + data[i].Department + '" id="' + data[i].Id + '">' + data[i].Department + '</option>';
+                            }
+                        }
+                        $("#drpSubDepartment").html(s);
+
+
+                    }),
+                    error: (function (data) {
+                        //code
+                    })
+                })
+            }
+            else {
+                $.ajax({
+                    url: '/List/Department',
+                    type: 'GET',
+                    data: {},
+                    dataType: 'JSON',
+                    success: (function (data) {
+                        locdata = data;
+
+                        //console.log(data);
+                        var s = '<option value="-1">Please Select Sub Department</option>';
+
+                        for (var i = 0; i < data.length; i++) {
+                            s += '<option value="' + data[i].Department + '" id="' + data[i].Id + '">' + data[i].Department + '</option>';
+                        }
+                        $("#drpSubDepartment").html(s);
+
+
+                    }),
+                    error: (function (data) {
+                        //code
+                    })
+                })
+            }
+        }
+
+    }
+
+    //function date_val_end() {
+    //    //
+    //    var week_string = document.getElementsByName("txtValidFrom")[0].value;
+    //    console.log(week_string);
+    //    var parts = week_string.split("-");
+    //    var date = new Date(parts[0], parts[1] - 1, parts[2]);
+    //    var min_date = date;
+    //    min_date.setDate(min_date.getDate() + 1);
+    //    var initial_date = min_date.toISOString().split('T')[0];
+    //    document.getElementsByName("txtValidTill")[0].setAttribute("min", initial_date);
+    //}
+
+    function date_val_end() {
+        ////
+        var dtToday = new Date();
+        var month = dtToday.getMonth() + 1;
+        var day = dtToday.getDate();
+        var year = dtToday.getFullYear();
+        if (month < 10)
+            month = '0' + month.toString();
+        if (day < 10)
+            day = '0' + day.toString();
+
+        var maxDate = year + '-' + month + '-' + day;
+        //alert(maxDate);
+        $('#txtValidTill').attr('min', maxDate);
+    }
+
+    $("#btnSubmit").on('click', function (e) {
+        ////
+
+        //File Checking if it is re-uploaded or not on edit mode
+        if (!IsEdit) {
+            var fileToUpload = $("#fileToUpload").val();
+            if (fileToUpload != "") {
+                $("#attachedfile").val('');
+                $("#attachedfileName").val('');
+            }
+        }
+
+        var drpRequestSubType = $("#drpRequestSubType option:selected").val();
+        if (drpRequestSubType != "OnBehalf") {
+            var drpEmployeeType = $("#drpEmployeeType option:selected").val();
+            if (drpEmployeeType == "0") {
+                requiredModal("Please select the Employee Type");
+                return false;
+            }
+        }
+        var txtDriverName = document.getElementById("txtDriverName").value;
+        if (txtDriverName == "") {
+            requiredModal("Please enter the Name of the Driver");
+            return false;
+        }
+        var txtEmployeeNumber = document.getElementById("txtEmployeeNumber").value;
+        if (txtEmployeeNumber == "") {
+            requiredModal("Please enter the Employee Number");
+            return false;
+        }
+        var drpDepartment = $("#drpDepartment option:selected").val();
+        if (drpDepartment == "-1") {
+            requiredModal("Please select the Department");
+            return false;
+        }
+        var drpSubDepartment = $("#drpSubDepartment option:selected").val();
+        if (drpSubDepartment == "-1") {
+            requiredModal("Please select the Sub Department");
+            return false;
+        }
+        var txtDateofBirth = document.getElementById("txtDateofBirth").value;
+        if (txtDateofBirth == "") {
+            requiredModal("Please select the Date of Birth");
+            return false;
+        }
+        var txtLicenceNumber = document.getElementById("txtLicenceNumber").value;
+        if (txtLicenceNumber == "") {
+            requiredModal("Please enter the Licence Number");
+            return false;
+        }
+        var txtValidFrom = document.getElementById("txtValidFrom").value;
+        if (txtValidFrom == "") {
+            requiredModal("Please select the Valid From Date");
+            return false;
+        }
+        var txtValidTill = document.getElementById("txtValidTill").value;
+        if (txtValidTill == "") {
+            requiredModal("Please select the Valid Till Date");
+            return false;
+        }
+        var txtDrivingExperience = document.getElementById("txtDrivingExperience").value;
+        if (txtDrivingExperience == "") {
+            requiredModal("Please enter the Driving Experience");
+            return false;
+        }
+        var txtMobile = document.getElementById("txtMobile").value;
+        if (txtMobile == "") {
+            requiredModal("Please enter the Mobile No");
+            return false;
+        }
+        var mobileLen = $("#txtMobile").val().length;
+        if (mobileLen < 10 || mobileLen > 10) {
+            mobileLengthModal();
+            return false;
+        }
+        var txtVehiclesDriven = document.getElementById("txtVehiclesDriven").value;
+        if (txtVehiclesDriven == "") {
+            requiredModal("Please enter the Vehicles Driven");
+            return false;
+        }
+        var txtAddress = document.getElementById("txtAddress").value;
+        if (txtAddress == "") {
+            requiredModal("Please enter the Address");
+            return false;
+        }
+       
+        $("#pageLoader").removeClass('invisible');
+        var form = $("#DrivingForm");
+        var formData = new FormData(form[0]);
+
+        $.ajax({
+            url: '/DrivingAuthorization/SaveDAF',
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            data: formData,
+            enctype: 'multipart/form-data',
+            success: (function (data) {
+                if (data[0].Value == 1) {
+                    $("#pageLoader").addClass('invisible');
+                    successModal(data[1].Value);
+                }
+                else {
+                    $("#pageLoader").addClass('invisible');
+                    failureModal();
+                }
+            }),
+            error: (function (data) {
+                $("#pageLoader").addClass('invisible');
+                failureModal();
+            })
+        })
+    });
+
+    function RequestSubmission() {
+        ////
+        var drpRequestSubType = $("#drpRequestSubType option:selected").val();
+        if (drpRequestSubType == "OnBehalf") {
+            $('#drpEmployeeType').val("0");
+            $('#txtDriverName').val('');
+            $('#txtEmployeeNumber').val('');
+            $('#drpDepartment').val("-1");
+            $('#drpSubDepartment').val("-1");
+            $('#txtMobile').val('');
+            document.getElementById("txtOtherEmpname").disabled = false;
+            $('#drpEmployeeType').val("0");
+            document.getElementById("drpEmployeeType").disabled = true;
+        }
+        else if (drpRequestSubType == "Self") {
+            $('#drpEmployeeType').val("Internal");
+            $('#txtOtherEmpname').val('');
+            func();
+            $('#drpEmployeeType').trigger('change');
+            document.getElementById("txtOtherEmpname").disabled = true;
+        }
+        else {
+            $('#txtOtherEmpname').val('');
+            document.getElementById("txtOtherEmpname").disabled = true;
+            $('#drpEmployeeType').val("0");
+            $('#txtDriverName').val('');
+            $('#txtEmployeeNumber').val('');
+            $('#drpDepartment').val("-1");
+            $('#drpSubDepartment').val("-1");
+            $('#txtMobile').val('');
+            document.getElementById("drpEmployeeType").disabled = false;
+        }
+    }
+
+    $("#txtOtherEmpname").autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                url: "/List/GetPAFEmployeeDetails",
+                dataType: "json",
+                cache: false,
+                async: false,
+                data: {
+                    searchText: $("#txtOtherEmpname").val()
+                },
+                success: function (data) {
+                    ////
+                    response($.map(data, function (item) {
+                        console.log(data, 'data');
+                        return { label: item.UserName, value: item.UserName, raw: item };
+                    }));
+                }
+            });
+        },
+        search: function (event, ui) {
+            var value = $("#txtOtherEmpname").val();
+            // If less than three chars, cancel the search event
+            if (value.length < 4) {
+                event.preventDefault();
+            }
+        },
+        min_length: 4,
+        delay: 0,
+        select: function (event, ui) {
+            var empOtherDetails = ui.item['raw'];
+
+            //Get the other details like Cost Center Code, Employee Number from DB.
+            $.ajax({
+                url: "/List/GetPAFExistingEmployeeDetails",
+                dataType: "json",
+                cache: false,
+                async: false,
+                data: {
+                    otherEmpUserId: empOtherDetails.UserId,
+                    //otherEmpEmail: empOtherDetails.Email
+                },
+                success: function (data) {
+                    console.log(data, 'data');
+
+                    $('#txtEmployeeNumber').val(data.EmpNumber);
+                    $('#txtDriverName').val(data.FirstName + " " + data.LastName);
+                    $('#drpDepartment').val(data.Department);
+                    var department = document.getElementById("drpDepartment");
+                    department.value = data.Department;
+                    $('#txtMobile').val(data.PhoneNumber);
+                    $('#hiddentxtEmail').val(data.Email);
+
+                }
+            });
+        }
+    });
+
+
+    function validityModal(txt) {
+        ////
+        if (txt == 'approve') {
+        }
+        else if (txt == 'reject') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for rejecting the form');
+        }
+        else if (txt == 'enquire') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for enquiring the form');
+        }
+    }
+
+    function saveResponse(text) {
+        //
+        if (!IsValidityCheck) {
+            var drpBloodGroup = $("#drpBloodGroup option:selected").val();
+            if (drpBloodGroup == "0") {
+                if (text == 'approve') {
+                    DisplayAlert('error', 'Error', 'Please select the Blood Group');
+                    return;
+                }
+            }
+            var drpEyeSight = $("#drpEyeSight option:selected").val();
+            if (drpEyeSight == "0") {
+                if (text == 'approve') {
+                    DisplayAlert('error', 'Error', 'Please select the Eye Sight');
+                    return;
+                }
+            }
+            var txtLT = document.getElementById("txtLT").value;
+            if (txtLT == "") {
+                DisplayAlert('error', 'Error', 'Please enter the LT');
+                return ;
+            }
+            var txtRT = document.getElementById("txtRT").value;
+            if (txtRT == "") {
+                DisplayAlert('error', 'Error', 'Please enter the RT');
+                return ;
+            }
+            var drpHistoryofEpilepsy = $("#drpHistoryofEpilepsy option:selected").val();
+            if (drpHistoryofEpilepsy == "0") {
+                if (text == 'approve') {
+                    DisplayAlert('error', 'Error', 'Please select the History of Epilepsy');
+                    return;
+                }
+            }
+            var txtRemarks = document.getElementById("txtRemarks").value;
+            if (txtRemarks == "") {
+                DisplayAlert('error', 'Error', 'Please enter the Remarks');
+                return;
+            }
+            var drpCertification = $("#drpCertification option:selected").val();
+            if (drpCertification == "0") {
+                if (text == 'approve') {
+                    DisplayAlert('error', 'Error', 'Please select the Certification');
+                    return;
+                }
+            }
+        }
+
+
+        var status = '', comment = '';
+        comment = $("#comment-" + text).val();
+        switch (text) {
+            case 'approve': {
+                status = 'Approved';
+                break;
+            }
+            case 'reject': {
+                status = 'Rejected';
+                if (comment == '') {
+                    validityModal(text);
+                    return;
+                }
+                break;
+            }
+            case 'enquire': {
+                status = 'Enquired';
+                if (comment == '') {
+                    validityModal(text);
+                    return;
+                }
+                break;
+            }
+        }
+
+        $.ajax({
+            url: '/List/SaveResponse',
+            type: 'POST',
+            data: { response: status, appRowId: appRowId, comment: comment, approvalType: approvalType },
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data == 1) {
+                    successModal(text);
+                    if (!IsValidityCheck) {
+                        OHCEntry();
+                    }
+                    setTimeout(FilterMyTasks, 5000)
+                }
+                else {
+                    failureModal();
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+            })
+        })
+    }
+
+    function OHCEntry() {
+        ////
+        var form = $("#DrivingForm").serialize();
+        $.ajax({
+            url: '/DrivingAuthorization/OHCEntry',
+            type: 'POST',
+            data: form,
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data == 1) {
+                }
+                else {
+                    failureModal();
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+            })
+        })
+
+    }
+
+    function requiredModal(text) {
+        $('#modalTitle').html('Required!');
+        $('#modalBody').html(text);
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function successModal(txt) {
+        ////
+        $('#modalTitle').html('Success');
+        if (txt == "approve") {
+            $('#modalBody').html('Form has been approved!');
+        }
+        else if (txt == "reject") {
+            $('#modalBody').html('Form has been rejected!');
+        }
+        else if (txt == "enquire") {
+            $('#modalBody').html('Form has been enquired!');
+        }
+        else if (txt == "cancelled") {
+            $('#modalBody').html('Form has been cancelled!');
+        }
+        else {
+            $('#modalBody').html('Your form with ID: DAF' + txt + ' has been submitted! Kindly use this for future reference');
+            FlagRedirect = txt;
+        }
+
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function failureModal() {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html('Some error occurred!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function permissionModal() {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html('No permssion granted since the device is not SAVWIPL owned!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function allowNumbersOnly(e) {
+        var code = (e.which) ? e.which : e.keyCode;
+        if (code > 31 && (code < 48 || code > 57)) {
+            e.preventDefault();
+        }
+    }
+
+    function alphaOnly(e) {
+        var key = e.keyCode;
+        if (key > 32 && (key < 65 || key > 122 || key == 91 || key == 92 || key == 93 || key == 94 || key == 95 || key == 96)) {
+            e.preventDefault();
+        }
+    }
+
+    function mobileLengthModal() {
+        $('#modalTitle').html('Required');
+        $('#modalBody').html('Please enter a 10-Digit Mobile No.!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    $("#modalOkButton").on('click', function () {
+        //
+        if (FlagRedirect != null) {
+            window.location = "../Dashboard";
+        }
+    });
+
+    function func(e) {
+        ////
+        var dropdown = document.getElementById("drpEmployeeType");
+        var selection = dropdown.value;
+        if (selection == "Internal") {
+            var txtDriverName = document.getElementById("txtDriverName");
+            var department = document.getElementById("drpDepartment");
+            var txtEmployeeNumber = document.getElementById("txtEmployeeNumber");
+
+            txtDriverName.value = "@currentUser.FirstName" + " "+ "@currentUser.LastName";
+            department.value = "@currentUser.Department";
+            txtEmployeeNumber.value = "@currentUser.EmpNumber";
+
+        }
+        else {
+            var txtDriverName = document.getElementById("txtDriverName");
+            var department = document.getElementById("drpDepartment");
+            var txtEmployeeNumber = document.getElementById("txtEmployeeNumber");
+
+            txtDriverName.value = "";
+            department.value = "-1";
+            txtEmployeeNumber.value = "";
+
+        }
+    }
+
+</script>
+

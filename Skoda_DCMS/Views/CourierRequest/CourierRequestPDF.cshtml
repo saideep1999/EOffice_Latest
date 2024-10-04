@@ -1,0 +1,425 @@
+﻿@{
+    Layout = null;
+    Skoda_DCMS.Models.CRFData CRF = null;
+    List<Skoda_DCMS.Models.ApprovalDataModel> appList = new List<Skoda_DCMS.Models.ApprovalDataModel>(); ;
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        CRF = ViewBag.Model.one[0] as Skoda_DCMS.Models.CRFData;
+        appList = ViewBag.Model?.three as List<Skoda_DCMS.Models.ApprovalDataModel>;
+    }
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SAVWIPL - Courier Request Form</title>
+    <style type="text/css">
+        *:visited, *:focus {
+            box-shadow: none;
+        }
+
+        input, select, input:focus, select:focus, textarea, textarea:focus {
+            border: 1px solid #000;
+        }
+
+        input, textarea {
+            padding: 5px;
+        }
+
+        table td {
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <table style="width: 100%; font-size: 14px; color: #000; font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+        <tr>
+            <td>
+                <table style="width: 100%;" cellspadding="0" cellspacing="0">
+                    <tr>
+                        <td colspan="6" width="60%" style="text-align: right;">
+                            <img style="width: 50%;" src='@Server.MapPath("~/assets/img/SAVWIPL_Merger_Logo.JPG")'>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="6" align="center">
+                <h2> Courier Request Form </h2>
+            </td>
+        </tr>
+
+        <tr>
+            <td style="padding: 15px;">
+                <table cellspacing="0" border="" cellpadding="0" width="100%">
+                    @if (CRF.RequestSubmissionFor == "Self")
+                    {
+
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Employee Name
+                            </td>
+                            <td style="width: 30%; font-weight: normal;" colspan="2" align='left'>
+                                <span style="height: 25px; width:85%; border-radius: 0; "> @(CRF.EmployeeName)  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Employee Code
+                            </td>
+                            <td style="width: 30%; font-weight: normal;" colspan="2" align='left'>
+                                <span style="height: 25px; width:85%; border-radius: 0; "> @(CRF.EmployeeCode) </span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Designatiion
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(CRF.EmployeeDesignation) </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Location
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(CRF.EmployeeLocation) </span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Department
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(CRF.EmployeeDepartment) </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Contact Number
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(CRF.EmployeeContactNo) </span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Cost Center Number
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(CRF.EmployeeCCCode)  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                UserID
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(CRF.EmployeeUserId)  </span>
+                            </td>
+
+                        </tr>
+                    }
+                    else
+                    {
+                        if (CRF.EmployeeType == "SAVWIPLEmployee")
+                        {
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Employee Name
+                                </td>
+                                <td style="width: 30%" colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(CRF.OtherEmployeeName)  </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Employee Code
+                                </td>
+                                <td style="width: 30%" colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(CRF.OtherEmployeeCode) </span>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Designation
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(CRF.OtherEmployeeDesignation) </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Location
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(CRF.OtherEmployeeLocation) </span>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Department
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(CRF.OtherEmployeeDepartment) </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Contact Number
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(CRF.OtherEmployeeContactNo) </span>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Cost Center Number
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(CRF.OtherEmployeeCCCode)  </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    UserID
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(CRF.OtherEmployeeUserId)  </span>
+                                </td>
+
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Employee Name
+                                </td>
+                                <td style="width: 30%" colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(CRF.OtherNewEmployeeName)  </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Employee Code
+                                </td>
+                                <td style="width: 30%" colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(CRF.OtherNewEmployeeCode) </span>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Designation
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(CRF.OtherNewEmpDesignation) </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Location
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(CRF.OtherNewEmpLocation) </span>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Department
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(CRF.OtherNewDepartment) </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Contact Number
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(CRF.OtherNewContactNo) </span>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Cost Center Number
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(CRF.OtherNewCostcenterCode)  </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    UserID
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(CRF.OtherNewUserId)  </span>
+                                </td>
+
+                            </tr>
+                        }
+
+                    }
+
+
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Type of Consignment
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(CRF?.ConsignmentType)  </span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">
+                            Courier Type
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(CRF?.CourierType)  </span>
+                        </td>
+
+                    </tr>
+
+                    <tr>
+                        <td colspan="6" style=" font-weight: bold;">
+                            Name & Address of Sender
+                        </td>
+                    </tr>
+                    <tr>
+
+                        <td colspan="6" align='left'>
+                            <span style=" width: 85%; font-weight: normal; border-radius: 0; "> @(CRF?.AddressofConsignee)  </span>
+                        </td>
+
+                    </tr>
+
+                    <tr>
+                        <td colspan="6" style=" font-weight: bold;">
+                            Name & Address of Receiver
+                        </td>
+
+                    </tr>
+                    <tr>
+
+                        <td colspan="6" align='left'>
+                            <span style=" width: 85%; font-weight: normal; border-radius: 0; "> @(CRF?.AddressofReceiver)  </span>
+                        </td>
+
+                    </tr>
+
+                    <tr>
+                        <td colspan="6" style=" font-weight: bold;">
+                            Weight/Dimension
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label id="" class="checkbox-container mr-2 mlSpaceChk">
+                                Weight
+                            </label>
+                        </td>
+
+
+                        @if (CRF?.WeightDimension == "Weight")
+                        {
+                            <td align='left'>
+                                <input disabled type="checkbox" class="wd" id="chkWeight" name="chkWeight" checked>
+                            </td>
+
+                        }
+                        else
+                        {
+                            <td align='left'>
+                                <input disabled type="checkbox" class="wd" id="chkWeight" name="chkWeight">
+                            </td>
+
+                        }
+
+                        <td>
+                            <label id="" class="checkbox-container mr-2 mlSpaceChk">
+                                Dimension
+                            </label>
+                        </td>
+                        @if (CRF?.WeightDimension == "Dimension")
+                        {
+                            <td align='left'>
+                                <input disabled type="checkbox" class="wd" id="chkDimension" name="chkDimension" checked>
+                            </td>
+                        }
+                        else
+                        {
+                            <td align='left'>
+                                <input disabled type="checkbox" class="wd" id="chkDimension" name="chkDimension">
+                            </td>
+                        }
+
+                        <td colspan="2" align='left'>
+                            <span style=" width: 85%; font-weight: normal; border-radius: 0; "> @(CRF?.WeightDimensionIn)  </span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="6" style=" font-weight: bold;">
+                            Courier Inward Register Sl. No
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td colspan="6" style="height: 15px;">
+                            <span style=" width: 85%; font-weight: normal; border-radius: 0; "> @(CRF?.CourierInwardRegisterNo)  </span>
+                        </td>
+                    </tr>
+
+
+                    @if (appList.Count > 0)
+                    {
+                        <tr>
+                            <td colspan="2">Name</td>
+                            <td colspan="2">Proccessed On</td>
+                            <td colspan="1">Status</td>
+                            <td colspan="1">Level</td>
+                        </tr>
+                        foreach (var item in appList)
+                        {
+                            <tr>
+                                <td colspan="2">
+                                    <div style="margin-bottom: 10px; font-weight: normal;">
+                                        <div>@item.UserName</div>
+                                        <div>@item.Designation</div>
+                                    </div>
+                                </td>
+                                <td colspan="2" style="font-weight: normal;">
+                                    @if (item.Logic == "OR")
+                                    {
+                                        if (item.ApproverStatus != "Pending")
+                                        {
+                                            <div>
+                                                @item.TimeStamp
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div>
+                                            @item.TimeStamp
+                                        </div>
+                                    }
+                                </td>
+                                <td colspan="1" style="font-weight: normal;">
+                                    @if (item.Logic == "OR")
+                                    {
+                                        if (item.ApproverStatus != "Pending")
+                                        {
+                                            <div>
+                                                @item.ApproverStatus
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div>
+                                            @item.ApproverStatus
+                                        </div>
+                                    }
+                                </td>
+                                <td colspan="1" style="font-weight: normal;">
+                                    <div>
+                                        @item.Level
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+

@@ -1,0 +1,1644 @@
+@model Skoda_DCMS.Models.DoorAccessRequestResults
+@{
+    var currentUser = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    ViewBag.Title = "Door Access Request Form";
+    bool IsNewMode = true, IsEditMode = false, IsViewMode = false;
+    bool IsValidityCheck = true;
+    Skoda_DCMS.Models.DoorAccessRequestData DARF = null;
+    List<Skoda_DCMS.Models.SelectedAcsessDoorDto> AccessDoorData = new List<Skoda_DCMS.Models.SelectedAcsessDoorDto>();
+    dynamic FlagRedirect = null;
+    int FormId = 0, AppRowId = 0, ApprovalType = 0;
+    Layout = ViewBag.Layout;
+    List<Skoda_DCMS.Models.ApprovalDataModel> appList = new List<Skoda_DCMS.Models.ApprovalDataModel>();
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IsNewMode = ViewBag.IsNewMode;
+        IsEditMode = ViewBag.IsEditMode;
+        IsViewMode = ViewBag.IsViewMode;
+        DARF = ViewBag.Model.one[0] as Skoda_DCMS.Models.DoorAccessRequestData;
+        AccessDoorData = ViewBag.Model?.two as List<Skoda_DCMS.Models.SelectedAcsessDoorDto>;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        IsValidityCheck = ViewBag.IsValidityCheck != null ? (bool)ViewBag.IsValidityCheck : false;
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+        appList = ViewBag.Model?.four as List<Skoda_DCMS.Models.ApprovalDataModel>;
+    }
+
+    // int count = 0;
+}
+<style>
+    /*New design css start here*/
+    .astColor {
+        color: red;
+    }
+
+    .textTrans {
+        width: 100%;
+        max-width: 99%;
+        border-radius: 5px;
+        margin-right: 0px;
+        border: 1px solid !important;
+    }
+
+    .empDetailsBg {
+        background-color: #fffbef;
+    }
+
+    #accordion select {
+        color: #000;
+        width: 100% !important;
+        height: 45px;
+        background-color: #F8F8F8;
+        border: 1px solid #BFBFBF;
+        box-sizing: border-box;
+        border-radius: 5px;
+        background-image: url(data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>);
+        background-repeat: no-repeat;
+        background-position: right .75rem center;
+        background-size: 16px 12px;
+    }
+
+    #accordion input[type='text'] {
+        width: 100% !important;
+        max-width: 100%;
+        height: 45px;
+        background-color: #F8F8F8;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px !important;
+    }
+
+    #accordion input[type='date'] {
+        width: 100% !important;
+        max-width: 100%;
+        height: 45px;
+        background-color: #F8F8F8;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px;
+    }
+
+    #accordion input[type='time'] {
+        height: 45px;
+    }
+
+    #accordion label {
+        font-size: 16px;
+        line-height: 22px;
+        font-weight: 600;
+        color: #201F1F;
+    }
+
+    #accordion table tr td {
+        font-size: 16px;
+        line-height: 19px;
+        color: #201F1F;
+        background-color: white;
+    }
+
+    #accordion label {
+        display: block;
+    }
+
+    #accordion .card-header {
+        /*background: rgb(4 59 100) !important;*/
+        border-radius: 5px 5px 0px 0px;
+        position: relative;
+        margin-top: 15px;
+    }
+
+        #accordion .card-header.collapsed h5:after {
+            content: '+';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        #accordion .card-header h5:after {
+            content: '-';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+    #accordion h5 button {
+        font-size: 18px;
+        line-height: 22px;
+        /* identical to box height */
+        padding-left: 0px;
+        display: flex;
+        align-items: center;
+        text-transform: uppercase;
+        /* Text_white */
+
+        color: #FFFFFF;
+    }
+
+        #accordion h5 button:focus {
+            box-shadow: none;
+        }
+
+    .empDetailsFields label {
+        display: block !important;
+        margin-bottom: 0px;
+    }
+
+    .empDetailsFields .row label {
+        display: block;
+        margin-bottom: 0px;
+    }
+
+        .empDetailsFields .row label:nth-child(1) {
+            font-style: normal;
+            font-weight: normal !important;
+            font-size: 12px;
+            line-height: 18px;
+            color: #A9A9A9 !important;
+        }
+
+        .empDetailsFields .row label:nth-child(2) {
+            font-style: normal;
+            font-weight: normal;
+            font-size: 18px;
+            line-height: 22px;
+            color: #201F1F;
+        }
+
+    .firstLastName {
+        font-style: normal;
+        font-weight: normal;
+        font-size: 20px;
+        line-height: 24px;
+        /* identical to box height */
+
+        display: flex;
+        align-items: center;
+        color: #201F1F;
+    }
+
+    .submit-btn {
+        background: #3D3D3D;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #FFFFFF;
+        border-color: transparent !important;
+    }
+
+    .cancl-btn {
+        background: #FAE99B;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        border-color: transparent !important;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #212221;
+        margin-left: 10px;
+    }
+
+
+
+
+    .card-footer {
+        display: flex;
+        background-color: transparent !important;
+    }
+
+    .photo-form {
+        width: 100%;
+    }
+
+    .ui-front {
+        z-index: 9999999 !important;
+    }
+
+    /* NEW UI CSS END*/
+
+
+    .showBorder {
+        border: 1px solid #dee2e6;
+    }
+
+    .multiselect {
+        height: 47px;
+        margin-top: -1px;
+    }
+    /*Animation CSS Starts*/
+
+    div.input-block {
+        position: relative;
+    }
+
+        div.input-block input {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 188px;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block textarea {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 100%;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            background-color: #fff;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block span.placeholder {
+            position: absolute;
+            margin: 17px 0;
+            padding: 0 4px;
+            font-family: Roboto, sans-serif;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            top: -6px;
+            left: 15px;
+            transition: all 0.2s;
+            transform-origin: 0% 0%;
+            background: none;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        div.input-block textarea:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: #fff !important;
+        }
+
+        div.input-block textarea:valid + span.placeholder,
+        div.input-block textarea:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px) !important;
+            background: #fff !important;
+        }
+
+        div.input-block input:valid + span.placeholder,
+        div.input-block input:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: rgb(219,238,213);
+        }
+
+
+        div.input-block input.spanUpperSide + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: rgb(219,238,213);
+        }
+
+        div.input-block input:read-only + span.placeholder,
+        div.input-block input:read-only + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background: rgb(219,238,213);
+        }
+
+
+    div.inputSelect span.placeholder {
+        position: absolute;
+        margin: 17px 0;
+        padding: 0 4px;
+        font-family: Roboto, sans-serif;
+        color: #000;
+        display: flex;
+        align-items: center;
+        font-size: 1rem;
+        top: -6px;
+        left: 15px;
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+        background: none;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    div.inputSelect select:focus + span.placeholder {
+        transform: scale(0.8) translateY(-30px);
+        background: rgb(219,238,213);
+        z-index: 9;
+    }
+
+    div.inputSelect select:not([value=""]):valid + span.placeholder {
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+    }
+
+
+
+    div.input-block input:focus + span.placeholder {
+        color: #284B63;
+    }
+
+    .breadcrumb {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+        padding: 1rem 1rem 0;
+        margin-bottom: 0;
+        list-style: none;
+        background-color: #FFFFFF;
+        border-radius: .25rem;
+    }
+
+    body.nav-sm .container.body .left_col {
+        width: 63px;
+        padding: 0;
+        position: fixed;
+        height: 100%;
+        z-index: 8;
+    }
+
+    .card {
+        position: relative;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        min-width: 0;
+        word-wrap: break-word;
+        background-color: #fff;
+        background-clip: border-box;
+        border: 0px;
+        border-radius: .25rem;
+    }
+
+    .dropdown-toggle::after {
+        display: none;
+        width: 0;
+        height: 0;
+        margin-left: .255em;
+        vertical-align: .255em;
+        content: "";
+        border-top: .3em solid;
+        border-right: .3em solid transparent;
+        border-bottom: 0;
+        border-left: .3em solid transparent;
+    }
+
+    input.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213);
+    }
+
+    inputSelect.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213) !important;
+    }
+
+    select.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background-color: rgb(219,238,213) !important;
+        z-index: 9;
+    }
+
+    textarea.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    .TransView {
+        background-color: white !important;
+    }
+
+    @@media only screen and (min-width: 992px) {
+        div .input-block span.placeholder {
+            font-size: 15px;
+        }
+
+        div.inputSelect span.placeholder {
+            font-size: 14px;
+        }
+    }
+
+    input[type='date'].spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    .showBorder {
+        border: 1px solid #dee2e6;
+    }
+
+    .wField {
+        width: 233px !important;
+        margin-left: 10px;
+    }
+
+    @@-moz-document url-prefix() {
+        input[type=time]::-ms-clear {
+            display: none;
+        }
+    }
+
+    .datetime-reset-button {
+        display: none !important;
+    }
+
+    .forShoppingCart {
+        margin-left: 14% !important;
+    }
+
+    .btn-group {
+        display: block !important;
+    }
+
+    #accordion label {
+        display: inline-block !important;
+    }
+
+
+    .custom-select:focus {
+        box-shadow: none !important;
+        border-color: none !important;
+    }
+
+    #addSoftwarebtn td {
+        border-top: none !important;
+    }
+
+    #locationBody select {
+        background-color: #fff !important;
+    }
+
+    #loader {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        z-index: 10000;
+    }
+</style>
+
+
+<script type="text/javascript">
+    function checkSelect(id) {
+
+        if ($('#' + id).val() != '') {
+            $('#' + id).addClass('spanUpperSide');
+        }
+    }
+    /*$('#timedemo').pickatime({ twelvehour: true });*/
+</script>
+@*Loader*@
+
+<body>
+    <div class="right_col bg-transparent" role="main">
+        <form id="DARForm" method="post">
+            <div class="container">
+                <div class="table-responsive">
+                    <div id="accordion">
+                        <div class="row breadcrumb-container table-bordered  mr-1 ml-1" style="background-color: rgb(219,238,213) !important; ">
+                            <div class="col-md-2 col-lg-2">
+                                <span class="placeholder">Date : @(IsViewMode ||IsEditMode ? (Convert.ToDateTime(DARF.FormID.CreatedDate).ToShortDateString()) : DateTime.Now.ToShortDateString())</span>
+                            </div>
+                            <div class="col-md-8 col-lg-8 mt-2 mb-1 form-heading" style="text-align:center; margin-top:5px">
+                                <span>Door Access Request Form</span>
+                            </div>
+                            <div class="col-md-2 col-lg-2">
+                                @if (IsViewMode || IsEditMode)
+                                {
+                                    <span class="placeholder"> Form Id : @(IsViewMode || IsEditMode ? ("DARF" + DARF.FormID.Id ?? "") : "" )</span>
+                                }
+                            </div>
+                        </div>
+                        <div class="heading d-none" id="headingErr">
+                            <h1 id="" class="info-header">Following fields are mandatory. Please fill in information for<br /></h1>
+                            <div id="add_to_me" class="header-list" style="color:red;">
+                            </div>
+                        </div>
+
+                        @if (IsEditMode || IsViewMode)
+                        {
+                            <div>
+                                <input type="hidden" id="FormSrId" name="FormSrId" value="@(ViewBag.Model.one[0].Id)" />
+                                <input type="hidden" id="FormID" name="FormID" value="@(FormId)" />
+                                <input type="hidden" id="AppRowId" name="AppRowId" value="@(ViewBag.Model.one[0].AppRowId)" />
+                            </div>
+                        }
+
+                        @{
+                            Html.RenderPartial("_SubmitterDetailsWithModel", (ViewBag as object));
+                        }
+                        @{
+                            Html.RenderPartial("_ApplicantDetailsWithModel", (ViewBag as object));
+                        }
+
+
+                        <div id="accordion">
+                            <div class="card">
+                                <div class="card-header collapsed" id="headingThree" data-toggle="collapse" data-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                                    <h5 class="mb-0">
+                                        <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                                            <img src="~/assets/img/transactionIcon.svg" width="24" height="24" class="mr-2" />Transaction Fields
+                                        </button>
+                                    </h5>
+                                </div>
+                                <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
+                                    <div class="card-body">
+                                        <div class="form-row">
+                                            <label><b> Note - Please type 8 digit Legic number  printed horizontally at the back of ID card.</b></label>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group col-md-3 col-lg-3 col-12 input-block">
+                                                <input type="text" name="IDCardNumber" class="txtDisable inpDisable" id="txtIDCardNumber" value="@(IsViewMode || IsEditMode ? DARF.IDCardNumber:"")" required />
+                                                <span class="placeholder TransView">ID Card Number<span class="astColor">*</span></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            @*<ul id="doorList"></ul>*@
+
+                                            <div class="" id="lblSoftware">
+                                                <label id="lblAccessDoorDet" class=""><b>Door Access Details</b><span class="astColor">*</span></label>
+                                            </div> <div class="table-responsive">
+                                                <table class="mainTbl table">
+                                                    <tr>
+                                                        <td class="bt-0 bb-0 pl-0">
+                                                            <table class="w-100 mx-auto table table-border form-border text-center">
+
+                                                                <thead class="form-head-1" style="margin-left:inherit !important;">
+                                                                    <tr>
+                                                                        <th>Sr. No.</th>
+                                                                        <th>Location Name</th>
+                                                                        <th>Department Name</th>
+                                                                        <th>Access Door Name</th>
+                                                                        @if (IsNewMode || IsEditMode)
+                                                                        {
+                                                                            <th></th>
+                                                                        }
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody class="form-border tableLocation" id="locationBody">
+                                                                    @if (IsNewMode)
+                                                                    {
+                                                                        for (var i = 1; i < 2; i++)
+                                                                        {
+                                                                            <tr id='@("row" + i)' class="tr_input">
+                                                                                <td class="sNo text-center">@i</td>
+                                                                                <td class="text-center">
+                                                                                    <input type="hidden" name="drpId1" value="" id='@("drpId" + i)' />
+                                                                                    <select class="inpLocationValidate" name='@("drpLocation" + i)' id='@("drpLocation" + i)' onchange="getDepartmentByLocation(this,'@("drpDepartment" + i)')">
+                                                                                    </select>
+                                                                                </td>
+                                                                                <td class="text-center">
+                                                                                    <select class="inpDepartmentValidate" name='@("drpDepartment" + i)' id='@("drpDepartment" + i)' onchange="getDoorNameByDepartment(this,'@("drpLocation" + i)','@("drpDoorName" + i)')" disabled>     <option value="-1" style="display:none;" selected>Select Department</option></select>
+                                                                                </td>
+                                                                                <td class="text-center">
+                                                                                    <select class="inpDoorNameValidate" name='@("drpDoorName" + i)' id='@("drpDoorName" + i)' disabled>     <option value="-1" style="display:none;" selected>Select Door Name</option></select>
+                                                                                </td>
+                                                                                <td class="text-center" style="background-color:white; max-width:123px; vertical-align:central;">
+                                                                                    <input class="remove-btn remove align-center" type="image" src="~/assets/img/remove.png"
+                                                                                           alt="Remove" style="max-width: 85%; background-color: white; border:none;">
+                                                                                </td>
+                                                                            </tr>
+                                                                        }
+                                                                    }
+                                                                    else if (IsViewMode)
+                                                                    {
+                                                                        var count = 1;
+                                                                        foreach (var item in AccessDoorData)
+                                                                        {
+                                                                            <tr id="" class="tr_input">
+                                                                                <td class="sNo text-center">@count</td>
+                                                                                <td class="text-center">
+                                                                                    <input type="hidden" name="drpId1" value="@(item.ID)" id="drpId" />
+                                                                                    <input type="text" class="inpDisable" name="drpLocation1" id="drpLocation1" value="@(item.Location)" />
+                                                                                </td>
+                                                                                <td class="text-center">
+                                                                                    <input type="text" class="inpDisable" name="drpDepartment1" id="drpDepartment1" value="@(item.DoorDepartment)" />
+                                                                                </td>
+                                                                                <td class="text-center">
+                                                                                    <input type="text" class="inpDisable" name="drpDoorName1" id="drpDoorName1" value="@(item.DoorName)" />
+                                                                                </td>
+                                                                            </tr>
+                                                                            count++;
+                                                                        }
+                                                                    }
+                                                                    else if (IsEditMode)
+                                                                    {
+                                                                        var count = 1;
+
+                                                                        foreach (var item in AccessDoorData)
+                                                                        {
+                                                                            <tr id='@("row" + count)' class="tr_input">
+                                                                                <td class="sNo text-center">@count</td>
+                                                                                <td class="text-center">
+                                                                                    <input type="hidden" name='@("drpId" + count)' value='@item.ID' id='@("drpId" + count)' />
+                                                                                    <select class="inpLocationValidate" name='@("drpLocation" + count)' id='@("drpLocation" + count)' onchange="getDepartmentByLocation(this,'@("drpDepartment" + count)')"></select>
+                                                                                </td>
+                                                                                <td class="text-center">
+                                                                                    <select class="inpDepartmentValidate" name='@("drpDepartment" + count)' id='@("drpDepartment" + count)' onchange="getDoorNameByDepartment(this,'@("drpLocation" + count)','@("drpDoorName" + count)')"></select>
+                                                                                </td>
+                                                                                <td class="text-center">
+                                                                                    <select class="inpDoorNameValidate" name='@("drpDoorName" + count)' id='@("drpDoorName" + count)'></select>
+                                                                                </td>
+                                                                                <td class="text-center" style="background-color:white; max-width:123px; vertical-align:central;">
+                                                                                    <input class="remove-btn  remove align-center" type="image" src="~/assets/img/remove.png"
+                                                                                           alt="Remove" style="max-width: 85%; background-color: white; border:none;">
+                                                                                </td>
+                                                                            </tr>
+                                                                            count++;
+                                                                        }
+                                                                    }
+                                                                </tbody>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                    @if (IsNewMode || IsEditMode)
+                                                    {
+
+                                                        <tr align="right" id="addSoftwarebtn">
+                                                            <td class="">
+                                                                <button type="button" class="btn btn-sm submit-btn d-flex float-right mb-2 bl-1 " onclick="AddRows()">
+                                                                    + Add
+                                                                </button>
+                                                                <input type="hidden" name="totalrows" id="totalrows" />
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div class="input-block mt-4">
+                                            @if (IsNewMode)
+                                            {
+                                                <textarea class="textTrans txtDisable" cols="90" rows="3" name="txtBusinessNeed" id="txtBusinessNeed" maxlength="500" required></textarea>
+                                            }
+                                            else if (IsEditMode)
+                                            {
+                                                <textarea class="textTrans txtDisable" cols="90" rows="3" name="txtBusinessNeed" id="txtBusinessNeed" maxlength="500" required>@(DARF.BusinessNeed ?? "")</textarea>
+                                            }
+                                            else if (IsViewMode)
+                                            {
+                                                <textarea class="textTrans inpDisable spanUpperSide" cols="90" rows="3" name="txtBusinessNeed" id="txtBusinessNeed" maxlength="500" required>@(DARF.BusinessNeed ?? "")</textarea>
+                                            }
+                                            <span class="placeholder">Business Function & Responsibility (Max. 500)<span class="astColor">*</span></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        @if (IsViewMode || IsEditMode)
+                        {
+                            <div id="accordion">
+                                <div class="card">
+                                    <div class="card-header collapsed" id="headingFour" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                                        <h5 class="mb-0">
+                                            <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                                                <img src="~/assets/img/approvalTracking.svg" width="24" height="24" class="mr-2" />Approval Tracking
+                                            </button>
+                                        </h5>
+                                    </div>
+                                    <div id="collapseFour" class="collapse" aria-labelledby="headingFour">
+                                        <div class="card-body">
+                                            <div class="form-row">
+                                                <div class="table-responsive col-md-12">
+                                                    <table class="table w-100 td-border showBorder">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Name</th>
+                                                                <th>Role</th>
+                                                                <th>Processed on</th>
+                                                                <th>Status</th>
+                                                                <th class="text-center">Comments</th>
+                                                                <th class="text-center">Approval Level</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @if (IsViewMode || IsEditMode)
+                                                            {
+                                                                //Dynamic Code
+                                                                appList = ViewBag.Model?.four as List<Skoda_DCMS.Models.ApprovalDataModel>;
+                                                                {
+                                                                    Html.RenderPartial("_ApprovalTracking", appList);
+                                                                }
+
+                                                            }
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        <div>
+                            <p class="text-left f-600">SF_SO/1_018.00</p>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div><br />
+            @if (IsEditMode)
+            {
+                <div class="card-footer align-content-center">
+                    <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                        Re-Submit
+                    </button>
+                    <button type="reset" class="btn btn-danger btn-sm cancl-btn" id="btnCancel">
+                        Cancel
+                    </button>
+                </div>
+            }
+            else if (IsNewMode)
+            {
+                <div class="card-footer align-content-center">
+                    <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                        Submit
+                    </button>
+                    <button type="reset" class="btn btn-danger btn-sm cancl-btn" id="btnCancel">
+                        Cancel
+                    </button>
+                </div>
+            }
+        </form>
+    </div><br><br><br>
+</body>
+<div class="loader"></div>
+<div class="modal fade" id="successModel" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header modelHeader">
+                <span class="modal-title modalMsgTitle" id="modalTitle"></span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label id="modalBody" class="lableMsg">  </label>
+                <input type="hidden" id="tab" value="0" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="submitBomBtn publishBtn" data-dismiss="modal" id="modalOkButton">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var spinner = $('#loader');
+    var isNewMode = @Html.Raw(Json.Encode(IsNewMode));
+    var isEditMode = @Html.Raw(Json.Encode(IsEditMode));
+    var isViewMode = @Html.Raw(Json.Encode(IsViewMode));
+    var darf = @Html.Raw(Json.Encode(DARF));
+    var appRowId = @Html.Raw(Json.Encode(AppRowId));
+    var approvalType =@Html.Raw(Json.Encode(ApprovalType));
+    var FlagRedirect = @Html.Raw(Json.Encode(FlagRedirect));
+    var selectedAccessDoors = @Html.Raw(Json.Encode(AccessDoorData));
+    var rowIdx = 0;
+    var errorCount = 0;
+    var errors = "";
+
+    var locationList = [];
+    var departmentList = [];
+    var doorList = [];
+    var allData = [];
+    var id = [];
+
+    $(document).ready(function () {
+        rowIdx = 1;
+        pageLoad();
+        $('.loader').hide();
+    });
+
+    function pageLoad() {
+        spinner.hide();// For Email Update
+        $("#headingErr").addClass('d-none');
+        getAccessDoorListData();
+        if (isViewMode) {
+            $(".inpDisable").attr("disabled", "disabled");
+        }
+
+
+    };
+
+    function LoadSelectedDoorData(allData) {
+
+        console.log("allData = " + allData);
+
+        var locationArray = allData.map(function (el) { return el.LocationName; });
+        locationList = [...new Set(locationArray)];
+        var departmentArray = allData.map(function (el) { return el.Department; });
+        departmentList = [...new Set(departmentArray)];
+
+        var value = JSON.stringify(selectedAccessDoors);
+        console.log("value=" + value);
+        var value_1 = JSON.parse(value);
+        console.log("value_1=" + value_1);
+        var len = value_1.length;
+        rowIdx = len;
+
+        var a = '<option value="-1" style="display:none;"></option>';
+        var b = '<option value="-1" style="display:none;"></option>';
+        var c = '<option value="-1" style="display:none;"></option>';
+        for (var i = 0; i < locationList.length; i++) {
+            a += '<option value="' + locationList[i] + '">' + locationList[i] + '</option>';
+        }
+
+        for (var i = 0; i < departmentList.length; i++) {
+            b += '<option value="' + departmentList[i] + '">' + departmentList[i] + '</option>';
+        }
+
+        for (var i = 0; i < allData.length; i++) {
+            console.log("doorId = " + allData[i].DoorName);
+            console.log("doorId = " + allData[i].DoorID);
+            c += '<option value="' + allData[i].DoorID + '+' + allData[i].DoorName + '">' + allData[i].DoorName + '</option>';
+        }
+
+        for (var j = 0; j < len; j++) {
+            console.log("id = " + value_1[j].DoorID);
+            $('#drpLocation' + (j+1)).html(a);
+            $("#drpLocation"+ (j+1) + " option[value='" + value_1[j].Location + "']").prop('selected', 'selected');
+
+            $('#drpDepartment' + (j + 1)).html(b);
+            $("#drpDepartment" + (j + 1) + " option[value='" + value_1[j].DoorDepartment + "']").prop('selected', 'selected');
+
+            $('#drpDoorName' + (j + 1)).html(c);
+            $("#drpDoorName" + (j + 1) + " option[value='" + value_1[j].DoorID +'+'+ value_1[j].DoorName + "']").prop('selected', 'selected');
+        }
+
+
+
+    }
+
+    function getAccessDoorListData() {
+      //  //
+        $.ajax({
+            url: '/DoorAccessRequest/GetAccessDoorListData',
+            type: 'GET',
+            data: {},
+            contentType: "application/json; charset=utf-8",
+            datatype: 'json',
+            success: (function (data) {
+                allData = data;
+                var locationArray = data.map(function (el) { return el.LocationName; });
+                locationList = [...new Set(locationArray)];
+                getLocations('drpLocation1');
+                if (isEditMode) {
+                    LoadSelectedDoorData(allData);
+                }
+            }),
+            error: (function (data) {
+                return "error";
+            })
+        })
+    }
+
+    function getLocations(elementId) {
+        ////
+        var s = '<option value="-1" style="display:none;" selected>Select Location</option>';
+        for (var i = 0; i < locationList.length; i++) {
+            s += '<option value="' + locationList[i] + '">' + locationList[i] + '</option>';
+        }
+        $('#' + elementId).html(s);
+        /*return locationList;*/
+    }
+
+    function getDepartmentByLocation(locationElem, deptElemId, location = '', selectedDept = '') {
+        //
+        $('#' + deptElemId).prop("disabled",false);
+        let deptList = [];
+        let distinctDept = [];
+        var locationElemId = locationElem.id;
+        if (location == '') {
+            var selectedLoctxt = $('#' + locationElemId).find("option:selected").text();
+            console.log("selectedLoctxt=" + selectedLoctxt);
+            location = selectedLoctxt;
+        }
+        deptList = allData.filter(function (item) { return (item.LocationName == location); });
+        distinctDept = [...new Set(deptList.map(item => item.Department))];
+        //console.log("distinctDept=" + distinctDept);
+        let s = '<option value="-1" style="display:none;" selected>Select Department</option>';
+        for (var i = 0; i < distinctDept.length; i++) {
+            s += '<option value="' + distinctDept[i] + '">' + distinctDept[i] + '</option>';
+        }
+        $('#' +deptElemId).html(s);
+
+        if (selectedDept != '') {
+            //dept list me se selectedDept ko select karva de
+        }
+
+        /*return deptList.map(function (el) { return el.Department; });*/
+    }
+
+    function getDoorNameByDepartment(deptElem, locationElemId, doorElemId, location = '',department='') {
+       // //
+
+        $('#' + doorElemId).prop("disabled", false);
+        let deptId = deptElem.id;
+        if (location == '') {
+            var selectedLoctxt = $('#' + locationElemId).find("option:selected").text();
+            //console.log("selectedLoctxt=" + selectedLoctxt);
+            location = selectedLoctxt;
+        }
+        if (department == '') {
+            var selectedDepttxt = $('#' + deptId).find("option:selected").text();
+            //console.log("selectedDepttxt=" + selectedDepttxt);
+            department = selectedDepttxt;
+        }
+        let doorNameList = [];
+
+        doorNameList = allData.filter(function (item) { return (item.LocationName == location && item.Department == department); });
+        let s = '';
+        if (department != 'COMMON ACCESS') {
+            s = '<option value="-1" style="display:none;" selected>Select Door Name</option>';
+        }
+        for (var i = 0; i < doorNameList.length; i++) {
+            s += '<option value="' + doorNameList[i].DoorID + '+' + doorNameList[i].DoorName + '">' + doorNameList[i].DoorName + '</option>';
+        }
+        $('#' + doorElemId).html(s);
+
+    }
+
+    function AddRows() {
+        //
+        var newCount = rowIdx + 1;
+        //  if (newCount <= 10) {
+        var row = '<tr id="row' + newCount + '" class="tr_input text-center">   <td class="sNo text-center" >' + newCount + '</td>'
+            + '<td><input type="hidden" name="drpId' + newCount +'" value="" id="drpId' + newCount +'" /><select class="inpLocationValidate" name="drpLocation' + newCount +'" id = "drpLocation' + newCount + '" onchange="getDepartmentByLocation(this, \'drpDepartment' + newCount + '\')"></select></td>'
+            + '<td><select class="inpDepartmentValidate" name="drpDepartment' + newCount +'" id = "drpDepartment' + newCount + '" onchange="getDoorNameByDepartment(this, \'drpLocation' + newCount + '\',\'drpDoorName' + newCount + '\')" disabled>     <option value="-1" style="display:none;" selected>Select Department</option></select></td>'
+            + '<td><select class="inpDoorNameValidate" name="drpDoorName' + newCount +'" id = "drpDoorName' + newCount + '" disabled><option value="-1" style="display:none;" selected>Select Door Name</option></select></td>'
+            + '<td style="background-color:white; max-width:70px; vertical-align:central;">'
+            + '<input class="remove-btn remove" type="image" src="/assets/img/remove.png" alt="Remove" style="max-width: 85%; background-color: white;">'
+            + '</td></tr>';
+
+        if (newCount == 1) {
+            $('.tableLocation').prepend(row);
+        }
+        else {
+            $(".tableLocation tr:last").after(row);
+        }
+        //count = newCount;
+        getLocations("drpLocation" + newCount);
+        rowIdx++;
+        //}
+        //else {
+        //    alert('Maximum 10 Locations can be added.');
+        //}
+    }
+
+    function successModal(txt) {
+        ////
+        $('#modalTitle').html('Success');
+        if (txt == "approve") {
+            $('#modalBody').html('Form has been approved!');
+        }
+        else if (txt == "reject") {
+            $('#modalBody').html('Form has been rejected!');
+        }
+        else if (txt == "enquire") {
+            $('#modalBody').html('Form has been enquired!');
+        }
+        else if (txt == "cancelled") {
+            $('#modalBody').html('Form has been cancelled!');
+        }
+        else {
+            if (isEditMode) {
+                $('#modalBody').html('Your form with ID: DARF' + txt + ' has been re-submitted! Kindly use this for future reference');
+            }
+            else {
+                $('#modalBody').html('Your form with ID: DARF' + txt + ' has been submitted! Kindly use this for future reference');
+            }
+            FlagRedirect = txt;
+        }
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    //function failureModal1() {
+    //    $('#modalTitle').html('Failure');
+    //    $('#modalBody').html('Some error occurred!');
+    //    $("#modalOkButton").attr('data-dismiss', 'modal');
+    //    $("#successModel").modal('show');
+    //}
+
+    //function failureModal1(txt) {
+    //    $('#modalTitle').html('Failure');
+    //    $('#modalBody').html(txt);
+    //    $("#modalOkButton").attr('data-dismiss', 'modal');
+    //    $("#successModel").modal('show');
+    //}
+    function failureModal(txt) {
+
+        if (txt == null) {
+            $('#modalBody').html('Some error occurred!');
+        }
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html(txt);
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function allowNumbersOnly(e) {
+        var code = (e.which) ? e.which : e.keyCode;
+        if (code > 31 && (code < 48 || code > 57)) {
+            e.preventDefault();
+        }
+    }
+
+    function alphaOnly(e) {
+        var key = e.keyCode;
+        if (key > 32 && (key < 65 || key > 122 || key == 91 || key == 92 || key == 93 || key == 94 || key == 95 || key == 96)) {
+            e.preventDefault();
+        }
+    }
+
+    $("#btnCancel").on('click', function (e) {
+        ////
+        $("#headingErr").addClass('d-none');
+        document.getElementById("add_to_me").innerHTML = '';
+        if ($('#myModalRequest').hasClass('show'))
+            $('#myModalRequest').modal('hide');
+        else
+            $('#myModalEdit').modal('hide');
+        if (isNewMode || isEditMode) {
+            window.location = "../Dashboard";
+        }
+    });
+
+    $("#btnSubmit").on('click', function (e) {
+        //
+        $(".full-screen-container").removeClass('invisible');
+        $(".full-screen-container").show();
+        validateSubmitter();
+        validateApplicant();
+
+        var iDCardNumber = document.getElementById("txtIDCardNumber").value;
+        if (iDCardNumber == "") {
+            errors += "<li id='error" + errorCount + "'>" + "ID Card Number" + "</li>";
+            AddError("txtIDCardNumber", '', errorCount);
+            errorCount++;
+        }
+        else {
+            RemoveError("txtIDCardNumber");
+        }
+
+        let firstDoorCount = $(".inpLocationValidate").length;
+        var rowCount = 0;
+        if (firstDoorCount > 0) {
+            // //
+            rowCount = 1;
+            $(".tableLocation").find('tr').each(function () {
+                let currentTr = $(this);
+                let currLocation = $(currentTr).find(".inpLocationValidate").val();
+                console.log("loc = " + currLocation);
+                let currDepartment = $(currentTr).find(".inpDepartmentValidate").val();
+                console.log("dept = " + currDepartment);
+                let currDoorName = $(currentTr).find(".inpDoorNameValidate").val();
+                console.log("door = " + currDoorName);
+
+                if (currLocation == "-1" && currDepartment == "-1" && currDoorName == "-1") {
+
+                    errors += "<li id='error" + errorCount + "'>" + "Enter data in row " + rowCount + " or remove the row in Door Access Details." + "</li>";
+                    $("#lblAccessDoorDet").addClass('removeAccessDoorDet');
+                    AddError("lblAccessDoorDet", 'removeAccessDoorDet', errorCount);
+                    errorCount++;
+                }
+                if (currLocation != "-1" && currDepartment != "-1" && currDoorName != "-1") {
+                    RemoveError("lblAccessDoorDet");
+                }
+                else if (currLocation != "-1" || currDepartment != "-1" || currDoorName != "-1") {
+                    if (currLocation == "-1") {
+
+                        errors += "<li id='error" + errorCount + "'>" + "Location Name in Row " + rowCount + "</li>";
+                        $("#lblAccessDoorDet").addClass('removeAccessDoorDet');
+                        AddError("lblAccessDoorDet", 'removeAccessDoorDet', errorCount);
+                        errorCount++;
+                    }
+                    else {
+                        RemoveError("lblAccessDoorDet");
+                    }
+                    if (currDepartment == "-1") {
+
+                        errors += "<li id='error" + errorCount + "'>" + "Department Name in Row " + rowCount + "</li>";
+                        $("#lblAccessDoorDet").addClass('removeAccessDoorDet');
+                        AddError("lblAccessDoorDet", 'removeAccessDoorDet', errorCount);
+                        errorCount++;
+                    }
+                    else {
+                        RemoveError("lblAccessDoorDet");
+                    }
+                    if (currDepartment != 'COMMON ACCESS') {
+                        if (currDoorName == "-1") {
+
+                            errors += "<li id='error" + errorCount + "'>" + "Door Name in Row " + rowCount + "</li>";
+                            $("#lblAccessDoorDet").addClass('removeAccessDoorDet');
+                            AddError("lblAccessDoorDet", 'removeAccessDoorDet', errorCount);
+                            errorCount++;
+                        }
+                        else {
+                            RemoveError("lblAccessDoorDet");
+                        }
+                    }
+                }
+                rowCount++;
+            });
+        }
+        else {
+            RemoveError("lblAccessDoorDet");
+            errors += "<li id='error" + errorCount + "'>" + "Fill data for atleast 1 Door Access Details" + "</li>";
+            $("#lblAccessDoorDet").addClass('removeDet');
+            AddError("lblAccessDoorDet", 'removeDet', errorCount);
+            errorCount++;
+        }
+
+        // $('#drpDoorName').val('');
+        // //
+        var door = [];
+        for (var i = 1; i <= firstDoorCount; i++) {
+            door.push($("#drpDoorName" + i).val());
+
+        }
+        console.log("Total = " + door);
+
+        let duplicate = door.reduce((acc, currentValue, index, array) => {
+            if (array.indexOf(currentValue) != index && !acc.includes(currentValue)) acc.push(currentValue);
+            return acc;
+        }, []);
+
+        if (duplicate.length > 0) {
+            errors += "<li id='error" + errorCount + "'>" + "Remove duplicate records from Access Door Details" + "</li>";
+            $("#lblAccessDoorDet").addClass('removeAccessDoorDet');
+            AddError("lblAccessDoorDet", 'removeAccessDoorDet', errorCount);
+            errorCount++;
+        }
+        else {
+            RemoveError("lblAccessDoorDet");
+        }
+
+        //var door = document.getElementById("drpDoorName").value;
+        //Console.log("door=" + door);
+
+        var businessNeed = document.getElementById("txtBusinessNeed").value;
+        if (businessNeed == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Business Function & Responsibility" + "</li>";
+            AddError("txtBusinessNeed", '', errorCount);
+            errorCount++;
+        }
+        else {
+            RemoveError("txtBusinessNeed");
+        }
+
+
+        if (errors.length) {
+            $(".full-screen-container").hide();
+            errors = "<ol id='errorList'>" + errors + "</ol>";
+            $("#headingErr").removeClass('d-none');
+            document.getElementById("add_to_me").innerHTML = errors;
+            errors = "";
+            errorCount = 0;
+            if (isEditMode) {
+                $("#myModalRequest").scrollTop(0);
+            }
+            else {
+                $(window).scrollTop(0);
+            }
+            return false;
+        }
+        $("#headingErr").addClass('d-none');
+        document.getElementById("add_to_me").innerHTML = '';
+        errors = "";
+        errorCount = 0;
+        $("#totalrows").val(rowCount);
+
+        $("#pageLoader").removeClass('invisible');
+        $("#btnSubmit").text('Saving');
+        $("#btnSubmit").prop("disabled", true);
+        $("#btnCancel").prop("disabled", true);
+        var n1 = document.getElementById("locationBody").rows.length;
+        if (n1 == 0) {
+            alert("Fill transaction table data fields.");
+            $(".full-screen-container").hide();
+            return false;
+        }
+        var DARFormDataList = [];
+        var i = 0, j = 0;
+
+        for (i = 0; i < n1; i++) { // for columns
+
+            var n2 = document.getElementById("locationBody").rows[i].cells.length;
+            var element = {};
+            for (j = 0; j < n2; j++) { // for Rows
+                var x = document.getElementById("locationBody").rows[i].cells.item(j).innerHTML;
+                if (j == 0) {
+                    element.SrNo = i + 1;
+                } else if (j == 1) {
+                    //
+                    element.drpId = $("#drpId" + (i + 1) + "").val() == null ? 0 : $("#drpId" + (i + 1) + "").val();
+                    element.drpLocation = $("#drpLocation" + (i + 1) + "").val();
+                    if (element.drpLocation == "-1") {
+
+                        errors += "<li id='error" + errorCount + "'>" + "Enter data in row " + rowCount + " or remove the row in Door Access Details." + "</li>";
+                        $("#lblAccessDoorDet").addClass('removeAccessDoorDet');
+                        AddError("lblAccessDoorDet", 'removeAccessDoorDet', errorCount);
+                        errorCount++;
+                    } else {
+                        RemoveError("lblAccessDoorDet");
+                    }
+                } else if (j == 2) {
+                    element.drpDepartment = $("#drpDepartment" + (i + 1) + "").val();
+                    if (element.drpDepartment == "-1") {
+
+                        errors += "<li id='error" + errorCount + "'>" + "Department Name in Row " + rowCount + "</li>";
+                        $("#lblAccessDoorDet").addClass('removeAccessDoorDet');
+                        AddError("lblAccessDoorDet", 'removeAccessDoorDet', errorCount);
+                        errorCount++;
+                    }
+                    else {
+                        RemoveError("lblAccessDoorDet");
+                    }
+                } else if (j == 3) {
+                    element.drpDoorName = $("#drpDoorName" + (i + 1) + "").val();
+                    if (element.drpDoorName == "-1") {
+
+                        errors += "<li id='error" + errorCount + "'>" + "Door Name in Row " + rowCount + "</li>";
+                        $("#lblAccessDoorDet").addClass('removeAccessDoorDet');
+                        AddError("lblAccessDoorDet", 'removeAccessDoorDet', errorCount);
+                        errorCount++;
+                    }
+                    else {
+                        RemoveError("lblAccessDoorDet");
+                    }
+                }
+
+            }
+            DARFormDataList.push(element);
+        }
+        var serializedArray = $("#DARForm").serializeArray();
+        var form = {
+
+        };
+
+        serializedArray.forEach((x, index) => {
+            form[x.name] = x.value;
+        });
+        //form['DARFormDataList'] = DARFormDataList;
+        //var form = $("#DARForm").serialize();
+        console.log(form);
+        $.ajax({
+            url: '/DoorAccessRequest/CreateDoorAccessRequest',
+            type: 'POST',
+            data: form,
+            dataType: 'JSON',
+            success: (function (data) {
+                console.log(data);
+                if (data.Status == 200) {
+
+                    $("#pageLoader").addClass('invisible');
+                    if (isNewMode && isEditMode) {
+                        $("#btnSubmit").text('Submit');
+                    }
+                    else {
+                        $("#btnSubmit").text('Re-Submit');
+                    }
+                    successModal(data.Message);
+                    $("#btnSubmit").prop("disabled", false);
+                    $("#btnCancel").prop("disabled", false);
+                }
+                else {
+                    failureModal(data.Message);
+                    console.log("failure :" + data.Message);
+                    if (isNewMode && isEditMode) {
+                        $("#btnSubmit").text('Submit');
+                    }
+                    else {
+                        $("#btnSubmit").text('Re-Submit');
+                    }
+                    $("#pageLoader").addClass('invisible');
+                    $("#btnSubmit").prop("disabled", false);
+                    $("#btnCancel").prop("disabled", false);
+                }
+                $(".full-screen-container").hide();
+            }),
+            error: (function (data) {
+                failureModal(data.Message);
+                console.log("error");
+                if (isNewMode && isEditMode) {
+                    $("#btnSubmit").text('Submit');
+                }
+                else {
+                    $("#btnSubmit").text('Re-Submit');
+                }
+                $("#btnSubmit").prop("disabled", false);
+                $("#btnCancel").prop("disabled", false);
+                $("#pageLoader").addClass('invisible');
+                $(".full-screen-container").hide();
+            })
+        })
+        $("#tab").val(2);
+    });
+
+    function validityModal(txt) {
+        ////
+        if (txt == 'approve') {
+        }
+        else if (txt == 'reject') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for rejecting the form');
+        }
+        else if (txt == 'enquire') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for enquiring the form');
+        }
+    }
+
+    function saveResponse(text) {
+        $(".full-screen-container").removeClass('invisible');
+        $(".full-screen-container").show();
+        var status = '', comment = '';
+        if (window.matchMedia('(max-width: 425px)').matches) {
+            comment = $("#commentMobile-" + text).val();
+        } else
+            comment = $("#comment-" + text).val();
+        switch (text) {
+            case 'approve': {
+                status = 'Approved';
+                break;
+            }
+            case 'reject': {
+                status = 'Rejected';
+                if (comment == '') {
+                    validityModal(text);
+                    return;
+                }
+                break;
+            }
+            case 'enquire': {
+                status = 'Enquired';
+                if (comment == '') {
+                    validityModal(text);
+                    return;
+                }
+                break;
+            }
+        }
+        spinner.show();
+        $.ajax({
+            url: '/List/SaveResponse',
+            type: 'POST',
+            data: { response: status, appRowId: appRowId, comment: comment, approvalType: approvalType },
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data.Result == 1) {
+                    successModal(text);
+                    spinner.hide();
+                    setTimeout(FilterMyTasks, 5000);
+                    //spinner.hide();
+                }
+                else {
+                    /*failureModal1();*/
+                    failureModal(data.Message);
+                    spinner.hide();
+                }
+                $(".full-screen-container").hide();
+            }),
+            error: (function (data) {
+                /*failureModal1();*/
+                failureModal(data.Message);
+                //spinner.hide();
+                $(".full-screen-container").hide();
+            })
+        })
+        $("#tab").val(1);
+        return false;
+    }
+
+    function validityModal(txt) {
+        if (txt == 'reject') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for rejecting the form');
+        }
+        else if (txt == 'enquire') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for enquiring the form');
+        }
+    }
+
+    $('#successModel').on('hide.bs.modal', function () {
+
+        var tab = $("#tab").val();
+        console.log("tab = " + tab);
+        if (tab == 1) {
+            GetMyTaskTab();
+        }
+        else if (tab == 2) {
+            window.location = "../Dashboard?tab=" + tab;
+        }
+    })
+
+    $(document).ready(function () {
+
+        $('#locationBody').on('click', '.remove', function () {
+            //
+            var delRow = $(this).closest('tr').attr('id');
+            console.log(delRow + " a");
+            var delRowNo = parseInt(delRow.substring(3));
+            console.log(delRowNo + " b");
+            var rowCount = $('#locationBody tr').length;
+            //if (rowCount == 1) {
+            //    requiredModal();
+            //    return false;
+            //}
+            //else {
+            //////
+            var child = $(this).closest('tr').nextAll();
+            console.log(child);
+            child.each(function () {
+                ////
+                // Getting <tr> id.
+                var id = $(this).attr('id');
+                console.log(id);
+
+                //  Getting the <p> inside the .row-index class.
+                var idx = $(this).children('.row-index').children('p');
+                console.log(idx);
+
+                // Gets the row number from <tr> id.
+                var dig = parseInt(id.substring(3));
+                console.log(dig);
+
+                // Modifying row index.
+                idx.html(`row${dig - 1}`);
+
+                // Modifying row id.
+                $(this).attr('id', `row${dig - 1}`);
+
+                //assigning updated serial number
+                //
+                updatedDig = dig - 1;
+                console.log(updatedDig);
+                $('#row' + updatedDig + ' .sNo').html(updatedDig);
+                $(this).find('td:eq(0) input[type="hidden"]').attr("id", "drpId" + updatedDig);
+                $(this).find('td:eq(0) select[class="inpLocationValidate"]').attr("id", "drpLocation" + updatedDig);
+                $(this).find('td:eq(1) select[class="inpLocationValidate"]').attr("onchange", "getDepartmentByLocation(this, 'drpDepartment" + updatedDig + "')");
+                $(this).find('td:eq(2) select[class="inpDepartmentValidate"]').attr("id", "drpDepartment" + updatedDig);
+                $(this).find('td:eq(2) select[class="inpDepartmentValidate"]').attr("onchange", "getDoorNameByDepartment(this, 'drpLocation" + updatedDig + "','drpDoorName" + updatedDig +"')");
+                $(this).find('td:eq(3) select[class="inpDoorNameValidate"]').attr("id", "drpDoorName" + updatedDig);
+
+                $(this).find('td:eq(1) input[type="hidden"]').attr("name", "drpId" + updatedDig);
+                $(this).find('td:eq(1) select[class="inpLocationValidate"]').attr("name", "drpLocation" + updatedDig);
+                $(this).find('td:eq(2) select[class="inpDepartmentValidate"]').attr("name", "drpDepartment" + updatedDig);
+                $(this).find('td:eq(3) select[class="inpDoorNameValidate"]').attr("name", "drpDoorName" + updatedDig);
+
+            });
+
+            // Removing the current row.
+            $(this).closest('tr').remove();
+            // Decreasing total number of rows by 1.
+            rowIdx--;
+            //console.log(rowIdx);
+            //}
+        });
+    });
+
+    //function getDeptByLoc(ele) {
+    //    var LocId = ele.id;
+    //    console.log("LocId : " + LocId);
+
+    //    var selectedLoctxt = $('#' + LocId).find("option:selected").text();
+    //    console.log("selectedLoctxt=" + selectedLoctxt);
+
+    //    var index = LocId.replace("drpLocation", "");
+    //    console.log("index=" + index);
+
+    //    var selectElement = getDeptsAjax(selectedLoctxt);
+    //    $('#drpDepartment' + index).html(selectElement);
+
+    //}
+
+    //function getDeptsAjax() {
+    //    $.ajax({
+    //        url: '/DoorAccessRequest/GetDepartments',
+    //        type: 'GET',
+    //        data: { loc: selectedLoctxt },
+    //        dataType: 'JSON',
+    //        success: (function (data) {
+    //            var s = '<option value="-1" style="display:none;"></option>';
+    //            for (var i = 0; i < data.length; i++) {
+    //                s += '<option value="' + data[i] + '">' + data[i] + '</option>';
+    //            }
+    //            return s;
+    //        }),
+    //        error: (function (data) {
+    //            //code
+    //        })
+    //    })
+    //}
+
+    //function getDoorNameByDept(ele) {
+    //    var deptId = ele.id;
+    //    console.log("deptId : " + deptId)
+
+    //    var selectedDepttxt = $('#' + deptId).find("option:selected").text();
+    //    console.log("selectedDepttxt : " + selectedDepttxt);
+
+    //    var index = deptId.replace("drpDepartment", "");
+    //    console.log("ondex : " + index)
+
+    //    var selectElement = getDoorNameAjax(selectedDepttxt);
+    //    $('#drpDoorName' + index).html(selectElement);
+
+    //}
+
+    //function getDoorNameAjax() {
+    //    $.ajax({
+    //        url: '/DoorAccessRequest/GetAccessDoors',
+    //        type: 'GET',
+    //        data: { loc: selectedLoctxt },
+    //        dataType: 'JSON',
+    //        success: (function (data) {
+    //            var s = '<option value="-1" style="display:none;"></option>';
+    //            for (var i = 0; i < data.length; i++) {
+    //                s += '<option value="' + data[i].LocationId + '">' + data[i].locationName + '</option>';
+    //            }
+    //            return s;
+    //        }),
+    //        error: (function (data) {
+    //            //code
+    //        })
+    //    })
+    //}
+
+
+
+    //function permissionModal() {
+    //    $('#modalTitle').html('Failure');
+    //    $('#modalBody').html('No permssion granted since the device is not SAVWIPL owned!');
+    //    $("#modalOkButton").attr('data-dismiss', 'modal');
+    //    $("#successModel").modal('show');
+    //}
+
+    //function requiredModal(text) {
+    //    $('#modalTitle').html('Required!');
+    //    $('#modalBody').html(text);
+    //    $("#modalOkButton").attr('data-dismiss', 'modal');
+    //    $("#successModel").modal('show');
+    //}
+
+    //function GetApprovers() {
+    //    $.ajax({
+    //        url: '/IDCard/GetDARFApprovalList',
+    //        type: 'GET',
+    //        data: {},
+    //        dataType: 'JSON',
+    //        success: (function (data) {
+    //            ////
+    //            approverData = data;
+    //            console.log(data);
+    //            var row = "";
+    //            for (var i = 0; i < data.length; i++) {
+    //                row += '<input type="hidden" id="hidden' + data[i].Department + 'Approver" name="hidden' + data[i].Department + 'Approver" value="' + data[i].ApproverEmailId + '">';
+    //            }
+    //            $("#hiddenApproverInformation").html(row);
+
+    //        }),
+    //        error: (function (data) {
+    //            //code
+    //        })
+    //    })
+
+    //}
+
+
+
+</script>

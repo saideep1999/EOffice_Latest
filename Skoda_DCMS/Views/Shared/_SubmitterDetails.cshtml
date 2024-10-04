@@ -1,0 +1,956 @@
+
+@{
+    var user = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    bool IsNew = true;
+    bool IsEdit = true;
+    dynamic Model = null;
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IsNew = ViewBag.IsNew;
+        IsEdit = ViewBag.IsEdit;
+        Model = ViewBag.Model;
+    }
+}
+
+<div id="accordion">
+    <div class="card">
+        <div class="card-header collapsed" id="headingOne" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+            <h5 class="mb-0">
+                <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    <img src="~/assets/img/empIcon.svg" width="24" height="24" class="mr-2" /><span class="d-inline-block mt-2">Submitter Details</span>
+                </button>
+            </h5>
+        </div>
+
+        <div id="collapseOne" class="collapse show" aria-labelledby="headingOne">
+            <div class="card-body empDetailsBg">
+                <div class="row">
+
+
+                    <div class="col-md-12 col-lg-12 col-12">
+                        <div class="empDetailsFields">
+
+                            @*@if (IsNew)
+                            {
+                                if (!IsEdit)
+                                {
+                                    /*Submitter Detail Edit Page*/
+                                    <div class="row">
+                                        <div class="form-group col-md-3 col-lg-3 col-12">
+                                            <label class="f-600" id="lblTypeOfEmp">Type of Employee<span class="astColor">*</span></label>
+                                        </div>
+
+
+
+                                        <div class="form-group col-md-2 col-lg-2 col-12">
+
+                                            <label class="checkbox-container">
+
+                                                <label class="f-600">Internal</label>
+                                                @if (Model.one[0].EmployeeType == "Internal")
+                                                {
+                                                    <input type="checkbox" class="isChkEditable" name="chkInternal" id="chkInternal" checked>
+                                                }
+                                                else
+                                                {
+                                                    <input type="checkbox" class="isChkEditable" name="chkInternal" id="chkInternal">
+                                                }
+                                                <span class="checkmark"></span>
+                                            </label>
+                                        </div>
+
+                                        <div class="form-group col-md-2 col-lg-2 col-12">
+                                            <label class="checkbox-container">
+                                                <label class="f-600">External</label>
+                                                @if (Model.one[0].EmployeeType == "External")
+                                                {
+                                                    <input type="checkbox" class="isChkEditable" name="chkExternal" id="chkExternal" checked>
+                                                }
+                                                else
+                                                {
+                                                    <input type="checkbox" class="isChkEditable" name="chkExternal" id="chkExternal">
+                                                }
+                                                <span class="checkmark"></span>
+                                            </label>
+                                            <input type="hidden" name="chkEmployeeType" id="chkEmployeeType" value="@(Model.one[0].EmployeeType ?? "")" />
+                                        </div>
+                                        @if (Model.one[0].EmployeeType == "External")
+                                        {
+                                            <div class="form-group col-md-4 col-lg-4 col-12 input-block" id="divExtOtherOrg">
+                                                <input type="text" class="w-100 spanUpperSide" placeholder="" name="txtExternalOtherOrganizationName" id="txtExternalOtherOrganizationName" value="@(Model.one[0].ExternalOtherOrganizationName ?? "")" />
+                                                <span class="placeholder">External Organization Name</span>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="form-group col-md-4 col-lg-4 col-12 input-block d-none" id="divExtOtherOrg">
+                                                <input type="text" class="w-100" placeholder="" name="txtExternalOtherOrganizationName" id="txtExternalOtherOrganizationName" value="" />
+                                                <span class="placeholder">External Organization Name</span>
+                                            </div>
+                                        }
+                                    </div>
+
+
+                                    <div class="row">
+                                        <div class="form-group col-md-3 col-lg-3 col-12 input-block">
+                                            <input type="text" class="w-100 isEditable" name="txtEmployeeName" id="txtEmployeeName" value="@(Model.one[0].EmployeeName ?? "")" onkeypress="alphaOnly(event)" />
+                                            <span class="placeholder">Employee Name <span class="astColor">*</span></span>
+                                        </div>
+                                        <div class="form-group col-md-3 col-lg-3 col-12 input-block">
+                                            <input type="text" class="w-100 isEditable" id="txtEmployeeCode" name="txtEmployeeCode" value="@(Model.one[0].EmployeeCode ?? "")" onkeypress="allowNumbersOnly(event)" />
+                                            <span class="placeholder">Employee Code <span class="astColor">*</span></span>
+                                        </div>
+                                        <div class="form-group col-md-3 col-lg-3 col-12 input-block">
+                                            <input type="text" class="w-100 isEditable" name="txtCostcenterCode" id="txtCostcenterCode" value="@(Model.one[0].EmployeeCCCode ?? "")" onkeypress="allowNumbersOnly(event)" />
+                                            <span class="placeholder">Cost Center No. <span class="astColor">*</span></span>
+                                        </div>
+
+                                        <div class="form-group col-md-3 col-lg-3 col-12 input-block">
+                                            <input type="text" class="w-100 isEditable" name="txtUserId" id="txtUserId" value="@(Model.one[0].EmployeeUserId ?? "")" />
+                                            <span class="placeholder">User-Id <span class="astColor">*</span></span>
+                                        </div>
+
+                                        <div class="form-group col-md-3 col-lg-3 col-12 input-block">
+                                            <input type="text" class="w-100 isEditable" name="txtDepartment" id="txtDepartment" value="@(Model.one[0].EmployeeDepartment ?? "")" onkeypress="alphaOnly(event)" />
+                                            <span class="placeholder">Department <span class="astColor">*</span></span>
+                                        </div>
+
+                                        <div class="form-group col-md-3 col-lg-3 col-12 inputSelect">
+                                            <select name="ddEmpDesignation" class="w-100 spanUpperSide" id="ddEmpDesignation" onchange="checkSelect('ddEmpDesignation')"></select>
+                                            <span class="placeholder">Designation <span class="astColor">*</span></span>
+                                        </div>
+                                        <div class="form-group col-md-3 col-lg-3 col-12 inputSelect">
+                                            <select name="ddEmpLocation" class="w-100 spanUpperSide" id="ddEmpLocation" onchange="checkSelect('ddEmpLocation')"></select>
+                                            <span class="placeholder">Location <span class="astColor">*</span></span>
+                                        </div>
+                                        <div class="form-group col-md-3 col-lg-3 col-12 input-block">
+                                            <input type="text" class="w-100" name="txtContactNo" id="txtContactNo" value="@(Model.one[0].EmployeeContactNo ?? "")" onkeypress="allowNumbersOnly(event)" maxlength="10" />
+                                            <span class="placeholder">Contact No</span>
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="form-row" style="display: flex;">
+
+                                        @foreach (var item in Model.one)
+                                        {
+                                            <div class="form-group col-md-3 pl-0 col-12 employee-type inputSelect">
+                                                <select name="drpRequestSubmissionFor" id="drpRequestSubmissionFor" class="choice spanUpperSide forResponsive" onchange="RequestSubmissionFor()">
+                                                    <option value="" class="d-none">Select..</option>
+                                                    <option value="Self" @(item.RequestSubmissionFor == "Self" ? "selected" : "")>Self</option>
+                                                    <option value="OnBehalf" @(item.RequestSubmissionFor == "OnBehalf" ? "selected" : "")>On Behalf</option>
+                                                </select>
+                                                <span class="placeholder">Request Submission Type<span class="astColor">*</span></span>
+                                            </div>
+                                        }
+
+                                        @if (Model.one[0].RequestSubmissionFor == "OnBehalf")
+                                        {
+                                            <div class="form-group col-md-8 col-12 d-flex pt-1 align-items-center employee-type" id="divEmployeeType">
+
+                                                <label id="lblEmpType" class="employee-type mr-4">Employee Type<span class="astColor">*</span></label>
+                                                @if (Model.one[0].OnBehalfOption == "SAVWIPLEmployee")
+                                                {
+                                                    <input class="form-check-input exisiting mr-2" type="radio" name="rdOnBehalfOption" id="rdOnBehalfOption" value="SAVWIPLEmployee" checked />
+                                                }
+                                                else
+                                                {
+                                                    <input class="form-check-input exisiting mr-2" type="radio" name="rdOnBehalfOption" id="rdOnBehalfOption" value="SAVWIPLEmployee" />
+                                                }
+                                                <label class="form-check-label exisiting mr-3 mt-0" for="inlineCheckbox1">SAVWIPL Employee</label>
+                                                @if (Model.one[0].OnBehalfOption == "Others")
+                                                {
+                                                    <input class="form-check-input new mr-2" type="radio" name="rdOnBehalfOption" id="rdOnBehalfOption" value="Others" checked>
+                                                }
+                                                else
+                                                {
+                                                    <input class="form-check-input new mr-2" type="radio" name="rdOnBehalfOption" id="rdOnBehalfOption" value="Others" />
+                                                }
+                                                <label class="form-check-label new mr-3 mt-1" for="inlineCheckbox1">New</label>
+                                                <input class="form-check-input new-radio" type="hidden" name="rdOnBehalfOptionSelected" id="rdOnBehalfOptionSelected" value="@Model.one[0].OnBehalfOption" />
+
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="form-group col-md-8 d-flex align-items-center col-12 pt-1 employee-type" id="divEmployeeType" style="visibility:hidden;">
+
+                                                <label class="employee-type" id="lblEmpType">Employee Type<span class="astColor">*</span></label>
+                                                <input class="form-check-input exisiting-radio" type="radio" name="rdOnBehalfOption" id="rdOnBehalfOption" value="SAVWIPLEmployee" />
+                                                <label class="form-check-label exisiting mr-3" for="inlineCheckbox1">SAVWIPL Employee</label>
+                                                <input class="form-check-input new-radio" type="radio" name="rdOnBehalfOption" id="rdOnBehalfOption" value="Others" />
+                                                <label class="form-check-label new" for="inlineCheckbox1">New</label>
+                                                <input class="form-check-input new-radio" type="hidden" name="rdOnBehalfOptionSelected" id="rdOnBehalfOptionSelected" value="" />
+
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    /*Submitter Detail Create New Page*/
+                                    <div class="row">
+                                        <div class="form-group col-md-3 col-lg-3 col-12">
+                                            <label class="f-600" id="lblTypeOfEmp">Type of Employee<span class="astColor">*</span></label>
+                                        </div>
+
+
+                                        <div class="form-group col-md-2 col-lg-2 col-12">
+
+                                            <label class="checkbox-container">
+                                                <label class="f-600">Internal</label>
+                                                <input type="checkbox" class="" name="chkInternal" id="chkInternal">
+
+                                                <span class="checkmark"></span>
+                                            </label>
+                                        </div>
+
+                                        <div class="form-group col-md-2 col-lg-2 col-12">
+                                            <label class="checkbox-container">
+                                                <label class="f-600">External</label>
+                                                <input type="checkbox" class="" name="chkExternal" id="chkExternal">
+
+                                                <span class="checkmark"></span>
+                                            </label>
+                                            <input type="hidden" name="chkEmployeeType" id="chkEmployeeType" value="" />
+                                        </div>
+
+
+                                        <div class="form-group col-md-4 col-lg-4 col-12 input-block d-none" id="divExtOtherOrg">
+                                            <input type="text" class="w-100" name="txtExternalOtherOrganizationName" id="txtExternalOtherOrganizationName" value="" required />
+                                            <span class="placeholder">External Organization Name </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="form-group col-md-3 col-lg-3 col-12 input-block">
+
+                                            <input type="text" class="w-100 txtDisable" name="txtEmployeeName" id="txtEmployeeName" value="" onkeypress="alphaOnly(event)" required />
+                                            <span class="placeholder">Employee Name<span class="astColor">*</span></span>
+                                        </div>
+                                        <input type="hidden" name="txtEmail" id="txtEmail" value="" />
+                                        <div class="form-group col-md-3 col-lg-3 col-12 input-block">
+
+                                            <input type="text" class="w-100 txtDisable" name="txtCostcenterCode" id="txtCostcenterCode" value="" onkeypress="allowNumbersOnly(event)" />
+                                            <span class="placeholder">Cost Center No.<span class="astColor">*</span></span>
+                                        </div>
+                                        <div class="form-group col-md-3 col-lg-3 col-12 input-block">
+
+                                            <input type="text" class="w-100 txtDisable" id="txtEmployeeCode" name="txtEmployeeCode" value="" onkeypress="allowNumbersOnly(event)" />
+                                            <span class="placeholder">Employee Code<span class="astColor">*</span></span>
+                                        </div>
+
+                                        <div class="form-group col-md-3 col-lg-3 col-12 input-block">
+                                            <input type="text" class="w-100 txtDisable" name="txtUserId" id="txtUserId" value="" />
+                                            <span class="placeholder">User-Id<span class="astColor">*</span></span>
+                                        </div>
+
+                                        <div class="form-group col-md-3 col-lg-3 col-12 input-block">
+                                            <input type="text" class="w-100 txtDisable" name="txtDepartment" id="txtDepartment" value="" onkeypress="alphaOnly(event)" />
+                                            <span class="placeholder">Department<span class="astColor">*</span></span>
+                                        </div>
+
+                                        <div class="form-group col-md-3 col-lg-3 col-12 inputSelect">
+
+                                            <select name="ddEmpDesignation" class="" id="ddEmpDesignation" onchange="checkSelect('ddEmpDesignation')"></select>
+                                            <span class="placeholder">Designation<span class="astColor">*</span></span>
+                                        </div>
+
+                                        <div class="form-group col-md-3 col-lg-3 col-12 inputSelect">
+
+                                            <select name="ddEmpLocation" class="" id="ddEmpLocation" onchange="checkSelect('ddEmpLocation')"></select>
+                                            <span class="placeholder">Location<span class="astColor">*</span></span>
+                                        </div>
+
+                                        <div class="form-group col-md-3 col-lg-3 col-12 input-block">
+
+                                            <input type="text" class="w-100 txtDisable" name="txtContactNo" id="txtContactNo" value="" onkeypress="allowNumbersOnly(event)" maxlength="10" required />
+                                            <span class="placeholder">Contact No</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-row" style="display: flex;">
+
+                                        <div class="form-group col-md-3 col-12 employee-type inputSelect">
+
+                                            <select name="drpRequestSubmissionFor" id="drpRequestSubmissionFor" class="choice" onchange="RequestSubmissionFor(); checkSelect('drpRequestSubmissionFor')">
+                                                <option value="" class="d-none"></option>
+                                                <option value="Self">Self</option>
+                                                <option value="OnBehalf">On Behalf</option>
+                                            </select>
+                                            <span class="placeholder">Request Submission Type<span class="astColor">*</span></span>
+                                        </div>
+                                        <div class="form-group col-md-8 d-flex align-items-center col-12 pt-1 employee-type" id="divEmployeeType" style="visibility:hidden;">
+
+                                            <label id="lblEmpType" class="employee-type">Employee Type<span class="astColor">*</span></label>
+                                            <input class="form-check-input exisiting-radio" type="radio" name="rdOnBehalfOption" id="rdOnBehalfOption" value="SAVWIPLEmployee" />
+                                            <label class="form-check-label exisiting mr-3" for="inlineCheckbox1">SAVWIPL Employee</label>
+                                            <input class="form-check-input new-radio" type="radio" name="rdOnBehalfOption" id="rdOnBehalfOption" value="Others" />
+                                            <label class="form-check-label new" for="inlineCheckbox1">New</label>
+                                            <input class="form-check-input new-radio" type="hidden" name="rdOnBehalfOptionSelected" id="rdOnBehalfOptionSelected" value="" />
+
+                                        </div>
+
+                                    </div>
+
+                                }
+                            }
+                            else if (!IsNew)
+                            {
+                                /*Submitter Detail View Page*/*@
+                                <div class="row">
+                                    <div class="form-group col-md-3 col-lg-3 col-12">
+                                        <label class="f-600">Type of Employee<span class="astColor">*</span></label>
+                                    </div>
+
+                                    <div class="form-group col-md-2 col-lg-2 col-12">
+
+                                        <label class="checkbox-container">
+                                            <label class="f-600">Internal</label>
+                                            @*@if (Model.one[0].EmployeeType == "Internal")
+                                            {
+                                                <input type="checkbox" class="inpDisable" name="chkInternal" id="chkInternal" checked>
+                                            }
+                                            else
+                                            {
+                                                <input type="checkbox" class="inpDisable" name="chkInternal" id="chkInternal">
+                                            }*@
+                                            @* Model.one[0].EmployeeType == "Internal" *@
+                                            <input type="checkbox" class="inpDisable" name="chkInternal" id="chkInternal" @(Model?.one[0].EmployeeType == "Internal" ? "checked" : "")>
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </div>
+
+                                    <div class="form-group col-md-2 col-lg-2 col-12">
+                                        <label class="checkbox-container">
+                                            <label class="f-600">External</label>
+                                            @*@if (Model.one[0].EmployeeType == "External")
+                                            {
+                                                <input type="checkbox" class="inpDisable" name="chkExternal" id="chkExternal" checked>
+                                            }
+                                            else
+                                            {
+                                                <input type="checkbox" class="inpDisable" name="chkExternal" id="chkExternal">
+                                            }*@
+                                            <input type="checkbox" class="inpDisable" name="chkExternal" id="chkExternal"  @(Model?.one[0].EmployeeType == "External" ? "checked" : "")>
+                                            <span class="checkmark"></span>
+                                        </label>
+                                        <input type="hidden" name="chkEmployeeType" id="chkEmployeeType" value="@(Model?.one[0].EmployeeType ?? "")" />
+                                    </div>
+                                    @if (Model?.one[0].EmployeeType == "External")
+                                    {<div class="form-group col-md-4 col-lg-4 col-12 input-block" id="divExtOtherOrg">
+                                            <input type="text" class="w-100 txtDisable spanUpperSide" placeholder="" name="txtExternalOtherOrganizationName" id="txtExternalOtherOrganizationName" value="@(Model?.one[0].ExternalOtherOrganizationName ?? "")" />
+                                            <span class="placeholder">External Organization Name</span>
+                                        </div>
+                                    }
+                                </div>
+
+                                <div class="row">
+                                    <div class="form-group col-md-3 col-lg-3 col-12 input-block">
+
+                                        <input type="text" class="w-100 inpDisable" name="txtEmployeeName" id="txtEmployeeName" value="@(Model?.one[0].EmployeeName ?? "")" />
+                                        <span class="placeholder">Employee Name<span class="astColor">*</span></span>
+                                    </div>
+                                    <div class="form-group col-md-3 col-lg-3 col-12 input-block">
+
+                                        <input type="text" class="w-100 txtDisable" name="txtCostcenterCode" id="txtCostcenterCode" value="@(Model?.one[0].EmployeeCCCode ?? "")" />
+                                        <span class="placeholder">Cost Center No.<span class="astColor">*</span></span>
+                                    </div>
+                                    <div class="form-group col-md-3 col-lg-3 col-12 input-block">
+
+                                        <input type="text" class="w-100 txtDisable" id="txtEmployeeCode" name="txtEmployeeCode" value="@(Model?.one[0].EmployeeCode ?? "")" />
+                                        <span class="placeholder">Employee Code<span class="astColor">*</span></span>
+                                    </div>
+
+                                    <div class="form-group col-md-3 col-lg-3 col-12 input-block">
+
+                                        <input type="text" class="w-100 txtDisable" name="txtUserId" id="txtUserId" value="@(Model?.one[0].EmployeeUserId ?? "")" />
+                                        <span class="placeholder">User-Id<span class="astColor">*</span></span>
+                                    </div>
+
+                                    <div class="form-group col-md-3 col-lg-3 col-12 input-block">
+
+                                        <input type="text" class="w-100 txtDisable" name="txtDepartment" id="txtDepartment" value="@(Model?.one[0].EmployeeDepartment ?? "")" onkeypress="alphaOnly(event)" />
+                                        <span class="placeholder">Department<span class="astColor">*</span></span>
+                                    </div>
+
+                                    <div class="form-group col-md-3 col-lg-3 col-12 input-block">
+                                        <select name="ddEmpDesignation" class="w-100 spanUpperSide" id="ddEmpDesignation" onchange="checkSelect('ddEmpDesignation')"></select>
+                                        <span class="placeholder">Designation <span class="astColor">*</span></span>
+                                        @*<input type="text" class="w-100 txtDisable" name="txtdesignation" id="txtdesignation" value="@(Model?.one[0].EmployeeDesignation ?? "")" />
+                                        <span class="placeholder">Designation<span class="astColor">*</span></span>*@
+                                    </div>
+                                    <div class="form-group col-md-3 col-lg-3 col-12 input-block">
+                                        <select name="ddEmpLocation" class="" id="ddEmpLocation" onchange="checkSelect('ddEmpLocation')"></select>
+                                        <span class="placeholder">Location<span class="astColor">*</span></span>
+                                        @*<input type="text" class="w-100 txtDisable" name="txtLocation" id="txtLocation" value="@(Model?.one[0].EmployeeLocation ?? "")" />
+                                        <span class="placeholder">Location<span class="astColor">*</span></span>*@
+                                    </div>
+                                    <div class="form-group col-md-3 col-lg-3 col-12 input-block">
+
+                                        <input type="text" class="w-100 txtDisable" name="txtContactNo" id="txtContactNo" value="@(Model?.one[0].EmployeeContactNo ?? "")" />
+                                        <span class="placeholder">Contact No</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-row" style="display: flex;">
+                                                                        
+                                    <div class="form-group col-md-3 pl-0 col-12 employee-type inputSelect">
+                                        <select name="drpRequestSubmissionFor" id="drpRequestSubmissionFor" class="choice spanUpperSide forResponsive" onchange="RequestSubmissionFor()">
+                                            <option value="" class="d-none">Select..</option>
+                                            <option value="Self" @(Model?.one[0].RequestSubmissionFor == "Self" ? "selected" : "")>Self</option>
+                                            <option value="OnBehalf" @(Model?.one[0].RequestSubmissionFor == "OnBehalf" ? "selected" : "")>On Behalf</option>
+                                        </select>
+                                        <span class="placeholder">Request Submission Type<span class="astColor">*</span></span>
+                                    </div>
+
+                                    @if (Model?.one[0].RequestSubmissionFor == "OnBehalf")
+                                    {
+                                        <div class="form-group col-md-8 col-12 d-flex pt-1 align-items-center employee-type" id="divEmployeeType">
+
+                                            <label id="lblEmpType" class="employee-type mr-4">Employee Type<span class="astColor">*</span></label>
+                                            @if (Model?.one[0].OnBehalfOption == "SAVWIPLEmployee")
+                                            {
+                                                <input class="form-check-input exisiting mr-2" type="radio" name="rdOnBehalfOption" id="rdOnBehalfOption" value="SAVWIPLEmployee" checked />
+                                            }
+                                            else
+                                            {
+                                                <input class="form-check-input exisiting mr-2" type="radio" name="rdOnBehalfOption" id="rdOnBehalfOption" value="SAVWIPLEmployee" />
+                                            }
+                                            <label class="form-check-label exisiting mr-3 mt-0" for="inlineCheckbox1">Employee</label>
+                                            @if (Model?.one[0].OnBehalfOption == "Others")
+                                            {
+                                                <input class="form-check-input new mr-2" type="radio" name="rdOnBehalfOption" id="rdOnBehalfOption" value="Others" checked>
+                                            }
+                                            else
+                                            {
+                                                <input class="form-check-input new mr-2" type="radio" name="rdOnBehalfOption" id="rdOnBehalfOption" value="Others" />
+                                            }
+                                            <label class="form-check-label new mr-3 mt-1" for="inlineCheckbox1">New</label>
+                                            <input class="form-check-input new-radio" type="hidden" name="rdOnBehalfOptionSelected" id="rdOnBehalfOptionSelected" value="@Model?.one[0].OnBehalfOption" />
+
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="form-group col-md-8 d-flex align-items-center col-12 pt-1 employee-type" id="divEmployeeType" style="visibility:hidden;">
+
+                                            <label class="employee-type" id="lblEmpType">Employee Type<span class="astColor">*</span></label>
+                                            <input class="form-check-input exisiting-radio" type="radio" name="rdOnBehalfOption" id="rdOnBehalfOption" value="SAVWIPLEmployee" />
+                                            <label class="form-check-label exisiting mr-3" for="inlineCheckbox1">Employee</label>
+                                            <input class="form-check-input new-radio" type="radio" name="rdOnBehalfOption" id="rdOnBehalfOption" value="Others" />
+                                            <label class="form-check-label new" for="inlineCheckbox1">New</label>
+                                            <input class="form-check-input new-radio" type="hidden" name="rdOnBehalfOptionSelected" id="rdOnBehalfOptionSelected" value="" />
+
+                                        </div>
+                                    }
+                                </div>
+                            @*}*@
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    var isNew = @Html.Raw(Json.Encode(IsNew));
+    var isEdit = @Html.Raw(Json.Encode(IsEdit));
+    var model = @Html.Raw(Json.Encode(Model));
+
+    function getSubmitterData() {
+        if (isNew && isEdit) {
+             var EmailId = "";
+            var extdesignation = "Team Member";
+            var result = getTypeOfEmployeeByEmail("@user.Email");
+
+            $('input[id="chkExternal"]').prop("disabled", true);
+            $('input[id="chkInternal"]').prop("disabled", true);
+            if (result == true) {
+                console.log("Emp type ext..=" + result);
+                $('input[id="chkExternal"]').prop("checked", true).change();
+                $("#chkEmployeeType").val('External');
+                $("#ddEmpDesignation option[value='" + extdesignation + "']").prop('selected', 'selected');
+                console.log("Emp Desg " + extdesignation);
+                $('#ddEmpDesignation').prop("disabled", true);
+                var company = "@user.CompanyName";
+                console.log("company=" + company);
+                if (company == "") {
+                    $('#divExtOtherOrg').addClass('d-none');
+                    $("#txtExternalOtherOrganizationName").val("");
+                }
+                else {
+                    $('#divExtOtherOrg').removeClass('d-none');
+                    $("#txtExternalOtherOrganizationName").val("@user.CompanyName").prop("readOnly", true);;
+                }
+                $('#ddEmpDesignation').addClass("spanUpperSide");
+            }
+            else {
+                $('input[id="chkInternal"]').prop("checked", true).change();
+                $("#chkEmployeeType").val('Internal');
+                $('#ddEmpDesignation').prop("disabled", false);
+                $('#ddEmpDesignation').prop("selectedIndex", 0).val();
+            }
+            $("#txtEmployeeName").val("@user.FirstName @user.LastName").prop("readOnly", true);
+            $("#txtCostcenterCode").val("@user.CostCenter").prop("readOnly", true);
+            $("#txtEmployeeCode").val("@user.EmpNumber").prop("readOnly", true);
+            $("#txtUserId").val("@user.UserName").prop("readOnly", true);
+            $("#txtDepartment").val("@user.Department").prop("readOnly", true);
+            $("#txtContactNo").val("@user.PhoneNumber");
+            $("#txtEmail").val("@user.Email");
+        }
+        if (!isNew) {
+            var value = JSON.stringify(model[0]);
+            console.log(value);
+            var value_1 = JSON.parse(value);
+            var org = value_1.Value[0].ExternalOtherOrganizationName;
+            var requestSubmissionFor = value_1.Value[0].RequestSubmissionFor;
+            var onBehalfOption = value_1.Value[0].OnBehalfOption;
+
+            if (org != null) {
+                $('#divExtOtherOrg').removeClass('d-none');
+                $('#txtExternalOtherOrganizationName').prop("readOnly", true);
+            }
+            else {
+                $('#divExtOtherOrg').addClass('d-none');
+            }
+
+            var otherOrg = value_1.Value[0].OtherExternalOtherOrganizationName;
+            console.log("otherOrg =" + otherOrg);
+            if (otherOrg == null) {
+                $('#divOtherExtOtherOrg').addClass('d-none');
+                $('#txtOtherExternalOtherOrganizationName').val("");
+            }
+
+            var employeeDesignation = value_1.Value[0].EmployeeDesignation;
+            $("#ddEmpDesignation option[value='" + employeeDesignation + "']").prop('selected', 'selected');
+            $("#ddEmpDesignation").prop("disabled", true);
+
+            var selectedLocation = value_1.Value[0].EmployeeLocation;
+            $("#ddEmpLocation option[value='" + selectedLocation + "']").prop('selected', 'selected');
+            $("#ddEmpLocation").prop("disabled", true);
+            $('#ddEmpLocation').addClass("spanUpperSide");
+
+            if (requestSubmissionFor == "OnBehalf" && onBehalfOption == "SAVWIPLEmployee") {
+                $('#SAVWIPLEmployeeDetailsSection').removeClass('d-none');
+                $('#OthersEmployeeDetailsSection').addClass('d-none');
+                $("#SAVWIPLEmployeeDetailsSection").prop("disabled", true);
+                $("#OthersEmployeeDetailsSection").prop("disabled", true);
+
+                var otherEmployeeDesignation = value_1.Value[0].OtherEmployeeDesignation;
+                console.log(otherEmployeeDesignation);
+                $("#ddOtherEmpDesignation option[value='" + otherEmployeeDesignation + "']").prop('selected', 'selected');
+                $("#ddOtherEmpDesignation").prop("disabled", true);
+                if (otherEmployeeDesignation == "Team Member") {
+                    $("#ddOtherEmpDesignation").prop("disabled", true);
+                }
+                $('#ddOtherEmpDesignation').addClass("spanUpperSide");
+
+                var selectedOtherLocation = value_1.Value[0].OtherEmployeeLocation;
+                $("#ddOtherEmpLocation option[value='" + selectedOtherLocation + "']").prop('selected', 'selected');
+                $('#ddOtherEmpLocation').addClass("spanUpperSide");
+                $("#ddOtherEmpLocation").prop("disabled", true);
+
+                $('input[id="chkOtherExternal"]').prop("disabled", true);
+                $('input[id="chkOtherInternal"]').prop("disabled", true);
+
+                var otherOrg = value_1.Value[0].OtherExternalOtherOrganizationName;
+                console.log("OtherOrg = " + otherOrg);
+                if (otherOrg != null) {
+                    $('#divOtherExtOtherOrg').removeClass('d-none');
+                    $('#txtOtherExternalOtherOrganizationName').prop("readOnly", true);
+                }
+                else {
+                    $('#divOtherExtOtherOrg').addClass('d-none');
+                }
+            }
+            else if (requestSubmissionFor == "OnBehalf" && onBehalfOption == "Others") {
+                $('#SAVWIPLEmployeeDetailsSection').addClass('d-none');
+                $('#OthersEmployeeDetailsSection').removeClass('d-none');
+
+                var otherNewEmployeeDesignation = value_1.Value[0].OtherEmployeeDesignation;
+                console.log(otherNewEmployeeDesignation);
+                $("#ddOtherNewEmpDesignation option[value='" + otherNewEmployeeDesignation + "']").prop('selected', 'selected');
+                $("#ddOtherNewEmpDesignation").prop("disabled", true);
+                if (otherNewEmployeeDesignation == "Team Member") {
+                    $("#ddOtherNewEmpDesignation").prop("disabled", true);
+                }
+                $('#ddOtherNewEmpDesignation').addClass("spanUpperSide");
+
+                var selectedOtherLocation = value_1.Value[0].OtherEmployeeLocation;
+                $("#ddOtherNewEmpLocation option[value='" + selectedOtherLocation + "']").prop('selected', 'selected');
+                $("#ddOtherNewEmpLocation").prop("disabled", true);
+                $('#ddOtherNewEmpLocation').addClass("spanUpperSide");
+
+                var otherOrg = value_1.Value[0].OtherExternalOtherOrganizationName;
+                console.log("otherOrg=" + otherOrg);
+                if (otherOrg != null) {
+                    $('#divOtherNewExtOtherOrg').removeClass('d-none');
+                }
+                else {
+                    $('#divOtherNewExtOtherOrg').addClass('d-none');
+                }
+
+            }
+        }
+        if (!isEdit) {
+            $('input[id="chkExternal"]').prop("disabled", true);
+            $('input[id="chkInternal"]').prop("disabled", true);
+            $("#txtEmployeeName").prop("readOnly", true);
+            $("#txtCostcenterCode").prop("readOnly", true);
+            $("#txtEmployeeCode").prop("readOnly", true);
+            $("#txtUserId").prop("readOnly", true);
+            $("#txtDepartment").prop("readOnly", true);
+            $("#txtExternalOtherOrganizationName").val("@user.CompanyName").prop("readOnly", true);
+            //$('#ddEmpDesignation').prop("disabled", true);
+            var value = JSON.stringify(model[0]);
+
+            var value_1 = JSON.parse(value);
+            var requestSubmissionFor = value_1.Value[0].RequestSubmissionFor;
+            console.log("requestSubmissionFor=" + requestSubmissionFor);
+            var onBehalfOption = value_1.Value[0].OnBehalfOption;
+            if (requestSubmissionFor == "Self") {
+                $('#SAVWIPLEmployeeDetailsSection').addClass('d-none');
+                $('#OthersEmployeeDetailsSection').addClass('d-none');
+            }
+
+            console.log('dropdownlist');
+            console.log($("#ddOtherEmpDesignation"));
+            if (requestSubmissionFor == "OnBehalf" && onBehalfOption == "SAVWIPLEmployee") {
+                $('#SAVWIPLEmployeeDetailsSection').removeClass('d-none');
+                $('#OthersEmployeeDetailsSection').addClass('d-none');
+
+                var otherEmployeeDesignation = value_1.Value[0].OtherEmployeeDesignation;
+                $("#ddOtherEmpDesignation option[value='" + otherEmployeeDesignation + "']").prop('selected', 'selected');
+                if (otherEmployeeDesignation == "Team Member") {
+                    $("#ddOtherEmpDesignation").prop("disabled", true);
+                }
+                $('#ddOtherEmpDesignation').addClass("spanUpperSide");
+
+                var selectedOtherLocation = value_1.Value[0].OtherEmployeeLocation;
+                $("#ddOtherEmpLocation option[value='" + selectedOtherLocation + "']").prop('selected', 'selected');
+                $('#ddOtherEmpLocation').addClass("spanUpperSide");
+
+                    $('input[id="chkOtherExternal"]').prop("disabled", true);
+                    $('input[id="chkOtherInternal"]').prop("disabled", true);
+
+                var otherOrg = value_1.Value[0].OtherExternalOtherOrganizationName;
+                if (otherOrg != null) {
+                    $('#divOtherExtOtherOrg').removeClass('d-none');
+                    $('#txtOtherExternalOtherOrganizationName').prop("readOnly", true);
+                }
+                else {
+                    $('#divOtherExtOtherOrg').addClass('d-none');
+                }
+            }
+            else if (requestSubmissionFor == "OnBehalf" && onBehalfOption == "Others") {
+                $('#SAVWIPLEmployeeDetailsSection').addClass('d-none');
+                $('#OthersEmployeeDetailsSection').removeClass('d-none');
+
+                var otherNewEmployeeDesignation = value_1.Value[0].OtherEmployeeDesignation;
+                $("#ddOtherNewEmpDesignation option[value='" + otherNewEmployeeDesignation + "']").prop('selected', 'selected');
+                if (otherNewEmployeeDesignation == "Team Member") {
+                    $("#ddOtherNewEmpDesignation").prop("disabled", true);
+                }
+                $('#ddOtherNewEmpDesignation').addClass("spanUpperSide");
+
+                var selectedOtherLocation = value_1.Value[0].OtherEmployeeLocation;
+                $("#ddOtherNewEmpLocation option[value='" + selectedOtherLocation + "']").prop('selected', 'selected');
+                $('#ddOtherNewEmpLocation').addClass("spanUpperSide");
+
+                var otherOrg = value_1.Value[0].OtherExternalOtherOrganizationName;
+                console.log("otherOrg=" + otherOrg);
+                if (otherOrg != null) {
+                    $('#divOtherNewExtOtherOrg').removeClass('d-none');
+                }
+                else {
+                    $('#divOtherNewExtOtherOrg').addClass('d-none');
+                }
+
+            }
+
+            var employeeDesignation = value_1.Value[0].EmployeeDesignation;
+            $("#ddEmpDesignation option[value='" + employeeDesignation + "']").prop('selected', 'selected');
+            if (employeeDesignation == "Team Member") {
+                $("#ddEmpDesignation").prop("disabled", true);
+            }
+
+            var selectedLocation = value_1.Value[0].EmployeeLocation;
+            $("#ddEmpLocation option[value='" + selectedLocation + "']").prop('selected', 'selected');
+
+            var otherOrg = value_1.Value[0].ExternalOtherOrganizationName;
+            if (otherOrg != null) {
+                $('#divExtOtherOrg').removeClass('d-none');
+                $('#txtExternalOtherOrganizationName').prop("readOnly", true);
+            }
+            else {
+                $('#divExtOtherOrg').addClass('d-none');
+            }
+
+            var requestSubmissionFor = value_1.Value[0].RequestSubmissionFor;
+            var onBehlfType = value_1.Value[0].OnBehalfOption;
+            console.log(onBehlfType, 'on behalf value')
+            if (requestSubmissionFor == "Self") {
+                $("#SAVWIPLEmployeeDetailsSection").addClass('d-none');
+                $("#OthersEmployeeDetailsSection").addClass('d-none');
+                console.log('self');
+            }
+            else {
+                if (onBehlfType == "SAVWIPLEmployee") {
+                    $("#OthersEmployeeDetailsSection").each(function () {
+                        console.log($(this));
+                        $(this).addClass('d-none');
+                    });
+                    console.log('if');
+
+                    var jsElemt = document.querySelectorAll('[id=OthersEmployeeDetailsSection]');
+                    for(let i = 0; i < jsElemt.length; i++)
+                    {
+                        jsElemt[i].classList.add("d-none");
+                    }
+
+                }
+                else {
+                    $("#SAVWIPLEmployeeDetailsSection").addClass('d-none');
+                    console.log('else');
+                }
+            }
+        }
+    }
+
+    function getTypeOfEmployeeByEmail(txt) {
+        console.log("email-validation");
+        var result = txt.includes("extern");
+        return result;
+    }
+
+    function RequestSubmissionFor() {
+
+        var drpRequestSubmissionFor = $("#drpRequestSubmissionFor").val();
+        console.log("drpRequestSubmissionFor=" + drpRequestSubmissionFor);
+        if (drpRequestSubmissionFor == "OnBehalf") {
+            $('#divEmployeeType').attr("style", "visibility:visible");
+
+        }
+        else if (drpRequestSubmissionFor == "Self") {
+            $('#divEmployeeType').attr("style", "visibility:hidden");
+            $('#SAVWIPLEmployeeDetailsSection').addClass('d-none');
+            $('#OthersEmployeeDetailsSection').addClass('d-none');
+            $('input:radio[value="SAVWIPLEmployee"]').prop("checked", false).change();
+            $('input:radio[value="Others"]').prop("checked", false).change();
+        }
+    }
+
+    function showHideControls() {
+        $('input[type=radio][name=rdOnBehalfOption]').click(function () {
+            var onBehalfOption = $(this).val();
+            console.log(onBehalfOption);
+
+            if (onBehalfOption == "SAVWIPLEmployee") {
+                $('#SAVWIPLEmployeeDetailsSection').removeClass('d-none');
+                $('#OthersEmployeeDetailsSection').addClass('d-none');
+                $('#rdOnBehalfOptionSelected').val('SAVWIPLEmployee');
+            }
+            else if (onBehalfOption == "Others") {
+                $('#SAVWIPLEmployeeDetailsSection').addClass('d-none');
+                $('#OthersEmployeeDetailsSection').removeClass('d-none');
+                $('#rdOnBehalfOptionSelected').val('Others');
+
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        getEmployeeType();
+        showHideControls();
+        getDesignations();
+        getServiceDeskLocations();
+        getSubmitterData();
+    });
+
+    function getDesignations() {
+        $.ajax({
+            type: "POST",
+            url: "/List/GetDesignations",
+            contentType: "application/json; charset=utf-8",
+            datatype: 'json',
+            cache: false,
+            async: false,
+            success: function (data) {
+                console.log(data);
+                var s = '<option value="" class="d-none"></option>';
+
+                for (var i = 0; i < data.length; i++) {
+                    s += '<option value="' + data[i].JobTitle + '">' + data[i].JobTitle + '</option>';
+                }
+                $("#ddEmpDesignation").html(s);
+                $("#ddOtherEmpDesignation").html(s);
+                $("#ddOtherNewEmpDesignation").html(s);
+            },
+            error: function (data) {
+                //code
+            }
+        });
+    }
+
+    function getServiceDeskLocations() {
+        $.ajax({
+            type: "GET",
+            url: "/List/GetServiceDeskLocations",
+            contentType: "application/json; charset=utf-8",
+            datatype: 'json',
+            cache: false,
+            async: false,
+            success: function (data) {
+                console.log("Hi=" + data);
+                var s = '<option value="" class="d-none"></option>';
+
+                for (var i = 0; i < data.length; i++) {
+                    s += '<option value="' + data[i].LocationName + '">' + data[i].LocationName + '</option>';
+                }
+                $("#ddEmpLocation").html(s);
+                $("#ddOtherEmpLocation").html(s);
+                $("#ddOtherNewEmpLocation").html(s);
+            },
+            error: function () {
+
+            }
+        });
+    }
+
+    function getEmployeeType() {
+        var extdesignation = "Team Member";
+        var z = 0;
+        $('input:checkbox[id="chkInternal"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                console.log("Internal");
+                $('input[id="chkInternal"]').prop('disabled', true);
+                $('input[id="chkExternal"]').prop('checked', false).change();
+                $('input[id="chkExternal"]').prop("disabled", false);
+                $("#chkEmployeeType").val('Internal');
+                $('#divExtOrg').addClass('d-none');
+                $('#divExtOtherOrg').addClass('d-none');
+                $('#ddExternalOrganizationName').prop("selectedIndex", 0).val();
+                $('#txtExternalOtherOrganizationName').val('');
+                console.log("internal z=" + z);
+                if (z == 1) {
+                    $("#ddEmpDesignation").prop("disabled", false);
+                    $("#ddEmpDesignation").prop("selectedIndex", 0);
+                    $('#ddEmpDesignation').removeClass("spanUpperSide");
+                }
+            }
+        });
+
+        $('input:checkbox[id="chkExternal"]').click(function () {
+            if ($(this).prop("checked") == true) {
+                z = 1;
+                $("#chkEmployeeType").val('External');
+                $('input[id="chkExternal"]').prop('disabled', true);
+                $('input[id="chkInternal"]').prop("checked", false).change();
+                $('input[id="chkInternal"]').prop("disabled", false);
+                $('#divExtOrg').removeClass('d-none');
+                $("#ddEmpDesignation option[value='" + extdesignation + "']").prop('selected', 'selected');
+                $('#ddEmpDesignation').addClass("spanUpperSide");
+                $('#ddEmpDesignation').prop("disabled", true);
+            }
+        });
+    }
+
+    function validateSubmitter() {
+        if (($("#chkInternal").prop("checked") == false) && ($("#chkExternal").prop("checked") == false)) {
+            errors += "<li id='error" + errorCount + "'>" + "Type of Employee" + "</li>";
+            $("#chkInternal").addClass('removeTypeOfEmp');
+            $("#chkExternal").addClass('removeTypeOfEmp');
+            AddError("lblTypeOfEmp", 'removeTypeOfEmp', errorCount);
+            errorCount++;
+        }
+        else {
+            RemoveError("lblTypeOfEmp");
+        }
+
+        var name = document.getElementById("txtEmployeeName").value;
+        if (name == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Employee Name" + "</li>";
+            AddError("txtEmployeeName", '', errorCount);
+            errorCount++;
+        }
+        else {
+            RemoveError("txtEmployeeName");
+        }
+
+        var costCenterNumlen = $("#txtCostcenterCode").val().length;
+        if (costCenterNumlen == 0 || costCenterNumlen < 0) {
+            errors += "<li id='error" + errorCount + "'>" + "Cost Center Code" + "</li>";
+            AddError("txtCostcenterCode", '', errorCount);
+            errorCount++;
+        }
+        else {
+            RemoveError("txtCostcenterCode");
+        }
+
+        var employeeCodelen = $("#txtEmployeeCode").val().length;
+        if (employeeCodelen == 0 || employeeCodelen < 0) {
+            errors += "<li id='error" + errorCount + "'>" + "Employee Code" + "</li>";
+            AddError("txtEmployeeCode", '', errorCount);
+            errorCount++;
+        }
+        else {
+            RemoveError("txtEmployeeCode");
+        }
+
+        var userId = document.getElementById("txtUserId").value;
+        if (userId == "") {
+            errors += "<li id='error" + errorCount + "'>" + "User Id" + "</li>";
+            AddError("txtUserId", '', errorCount);
+            errorCount++;
+        }
+        else {
+            RemoveError("txtUserId");
+        }
+
+        var department = document.getElementById("txtDepartment").value;
+        if (department == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Department" + "</li>";
+            AddError("txtDepartment", '', errorCount);
+        }
+        else {
+            RemoveError("txtDepartment");
+        }
+
+        var designation = $("#ddEmpDesignation option:selected").val();
+        if (designation == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Designation" + "</li>";
+            AddError("ddEmpDesignation", '', errorCount);
+            errorCount++;
+        }
+        else {
+            RemoveError("ddEmpDesignation");
+        }
+
+        var location = $("#ddEmpLocation option:selected").val();
+        if (location == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Location " + "</li>";
+            AddError("ddEmpLocation", '', errorCount);
+            errorCount++;
+        }
+        else {
+            RemoveError("ddEmpLocation");
+        }
+
+        var requestSubmissionFor = $("#drpRequestSubmissionFor option:selected").val();
+        console.log(requestSubmissionFor);
+        if (requestSubmissionFor == "") {
+            errors += "<li id='error" + errorCount + "'>" + "Request Submission Type" + "</li>";
+            AddError("drpRequestSubmissionFor", '', errorCount);
+            errorCount++;
+        }
+        else {
+            RemoveError("drpRequestSubmissionFor");
+        }
+    }
+
+</script>

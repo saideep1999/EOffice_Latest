@@ -1,0 +1,1585 @@
+﻿
+@{
+    ViewBag.Title = "SAPUserIdCreationForm";
+    int FormId = 0, AppRowId = 0, ApprovalType = 0;
+    int FormSrId = 0;
+    bool IsNewMode = true, IsEditMode = false, IsViewMode = false;
+    var currentUser = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    List<Skoda_DCMS.Models.ApprovalDataModel> appList = new List<Skoda_DCMS.Models.ApprovalDataModel>();
+    string disabled = "";
+    Skoda_DCMS.Models.SAPUserIdCreationModel SUCF = null;
+    int? tableCount = 0;
+    if (ViewBag != null && !ViewBag.IsNewMode)
+    {
+        IsNewMode = ViewBag.IsNewMode;
+        IsEditMode = ViewBag.IsEditMode;
+        IsViewMode = ViewBag.IsViewMode;
+        disabled = IsViewMode ? "disabled" : "";
+        SUCF = ViewBag.Model.one[0] as Skoda_DCMS.Models.SAPUserIdCreationModel;
+        tableCount = SUCF?.UserData?.Count();
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        appList = ViewBag.Model?.three as List<Skoda_DCMS.Models.ApprovalDataModel>;
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+        if (IsViewMode)
+        {
+            var Ap = appList?.Where(x =>
+                x.ApproverUserName.ToLower() == currentUser.UserName.ToLower()
+                && x.ApproverStatus.ToLower() == "pending"
+            ).FirstOrDefault();
+        }
+    }
+}
+
+<style>
+    .showBorder {
+        border: 1px solid #dee2e6;
+    }
+    .f-600 {
+        font-weight: 400 !important;
+        /*color: #A9A9A9 !important;*/
+    }
+    .new-radio {
+        margin-top: 8px;
+    }
+    .exisiting-radio {
+
+        margin-left: 0px;
+    }
+
+    .textTrans {
+        width: 100%;
+        max-width: 100%;
+        margin-right: 0px;
+        border: 1px solid !important;
+    }
+    .form-row {
+        display: -ms-flexbox;
+        display: block;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+        margin-right: -5px;
+        margin-left: -5px;
+    }
+    .empDetailsBg {
+        background-color: #fffbef;
+    }
+        /*.empDetailsBg .spanUpperSide {
+            background-color: #fffbef !important;
+        }*/
+    #accordion select {
+        width: 100% !important;
+        height: 45px;
+        background-color: #fff;
+        border: 1px solid #BFBFBF;
+        box-sizing: border-box;
+        border-radius: 5px;
+        background-image: url(data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>);
+        background-repeat: no-repeat;
+        background-position: right .75rem center;
+        background-size: 16px 12px;
+    }
+    #accordion input[type='text'] {
+        width: 100% !important;
+        height: 45px;
+        background-color: #fff;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px;
+        padding-left: 7px !important;
+    }
+    #accordion input[type='date'] {
+        width: 100% !important;
+
+        height: 45px;
+        background-color: #fff;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px;
+        padding-left: 10px;
+    }
+    #accordion label {
+        font-size: 16px;
+        line-height: 22px;
+        font-weight: 600;
+        color: #201F1F;
+    }
+    #accordion table tr td {
+        border: none;
+        font-size: 16px;
+        line-height: 19px;
+        color: #201F1F;
+    }
+    #accordion label {
+        display: block;
+    }
+    #accordion .card-header {
+        background: rgb(4 59 100) !important;
+        border-radius: 5px 5px 0px 0px;
+        position: relative;
+        margin-bottom: 15px;
+    }
+        #accordion .card-header.collapsed h5:after {
+            content: '+';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+        #accordion .card-header h5:after {
+            content: '-';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+    #accordion h5 button {
+        font-size: 18px;
+        line-height: 22px;
+        /* identical to box height */
+        padding-left: 0px;
+        display: flex;
+        align-items: center;
+        text-transform: uppercase;
+        /* Text_white */
+        color: #FFFFFF;
+    }
+        #accordion h5 button:focus {
+            box-shadow: none;
+        }
+    .empDetailsFields label {
+        display: block !important;
+        margin-bottom: 0px;
+    }
+    .empDetailsFields .row label {
+        display: block;
+        margin-bottom: 0px;
+    }
+        .empDetailsFields .row label:nth-child(1) {
+            font-style: normal;
+            font-weight: normal !important;
+            font-size: 12px;
+            line-height: 18px;
+            color: #A9A9A9 !important;
+        }
+        .empDetailsFields .row label:nth-child(2) {
+            font-style: normal;
+            font-weight: normal;
+            font-size: 18px;
+            line-height: 22px;
+            color: #201F1F;
+        }
+    .firstLastName {
+        font-style: normal;
+        font-weight: normal;
+        font-size: 20px;
+        line-height: 24px;
+        /* identical to box height */
+        display: flex;
+        align-items: center;
+        color: #201F1F;
+    }
+    .submit-btn {
+        background: #3D3D3D;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #FFFFFF;
+        border-color: transparent !important;
+    }
+    .cancl-btn {
+        background: #FAE99B;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        border-color: transparent !important;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #212221;
+        margin-left: 10px;
+    }
+
+
+    .card-footer {
+        display: flex;
+        background-color: transparent !important;
+        /*padding-left: 11.4%;*/
+        border: none !important;
+        margin-bottom: 20px;
+    }
+    .photo-form {
+        width: 100%;
+    }
+    .approvalTracking table th {
+        font-family: SKODA Next;
+        font-style: normal;
+        font-weight: 600;
+        font-size: 16px;
+        line-height: 19px;
+        color: #201F1F;
+        padding: .75rem 0 !important;
+    }
+    .approvalTracking table tr td {
+        font-family: SKODA Next;
+        font-style: normal;
+        font-weight: 600;
+        font-size: 14px !important;
+        line-height: 19px;
+        color: #201F1F;
+        padding: .75rem 0 !important;
+    }
+    .actionTab textarea {
+        width: 100% !important;
+        max-width: 98.7%;
+        height: 45px;
+        background: #F8F8F8;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px;
+        padding-left: 10px;
+    }
+    .table-middle tr td, .table-middle tr th {
+        text-align: center !important;
+    }
+@*    .per-checkbox {
+        padding-left: 4.8% !important;
+    }*@
+    .astColor {
+        color: red;
+    }
+    #OtherEmpName #txtOtherEmpname {
+        border-radius: 0;
+        height: 20%;
+        font-size: 12px;
+    }
+    .ui-front {
+        z-index: 9999999 !important;
+    }
+    .actionTypeWidth {
+        width:16.4%;
+    }
+    .tempWidth {
+        width: 20% !important;
+    }
+    .ownerOfAcc {
+        width: 16%;
+    }
+    /*Animation CSS Starts*/
+    div.input-block {
+        position: relative;
+    }
+        div.input-block input {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 188px;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+        div.input-block textarea {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 100%;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            background-color: #fff;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+        div.input-block span.placeholder {
+            position: absolute;
+            margin: 17px 0;
+            padding: 0 4px;
+            font-family: Roboto, sans-serif;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            top: -6px;
+            left: 15px;
+            transition: all 0.2s;
+            transform-origin: 0% 0%;
+            background: none;
+            pointer-events: none;
+            z-index: 1;
+        }
+        div.input-block textarea:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px) !important;
+            background-color: #fff !important;
+        }
+        div.input-block textarea:valid + span.placeholder,
+        div.input-block textarea:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px) !important;
+            background: #fff !important;
+        }
+        div.input-block input:valid + span.placeholder,
+        div.input-block input:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: rgb(219,238,213);
+        }
+        div.input-block input.spanUpperSide + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: rgb(219,238,213);
+        }
+        div.input-block textarea.spanUpperSide + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: rgb(219,238,213);
+        }
+        div.input-block input:read-only + span.placeholder,
+        div.input-block input:read-only + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background: rgb(219,238,213);
+        }
+    div.inputSelect span.placeholder {
+        position: absolute;
+        margin: 17px 0;
+        padding: 0 4px;
+        font-family: Roboto, sans-serif;
+        color: #000;
+        display: flex;
+        align-items: center;
+        font-size: 1rem;
+        top: -6px;
+        left: 15px;
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+        background: none;
+        pointer-events: none;
+        z-index: 1;
+    }
+    div.inputSelect select:focus + span.placeholder
+   {
+        transform: scale(0.8) translateY(-25px);
+        background: rgb(219,238,213);
+        z-index: 9;
+    }
+    div.inputSelect select:not([value=""]):valid + span.placeholder {
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+    }
+    div.input-block input:focus + span.placeholder {
+        color: #284B63;
+    }
+    .breadcrumb {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+        padding: 1rem 1rem 0;
+        margin-bottom: 0;
+        list-style: none;
+        background-color: #FFFFFF;
+        border-radius: .25rem;
+    }
+    body.nav-sm .container.body .left_col {
+        width: 63px;
+        padding: 0;
+        position: fixed;
+        height: 100%;
+        z-index: 8;
+    }
+    .card {
+        position: relative;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        min-width: 0;
+        word-wrap: break-word;
+        background-color: #fff;
+        background-clip: border-box;
+        border: 0px;
+        border-radius: .25rem;
+    }
+    .dropdown-toggle::after {
+        display: none;
+        width: 0;
+        height: 0;
+        margin-left: .255em;
+        vertical-align: .255em;
+        content: "";
+        border-top: .3em solid;
+        border-right: .3em solid transparent;
+        border-bottom: 0;
+        border-left: .3em solid transparent;
+    }
+    input.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213);
+    }
+    inputSelect.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213) !important;
+    }
+    select.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background-color: rgb(219,238,213);
+        z-index: 9;
+    }
+    .empDetailsBg select.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213) !important;
+    }
+
+    textarea.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+    @@media only screen and (min-width: 992px) {
+        div.input-block span.placeholder {
+            font-size: 15px;
+        }
+        div.inputSelect span.placeholder {
+            font-size: 15px;
+        }
+    }
+    .TransView {
+        background-color: rgb(255,255,255) !important;
+    }
+    #accordion table.tblBorders tr td {
+        border: 1px solid #dee2e6 !important;
+    }
+    .sNo {
+        text-align: center !important;
+    }
+    .w18 {
+        width: 18.3%;
+    }
+    .ml06rem {
+        margin-left:1.8rem;
+    }
+    .w16 {
+        width: 16.8%;
+    }
+    .ml06remEdit {
+        margin-left: 0.4rem;
+    }
+    ::ng-deep .width116 {
+        width: 125px !important;
+    }
+
+    .h45TextArea {
+        height: 45px !important;
+    }
+    .text_module_text {
+        background:#fff !important;
+    }
+</style>
+
+
+@*Loader*@
+<div class="container">
+
+    <form action="/SAPUserIdCreation/SaveSACF" id="SUCFForm" method="post">
+        <div class="main_container">
+
+            <div class="right_col bg-transparent" role="main">
+
+                <div class="">
+                    <div class="breadcrumb-container height-space">
+                        <div>
+                            @if (IsEditMode || IsViewMode)
+                            {
+                                <div>
+                                    @*<input type="hidden" id="FormSrId" name="FormSrId" value="@(SUCF.Id)" />*@
+                                    <input type="hidden" id="FormId" name="FormId" value="@(FormId)" />
+                                    <input type="hidden" id="AppRowId" name="AppRowId" value="@(AppRowId)" />
+                                </div>
+                            }
+                            <ol class="breadcrumb">
+                                <li>
+                                    <a href="/Dashboard?formName=SUCF">
+                                        Dashboard
+                                    </a>
+                                </li>
+                                <li>
+                                    SAP User Id Creation Form
+                                </li>
+
+                            </ol>
+                        </div>
+                    </div>
+                    <div class="row breadcrumb-container table-bordered  mr-1 ml-1" style="background-color: rgb(219,238,213) !important; ">
+                        <div class="col-md-2 col-lg-2">
+                            <span class="placeholder">Date : @(IsViewMode || IsEditMode ? (Convert.ToDateTime(appList.FirstOrDefault().FormId.CreatedDate).ToShortDateString()) : DateTime.Now.ToShortDateString())</span>
+                        </div>
+                        <div class="col-md-8 col-lg-8 mt-2 mb-1 form-heading" style="text-align:center; margin-top:5px">
+                            <span> SAP User Id Creation Form</span>
+                        </div>
+                        <div class="col-md-2 col-lg-2">
+                            @if (IsViewMode || IsEditMode)
+                            {
+                                <span class="placeholder"> Form Id : @(IsViewMode || IsEditMode ? ("SUCF" + FormId ?? "") : "" )</span>
+                            }
+                        </div>
+                    </div>
+
+                </div>
+                <div class="heading d-none" id="headingErr">
+                    <h1 id="" class="info-header">Following fields are mandatory. Please fill in information for<br /></h1>
+                    <div id="add_to_me" class="header-list" style="color:red;"></div>
+                </div>
+
+                @* Submitter Section *@
+                @{
+                    Html.RenderPartial("_OldStructureSubmitterDetailsWithModel", (ViewBag as object));
+                }
+
+                @* Applicant Section *@
+                @{
+                    Html.RenderPartial("_OldStructureApplicantDetailsWithModel", (ViewBag as object));
+                }
+
+                @* Transaction Section *@
+                <div id="accordion">
+                    <div class="card">
+                        <div class="card-header" id="headingThree" data-toggle="collapse" data-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                            <h5 class="mb-0">
+                                <button type="button" class="btn btn-link" data-toggle="collapse" data-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                                    <img src="~/assets/img/transactionIcon.svg" width="24" height="24" class="mr-2">Transaction Fields
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseThree" class="collapse show" aria-labelledby="headingThree" data-parent="#accordion" style="">
+                            <div class="card-body">
+                                <div class="form-row">
+                                    <div class="" id="lblSoftware">
+                                        <label id="lblAccessDoorDet" class=""><b>To be filled for user id creation</b><span class="astColor">*</span></label>
+                                    </div>
+                                    <table class="mainTbl table table-border form-table-container-2">
+                                        <tbody>
+                                            <tr>
+                                                <td class="bt-0 bb-0 pl-0">
+                                                    <table class="w-100 mx-auto table table-border form-border text-center">
+
+                                                        <thead class="form-head-1" style="margin-left:inherit !important;">
+                                                            <tr>
+                                                                <th>Sr. No.</th>
+                                                                <th style="width:116px;">System</th>
+                                                                <th style="width:116px;">Client</th>
+                                                                <th style="width: 144px;">Type of user id</th>
+                                                                <th>Reason/Details/Justification</th>
+                                                                <th style="width: 90px;">Module</th>
+                                                                <th style="width: 90px;" class="module_desc">Module Desc.</th>
+                                                                <th>Sub-Module</th>
+                                                                <th style="width: 130px;">Request type</th>
+                                                                <th class="temp_from">Temp-From</th>
+                                                                <th class="temp_to">Temp-To</th>
+                                                                <th></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody class="form-border tableLocation" id="locationBody">
+                                                            <tr id="row_clone" class="d-none">
+                                                                <td class="sNo text-center">0</td>
+                                                                <td class="text-center">
+                                                                    <input type="text" name="System" class="form-control width116" value="" id="System_0">
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <input type="text" name="Client" class="form-control width116" value="" id="Client_0">
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <select class="inpDoorNameValidate type_user_id" name="Type" id="Type_0">
+                                                                        <option style="display: none;" value=""></option>
+                                                                        <option value="New">New</option>
+                                                                        <option value="Replacement">Replacement</option>
+                                                                        <option value="Reactivation">Reactivation</option>
+                                                                    </select>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <textarea name="Reason" class="form-control h45TextArea" id="Reason_0"></textarea>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <select class="inpDoorNameValidate module" name="Module" id="Module_0" multiple="multiple">
+                                                                        @*<option style="display: none;" value=""></option>*@
+                                                                        <option value="MM">MM</option>
+                                                                        <option value="WM">WM</option>
+                                                                        <option value="FI">FI</option>
+                                                                        <option value="CO">CO</option>
+                                                                        <option value="HR">HR</option>
+                                                                        <option value="PM">PM</option>
+                                                                        <option value="SD">SD</option>
+                                                                        <option value="PP">PP</option>
+                                                                        <option value="QM">QM</option>
+                                                                        <option value="Others">Others</option>
+                                                                    </select>
+                                                                </td>
+                                                                <td class="module_desc">
+                                                                    <textarea name="ModuleDescription" id="ModuleDescription_0" class="text_module_text h45TextArea"></textarea>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <input type="text" name="SubModule" id="SubModule_0" class="form-control">
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <select class="inpDoorNameValidate requestType" name="RequestType" id="RequestType_0">
+                                                                        <option style="display: none;" value=""></option>
+                                                                        <option value="Permanent">Permanent</option>
+                                                                        <option value="Temporary">Temporary</option>
+                                                                    </select>
+                                                                </td>
+                                                                <td class="text-center temp_from">
+                                                                    <input type="date" name="TempFrom" class="temp_from_input" id="TempFrom_0">
+                                                                </td>
+                                                                <td class="text-center temp_to">
+                                                                    <input type="date" name="TempTo" class="temp_to_input" id="TempTo_0">
+                                                                </td>
+                                                                <td class="text-center" style="background-color:white; max-width:123px; vertical-align:central;">
+                                                                    <input class="remove-btn remove align-center" type="image"
+                                                                           src="~/assets/img/remove.png" alt="Remove"
+                                                                           id="remove_0"
+                                                                           style="max-width: 85%; background-color: white; border:none;">
+                                                                </td>
+                                                            </tr>
+                                                            @{
+                                                                int id = 1;
+                                                            }
+                                                            @if (SUCF != null && SUCF.UserData != null && SUCF.UserData.Count > 0)
+                                                            {
+                                                                foreach (var item in SUCF.UserData)
+                                                                {
+                                                                    <tr id="row@(id)" class="tr_input">
+                                                                        <td class="sNo text-center">@(id)</td>
+                                                                        <td class="text-center">
+                                                                            <input type="text" name="System" class="form-control width116" value="@(item.System)" id="System_@(id)" @(disabled)>
+                                                                        </td>
+                                                                        <td class="text-center">
+                                                                            <input type="text" name="Client" class="form-control width116" value="@(item.Client)" id="Client_@(id)" @(disabled)>
+                                                                        </td>
+                                                                        <td class="text-center">
+                                                                            <select class="inpDoorNameValidate type_user_id" name="Type" id="Type_@(id)" @(disabled)>
+                                                                                <option style="display: none;" value=""></option>
+                                                                                <option value="New">New</option>
+                                                                                <option value="Replacement">Replacement</option>
+                                                                                <option value="Reactivation">Reactivation</option>
+                                                                            </select>
+                                                                        </td>
+                                                                        <td class="text-center">
+                                                                            <textarea name="Reason" class="form-control h45TextArea" id="Reason_@(id)" @(disabled)>@(item.Reason)</textarea>
+                                                                        </td>
+                                                                        <td class="text-center">
+                                                                            <select class="inpDoorNameValidate module" name="Module" id="Module_@(id)" multiple="multiple" @(disabled)>
+                                                                                <option value="MM">MM</option>
+                                                                                <option value="WM">WM</option>
+                                                                                <option value="FI">FI</option>
+                                                                                <option value="CO">CO</option>
+                                                                                <option value="HR">HR</option>
+                                                                                <option value="PM">PM</option>
+                                                                                <option value="SD">SD</option>
+                                                                                <option value="PP">PP</option>
+                                                                                <option value="QM">QM</option>
+                                                                                <option value="Others">Others</option>
+                                                                            </select>
+                                                                        </td>
+                                                                        <td class="module_desc">
+                                                                            <textarea name="ModuleDescription" id="ModuleDescription_@(id)" class="text_module_text h45TextArea" @(disabled)>@(item.ModuleDescription)</textarea>
+                                                                        </td>
+                                                                        <td class="text-center">
+                                                                            <input type="text" name="SubModule" id="SubModule_@(id)" class="form-control" value="@(item.SubModule)" @(disabled)>
+                                                                        </td>
+                                                                        <td class="text-center">
+                                                                            <select class="inpDoorNameValidate requestType" name="RequestType" id="RequestType_@(id)" @(disabled)>
+                                                                                <option style="display: none;" value=""></option>
+                                                                                <option value="Permanent">Permanent</option>
+                                                                                <option value="Temporary">Temporary</option>
+                                                                            </select>
+                                                                        </td>
+                                                                        <td class="text-center temp_from">
+                                                                            <input type="date" name="TempFrom" class="temp_from_input" id="TempFrom_@(id)" @(disabled)
+                                                                                   value="@(item?.TempFrom?.ToString("yyyy-MM-dd"))">
+                                                                        </td>
+                                                                        <td class="text-center temp_to">
+                                                                            <input type="date" name="TempTo" class="temp_to_input" id="TempTo_@(id)" @(disabled)
+                                                                                   value="@(item?.TempTo?.ToString("yyyy-MM-dd"))">
+                                                                        </td>
+                                                                        <td class="text-center" style="background-color:white; max-width:123px; vertical-align:central;">
+                                                                            <input class="remove-btn remove align-center" type="image"
+                                                                                   src="~/assets/img/remove.png" alt="Remove"
+                                                                                   id="remove_@(id)"
+                                                                                   style="max-width: 85%; background-color: white; border:none;" @(disabled)>
+                                                                        </td>
+                                                                    </tr>
+                                                                    ++id;
+                                                                }
+                                                            }
+                                                            else
+                                                            {
+                                                                <tr id="row1" class="tr_input">
+                                                                    <td class="sNo text-center">1</td>
+                                                                    <td class="text-center">
+                                                                        <input type="text" name="System" class="form-control width116" value="" id="System_1">
+                                                                    </td>
+                                                                    <td class="text-center">
+                                                                        <input type="text" name="Client" class="form-control width116" value="" id="Client_1">
+                                                                    </td>
+                                                                    <td class="text-center">
+                                                                        <select class="inpDoorNameValidate type_user_id" name="Type" id="Type_1">
+                                                                            <option style="display: none;" value=""></option>
+                                                                            <option value="New">New</option>
+                                                                            <option value="Replacement">Replacement</option>
+                                                                            <option value="Reactivation">Reactivation</option>
+                                                                        </select>
+                                                                    </td>
+                                                                    <td class="text-center">
+                                                                        <textarea name="Reason" class="form-control h45TextArea" id="Reason_1"></textarea>
+                                                                    </td>
+                                                                    <td class="text-center">
+                                                                        <select class="inpDoorNameValidate module" name="Module" id="Module_1" multiple="multiple">
+                                                                            <option value="MM">MM</option>
+                                                                            <option value="WM">WM</option>
+                                                                            <option value="FI">FI</option>
+                                                                            <option value="CO">CO</option>
+                                                                            <option value="HR">HR</option>
+                                                                            <option value="PM">PM</option>
+                                                                            <option value="SD">SD</option>
+                                                                            <option value="PP">PP</option>
+                                                                            <option value="QM">QM</option>
+                                                                            <option value="Others">Others</option>
+                                                                        </select>
+                                                                    </td>
+                                                                    <td class="module_desc">
+                                                                        <textarea name="ModuleDescription" id="ModuleDescription_1" class="text_module_text h45TextArea"></textarea>
+                                                                    </td>
+                                                                    <td class="text-center">
+                                                                        <input type="text" name="SubModule" id="SubModule_1" class="form-control">
+                                                                    </td>
+                                                                    <td class="text-center">
+                                                                        <select class="inpDoorNameValidate requestType" name="RequestType" id="RequestType_1">
+                                                                            <option style="display: none;" value=""></option>
+                                                                            <option value="Permanent">Permanent</option>
+                                                                            <option value="Temporary">Temporary</option>
+                                                                        </select>
+                                                                    </td>
+                                                                    <td class="text-center temp_from">
+                                                                        <input type="date" name="TempFrom" class="temp_from_input" id="TempFrom_1">
+                                                                    </td>
+                                                                    <td class="text-center temp_to">
+                                                                        <input type="date" name="TempTo" class="temp_to_input" id="TempTo_1">
+                                                                    </td>
+                                                                    <td class="text-center" style="background-color:white; max-width:123px; vertical-align:central;">
+                                                                        <input class="remove-btn remove align-center" type="image"
+                                                                               src="~/assets/img/remove.png" alt="Remove"
+                                                                               id="remove_1"
+                                                                               style="max-width: 85%; background-color: white; border:none;">
+                                                                    </td>
+                                                                </tr>
+                                                            }
+                                                        </tbody>
+                                                    </table>
+                                                    <button type="button" class="btn btn-primary btn-sm submit-btn d-flex float-right mt-5" id="btn-AddRow" @(disabled)>Add</button>
+                                                    <input type="hidden" id="UserIdTableRowCount" value="@(IsNewMode ? id : --id)" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="6" class="allFormLables borderLTB">
+                                                    <div class="input-block">
+                                                        <textarea class="textTrans" cols="90" rows="3" name="BusinessNeed" id="BusinessNeed" maxlength="500" required @(disabled)>@(SUCF?.BusinessNeed)</textarea>
+                                                        <span class="placeholder placeholder_white">Business Function & Responsibility (Max. 500)<span class="astColor">*</span></span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                @*<div class="form-row">
+                                    <div class="form-group col-md-12 col-12 input-block">
+                                        <table class="w-100">
+                                            <tbody>
+                                                <tr>
+                                                    <td colspan="6" class="allFormLables borderLTB">
+                                                        <div class="input-block">
+                                                            <textarea class="textTrans" cols="90" rows="3" name="BusinessNeed" id="BusinessNeed" maxlength="500" required @(disabled)>@(SUCF?.BusinessNeed)</textarea>
+                                                            <span class="placeholder">Business Function & Responsibility (Max. 500)<span class="astColor">*</span></span>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="6" class="allFormLables borderLTB">
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>*@
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    @*<div class="card-footer align-content-center">
+                            <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                                Submit
+                            </button>
+                            <button type="reset" class="btn btn-danger btn-sm cancl-btn" id="btnCancel">
+                                Cancel
+                            </button>
+                        </div>*@
+                </div>
+
+                @* Approval Section And Action Section *@
+                @if (IsViewMode || IsEditMode)
+                {
+                    //Approval Section
+                    <div id="accordion">
+                        <div class="card">
+                            <div class="card-header collapsed" id="headingFour" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                                <h5 class="mb-0">
+                                    <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                                        <img src="~/assets/img/approvalTracking.svg" width="24" height="24" class="mr-2" />Approval Tracking
+                                    </button>
+                                </h5>
+                            </div>
+                            <div id="collapseFour" class="collapse" aria-labelledby="headingFour">
+                                <div class="card-body">
+                                    <div class="form-row">
+                                        <div class="col-12">
+                                            <table class="table w-100 td-border showBorder">
+                                                <thead>
+                                                    <tr>
+                                                        @*<th>Sr. No.</th>*@
+                                                        <th>Name</th>
+                                                        <th>Role</th>
+                                                        <th style="display: @(appList.Any(x => !string.IsNullOrEmpty(x.ExtraDetails)) ? "" : "none")">Content</th>
+                                                        <th>Processed on</th>
+                                                        <th>Status</th>
+                                                        <th class="text-center">Comments</th>
+                                                        <th class="text-center">Approval Level</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @if (IsViewMode || IsEditMode)
+                                                    {
+                                                        Html.RenderPartial("_ApprovalTracking", appList);
+                                                    }
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                }
+
+                @* Buttons *@
+                @if (IsNewMode)
+                {
+                    <div>
+                        <p class="text-left f-600">SF_SO/1_018.00</p>
+                    </div>
+                    <div class="card-footer align-content-center">
+                        <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                            Submit
+                        </button>
+                        <button type="reset" class="btn btn-danger btn-sm cancl-btn" id="btnCancel">
+                            Cancel
+                        </button>
+                    </div>
+                }
+                else if (IsEditMode)
+                {
+                    <div class="card-footer align-content-center">
+                        <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                            Re-Submit
+                        </button>
+                        <button type="reset" class="btn btn-danger btn-sm cancl-btn" id="btnCancel">
+                            Cancel
+                        </button>
+                    </div>
+                }
+            </div>
+        </div>
+    </form>
+</div>
+
+@{
+    Html.RenderPartial("_SuccessModel", (ViewBag as object));
+}
+
+
+
+<script>
+    var spinner = $('#loader');
+    var IsNewMode = @Html.Raw(Json.Encode(IsNewMode));
+    var IsEditMode = @Html.Raw(Json.Encode(IsEditMode));
+    var IsViewMode = @Html.Raw(Json.Encode(IsViewMode));
+    var SUCF = @Html.Raw(Json.Encode(SUCF));
+    var appRowId = @Html.Raw(Json.Encode(AppRowId));
+    var formID = @Html.Raw(Json.Encode(FormId));
+    var approvalType =@Html.Raw(Json.Encode(ApprovalType));
+    var $tr = $('#row_clone');
+    pageLoad();
+    var errorCount = 0;
+    var errors = "";
+
+    $(document).ready(function () {
+        /*for user id*/
+        var type_user_id = document.querySelectorAll(".type_user_id");
+        var values = [];
+
+        for (var i = 0; i < type_user_id.length; i++) {
+            values.push(type_user_id[i]['value']);
+        };
+
+        //if (values.includes("Replacement") || values.includes("Reactivation")) {
+        //    $(".reason_for_replacement").removeClass('hide');
+        //    $(".type_user_id").each(function (index) {
+        //        if ($(this).val() == 'New') {
+        //            $(this).parent().parent().find('.txt_replacement').attr('disabled', 'disabled');
+        //        }
+        //        else {
+        //            $(this).parent().parent().find('.txt_replacement').removeAttr('disabled', 'disabled');
+        //        }
+        //    });
+        //}
+        //else {
+        //    $(".reason_for_replacement").addClass('hide');
+        //}
+
+        //$(".type_user_id").change(function () {
+        //    var type_user_id2 = document.querySelectorAll(".type_user_id");
+        //    var values2 = [];
+
+        //    for (var i = 0; i < type_user_id2.length; i++) {
+        //        values2.push(type_user_id2[i]['value']);
+        //    };
+
+        //    if (values2.includes("Replacement") || values2.includes("Reactivation")) {
+        //        //$(".reason_for_replacement").removeClass('hide');
+        //        $(".type_user_id").each(function (index) {
+        //            if ($(this).val() == 'New') {
+        //                $(this).parent().parent().find('.txt_replacement').attr('disabled', 'disabled');
+        //            }
+        //            else {
+        //                $(this).parent().parent().find('.txt_replacement').removeAttr('disabled', 'disabled');
+        //            }
+        //        });
+        //    }
+        //    else {
+        //        $(".reason_for_replacement").addClass('hide');
+        //    }
+        //});
+
+        /* For Request Type*/
+        var request_type = document.querySelectorAll(".requestType");
+        var requestType_arr = [];
+
+        for (var i = 0; i < request_type.length; i++) {
+            requestType_arr.push(request_type[i]['value']);
+        };
+
+        if (requestType_arr.includes("Temporary")) {
+            $(".temp_from").removeClass('d-none');
+            $(".temp_to").removeClass('d-none');
+            $(".requestType").each(function (index) {
+                if ($(this).val() == 'Permanent') {
+                    $(this).parent().parent().find('.txt_replacement input').attr('disabled', 'disabled');
+                    $(this).parent().parent().find('.txt_replacement input').attr('disabled', 'disabled');
+                }
+                else {
+                    $(this).parent().parent().find('.temp_from_input').removeAttr('disabled', 'disabled');
+                    $(this).parent().parent().find('.temp_to_input').removeAttr('disabled', 'disabled');
+                }
+            });
+        }
+        else {
+            $(".temp_from").addClass('d-none');
+            $(".temp_to").addClass('d-none');
+        }
+
+
+
+        /* For Other Module*/
+
+        var module_name = document.querySelectorAll(".module");
+        var module = [];
+
+        for (var i = 0; i < module_name.length; i++) {
+            module.push(module_name[i]['value']);
+        };
+
+        if (module.includes("Others")) {
+            $(".module_desc").removeClass('d-none');
+            $(".module").each(function (index) {
+                if ($(this).val() == 'Others') {
+                    $(this).parent().parent().find('.text_module_text').attr('disabled', 'disabled');
+                }
+                else {
+                    $(this).parent().parent().find('.text_module_text').removeAttr('disabled', 'disabled');
+                }
+            });
+        }
+        else {
+            $(".module_desc").addClass('d-none');
+        }
+
+        AddTableElementsEvent();
+
+        if (IsNewMode) {
+            //$('#Module_1').multiselect();
+            $('#Module_1').multiselect({
+                onChange: function (option, checked) {
+                    var rowid = 1;
+                    multiselectEvent(option, checked, rowid);
+                    //var count = $('#UserIdTableRowCount').val();
+                    //if (checked && option[0].value === "Others") {
+                    //    $(".module_desc").removeClass('d-none');
+                    //    $('#ModuleDescription_' + rowid).removeAttr('disabled');
+                    //}
+                    //else if (!checked && option[0].value === "Others") {
+                    //    var flag = false;
+                    //    for (let j = 1; j <= parseInt(count); j++) {
+                    //        var dataArr = $('#Module_' + j + " option:selected");
+                    //        for (let k = 0; k < dataArr.length; k++) {
+                    //            console.log($(dataArr[k]).val());
+                    //            if ($(dataArr[k]).val() === "Others") {
+                    //                flag = true;
+                    //                console.log(flag);
+                    //                break;
+                    //            }
+                    //        }
+                    //    }
+                    //    if (!flag) {
+                    //        $(".module_desc").addClass('d-none');
+                    //    }
+                    //    $('#ModuleDescription_' + rowid).attr('disabled', 'disabled');
+                    //}
+                }
+            });
+        }
+        if (IsEditMode || IsViewMode) {
+            SUCF.UserData.forEach((x, i) => {
+                $('#Module_' + (i + 1)).multiselect({
+                    onChange: function (option, checked) {
+                        var rowid = (i + 1);
+                        multiselectEvent(option, checked, rowid);
+                        //var count = $('#UserIdTableRowCount').val();
+                        //if (checked && option[0].value === "Others") {
+                        //    $(".module_desc").removeClass('d-none');
+                        //    $('#ModuleDescription_' + rowid).removeAttr('disabled');
+                        //}
+                        //else if (!checked && option[0].value === "Others") {
+                        //    var flag = false;
+                        //    for (let j = 1; j <= parseInt(count); j++) {
+                        //        var dataArr = $('#Module_' + j + " option:selected");
+                        //        for (let k = 0; k < dataArr.length; k++) {
+                        //            console.log($(dataArr[k]).val());
+                        //            if ($(dataArr[k]).val() === "Others") {
+                        //                flag = true;
+                        //                console.log(flag);
+                        //                break;
+                        //            }
+                        //        }
+                        //    }
+                        //    if (!flag) {
+                        //        $(".module_desc").addClass('d-none');
+                        //    }
+                        //    $('#ModuleDescription_' + rowid).attr('disabled', 'disabled');
+                        //}
+                    }
+                });
+                $("#Type_" + (i + 1) + " option[value='" + x.Type + "']").prop('selected', 'selected').change();
+                var strArr = x.Module?.split(",");
+                $('#Module_' + (i + 1)).multiselect('select', strArr);
+                if (strArr && strArr.length > 0) {
+                    var flag = false;
+                    strArr.forEach(x => {
+                        if (x === "Others")
+                            flag = true;
+                    })
+                    if (flag) {
+                        $(".module_desc").removeClass('d-none');
+                        $('#ModuleDescription_' + (i + 1)).removeAttr('disabled');
+                    }
+                    else {
+                        $('#ModuleDescription_' + (i + 1)).attr('disabled', 'disabled');
+                    }
+                }
+                if (IsViewMode) {
+                    $('#Module_' + (i + 1)).multiselect('disable');
+                    $('#ModuleDescription_' + (i + 1)).attr('disabled', 'disabled');
+                }
+                $("#RequestType_" + (i + 1) + " option[value='" + x.RequestType + "']").prop('selected', 'selected').change();
+            });
+        }
+        //$('.chosen-module').chosen();
+        //$('.listbox_1').multiselect({
+        //    includeSelectAllOption: true
+        //});
+        //$('#Module_0').multiselect();
+        $('#txtOtherNewUserId').next().append('<span class="astColor">*</span>');
+        $('#txtOtherNewEmailId').next().append('<span class="astColor">*</span>');
+        if (IsViewMode) {
+            $('.temp_from_input').attr('disabled', 'disabled');
+            $('.temp_to_input').attr('disabled', 'disabled');
+        }
+    })
+
+    function multiselectEvent(option, checked, row) {
+        var rowid = row;;
+        var count = $('#UserIdTableRowCount').val();
+        if (checked && option[0].value === "Others") {
+            $(".module_desc").removeClass('d-none');
+            $('#ModuleDescription_' + rowid).removeAttr('disabled');
+        }
+        else if (!checked && option[0].value === "Others") {
+            var flag = false;
+            for (let j = 1; j <= parseInt(count); j++) {
+                var dataArr = $('#Module_' + j + " option:selected");
+                for (let k = 0; k < dataArr.length; k++) {
+                    if ($(dataArr[k]).val() === "Others") {
+                        flag = true;
+                        console.log(flag);
+                        break;
+                    }
+                }
+            }
+            if (!flag) {
+                $(".module_desc").addClass('d-none');
+            }
+            $('#ModuleDescription_' + rowid).attr('disabled', 'disabled');
+        }
+    }
+
+    function AddTableElementsEvent() {
+        $(".requestType").off('change');
+        $(".module").off('change');
+
+        $(".requestType").change(function () {
+            var requestType2 = document.querySelectorAll(".requestType");
+            var requestType_arr2 = [];
+
+            for (var i = 0; i < requestType2.length; i++) {
+                requestType_arr2.push(requestType2[i]['value']);
+            };
+
+            if (requestType_arr2.includes("Temporary")) {
+                $(".temp_from").removeClass('d-none');
+                $(".temp_to").removeClass('d-none');
+                $(".requestType").each(function (index) {
+                    if ($(this).val() == 'Permanent') {
+                        $(this).parent().parent().find('.temp_from_input').attr('disabled', 'disabled');
+                        $(this).parent().parent().find('.temp_to_input').attr('disabled', 'disabled');
+                    }
+                    else {
+                        $(this).parent().parent().find('.temp_from_input').removeAttr('disabled', 'disabled');
+                        $(this).parent().parent().find('.temp_to_input').removeAttr('disabled', 'disabled');
+                    }
+                });
+            }
+            else {
+                $(".temp_from").addClass('d-none');
+                $(".temp_to").addClass('d-none');
+            }
+        });
+
+        //$(".module").change(function () {
+        //    var module_name2 = document.querySelectorAll(".module");
+        //    var module2 = [];
+        //    console.log(module_name2);
+
+        //    for (var i = 0; i < module_name2.length; i++) {
+        //        module2.push(module_name2[i]['value']);
+        //    }
+        //    console.log(module2);
+
+        //    if (module2.includes("Others")) {
+        //        $(".module_desc").removeClass('d-none');
+        //        $(".module").each(function (index) {
+        //            if ($(this).val() == 'Others') {
+        //                $(this).parent().parent().find('.text_module_text').removeAttr('disabled', 'disabled');
+        //            }
+        //            else {
+        //                $(this).parent().parent().find('.text_module_text').attr('disabled', 'disabled');
+        //            }
+        //        });
+        //    }
+        //    else {
+        //        $(".module_desc").addClass('d-none');
+        //    }
+        //});
+    }
+
+    function pageLoad() {
+        //AddFocusEvent();
+        $("#headingErr").addClass('d-none');
+        var data = "";
+        if (IsViewMode) {
+            $(".inpDisable").attr("disabled", "disabled");
+            $(".drpDisable").attr("disabled", "disabled");
+        }
+        if (IsEditMode) {
+            $(".inpDisable").attr("disabled", "disabled");
+            //AddCheckBoxEvents();
+        }
+        if (IsNewMode) {
+            //AddCheckBoxEvents();
+        }
+    }
+
+    $('#locationBody').on('click', '.remove', function () {
+        var rows = parseInt($('#UserIdTableRowCount').val());
+        var id = $(this).attr('id');
+
+        var deleteRowNum = parseInt(id.split("_")[1]);
+        $('#row' + deleteRowNum).remove();
+        var index = deleteRowNum;
+        //Below code will normalise the row number and the ids of the input
+        $('#locationBody').children().each(function () {
+            var trId = $(this).attr('id');
+            var rowNum = parseInt(trId.replace("row", ""));
+            if (rowNum > deleteRowNum) {
+                var selector = "#" + trId + " input[type='text'], " + "#" + trId + " textarea, " + "#" + trId + " select, " + "#" + trId + " input[type='image']";
+                $(selector).each(function (i, x) {
+                    x.id = x.id.replace(/_.*/, "_" + index);
+                });
+                $("#" + trId).find('.sNo').html('' + index);
+                $(this).attr('id', 'row' + index);
+                index++;
+            }
+        });
+        --rows;
+        $('#UserIdTableRowCount').val(rows);
+    });
+
+    $('#btn-AddRow').click(() => {
+        var $clone = $tr.clone();
+        //Get the last inserted rowcount
+        var rows = parseInt($('#UserIdTableRowCount').val());
+        ++rows;
+        $clone.removeClass('d-none');
+        $clone.find('.sNo').html('' + rows);
+        $clone.find(':text, textarea, select, input[type="date"]').val('');
+        var newRowId = 'row' + rows;
+        $('#Module_' + rows).val('');
+        $($clone).prop('id', newRowId);
+        $('#locationBody').append($clone);
+        var selector = "#" + newRowId + " input[type='text'], " + "#" + newRowId + " textarea, " + "#" + newRowId + " select, " + "#" + newRowId + " input[type='image'], " + "#" + newRowId + " input[type='date']";
+        $(selector).each(function (i, x) {
+            x.id = x.id.replace(/_.*/, "_" + rows);
+            x.classList.remove("errorIcon");
+            x.classList.remove("errorIconDropDown");
+            x.classList.remove("errorIconTextarea");
+        });
+        $('#UserIdTableRowCount').val(rows);
+        AddTableElementsEvent();
+        $('#ModuleDescription_' + rows).attr('disabled', 'disabled');
+        //$('.listbox_' + rows).multiselect();
+        $("#Module_" + rows).multiselect({
+            onChange: function(option, checked) {
+                var rowid = rows;
+                multiselectEvent(option, checked, rowid);               
+            }
+        });
+    });
+
+    function multiselect_deselectAll($el) {
+        $('option', $el).each(function (element) {
+            $el.multiselect('deselect', $(this).val());
+        });
+    }
+
+    function date_val() {
+        var week_string = document.getElementsByName("txtTempFrom")[0].value;
+        var parts = week_string.split("-");
+        var date = new Date(parts[0], parts[1] - 1, parts[2]);
+        $("#txtTempTo").val('');
+        if (isValidDate(date)) {
+            var min_date = date;
+            min_date.setDate(min_date.getDate() + 1);
+            var initial_date = min_date.toISOString().split('T')[0];
+            document.getElementsByName("txtTempTo")[0].setAttribute("min", initial_date);
+        }
+    }
+
+    function isValidDate(d) {
+        return d instanceof Date && !isNaN(d);
+    }
+
+    $("#btnSubmit").on('click', function (e) {
+        
+        errors = "";
+        validateSubmitter();
+        validateApplicant();
+        var rows = parseInt($('#UserIdTableRowCount').val());
+
+        if ($('input:radio[value="Others"]').prop("checked")) {
+            var data = document.getElementById("txtOtherNewUserId").value;
+            if (!data) {
+                errors += "<li id='error" + errorCount + "'>" + "Applicant User Id " + "</li>";
+                AddError("txtOtherNewUserId", '', errorCount);
+                errorCount++;
+            }
+            else
+                RemoveError("txtOtherNewUserId");
+
+            var data = document.getElementById("txtOtherNewEmailId").value;
+            if (!data) {
+                errors += "<li id='error" + errorCount + "'>" + "Applicant Email-Id " + "</li>";
+                AddError("txtOtherNewEmailId", '', errorCount);
+                errorCount++;
+            }
+            else
+                RemoveError("txtOtherNewEmailId");
+        }
+
+        var set = new Set();
+        for (let i = 1; i <= rows; ++i) {
+            var tableContents = ['System_', 'Client_', 'Type_', 'Reason_', 'Module_', 'ModuleDescription_', 'SubModule_', 'RequestType_', 'TempFrom_', 'TempTo_'];
+            tableContents.forEach(x => {
+                if (x === 'System_') {
+                    var sys = $('#' + x + i).val();
+                    if (set.has(sys.toLowerCase())) {
+                        errors += "<li id='error" + errorCount + "'>Same " + (x.replace('_', '')) + " name cannot be used more than once </li>";
+                        AddError(x + i, '', errorCount);
+                        errorCount++;
+                    }
+                    else {
+                        set.add(sys.toLowerCase());
+                        RemoveError('row' + i + ' .multiselect');
+                    }
+                }
+                if ((x === 'TempFrom_' || x === 'TempTo_') && $('#RequestType_' + i + ' option:selected').val() !== 'Temporary') {
+                    return;
+                }
+                if (x === 'ModuleDescription_' && $('#Module_' + i + ' option:selected').val() !== 'Others') {
+                    return;
+                }
+                const isDropDown = x === "Type_" || x === "RequestType_";
+                const isModule = x === "Module_";
+                var data = $('#' + x + i + (isDropDown ? " option:selected" : "")).val();
+                if (isModule) {
+                    data = $('#' + x + i + " option:selected");
+                    if (data && data.length <= 0) {
+                        errors += "<li id='error" + errorCount + "'>" + (x.replace('_', '')) + " from row " + i + "</li>";
+                        AddError('row' + i + ' .multiselect', '', errorCount);
+                        errorCount++;
+                    }
+                    else
+                        RemoveError('row' + i + ' .multiselect');
+                    return;
+                }
+                if (!data) {
+                    errors += "<li id='error" + errorCount + "'>" + (x.replace('_', '')) + " from row " + i + "</li>";
+                    AddError(x + i, '', errorCount);
+                    errorCount++;
+                }
+            })
+        }
+
+        var data = document.getElementById("BusinessNeed").value;
+        if (!data) {
+            errors += "<li id='error" + errorCount + "'>" + "Business Need " + "</li>";
+            AddError("BusinessNeed", '', errorCount);
+            errorCount++;
+        }
+        else
+            RemoveError("BusinessNeed");
+
+        if (errors.length) {
+            errors = "<ol id='errorList'>" + errors + "</ol>";
+            $("#headingErr").removeClass('d-none');
+            document.getElementById("add_to_me").innerHTML = errors;
+            if (IsEditMode) {
+                $("#myModalRequest").scrollTop(0);
+            }
+            else {
+                $(window).scrollTop(0);
+            }
+            return false;
+        }
+
+        $("#headingErr").addClass('d-none');
+        document.getElementById("add_to_me").innerHTML = '';
+
+
+        $("#pageLoader").removeClass('invisible');
+        $("#btnSubmit").text('Saving');
+        $("#btnSubmit").prop("disabled", true);
+        $("#btnCancel").prop("disabled", true);
+
+        //Logic to convert formdata into Model
+        var serializedArray = $("#SUCFForm").serializeArray();
+        var form = {
+            UserData: []
+        };
+        var transData = {
+        };
+        var tableData = new Set(['System', 'Client', 'Type', 'Reason', 'Module', 'ModuleDescription', 'SubModule', 'RequestType', 'TempFrom', 'TempTo']);
+        serializedArray.forEach((x, index) => {
+            if (tableData.has(x.name)) {
+                if (x.name === "Module") {
+                    if (!transData[x.name])
+                        transData[x.name] = x.value;
+                    else
+                        transData[x.name] += "," + x.value;
+                    return;
+                }
+                transData[x.name] = x.value;
+                if (x.name === "RequestType" && x.value.toLowerCase() === "permanent") {//When request type is permanent that TempTo will be the last property
+                    form.UserData.push(transData);
+                    transData = {};
+                }
+                if (x.name === 'TempTo' && transData.RequestType?.toLowerCase() === "temporary") {//Assuming that TempTo will be the last property
+                    form.UserData.push(transData);
+                    transData = {};
+                }
+                return;
+            }
+            form[x.name] = x.value;
+        });
+        form['EmployeeName'] = $('#txtEmployeeName').val();
+        console.log(form)
+        $.ajax({
+            url: '/SAPUserIdCreation/SaveData',
+            type: 'POST',
+            data: form,
+            cache: false,
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data.Status == 200) {
+                    $("#pageLoader").addClass('invisible');
+                    if (IsNewMode) {
+                        $("#btnSubmit").text('Submit');
+                    }
+                    else {
+                        $("#btnSubmit").text('Re-Submit');
+                    }
+                    $("#btnSubmit").prop("disabled", false);
+                    $("#btnCancel").prop("disabled", false);
+                    successModal("SUCF" + data.Message);
+                }
+                else {
+                    failureModal(data.Message);
+                    if (IsNewMode) {
+                        $("#btnSubmit").text('Submit');
+                    }
+                    else {
+                        $("#btnSubmit").text('Re-Submit');
+                    }
+                    $("#pageLoader").addClass('invisible');
+                    $("#btnSubmit").prop("disabled", false);
+                    $("#btnCancel").prop("disabled", false);
+                }
+            }),
+            error: (function (data) {
+                failureModal(data.Message);
+                if (IsNewMode && IsEditMode) {
+                    $("#btnSubmit").text('Submit');
+                }
+                else {
+                    $("#btnSubmit").text('Re-Submit');
+                }
+                $("#pageLoader").addClass('invisible');
+                $("#btnSubmit").prop("disabled", false);
+                $("#btnCancel").prop("disabled", false);
+            })
+        })
+        $("#tab").val(2);
+    });
+
+    $("#btnCancel").on('click', function (e) {
+        $("#headingErr").addClass('d-none');
+        document.getElementById("add_to_me").innerHTML = '';
+        if ($('#myModalRequest').hasClass('show'))
+            $('#myModalRequest').modal('hide');
+        else
+            $('#myModalEdit').modal('hide');
+        if (IsNewMode) {
+            window.location = "../Dashboard";
+        }
+    });
+
+    function checkSelect(id) {
+        if ($('#' + id).val() != '') {
+            $('#' + id).addClass('spanUpperSide');
+        }
+    }
+
+    function saveResponse(text) {
+        var status = '', comment = '';
+        comment = $("#comment-" + text).val();
+        switch (text) {
+            case 'approve': {
+                status = 'Approved';
+                break;
+            }
+            case 'reject': {
+                status = 'Rejected';
+                if (comment == '') {
+                    validityModal(text);
+                    return;
+                }
+                break;
+            }
+            case 'enquire': {
+                status = 'Enquired';
+                if (comment == '') {
+                    validityModal(text);
+                    return;
+                }
+                break;
+            }
+        }
+        spinner.show();
+        $.ajax({
+            url: '/List/SaveResponse',
+            type: 'POST',
+            data: { response: status, appRowId: appRowId, comment: comment, approvalType: approvalType },
+            dataType: 'JSON',
+            success: (function (data) {
+                   if (data.Result == 1) {
+                //if (data.Status == 200) {
+                     successModal(text);
+                    //successModal(data.Message);
+                    setTimeout(FilterMyTasks, 5000)
+                    spinner.hide();
+                }
+                else {
+                    failureModal(data.Message);
+                   /* failureModal();*/
+                    spinner.hide();
+                }
+
+            }),
+            error: (function (data) {
+                failureModal(data.Message);
+                /*failureModal();*/
+                spinner.hide();
+            })
+        })
+        $("#tab").val(1);
+        return false;
+    }
+</script>

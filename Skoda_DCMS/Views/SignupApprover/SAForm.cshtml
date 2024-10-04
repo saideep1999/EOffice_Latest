@@ -1,0 +1,1863 @@
+﻿@model Skoda_DCMS.Models.SignupApproverModel
+@{
+    var currentUser = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    ViewBag.Title = "Signup Approver Form";
+    bool IsNewMode = true, IsEditMode = false, IsViewMode = false;
+    bool IsValidityCheck = true;
+    Skoda_DCMS.Models.SignupApproverModel SAF = null;
+    Skoda_DCMS.Models.GetUserDetailsModel user = null;
+    dynamic FlagRedirect = null;
+    Layout = ViewBag.Layout;
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+
+        IsNewMode = ViewBag.IsNewMode;
+        IsEditMode = ViewBag.IsEditMode;
+        IsViewMode = ViewBag.IsViewMode;
+        SAF = ViewBag.Model.one[0] as Skoda_DCMS.Models.SignupApproverModel;
+        user = ViewBag.Model.one[0] as Skoda_DCMS.Models.GetUserDetailsModel;
+    }
+
+    // int count = 0;
+}
+<style>
+    /*New design css start here*/
+    .astColor {
+        color: red;
+    }
+
+    .textTrans {
+        width: 100%;
+        max-width: 99%;
+        border-radius: 5px;
+        margin-right: 0px;
+        border: 1px solid !important;
+    }
+
+    .empDetailsBg {
+        background-color: #fffbef;
+    }
+
+    #accordion select {
+        color: #000;
+        width: 100% !important;
+        height: 45px;
+        background-color: #F8F8F8;
+        border: 1px solid #BFBFBF;
+        box-sizing: border-box;
+        border-radius: 5px;
+        background-image: url(data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>);
+        background-repeat: no-repeat;
+        background-position: right .75rem center;
+        background-size: 16px 12px;
+    }
+
+    #accordion input[type='text'] {
+        width: 100% !important;
+        max-width: 100%;
+        height: 45px;
+        background-color: #F8F8F8;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px !important;
+    }
+
+    #accordion input[type='date'] {
+        width: 100% !important;
+        max-width: 100%;
+        height: 45px;
+        background-color: #F8F8F8;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px;
+    }
+
+    #accordion input[type='time'] {
+        height: 45px;
+    }
+
+    #accordion label {
+        font-size: 16px;
+        line-height: 22px;
+        font-weight: 600;
+        color: #201F1F;
+    }
+
+    #accordion table tr td {
+        font-size: 16px;
+        line-height: 19px;
+        color: #201F1F;
+        background-color: white;
+    }
+
+    #accordion label {
+        display: block;
+    }
+
+    #accordion .card-header {
+        background: rgb(4 59 100) !important;
+        border-radius: 5px 5px 0px 0px;
+        position: relative;
+        margin-top: 15px;
+    }
+
+        #accordion .card-header.collapsed h5:after {
+            content: '+';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        #accordion .card-header h5:after {
+            content: '-';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+    #accordion h5 button {
+        font-size: 18px;
+        line-height: 22px;
+        /* identical to box height */
+        padding-left: 0px;
+        display: flex;
+        align-items: center;
+        text-transform: uppercase;
+        /* Text_white */
+
+        color: #FFFFFF;
+    }
+
+        #accordion h5 button:focus {
+            box-shadow: none;
+        }
+
+    .empDetailsFields label {
+        display: block !important;
+        margin-bottom: 0px;
+    }
+
+    .empDetailsFields .row label {
+        display: block;
+        margin-bottom: 0px;
+    }
+
+        .empDetailsFields .row label:nth-child(1) {
+            font-style: normal;
+            font-weight: normal !important;
+            font-size: 12px;
+            line-height: 18px;
+            color: #A9A9A9 !important;
+        }
+
+        .empDetailsFields .row label:nth-child(2) {
+            font-style: normal;
+            font-weight: normal;
+            font-size: 18px;
+            line-height: 22px;
+            color: #201F1F;
+        }
+
+    .firstLastName {
+        font-style: normal;
+        font-weight: normal;
+        font-size: 20px;
+        line-height: 24px;
+        /* identical to box height */
+
+        display: flex;
+        align-items: center;
+        color: #201F1F;
+    }
+
+    .submit-btn {
+        background: #3D3D3D;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #FFFFFF;
+        border-color: transparent !important;
+    }
+
+    .cancl-btn {
+        background: #FAE99B;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        border-color: transparent !important;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #212221;
+        margin-left: 10px;
+    }
+
+    .delete-btn {
+        background: #b92c28;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        border-color: transparent !important;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #212221;
+        margin-left: 10px;
+    }
+
+
+
+
+    .card-footer {
+        display: flex;
+        background-color: transparent !important;
+    }
+
+    .photo-form {
+        width: 100%;
+    }
+
+    .ui-front {
+        z-index: 9999999 !important;
+    }
+
+    /* NEW UI CSS END*/
+
+
+    .showBorder {
+        border: 1px solid #dee2e6;
+    }
+
+    .multiselect {
+        height: 47px;
+        margin-top: -1px;
+    }
+    /*Animation CSS Starts*/
+
+    div.input-block {
+        position: relative;
+    }
+
+        div.input-block input {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 188px;
+            padding: 8px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block textarea {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 100%;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            background-color: #fff;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block span.placeholder {
+            position: absolute;
+            margin: 12px 0;
+            padding: 0 4px;
+            font-family: Roboto, sans-serif;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            top: -6px;
+            left: 15px;
+            transition: all 0.2s;
+            transform-origin: 0% 0%;
+            background: none;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        div.input-block textarea:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: #fff !important;
+        }
+
+        div.input-block textarea:valid + span.placeholder,
+        div.input-block textarea:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px) !important;
+            background: #fff !important;
+        }
+
+        div.input-block input:valid + span.placeholder,
+        div.input-block input:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: rgb(219,238,213);
+        }
+
+
+        div.input-block input.spanUpperSide + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: rgb(219,238,213);
+        }
+
+        div.input-block input:read-only + span.placeholder,
+        div.input-block input:read-only + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background: rgb(219,238,213);
+        }
+
+
+    div.inputSelect span.placeholder {
+        position: absolute;
+        margin: 17px 0;
+        padding: 0 4px;
+        font-family: Roboto, sans-serif;
+        color: #000;
+        display: flex;
+        align-items: center;
+        font-size: 1rem;
+        top: -6px;
+        left: 15px;
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+        background: none;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    div.inputSelect select:focus + span.placeholder {
+        transform: scale(0.8) translateY(-30px);
+        background: rgb(219,238,213);
+        z-index: 9;
+    }
+
+    div.inputSelect select:not([value=""]):valid + span.placeholder {
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+    }
+
+
+
+    div.input-block input:focus + span.placeholder {
+        color: #284B63;
+    }
+
+    .breadcrumb {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+        padding: 1rem 1rem 0;
+        margin-bottom: 0;
+        list-style: none;
+        background-color: #FFFFFF;
+        border-radius: .25rem;
+    }
+
+    body.nav-sm .container.body .left_col {
+        width: 63px;
+        padding: 0;
+        position: fixed;
+        height: 100%;
+        z-index: 8;
+    }
+
+    .card {
+        position: relative;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        min-width: 0;
+        word-wrap: break-word;
+        background-color: #fff;
+        background-clip: border-box;
+        border: 0px;
+        border-radius: .25rem;
+    }
+
+    .dropdown-toggle::after {
+        display: none;
+        width: 0;
+        height: 0;
+        margin-left: .255em;
+        vertical-align: .255em;
+        content: "";
+        border-top: .3em solid;
+        border-right: .3em solid transparent;
+        border-bottom: 0;
+        border-left: .3em solid transparent;
+    }
+
+    input.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213);
+    }
+
+    inputSelect.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213) !important;
+    }
+
+    select.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background-color: rgb(219,238,213) !important;
+        z-index: 9;
+    }
+
+    textarea.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    .TransView {
+        background-color: white !important;
+    }
+
+    .user_summary_modal {
+        margin: 0 auto !important;
+        margin-top: 160px !important;
+    }
+
+    .swal2-popup .swal2-title {
+        margin: 20px 0 0.4em !important;
+    }
+
+    @@media only screen and (min-width: 992px) {
+        div .input-block span.placeholder {
+            font-size: 15px;
+        }
+
+        div.inputSelect span.placeholder {
+            font-size: 14px;
+        }
+    }
+
+    input[type='date'].spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    .showBorder {
+        border: 1px solid #dee2e6;
+    }
+
+    .wField {
+        width: 233px !important;
+        margin-left: 10px;
+    }
+
+    @@-moz-document url-prefix() {
+        input[type=time]::-ms-clear {
+            display: none;
+        }
+    }
+
+    .datetime-reset-button {
+        display: none !important;
+    }
+
+    .forShoppingCart {
+        margin-left: 14% !important;
+    }
+
+    .btn-group {
+        display: block !important;
+    }
+
+    #accordion label {
+        display: inline-block !important;
+    }
+
+
+    .custom-select:focus {
+        box-shadow: none !important;
+        border-color: none !important;
+    }
+
+    #addSoftwarebtn td {
+        border-top: none !important;
+    }
+
+    #locationBody select {
+        background-color: #fff !important;
+    }
+
+    #loader {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        z-index: 10000;
+    }
+</style>
+@*<script type="text/javascript">
+        function checkSelect(id) {
+
+            if ($('#' + id).val() != '') {
+                $('#' + id).addClass('spanUpperSide');
+            }
+        }
+        /*$('#timedemo').pickatime({ twelvehour: true });*/
+    </script>*@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/7.2.0/sweetalert2.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/7.2.0/sweetalert2.all.min.js"></script>
+<script type="text/javascript">
+    function checkSelect(id) {
+
+        if ($('#' + id).val() != '') {
+            $('#' + id).addClass('spanUpperSide');
+        }
+    }
+    /*$('#timedemo').pickatime({ twelvehour: true });*/
+</script>
+@*Loader*@
+
+<body>
+    <div class="right_col">
+        <form id="DARForm" method="post">
+            <div class="container">
+                <div class="table-responsive">
+                    <div id="accordion">
+                        <div class="row breadcrumb-container table-bordered  mr-1 ml-1" style="background-color: rgb(219,238,213) !important; ">
+                            @*<div class="col-md-2 col-lg-2">
+                                    <span class="placeholder">Date : @(IsViewMode ||IsEditMode ? (Convert.ToDateTime(DARF.FormID.CreatedDate).ToShortDateString()) : DateTime.Now.ToShortDateString())</span>
+                                </div>*@
+                            <div class="col-md-12 col-lg-12 mt-2 mb-1 form-heading" style="text-align:center; margin-top:5px">
+                                <span>SignUp Approver</span>
+                            </div>
+                        </div>
+                        <div id="accordion1">
+                            <div class="card">
+                                <div class="card-header" id="headingThree" data-toggle="collapse" data-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                                    <h5 class="mb-0">
+                                        <button type="button" id="accordionName" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                                            <img src="~/assets/img/transactionIcon.svg" width="24" height="24" class="mr-2" />SignUp Users / Employees
+                                        </button>
+                                    </h5>
+                                </div>
+
+                                <div id="collapseThree" class="collapse show" aria-labelledby="headingThree" data-parent="#accordion">
+                                    <div id="accordionUA" class="card-body">
+                                        <div class="">
+                                            <div>
+                                                <a href="javascript:void(0);" style="float:right;" onclick="myFunction()">Get all Employees</a>
+                                            </div>
+
+                                            <table id="dtSATable" class="table table-striped table-bordered table-sm display nowrap" cellspacing="0" width="100%">
+                                                <thead>
+
+                                                    <tr class="status-table-row">
+                                                        <th class="th-sm sortingFormIdForReport">
+                                                            Sr. No.
+                                                            <span class="caret-icon">
+                                                                <a href="" class="caret-up">
+                                                                    <i class="fa fa-caret-up"></i>
+                                                                </a>
+                                                                <a href="" class="caret-down">
+                                                                    <i class="fa fa-caret-down"></i>
+                                                                </a>
+                                                            </span>
+                                                        </th>
+                                                        <th class="th-sm sortingFormNameForReport">
+                                                            Name
+                                                            <span class="caret-icon">
+                                                                <a href="" class="caret-up">
+                                                                    <i class="fa fa-caret-up"></i>
+                                                                </a>
+                                                                <a href="" class="caret-down">
+                                                                    <i class="fa fa-caret-down"></i>
+                                                                </a>
+                                                            </span>
+                                                        </th>
+                                                        <th class="th-sm sortingRequestFormForReport">
+                                                            EmailId
+                                                            <span class="caret-icon">
+                                                                <a href="" class="caret-up">
+                                                                    <i class="fa fa-caret-up"></i>
+                                                                </a>
+                                                                <a href="" class="caret-down">
+                                                                    <i class="fa fa-caret-down"></i>
+                                                                </a>
+                                                            </span>
+                                                        </th>
+                                                        <th class="th-sm sortingBusinessNeedForReport">
+                                                            Department
+                                                            <span class="caret-icon">
+                                                                <a href="" class="caret-up">
+                                                                    <i class="fa fa-caret-up"></i>
+                                                                </a>
+                                                                <a href="" class="caret-down">
+                                                                    <i class="fa fa-caret-down"></i>
+                                                                </a>
+                                                            </span>
+                                                        </th>
+                                                        <th class="th-sm sortingStatusForReport">
+                                                            SubDepartment
+                                                            <span class="caret-icon">
+                                                                <a href="" class="caret-up">
+                                                                    <i class="fa fa-caret-up"></i>
+                                                                </a>
+                                                                <a href="" class="caret-down">
+                                                                    <i class="fa fa-caret-down"></i>
+                                                                </a>
+                                                            </span>
+                                                        </th>
+                                                        <th class="th-sm text-center">
+                                                            Action
+                                                            <span class="caret-icon">
+                                                                <a href="" class="caret-up">
+                                                                    <i class="fa fa-caret-up"></i>
+                                                                </a>
+                                                                <a href="" class="caret-down">
+                                                                    <i class="fa fa-caret-down"></i>
+                                                                </a>
+                                                            </span>
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                @*<tbody class="form-border tableLocation" id="locationBody">
+                                                    </tbody>*@
+                                            </table>
+                                        </div>
+
+                                    </div>
+                                    <div id="userinfo" style="display:none;" class="card-body">
+                                        <div class="">
+                                            <div>
+                                                <a href="javascript:void(0);" style="float:right;" onclick="myFunction()">Get all Users</a>
+                                            </div>
+                                            <div>
+                                                <table id="usertable" class="table table-striped table-bordered table-sm display nowrap" cellspacing="0" width="100%">
+                                                    <thead>
+
+                                                        <tr class="status-table-row">
+                                                            <th class="th-sm sortingFormIdForReport">
+                                                                Sr. No.
+                                                                <span class="caret-icon">
+                                                                    <a href="" class="caret-up">
+                                                                        <i class="fa fa-caret-up"></i>
+                                                                    </a>
+                                                                    <a href="" class="caret-down">
+                                                                        <i class="fa fa-caret-down"></i>
+                                                                    </a>
+                                                                </span>
+                                                            </th>
+                                                            <th class="th-sm sortingFormNameForReport">
+                                                                Employee Number
+                                                                <span class="caret-icon">
+                                                                    <a href="" class="caret-up">
+                                                                        <i class="fa fa-caret-up"></i>
+                                                                    </a>
+                                                                    <a href="" class="caret-down">
+                                                                        <i class="fa fa-caret-down"></i>
+                                                                    </a>
+                                                                </span>
+                                                            </th>
+                                                            <th class="th-sm sortingRequestFormForReport">
+                                                                First Name
+                                                                <span class="caret-icon">
+                                                                    <a href="" class="caret-up">
+                                                                        <i class="fa fa-caret-up"></i>
+                                                                    </a>
+                                                                    <a href="" class="caret-down">
+                                                                        <i class="fa fa-caret-down"></i>
+                                                                    </a>
+                                                                </span>
+                                                            </th>
+                                                            <th class="th-sm sortingBusinessNeedForReport">
+                                                                Email ID
+                                                                <span class="caret-icon">
+                                                                    <a href="" class="caret-up">
+                                                                        <i class="fa fa-caret-up"></i>
+                                                                    </a>
+                                                                    <a href="" class="caret-down">
+                                                                        <i class="fa fa-caret-down"></i>
+                                                                    </a>
+                                                                </span>
+                                                            </th>
+                                                            <th class="th-sm sortingStatusForReport">
+                                                                Cost Center
+                                                                <span class="caret-icon">
+                                                                    <a href="" class="caret-up">
+                                                                        <i class="fa fa-caret-up"></i>
+                                                                    </a>
+                                                                    <a href="" class="caret-down">
+                                                                        <i class="fa fa-caret-down"></i>
+                                                                    </a>
+                                                                </span>
+                                                            </th>
+                                                            <th class="th-sm sortingStatusForReport">
+                                                                Manager EmployeeNumber
+                                                                <span class="caret-icon">
+                                                                    <a href="" class="caret-up">
+                                                                        <i class="fa fa-caret-up"></i>
+                                                                    </a>
+                                                                    <a href="" class="caret-down">
+                                                                        <i class="fa fa-caret-down"></i>
+                                                                    </a>
+                                                                </span>
+                                                            </th>
+                                                            <th class="th-sm text-center">
+                                                                Action
+                                                                <span class="caret-icon">
+                                                                    <a href="" class="caret-up">
+                                                                        <i class="fa fa-caret-up"></i>
+                                                                    </a>
+                                                                    <a href="" class="caret-down">
+                                                                        <i class="fa fa-caret-down"></i>
+                                                                    </a>
+                                                                </span>
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                    @*<tbody class="form-border tableLocation" id="locationBody">
+                                                        </tbody>*@
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <!--<div id="userinfo" style="display:none ;">
+                            <div class="card">
+                                <div class="card-header" id="headingThree" data-toggle="collapse" data-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                                    <h5 class="mb-0">
+                                        <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                                            <img src="~/assets/img/transactionIcon.svg" width="24" height="24" class="mr-2" />User Summary
+                                        </button>
+                                    </h5>
+                                </div>
+
+                                <div id="userdetails" class="collapse show" aria-labelledby="headingThree" data-parent="#accordion">
+                                    <div class="card-body">
+                                        <div class="">
+
+                                            <div>
+                                                <table id="usertable" class="table table-striped table-bordered table-sm display nowrap" cellspacing="0" width="100%">
+                                                    <thead>
+
+                                                        <tr class="status-table-row">
+                                                            <th class="th-sm sortingFormIdForReport">
+                                                                Sr. No.
+                                                                <span class="caret-icon">
+                                                                    <a href="" class="caret-up">
+                                                                        <i class="fa fa-caret-up"></i>
+                                                                    </a>
+                                                                    <a href="" class="caret-down">
+                                                                        <i class="fa fa-caret-down"></i>
+                                                                    </a>
+                                                                </span>
+                                                            </th>
+                                                            <th class="th-sm sortingFormNameForReport">
+                                                                Employee Number
+                                                                <span class="caret-icon">
+                                                                    <a href="" class="caret-up">
+                                                                        <i class="fa fa-caret-up"></i>
+                                                                    </a>
+                                                                    <a href="" class="caret-down">
+                                                                        <i class="fa fa-caret-down"></i>
+                                                                    </a>
+                                                                </span>
+                                                            </th>
+                                                            <th class="th-sm sortingRequestFormForReport">
+                                                                First Name
+                                                                <span class="caret-icon">
+                                                                    <a href="" class="caret-up">
+                                                                        <i class="fa fa-caret-up"></i>
+                                                                    </a>
+                                                                    <a href="" class="caret-down">
+                                                                        <i class="fa fa-caret-down"></i>
+                                                                    </a>
+                                                                </span>
+                                                            </th>
+                                                            <th class="th-sm sortingBusinessNeedForReport">
+                                                                Email ID
+                                                                <span class="caret-icon">
+                                                                    <a href="" class="caret-up">
+                                                                        <i class="fa fa-caret-up"></i>
+                                                                    </a>
+                                                                    <a href="" class="caret-down">
+                                                                        <i class="fa fa-caret-down"></i>
+                                                                    </a>
+                                                                </span>
+                                                            </th>
+                                                            <th class="th-sm sortingStatusForReport">
+                                                                Cost Center
+                                                                <span class="caret-icon">
+                                                                    <a href="" class="caret-up">
+                                                                        <i class="fa fa-caret-up"></i>
+                                                                    </a>
+                                                                    <a href="" class="caret-down">
+                                                                        <i class="fa fa-caret-down"></i>
+                                                                    </a>
+                                                                </span>
+                                                            </th>
+                                                            <th class="th-sm sortingStatusForReport">
+                                                                Manager EmployeeNumber
+                                                                <span class="caret-icon">
+                                                                    <a href="" class="caret-up">
+                                                                        <i class="fa fa-caret-up"></i>
+                                                                    </a>
+                                                                    <a href="" class="caret-down">
+                                                                        <i class="fa fa-caret-down"></i>
+                                                                    </a>
+                                                                </span>
+                                                            </th>
+                                                            <th class="th-sm text-center">
+                                                                Action
+                                                                <span class="caret-icon">
+                                                                    <a href="" class="caret-up">
+                                                                        <i class="fa fa-caret-up"></i>
+                                                                    </a>
+                                                                    <a href="" class="caret-down">
+                                                                        <i class="fa fa-caret-down"></i>
+                                                                    </a>
+                                                                </span>
+                                                            </th>
+                                                        </tr>
+                                                    </thead>-->
+                        @*<tbody class="form-border tableLocation" id="locationBody">
+                            </tbody>*@
+                        <!--</table>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>-->
+                    </div>
+
+                </div>
+                <!-- .SignUpForm -->
+                <div class="modal fade" id="SignUpForm">
+                    <div class="modal-dialog modal-xl">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <div class="w-100 d-flex">
+                                    <h2 class="mb-0">SignUp Details</h2>
+                                    <button type="button" class="close" data-dismiss="modal">
+                                        ×
+                                    </button>
+                                </div>
+
+
+                            </div>
+                            <div class="modal-body">
+
+                                <div id="CreateDiv">
+                                    @*<h2>User Details</h2>*@
+                                    <form action="" method="post" id="SUForm">
+                                        <div class="row">
+
+                                            <div class="col-12 mb-4">
+
+                                                <div class="row">
+                                                    <input type="hidden" id="SUId" name="SUId" value="">
+                                                    @*<div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                                            <input type="text" class="w-100" id="txtEmployeeCodeSU" name="EmployeeCode" value=""
+                                                                   onkeypress="allowNumbersOnly(event)" required>
+                                                            <span class="placeholder">Employee Code<span class="astColor">*</span></span>
+                                                        </div>*@
+                                                    <div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                                        <input type="text" class="w-100" id="txtEmployeeFirstNameSU" name="FirstName" value="" required autocomplete="off">
+                                                        <span class="placeholder">Employee First Name<span class="astColor">*</span></span>
+                                                    </div>
+                                                    <div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                                        <input type="text" class="w-100" id="txtEmployeeMiddleNameSU" name="MiddleName" value="" required autocomplete="off">
+                                                        <span class="placeholder">Employee Middle Name</span>
+                                                    </div>
+                                                    <div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                                        <input type="text" class="w-100" id="txtEmployeeLastNameSU" name="LastName" value="" required autocomplete="off">
+                                                        <span class="placeholder">Employee Last Name<span class="astColor">*</span></span>
+                                                    </div>
+
+                                                    <div class="form-group col-md-4 col-lg-4 col-12 input-block autocompleteCC-div">
+                                                        <input type="text" class="w-100" id="txtCostCenterSU" name="CostCenter" value="" required autocomplete="off">
+                                                        <span class="placeholder">Cost Center<span class="astColor">*</span></span>
+                                                    </div>
+                                                    <div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                                        <input type="text" class="w-100" id="txtEmailIdSU" name="Email" value="" required autocomplete="off">
+                                                        <span class="placeholder">Email ID<span class="astColor">*</span></span>
+                                                    </div>
+                                                    <div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                                        <input type="text" class="w-100" name="PhoneNumber" id="txtContactNoSU" maxlength="10" value=""
+                                                               onkeypress="allowNumbersOnly(event)" required autocomplete="off" />
+                                                        <span class="placeholder">Contact No</span>
+                                                    </div>
+                                                    <!--<div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                                    <select class="form-control cls_subcategory w-100" name="Department" id="txtDepartmentSU">
+                                                        <option value="">Select Department*</option>
+                                                    </select>-->
+                                                    @*<span class="placeholder">Department<span class="astColor">*</span></span>*@
+                                                    <!--</div>-->
+                                                    <div class="form-group col-md-4 col-lg-4 col-12 inputSelect">
+                                                        <select class="form-control w-100" name="Department" id="txtDepartmentSU" onchange="checkSelect('txtDepartmentSU')">
+                                                            <option id="0" value="0">Select Department</option>
+                                                        </select>
+                                                        <span class="placeholder">Department<span class="astColor">*</span></span>
+                                                    </div>
+                                                    <!--<div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                                    <select class="form-control cls_subcategory w-100" name="SubDepartment" id="txtSubDepartmentSU">
+                                                        <option value="">Sub Department*</option>
+                                                    </select>-->
+                                                    @*<span class="placeholder">Sub Department<span class="astColor">*</span></span>*@
+                                                    <!--</div>-->
+                                                    <div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                                        <select class="form-control cls_subcategory w-100" name="SubDepartment" id="txtSubDepartmentSU" onchange="checkSelect('txtSubDepartmentSU')">
+                                                            <option value="0">Sub Department</option>
+                                                        </select>
+                                                        <span class="placeholder">Sub Department<span class="astColor">*</span></span>
+                                                    </div>
+                                                    <div class="form-group col-md-4 col-lg-4 col-12 input-block autocompleteManagerEmpCode-div">
+                                                        <input type="text" class="w-100" id="txtManagerEmployeeCodeSU" name="ManagerEmployeeNumber" value=""
+                                                               onkeypress="allowNumbersOnly(event)" required autocomplete="off">
+                                                        <span class="placeholder">Manager Employee Number<span class="astColor">*</span></span>
+                                                    </div>
+                                                    @*<div class="form-group col-md-4 col-lg-4 col-12 input-block autocompleteManagerEmpCode-div">
+                                                            <input type="text" class="w-100" id="txtUserNameSU" name="UserName" value=""
+                                                                   onkeypress="alphaOnly(event)" required autocomplete="off">
+                                                            <span class="placeholder">UserName<span class="astColor">*</span></span>
+                                                        </div>
+                                                        <div class="form-group col-md-4 col-lg-4 col-12 input-block autocompleteManagerEmpCode-div">
+                                                            <input type="text" class="w-100" id="txtPasswordSU" name="Password" value=""
+                                                                   onkeypress="alphaOnly(event)" required autocomplete="off">
+                                                            <span class="placeholder">Password<span class="astColor">*</span></span>
+                                                        </div>*@
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </form>
+
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-success btn-sm submit-btn" id="btnApprove" onclick="SaveSignUpDetails('Approve');">
+                                    Approve
+                                </button>
+                                <button type="button" class="btn btn-danger btn-sm delete-btn" id="btnReject" onclick="javascript: $('#ModelReason').modal('show');" data-placement="right" title="Reason" data-toggle="modal" data-target="#ModelReason">
+                                    Reject
+                                </button>
+                                <button type="button" class="btn btn-danger btn-sm cancl-btn" id="btnClose" data-dismiss="modal">
+                                    Close
+                                </button>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @*usersummaryForm*@
+                @*<div id="sumary">*@
+                <div class="modal fade" id="UserSummaryForm">
+                    <div class="modal-dialog user_summary_modal modal-xl">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <div class="w-100 d-flex">
+                                    <h2 class="mb-0">UserSummary Details</h2>
+                                    <button type="button" class="close" data-dismiss="modal">
+                                        ×
+                                    </button>
+                                </div>
+
+
+                            </div>
+                            <div class="modal-body">
+
+                                <div id="CreateDiv">
+                                    @*<h2>User Details</h2>*@
+                                    <form action="" method="post" id="SUForm">
+                                        <div class="row">
+
+                                            <div class="col-12 mb-4">
+
+                                                <div class="row">
+                                                    <input type="hidden" id="SUId1" name="SUId1">
+                                                    @*<div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                                            <input type="text" class="w-100" id="txtEmployeeCodeSU" name="EmployeeCode" value=""
+                                                                   onkeypress="allowNumbersOnly(event)" required>
+                                                            <span class="placeholder">Employee Code<span class="astColor">*</span></span>
+                                                        </div>*@
+
+                                                    @*<div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                                            <input type="text" class="w-100" id="txtEmployeeNumberSU1" name="txtEmployeeNumberSU1" value="" required autocomplete="off">
+                                                            <span class="placeholder">Employee Number<span class="astColor">*</span></span>
+                                                        </div>*@
+                                                    <div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                                        <input type="text" class="w-100" id="txtEmployeeFirstNameSU1" name="FirstName" value="" required autocomplete="off">
+                                                        <span class="placeholder">Employee First Name<span class="astColor">*</span></span>
+                                                    </div>
+                                                    <div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                                        <input type="text" class="w-100" id="txtEmployeeMiddleNameSU1" name="MiddleName" value="" required autocomplete="off">
+                                                        <span class="placeholder">Employee Middle Name</span>
+                                                    </div>
+                                                    <div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                                        <input type="text" class="w-100" id="txtEmployeeLastNameSU1" name="LastName" value="" required autocomplete="off">
+                                                        <span class="placeholder">Employee Last Name<span class="astColor">*</span></span>
+                                                    </div>
+
+                                                    <div class="form-group col-md-4 col-lg-4 col-12 input-block autocompleteCC-div">
+                                                        <input type="text" class="w-100" id="txtCostCenterSU1" name="CostCenter" value="" required autocomplete="off">
+                                                        <span class="placeholder">Cost Center<span class="astColor">*</span></span>
+                                                    </div>
+                                                    <div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                                        <input type="text" class="w-100" id="txtEmailIdSU1" name="Email" value="" required autocomplete="off">
+                                                        <span class="placeholder">Email ID<span class="astColor">*</span></span>
+                                                    </div>
+                                                    <div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                                        <input type="text" class="w-100" name="PhoneNumber1" id="txtContactNoSU1" maxlength="10" value=""
+                                                               onkeypress="allowNumbersOnly(event)" required autocomplete="off" />
+                                                        <span class="placeholder">Contact No</span>
+                                                    </div>
+                                                    <div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                                        <select class="form-control cls_subcategory w-100" name="Department" id="txtDepartmentSU1" onchange="checkSelect('txtDepartmentSU1')">
+                                                            <option value="">Select Department*</option>
+                                                        </select>
+                                                        @*<span class="placeholder">Department<span class="astColor">*</span></span>*@
+                                                    </div>
+                                                    <div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                                                        <select class="form-control cls_subcategory w-100" name="SubDepartment" id="txtSubDepartmentSU1" onchange="checkSelect('txtSubDepartmentSU1')">
+                                                            <option value="">Sub Department*</option>
+                                                        </select>
+                                                        @*<span class="placeholder">Sub Department<span class="astColor">*</span></span>*@
+                                                    </div>
+                                                    <div class="form-group col-md-4 col-lg-4 col-12 input-block autocompleteManagerEmpCode-div">
+                                                        <input type="text" class="w-100" id="txtManagerEmployeeCodeSU1" name="ManagerEmployeeNumber" value=""
+                                                               onkeypress="allowNumbersOnly(event)" required autocomplete="off">
+                                                        <span class="placeholder">Manager Employee Number<span class="astColor">*</span></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-success btn-sm submit-btn" id="txtsavebtn" onclick="SaveUserSummary();">
+                                    Save
+                                </button>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @*</div>*@
+            </div>
+        </form>
+    </div>
+
+    @*</div>*@
+</body>
+
+<div class="modal fade" id="successModel" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header modelHeader">
+                <span class="modal-title modalMsgTitle" id="modalTitle"></span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label id="modalBody" class="lableMsg">  </label>
+                <input type="hidden" id="tab" value="0" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="submitBomBtn publishBtn" data-dismiss="modal" id="modalOkButton">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="ModelReason">
+    <div class="modal-dialog modal-m">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="w-100 d-flex">
+                    <button type="button" class="close" data-dismiss="modal">
+                        ×
+                    </button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <form action="" method="post" id="SUForm">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="row">
+                                <div class="form-group input-block">
+                                    <textarea id="txtRejectReason" rows="4" cols="50" name="Reason" placeholder="Reject Reason..." required></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success btn-sm submit-btn" id="btnSave" onclick="SaveSignUpDetails('Reject');">
+                    Save
+                </button>
+                <button type="button" class="btn btn-danger btn-sm cancl-btn" id="btnClose" data-dismiss="modal">
+                    Close
+                </button>
+
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    var spinner = $('#loader');
+
+    var rowIdx = 0;
+    var errorCount = 0;
+    var errors = "";
+
+    var locationList = [];
+    var departmentList = [];
+    var doorList = [];
+    var allData = [];
+    var id = [];
+    var Appvroverdata = [];
+
+    $(document).ready(function () {
+        rowIdx = 1;
+        GetApprovers();
+        $('#txtDepartmentSU').on('change', function (e) {
+
+            var DepId = $(this).children(":selected").attr("id");
+            var Depval = $('#txtDepartmentSU option:selected').val();
+            GetSubDepartmentList(DepId);
+            $('#txtSubDepartmentSU option[value="0"]').attr("selected", "selected").change();
+            $('#txtSubDepartmentSU1 option[value="0"]').attr("selected", "selected").change();
+        });
+
+        $('#txtDepartmentSU1').on('change', function (e) {
+
+            var DepId = $(this).children(":selected").attr("id");
+            var Depval = $('#txtDepartmentSU1 option:selected').val();
+            GetSubDepartmentList(DepId);
+            $('#txtSubDepartmentSU1 option[value="0"]').attr("selected", "selected").change();
+        });
+
+    });
+    function myFunction() {
+
+        var x = document.getElementById("accordionUA");
+        var y = document.getElementById("userinfo");
+        if (x.style.display === "none") {
+            $("#accordionName").text("SignUp Users");
+            x.style.display = "block";
+            y.style.display = "none";
+        } else {
+            $("#accordionName").text("User Summary");
+            x.style.display = "none";
+            y.style.display = "block";
+        }
+        GetUserdata();
+
+    }
+    function GetApprovers() {
+        $(".full-screen-container").removeClass('invisible');
+        $(".full-screen-container").show();
+        /*        $("#delegate-list-table tbody tr").remove();*/
+        $.ajax({
+            url: "/SignupApprover/SignupApproverList",
+            dataType: "json",
+            cache: false,
+            async: true,
+            success: function (data) {
+                console.log(data);
+                Appvroverdata = data;
+                $('#dtSATable').dataTable({
+                    data: data,
+                    columns: [
+                        //{data :'Id'},
+                        { data: 'SrNo' },
+                        { data: 'Name' },
+                        { data: 'EmailID' },
+                        { data: "Department" },
+                        { data: 'SubDepartment' },
+                        {
+                            render: function (data, type, row, meta) {
+                                console.log(row);
+                                return '<div class="container col-lg-12 justify-content-sm-between" style="text-align: center;">' +
+                                    '<button type="button" class="btn btn-xs btn-default photography-action-btn" id="tooltipex" onclick="SignupApprove(' + row.Id + ')" data-bs-toggle="tooltip" data-bs-placement="right" title="View">' +
+                                    '<i class="fa fa-eye" aria-hidden="true"></i></button>' +
+                                    '</div></td>';
+                            }
+                        }
+                    ],
+                    destroy: true,
+                    "lengthChange": false,
+                    "searching": true,
+                    "info": false,
+                    "responsive": true,
+                    // "oLanguage": { "sSearch": "" },
+                    "bAutoWidth": false,
+                    //language: {
+                    //    searchPlaceholder: "Search",
+                    //    paginate: {
+                    //        next: '&#8811;', // or '→'
+                    //        previous: '&#8810;' // or '←'
+                    //    }
+                    //columnDefs: [{ type: 'date', 'targets': [5] }],
+                    //order: [[5, 'desc']]
+                });
+                $(".full-screen-container").hide();
+            }
+        });
+    }
+    function GetUserdata() {
+        $(".full-screen-container").removeClass('invisible');
+        $(".full-screen-container").show();
+        $.ajax({
+            url: "/SignupApprover/UserdataList",
+            dataType: "json",
+            cache: false,
+            async: true,
+            success: function (data) {
+
+                console.log(data);
+                $('#usertable').dataTable({
+                    data: data,
+                    columns: [
+                        //{data :'Id'},
+                        { data: 'SrNo' },
+                        { data: 'EmployeeNumber' },
+                        { data: 'EmployeeName' },
+                        { data: "EmailID" },
+                        { data: 'CostCenter' },
+                        { data: 'ManagerEmployeeNumber' },
+                        {
+                            render: function (data, type, row, meta) {
+                                console.log(row);
+                                return '<div class="container col-lg-12 justify-content-sm-between" style="text-align: center;">' +
+                                    '<button type="button" class="btn btn-xs btn-default photography-action-btn" id="tooltipex" onclick="userSummaryData(' + row.EmployeeNumber + ')" data-bs-toggle="tooltip" data-bs-placement="right" title="Edit">' +
+                                    '<i class="fa fa-edit" aria-hidden="true"></i></button>' +
+                                    '<button type="button" class="btn btn-xs btn-default photography-action-btn txt-primary trash-icon" id="tooltipex" onclick="IsActiveuserdetails(' + row.EmployeeNumber + ')" data-bs-toggle="tooltip" data-bs-placement="right" title="Deleted">' +
+                                    '<i class="fa fa-trash-o" aria-hidden="true"></i></button></div></td > ';
+                            }
+                        }
+                    ],
+                    destroy: true,
+                    "lengthChange": false,
+                    "searching": true,
+                    "info": false,
+                    "responsive": true,
+                    // "oLanguage": { "sSearch": "" },
+                    "bAutoWidth": false,
+                    //language: {
+                    //    searchPlaceholder: "Search",
+                    //    paginate: {
+                    //        next: '&#8811;', // or '→'
+                    //        previous: '&#8810;' // or '←'
+                    //    }
+                    //columnDefs: [{ type: 'date', 'targets': [5] }],
+                    //order: [[5, 'desc']]
+                });
+                $(".full-screen-container").hide();
+            }
+        });
+    }
+    function pageLoad() {
+        spinner.hide();// For Email Update
+        $("#headingErr").addClass('d-none');
+        getAccessDoorListData();
+        //if (isViewMode) {
+        //    $(".inpDisable").attr("disabled", "disabled");
+        //}
+
+
+    };
+    function EnableButtons() {
+        $("#btnApprove").removeAttr("disabled", "disabled");
+        $("#btnReject").removeAttr("disabled", "disabled");
+        $("#btnClose").removeAttr("disabled", "disabled");
+    };
+    function DisableButtons() {
+        $("#btnApprove").attr("disabled", "disabled");
+        $("#btnReject").attr("disabled", "disabled");
+        $("#btnClose").attr("disabled", "disabled");
+    };
+    function successModal(txt) {
+        ////
+        $('#modalTitle').html('Success');
+        if (txt == "success") {
+            $('#modalBody').html('Data has been saved successfully');
+        }
+        else if (txt == "reject") {
+            $('#modalBody').html('Data has been rejected!');
+        }
+        else if (txt == "IsActive") {
+            $('#modalBody').html('User has been Deleted!');
+        }
+        else if (txt == "enquire") {
+            $('#modalBody').html('Form has been enquired!');
+        }
+        else if (txt == "cancelled") {
+            $('#modalBody').html('Form has been cancelled!');
+        }
+        else {
+            if (isEditMode) {
+                $('#modalBody').html('Your form with ID: DARF' + txt + ' has been re-submitted! Kindly use this for future reference');
+            }
+            else {
+                $('#modalBody').html('Your form with ID: DARF' + txt + ' has been submitted! Kindly use this for future reference');
+            }
+            FlagRedirect = txt;
+        }
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+    function failureModal(txt) {
+
+        if (txt == null) {
+            $('#modalBody').html('Some error occurred!');
+        }
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html(txt);
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+    function SignupApprove(Id) {
+
+        SignupDetailsClearData();
+        GetDepartmentList();
+        //GetSubDepartmentList();
+        GetApproversData(Id);
+        $('#SignUpForm').modal('show');
+
+    }
+    function userSummaryData(EmployeeNumber) {
+
+        GetDepartmentList();
+        //GetSubDepartmentList();
+        GetuserSummaryData(EmployeeNumber);
+        $('#UserSummaryForm').modal('show');
+
+    }
+    function GetDepartmentList() {
+        $(".full-screen-container").removeClass('invisible');
+        $(".full-screen-container").show();
+        $.ajax({
+            url: "/Login/GetDepartmentList",
+            dataType: "json",
+            async: false,
+            success: function (data) {
+
+                console.log(data);
+                var s = '<option value="" class="d-none">Select Department</option>';
+
+                for (var i = 0; i < data.length; i++) {
+                    s += '<option id="' + data[i].DivId + '" value="' + data[i].DivName + '">' + data[i].DivName + '</option>';
+                }
+                $("#txtDepartmentSU").html(s);
+                $('#txtDepartmentSU option[value="0"]').attr("selected", "selected").change();
+                $("#txtDepartmentSU1").html(s);
+                $('#txtDepartmentSU1 option[value="0"]').attr("selected", "selected").change();
+                $(".full-screen-container").hide();
+            },
+            error: function (data) {
+                $(".full-screen-container").hide();
+            }
+        });
+    }
+    function GetSubDepartmentList(DepId) {
+        $.ajax({
+            url: "/Login/GetSubDepartmentList",
+            dataType: "json",
+            cache: false,
+            async: false,
+            data: {
+                DepId: DepId
+            },
+            success: function (data) {
+
+                console.log(data);
+                var s = '<option value="0" class="">Sub Department</option>';
+
+                for (var i = 0; i < data.length; i++) {
+                    s += '<option value="' + data[i].DeptName + '">' + data[i].DeptName + '</option>';
+                }
+                $("#txtSubDepartmentSU").html(s);
+                $('#txtSubDepartmentSU option[value="0"]').attr("selected", "selected").change();
+                $("#txtSubDepartmentSU1").html(s);
+                $('#txtSubDepartmentSU1 option[value="0"]').attr("selected", "selected").change();
+            },
+            error: function (data) {
+                //code
+            }
+        });
+    }
+    function GetApproversData(Id) {
+        $(".full-screen-container").removeClass('invisible');
+        $(".full-screen-container").show();
+        $.ajax({
+            url: "/SignupApprover/GetApproversData",
+            dataType: "json",
+            cache: false,
+            async: true,
+            data: {
+                EmpNum: Id
+            },
+            success: function (data) {
+
+                for (var i = 0; i < data.length; i++) {
+                    $('#SUId').val(data[i].Id);
+                    $('#txtEmployeeFirstNameSU').val(data[i].FirstName);
+                    $('#txtEmployeeMiddleNameSU').val(data[i].MiddleName);
+                    $('#txtEmployeeLastNameSU').val(data[i].LastName);
+                    $('#txtCostCenterSU').val(data[i].CostCenter);
+                    $('#txtEmailIdSU').val(data[i].EmailID);
+                    $('#txtContactNoSU').val(data[i].PhoneNumber);
+                    //$('#txtDepartmentSU').val(data[i].Department);
+                    //$('#txtSubDepartmentSU').val(data[i].SubDepartment);
+                    $('#txtManagerEmployeeCodeSU').val(data[i].ManagerEmployeeNumber);
+                    $('#txtDepartmentSU option[value="' + data[i].Department + '"]').attr("selected", "selected").change();
+                    $('#txtSubDepartmentSU option[value="' + data[i].SubDepartment + '"]').attr("selected", "selected").change();
+                }
+                $(".full-screen-container").hide();
+            }
+        });
+    }
+    function GetuserSummaryData(EmployeeNumber) {
+        $.ajax({
+            url: "/SignupApprover/GetActiveApproversData",
+            dataType: "json",
+            cache: false,
+            async: true,
+            data: {
+                EmpNum: EmployeeNumber
+            },
+            success: function (data) {
+
+                for (var i = 0; i < data.length; i++) {
+                    $('#SUId1').val(data[i].EmployeeNumber);
+                    $('#txtEmployeeFirstNameSU1').val(data[i].FirstName);
+                    $('#txtEmployeeMiddleNameSU1').val(data[i].MiddleName);
+                    $('#txtEmployeeLastNameSU1').val(data[i].LastName);
+                    $('#txtCostCenterSU1').val(data[i].CostCenter);
+                    $('#txtEmailIdSU1').val(data[i].EmailID);
+                    $('#txtContactNoSU1').val(data[i].PhoneNumber);
+                    //$('#txtDepartmentSU').val(data[i].Department);
+                    //$('#txtSubDepartmentSU').val(data[i].SubDepartment);
+                    $('#txtManagerEmployeeCodeSU1').val(data[i].ManagerEmployeeNumber);
+                    //$('#txtDepartmentSU1 option[value="' + data[i].Department + '"]').attr("selected", "selected").change();
+
+                    $("#txtDepartmentSU1 option[value='" + data[i].Department + "']").attr("selected", "selected");
+                    $('#txtDepartmentSU1').val(data[i].Department).change();
+                    $('#txtSubDepartmentSU1 option[value="' + data[i].SubDepartment + '"]').attr("selected", "selected").change();
+
+                }
+            }
+        });
+    }
+    function SignupDetailsClearData() {
+        //$('#txtEmployeeCodeSU').value = "";
+        $('#SUId').value = "";
+        $('#txtEmployeeFirstNameSU').value = "";
+        $('#txtEmployeeMiddleNameSU').value = "";
+        $('#txtEmployeeLastNameSU').value = "";
+        $('#txtCostCenterSU').value = "";
+        $('#txtEmailIdSU').value = "";
+        $('#txtContactNoSU').value = "";
+        $('#txtSubDepartmentSU').value = "";
+        $('#txtManagerEmployeeCodeSU').value = "";
+        //$('#txtUserNameSU').value = "";
+        //$('#txtPasswordSU').value = "";
+        //$('#txtEmployeeCodeSU').prop('readonly', false);
+        //$('#txtEmployeeFirstNameSU').prop('readonly', false);
+        //$('#txtEmployeeMiddleNameSU').prop('readonly', false);
+        //$('#txtEmployeeLastNameSU').prop('readonly', false);
+        ////$('#txtCostCenterSU').prop('readonly', false);
+        //$('#txtEmailIdSU').prop('readonly', false);
+        //$('#txtContactNoSU').prop('readonly', false);
+        //$('#txtDepartmentSU').prop('readonly', false);
+        //$('#txtSubDepartmentSU').prop('readonly', false);
+        ////$('#txtManagerEmployeeCodeSU').prop('readonly', false);
+        //$('#txtUserNameSU').prop('readonly', false);
+        //$('#txtPasswordSU').prop('readonly', false);
+        //GetDepartmentList();
+        //GetSubDepartmentList();
+    }
+    function SaveUserSummary() {
+        $(".full-screen-container").removeClass('invisible');
+        $(".full-screen-container").show();
+        var SUId1 = $('#SUId1').val();
+        var txtEmployeeFirstName = $('#txtEmployeeFirstNameSU1').val();
+        var txtEmployeeMiddleName = $('#txtEmployeeMiddleNameSU1').val();
+        var txtEmployeeLastName = $('#txtEmployeeLastNameSU1').val();
+        var txtCostCenter = $('#txtCostCenterSU1').val();
+        var txtEmailId = $('#txtEmailIdSU1').val();
+        var txtContactNo = $('#txtContactNoSU1').val();
+        var txtDepartment = $('#txtDepartmentSU1').val();
+        var txtSubDepartment = $('#txtSubDepartmentSU1').val();
+        var txtManagerEmployeeCode = $('#txtManagerEmployeeCodeSU1').val();
+
+        $.ajax({
+            url: '/SignupApprover/SaveUsersummaryData',
+            type: 'POST',
+            data: { EmployeeNumber: SUId1, FirstName: txtEmployeeFirstName, MiddleName: txtEmployeeMiddleName, LastName: txtEmployeeLastName, EmailID: txtEmailId, PhoneNumber: txtContactNo, Department: txtDepartment, SubDepartment: txtSubDepartment, CostCenter: txtCostCenter, ManagerEmployeeNumber: txtManagerEmployeeCode },
+            dataType: 'JSON',
+            success: (function (data) {
+
+                if (data.Status == 200) {
+
+                    $('#UserSummaryForm').modal('hide');
+                    successModal("success");
+                    //spinner.hide();
+                    //setTimeout(FilterMyTasks, 5000);
+                    //spinner.hide();
+                }
+                else {
+                    /*failureModal1();*/
+                    failureModal(data.Message);
+                    spinner.hide();
+                }
+                $(".full-screen-container").hide();
+            }),
+            error: (function (data) {
+                /*failureModal1();*/
+                failureModal(data.Message);
+                $(".full-screen-container").hide();
+                spinner.hide();
+            })
+        })
+    }
+    function RejectSignUpDetails(Id) {
+        swal({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, Reject it!',
+            cancelButtonText: 'No, cancel!',
+            confirmButtonClass: 'btn btn-success',
+            cancelButtonClass: 'btn btn-danger',
+            buttonsStyling: false
+        }).then(function (e) {
+            if (e.dismiss === 'cancel') {
+                swal(
+                    'Cancelled!',
+                    'Record is not reject.',
+                    'warning'
+                )
+            }
+            else {
+                $(".full-screen-container").removeClass('invisible');
+                $(".full-screen-container").show();
+                var Emailid = "";
+                let filteredUsers = Appvroverdata.filter((user) => {
+                    return user.Id == Id;
+                });
+                if (filteredUsers != null)
+                    Emailid = filteredUsers[0].EmailID;
+                var SUId = $('#SUId').val() == 0 ? Id : $('#SUId').val();
+                $.ajax({
+                    url: '/SignupApprover/SaveRejectData',
+                    type: 'POST',
+                    data: { Id: SUId, EmailID: Emailid },
+                    dataType: 'JSON',
+                    success: (function (data) {
+                        debugger;
+                        if (data.Status == 200) {
+
+                            $('#SignUpForm').modal('hide');
+                            successModal("reject");
+                        }
+                        else {
+                            failureModal(data.Message);
+                            spinner.hide();
+                        }
+                        $(".full-screen-container").hide();
+                    }),
+                    error: (function (data) {
+                        /*failureModal1();*/
+                        failureModal(data.Message);
+                        spinner.hide();
+                        $(".full-screen-container").hide();
+                    })
+                })
+
+            }
+        })
+    }
+    function IsActiveuserdetails(EmployeeNumber) {
+
+        Swal.fire({
+            title: 'Are you sure want to Delete?',
+            //showDenyButton: true,
+            ///* showCancelButton: true,*/
+            //confirmButtonText: 'Yes',
+            //denyButtonText: `NO`,
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/SignupApprover/Isactiveuser',
+                    dataType: "json",
+                    cache: false,
+                    async: true,
+                    data: {
+                        empnum: EmployeeNumber
+                    },
+                    success: (function (data) {
+
+                        if (data.Status == 200) {
+
+                            Swal.fire({
+                                title: 'Success',
+                                title: 'Record Deleted Successfully !',
+                                icon: 'success'
+                            })
+                            GetUserdata();
+
+                        }
+                        else {
+                            /*failureModal1();*/
+                            failureModal(data.Message);
+                            spinner.hide();
+                        }
+                    }),
+                    error: (function (data) {
+                        /*failureModal1();*/
+                        failureModal(data.Message);
+                        spinner.hide();
+                    })
+                })
+            }
+
+
+
+
+        })
+
+    }
+
+    function SaveSignUpDetails(Text) {
+        $(".full-screen-container").removeClass('invisible');
+        $(".full-screen-container").show();
+        DisableButtons();
+        var SUId = $('#SUId').val();
+        var txtRejectReason = $('#txtRejectReason').val();
+        if (Text == "Reject" && txtRejectReason == "") {
+            $(".full-screen-container").hide();
+            $("#txtRejectReason").addClass('errorIconTextarea');
+            $("#txtRejectReason").focus()
+            EnableButtons();
+            return false
+        }
+        else {
+            $("#txtRejectReason").removeClass('errorIconTextarea');
+            $('#ModelReason').modal('hide');
+        }
+
+        var txtEmployeeFirstNameSU = $('#txtEmployeeFirstNameSU').val();
+        var txtEmployeeMiddleNameSU = $('#txtEmployeeMiddleNameSU').val();
+        var txtEmployeeLastNameSU = $('#txtEmployeeLastNameSU').val();
+        var txtCostCenterSU = $('#txtCostCenterSU').val();
+        var txtEmailIdSU = $('#txtEmailIdSU').val();
+        var txtContactNoSU = $('#txtContactNoSU').val();
+        var txtDepartmentSU = $('#txtDepartmentSU').val();
+        var txtSubDepartmentSU = $('#txtSubDepartmentSU').val();
+        var txtManagerEmployeeCodeSU = $('#txtManagerEmployeeCodeSU').val();
+
+        $.ajax({
+            url: '/SignupApprover/SaveApproveData',
+            type: 'POST',
+            data: { Id: SUId, FirstName: txtEmployeeFirstNameSU, MiddleName: txtEmployeeMiddleNameSU, LastName: txtEmployeeLastNameSU, EmailID: txtEmailIdSU, PhoneNumber: txtContactNoSU, Department: txtDepartmentSU, SubDepartment: txtSubDepartmentSU, CostCenter: txtCostCenterSU, ManagerEmployeeNumber: txtManagerEmployeeCodeSU, Action: Text, RejectReason: txtRejectReason },
+            dataType: 'JSON',
+            success: (function (data) {
+
+                if (data.Status == 200) {
+                    $('#SignUpForm').modal('hide');
+                    if (Text == "Approve")
+                        successModal("success");
+                    else
+                        successModal("reject");
+                }
+                else {
+                    failureModal(data.Message);
+                    spinner.hide();
+                }
+                EnableButtons();
+                $(".full-screen-container").hide();
+            }),
+            error: (function (data) {
+                failureModal(data.Message);
+                spinner.hide();
+                EnableButtons();
+                $(".full-screen-container").hide();
+            })
+        })
+    }
+    //function RejectSignUpDetails() {
+    //    DisableButtons();
+    //    var SUId = $('#SUId').val();
+    //    $.ajax({
+    //        url: '/SignupApprover/SaveRejectData',
+    //        type: 'POST',
+    //        data: { Id: SUId },
+    //        dataType: 'JSON',
+    //        success: (function (data) {
+
+    //            if (data.Status == 200) {
+
+    //                $('#SignUpForm').modal('hide');
+    //                successModal("reject");
+    //                //spinner.hide();
+    //                //setTimeout(FilterMyTasks, 5000);
+    //                //spinner.hide();
+    //            }
+    //            else {
+    //                /*failureModal1();*/
+    //                failureModal(data.Message);
+    //                spinner.hide();
+    //            }
+    //            EnableButtons();
+    //        }),
+    //        error: (function (data) {
+    //            /*failureModal1();*/
+    //            failureModal(data.Message);
+    //            spinner.hide();
+    //            EnableButtons();
+    //        })
+    //    })
+    //}
+    $("#txtCostCenter").autocomplete({
+        source: function (request, response) {
+            $.ajax
+                ({
+                    url: "/List/GetCostCenterDetails",
+                    dataType: "json",
+                    cache: false,
+                    async: true,
+                    data: {
+                        searchText: $("#txtCostCenterSU").val()
+                    },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            return { label: item, value: item, raw: item };
+                        }));
+                    },
+                    error: (function (data) {
+                        failureModal();
+                    })
+                })
+        },
+        minLength: 2,
+        change: function (event, ui) {
+            if (!ui.item) {
+                $(this).val('');
+                DisplayAlert('error', 'Warning', 'Invalid CostCenter');
+            }
+        }
+    });
+
+    $("#txtOtherNewCostcenterCode").autocomplete("option", "appendTo", ".autocompleteCC-div");
+
+    function allowNumbersOnly(e) {
+        var code = (e.which) ? e.which : e.keyCode;
+        if (code > 31 && (code < 48 || code > 57)) {
+            e.preventDefault();
+        }
+    }
+
+    function alphaOnly(e) {
+        var key = e.keyCode;
+        if (key > 32 && (key < 65 || key > 122 || key == 91 || key == 92 || key == 93 || key == 94 || key == 95 || key == 96)) {
+            e.preventDefault();
+        }
+    }
+
+    $("#btnCancel").on('click', function (e) {
+        ////
+        $("#headingErr").addClass('d-none');
+        document.getElementById("add_to_me").innerHTML = '';
+        if ($('#myModalRequest').hasClass('show'))
+            $('#myModalRequest').modal('hide');
+        else
+            $('#myModalEdit').modal('hide');
+        if (isNewMode || isEditMode) {
+            window.location = "../Dashboard";
+        }
+    });
+
+    function validityModal(txt) {
+        ////
+        if (txt == 'approve') {
+        }
+        else if (txt == 'reject') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for rejecting the form');
+        }
+        else if (txt == 'enquire') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for enquiring the form');
+        }
+    }
+
+    function validityModal(txt) {
+        if (txt == 'reject') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for rejecting the form');
+        }
+        else if (txt == 'enquire') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for enquiring the form');
+        }
+    }
+
+
+    $('#successModel').on('hide.bs.modal', function () {
+
+        GetApprovers();
+    })
+
+
+</script>

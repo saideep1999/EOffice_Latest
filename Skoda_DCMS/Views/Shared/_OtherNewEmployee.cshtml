@@ -1,0 +1,87 @@
+﻿
+<div id="otherNewEmp" class="panel-group mb-2" style="display:none">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" href="#collapseNewEmp">Other Employee Details</a>
+            </h4>
+        </div>
+        <div id="collapseNewEmp" class="panel-collapse collapse in">
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="form-group col-lg-4 required right-padding ui-widget">
+                            <label id="lblOtherNewEmpCCCode" class="control-label">Cost Center (Type 4 numbers for faster results)</label>
+                            <input type="text" name="txtOtherNewEmpCCCode" id="txtOtherNewEmpCCCode" class="form-control" required="required" maxlength="6">
+                        </div>
+                        <div class="form-group col-lg-4 required right-padding">
+                            <label id="lblOtherNewEmpName" class="control-label">Name</label>
+                            <input type="text" name="txtOtherNewEmpname" id="txtOtherNewEmpname" class="form-control" required="required" maxlength="100">
+                        </div>
+                        <div class="form-group col-lg-4 required right-padding">
+                            <label id="lblOtherNewEmpCode" class="control-label">Employee Code</label>
+                            <input type="text" name="txtOtherNewEmpCode" id="txtOtherNewEmpCode" class="form-control" required="required" maxlength="10">
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="form-group col-lg-4 required right-padding">
+                            <label id="lblOtherNewEmpUserID" class="control-label">User ID</label>
+                            <input type="text" name="txtOtherNewUserId" id="txtOtherNewUserId" class="form-control" required="required" maxlength="8">
+                        </div>
+                        <div class="form-group col-lg-4 required right-padding">
+                            <label id="lblOtherNewEmpDept" class="control-label">EmployeeDept</label>
+                            <input type="text" name="txtOtherNewEmpdept" id="txtOtherNewEmpDept" class="form-control" required="required" maxlength="50">
+                        </div>
+                        <div class="form-group col-lg-4 required right-padding">
+                            <label id="lblOtherNewEmpEmailId" class="control-label">Email ID</label>
+                            <input type="text" name="txtOtherNewEmailId" id="txtOtherNewEmailId" class="form-control" required="required" maxlength="50">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="form-group col-lg-4 required right-padding">
+                            <label id="lblOtherNewEmpLevel" class="control-label">Designation</label>
+                            @*<input type="text" name="txtOtherNewEmpLevel" id="txtOtherNewEmpLevel" class="form-control" maxlength="2">*@
+                            <select name="ddOtherNewEmpLevel" id="ddOtherNewEmpLevel" class="form-control"></select>
+                        </div>
+                        <div class="form-group col-lg-4 required right-padding">
+                            <label id="lblOtherNewEmpLocation" class="control-label">Location</label>
+                            <select name="ddOtherNewEmpLocation" id="ddOtherNewEmpLocation" class="form-control"></select>
+                        </div>
+                        <div class="form-group col-lg-4 required right-padding">
+                            <label id="lblOtherNewEmpContactNo" class="control-label">Contact No. (Sample Format: 111-111-1111 or 1111)</label>
+                            <input type="text" name="txtOtherNewEmpContactNo" id="txtOtherNewEmpContactNo" class="form-control" maxlength="12">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 col-lg-12">
+                        <div class="form-group col-lg-3 required right-padding">
+                            <label id="lblOtherNewEmpType" class="radio control-label">Type of Employee</label>
+                            <input type="radio" name="TypeOfOtherNewEmployee" value="Internal"> Internal
+                            <input type="radio" name="TypeOfOtherNewEmployee" value="External"> External/Business Vendor
+                        </div>
+                        <div class="form-group col-lg-3 right-padding">
+                            <label id="lblOtherNewEmpExternalOrg" style="display: none;" class="control-label">External Organisation Name:</label>
+                            <select name="ddOtherNewEmpExternalOrgName" id="ddOtherNewEmpExternalOrgName" class="form-control" style="display: none"></select>
+                        </div>
+
+                        <div id="divOtherNewEmpExtOrgName" class="form-group col-lg-6 right-padding" style="display: none;">
+                            <label id="lblOtherNewEmpExternalOrg" class="control-label">Other External Organisation Name:</label>
+                            <input type="text" id="txtNewEmpOtherExtOrgName" class="form-control" maxlength="100">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+

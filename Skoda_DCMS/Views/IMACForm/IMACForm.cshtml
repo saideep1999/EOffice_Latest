@@ -1,0 +1,2301 @@
+﻿@{
+    ViewBag.Title = "IMAC Form";
+    int FormId = 0, AppRowId = 0, ApprovalType = 0; bool IsEdit = true; bool IsNew = true;
+    bool IsNewMode = true, IsEditMode = false, IsViewMode = false;
+    var SecurityDesgnString = "Security";
+    Skoda_DCMS.Models.IMACFormModel IMAC = null;
+    List<Skoda_DCMS.Models.IMACFormModel> IMACFormDataList = new List<Skoda_DCMS.Models.IMACFormModel>();
+    dynamic FlagRedirect = null;
+    var currentUser = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    List<Skoda_DCMS.Models.ApprovalDataModel>
+    appList = new List<Skoda_DCMS.Models.ApprovalDataModel>();
+    int? tableCount = 0;
+    string disabled = "";
+    var CurrentUserDesgn = "";
+    long? CurrentUserLevel = 0;
+
+    if (ViewBag != null && !ViewBag.IsNewMode)
+    {
+        IsNew = ViewBag.IsNew;
+        IsEdit = ViewBag.IsEdit;
+        IsNewMode = ViewBag.IsNewMode;
+        IsEditMode = ViewBag.IsEditMode;
+        IsViewMode = ViewBag.IsViewMode;
+        disabled = IsViewMode ? "disabled" : "";
+        IMAC = ViewBag.Model.one[0] as Skoda_DCMS.Models.IMACFormModel;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        appList = ViewBag.Model?.three as List<Skoda_DCMS.Models.ApprovalDataModel>;
+
+        CurrentUserDesgn = appList?.Where(x => x.ApproverUserName == currentUser.UserName).Select(x => x.Designation).FirstOrDefault();
+        CurrentUserLevel = appList?.Where(x => x.ApproverUserName == currentUser.UserName && x.ApproverStatus == "Pending").Select(x => x.Level).FirstOrDefault();
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+        //if (IsViewMode)
+        //{
+        //    var Ap = appList?.Where(x =>
+        //    x.ApproverUserName.ToLower() == currentUser.UserName.ToLower()
+        //    && x.ApproverStatus.ToLower() == "pending"
+        //    ).FirstOrDefault();
+        //}
+        var Ap = appList;
+        IMACFormDataList = ViewBag.Model?.Four as List<Skoda_DCMS.Models.IMACFormModel>;
+    }
+}
+
+<style>
+
+    .hide {
+        display: none;
+    }
+    /*New design css start here*/
+    .astColor {
+        color: red;
+    }
+
+    .textTrans {
+        width: 100%;
+        max-width: 99%;
+        border-radius: 5px;
+        margin-right: 0px;
+        border: 1px solid !important;
+    }
+
+    .empDetailsBg {
+        background-color: #fffbef;
+    }
+
+    #accordion select {
+        color: #000;
+        width: 100% !important;
+        height: 45px;
+        background-color: #FFFFFF;
+        border: 1px solid #BFBFBF;
+        box-sizing: border-box;
+        border-radius: 5px;
+        background-image: url(data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>);
+        background-repeat: no-repeat;
+        background-position: right .75rem center;
+        background-size: 16px 12px;
+    }
+
+    #accordion input[type='text'] {
+        width: 100% !important;
+        max-width: 100%;
+        height: 45px;
+        background-color: #FFFFFF;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px !important;
+    }
+
+    #accordion input[type='date'] {
+        width: 100% !important;
+        max-width: 100%;
+        height: 45px;
+        background-color: #FFFFFF;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px;
+    }
+
+    #accordion input[type='time'] {
+        height: 45px;
+    }
+
+    #accordion label {
+        font-size: 16px;
+        line-height: 22px;
+        font-weight: 600;
+        color: #201F1F;
+    }
+
+    #accordion table tr td {
+        font-size: 16px;
+        line-height: 19px;
+        color: #201F1F;
+        background-color: white;
+    }
+
+    #accordion label {
+        display: block;
+    }
+
+    #accordion .card-header {
+        background: rgb(4 59 100) !important;
+        border-radius: 5px 5px 0px 0px;
+        position: relative;
+        margin-top: 15px;
+    }
+
+        #accordion .card-header.collapsed h5:after {
+            content: '+';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        #accordion .card-header h5:after {
+            content: '-';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+    #accordion h5 button {
+        font-size: 18px;
+        line-height: 22px;
+        /* identical to box height */
+        padding-left: 0px;
+        display: flex;
+        align-items: center;
+        text-transform: uppercase;
+        /* Text_white */
+
+        color: #FFFFFF;
+    }
+
+        #accordion h5 button:focus {
+            box-shadow: none;
+        }
+
+    .empDetailsFields label {
+        display: block !important;
+        margin-bottom: 0px;
+    }
+
+    .empDetailsFields .row label {
+        display: block;
+        margin-bottom: 0px;
+    }
+
+        .empDetailsFields .row label:nth-child(1) {
+            font-style: normal;
+            font-weight: normal !important;
+            font-size: 12px;
+            line-height: 18px;
+            color: #A9A9A9 !important;
+        }
+
+        .empDetailsFields .row label:nth-child(2) {
+            font-style: normal;
+            font-weight: normal;
+            font-size: 18px;
+            line-height: 22px;
+            color: #201F1F;
+        }
+
+    .firstLastName {
+        font-style: normal;
+        font-weight: normal;
+        font-size: 20px;
+        line-height: 24px;
+        /* identical to box height */
+
+        display: flex;
+        align-items: center;
+        color: #201F1F;
+    }
+
+    .submit-btn {
+        background: #3D3D3D;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #FFFFFF;
+        border-color: transparent !important;
+    }
+
+    .cancl-btn {
+        background: #FAE99B;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        border-color: transparent !important;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #212221;
+        margin-left: 10px;
+    }
+
+
+
+
+    .card-footer {
+        display: flex;
+        background-color: transparent !important;
+    }
+
+    .photo-form {
+        width: 100%;
+    }
+
+    .ui-front {
+        z-index: 9999999 !important;
+    }
+
+    /* NEW UI CSS END*/
+
+
+    .showBorder {
+        border: 1px solid #dee2e6;
+    }
+
+    .multiselect {
+        height: 47px;
+        margin-top: -1px;
+    }
+    /*Animation CSS Starts*/
+
+    div.input-block {
+        position: relative;
+    }
+
+        div.input-block input {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 188px;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block textarea {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 100%;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            background-color: #fff;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block span.placeholder {
+            position: absolute;
+            margin: 17px 0;
+            padding: 0 4px;
+            font-family: Roboto, sans-serif;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            top: -6px;
+            left: 15px;
+            transition: all 0.2s;
+            transform-origin: 0% 0%;
+            background: none;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+    .question_span {
+        width: 116% !important;
+        font-size: 15px !important;
+    }
+
+    div.input-block textarea:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: #fff !important;
+    }
+
+    div.input-block textarea:valid + span.placeholder,
+    div.input-block textarea:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+    }
+
+    div.inputSelect select:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+    }
+
+    div.input-block input:valid + span.placeholder,
+    div.input-block input:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: #fff;
+        /*background-color: rgb(219,238,213);*/
+    }
+
+
+    div.input-block input.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: rgb(219,238,213);
+    }
+
+    div.input-block input:read-only + span.placeholder,
+    div.input-block input:read-only + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: rgb(219,238,213);
+    }
+
+
+    div.inputSelect span.placeholder {
+        position: absolute;
+        margin: 17px 0;
+        padding: 0 4px;
+        font-family: Roboto, sans-serif;
+        color: #000;
+        display: flex;
+        align-items: center;
+        font-size: 1rem;
+        top: -6px;
+        left: 15px;
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+        background: none;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    div.inputSelect select:focus + span.placeholder {
+        transform: scale(0.8) translateY(-30px);
+        background: rgb(219,238,213);
+        z-index: 9;
+    }
+
+    div.inputSelect select:not([value=""]):valid + span.placeholder {
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+    }
+
+
+
+    div.input-block input:focus + span.placeholder {
+        color: #284B63;
+    }
+
+    .breadcrumb {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+        padding: 1rem 1rem 0;
+        margin-bottom: 0;
+        list-style: none;
+        background-color: #FFFFFF;
+        border-radius: .25rem;
+    }
+
+    body.nav-sm .container.body .left_col {
+        width: 63px;
+        padding: 0;
+        position: fixed;
+        height: 100%;
+        z-index: 8;
+    }
+
+    .card {
+        position: relative;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        min-width: 0;
+        word-wrap: break-word;
+        background-color: #fff;
+        background-clip: border-box;
+        border: 0px;
+        border-radius: .25rem;
+    }
+
+    .dropdown-toggle::after {
+        display: none;
+        width: 0;
+        height: 0;
+        margin-left: .255em;
+        vertical-align: .255em;
+        content: "";
+        border-top: .3em solid;
+        border-right: .3em solid transparent;
+        border-bottom: 0;
+        border-left: .3em solid transparent;
+    }
+
+    input.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213);
+    }
+
+    inputSelect.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213) !important;
+    }
+
+    select.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background-color: rgb(219,238,213) !important;
+        z-index: 9;
+    }
+
+    select.spanUpperSideWhite + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background-color: rgb(255,255,255) !important;
+        z-index: 9;
+    }
+
+    textarea.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    .TransView {
+        background-color: white !important;
+    }
+
+    @@media only screen and (min-width: 992px) {
+        div .input-block span.placeholder {
+            font-size: 15px;
+        }
+
+        div.inputSelect span.placeholder {
+            font-size: 1rem;
+        }
+    }
+
+    input[type='date'].spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    .showBorder {
+        border: 1px solid #dee2e6;
+    }
+
+    .wField {
+        width: 233px !important;
+        margin-left: 10px;
+    }
+
+    @@-moz-document url-prefix() {
+        input[type=time]::-ms-clear {
+            display: none;
+        }
+    }
+
+    .datetime-reset-button {
+        display: none !important;
+    }
+
+    .forShoppingCart {
+        margin-left: 14% !important;
+    }
+
+    .btn-group {
+        display: block !important;
+    }
+
+    #accordion label {
+        display: inline-block !important;
+    }
+
+
+    .custom-select:focus {
+        box-shadow: none !important;
+        border-color: none !important;
+    }
+
+    #addSoftwarebtn td {
+        border-top: none !important;
+    }
+
+    #ApplicationCategoryBody select {
+        background-color: #fff !important;
+    }
+
+    #loader {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        z-index: 10000;
+    }
+
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        margin: 0;
+    }
+</style>
+<script type="text/javascript">
+    function checkSelectGlobal(id) {
+        if ($('#' + id).val() != '') {
+            $('#' + id).addClass('spanUpperSideWhite');
+        }
+    }
+</script>
+
+<div class="container">
+    <div class="right_col bg-transparent" role="main">
+        <div class="main_container">
+            <form id="IMACForm" method="post">
+                <div>
+                    <div class="breadcrumb-container">
+                        <div>
+                            @if (IsEditMode || IsViewMode)
+                            {
+                                <div>
+                                    @*<input type="hidden" id="FormSrId" name="FormSrId" value="@(ViewBag.Model.one[0].Id)" />*@
+                                    <input type="hidden" id="FormId" name="FormId" value="@(FormId)" />
+                                    <input type="hidden" id="AppRowId" name="AppRowId" value="@(AppRowId)" />
+                                    <input type="hidden" id="FormSrId" name="FormSrId" value="@(IMAC.ID)" />
+
+
+                                </div>
+                            }
+                            <ol class="breadcrumb">
+                                <li>
+                                    <a href="/Dashboard?formName=IMAC">
+                                        Dashboard
+                                    </a>
+                                </li>
+                                <li>
+                                    IMAC Form
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="row breadcrumb-container table-bordered  mr-1 ml-1" style="background-color: rgb(219,238,213) !important; ">
+                        <div class="col-md-2 col-lg-2">
+                            <span class="placeholder">Date : @(IsViewMode || IsEditMode ? (Convert.ToDateTime(appList.FirstOrDefault().FormId.CreatedDate).ToShortDateString()) : DateTime.Now.ToShortDateString())</span>
+                        </div>
+                        <div class="col-md-8 col-lg-8 mt-2 mb-1 form-heading" style="text-align:center; margin-top:5px">
+                            <span>IMAC Form</span>
+                        </div>
+                        <div class="col-md-2 col-lg-2">
+                            @if (IsViewMode || IsEditMode)
+                            {
+                                <span class="placeholder white_space_nowrap"> Form Id : @(IsViewMode || IsEditMode ? ("IMAC" + FormId ?? "") : "" )</span>
+                            }
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="heading d-none" id="headingErr">
+                    <h1 id="" class="info-header">Following fields are mandatory. Please fill in information for<br></h1>
+                    <div id="add_to_me" class="header-list" style="color:red;"></div>
+                </div>
+                <!-- ACCORDIAN STRUCTURE START HERE-->
+                @* Submitter Section *@
+                @{
+                    Html.RenderPartial("_NewSubmitterDetailsWithModel", (ViewBag as object));
+                }
+
+                @* Applicant Section *@
+                @{
+                    Html.RenderPartial("_NewApplicantDetailsWithModel", (ViewBag as object));
+                }
+                @* Transaction Fields *@
+                @if (IsNewMode)
+                {
+                    <div id="accordion">
+                        <div class="card">
+                            <div class="card-header collapsed" id="headingThree" data-toggle="collapse" data-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                                <h5 class="mb-0">
+                                    <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                                        <img src="/assets/img/transactionIcon.svg" width="24" height="24" class="mr-2">Transaction Fields
+                                    </button>
+                                </h5>
+                            </div>
+                            <div id="collapseThree" class="collapse show" aria-labelledby="headingThree" style="">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-12 col-lg-12 col-12">
+                                            <div class="col-md-8 col-lg-8 col-12">
+                                                <table class="table row mainTbl form-table-container-2">
+                                                    <tbody>
+
+                                                        <tr>
+                                                            <td class="actionTypeWidth"><label id="lblActionType" class="f-600">IMAC: </label></td>
+                                                            <td class="w18">
+                                                                <label class="checkbox-container f-600">
+                                                                    Install
+                                                                    <input type="radio" class="inpDisable" name="chkIMAC" id="chkInstall" value="Install"
+                                                                           onclick="getIMACType()" checked>
+                                                                    <span class="checkmark"></span>
+                                                                </label>
+                                                            </td>
+                                                            <td class="align w-20">
+                                                                <label class="checkbox-container f-600">
+                                                                    Movement
+                                                                    <input type="radio" class="inpDisable" name="chkIMAC" id="chkMovement" value="Movement" onclick="getIMACType()">
+
+                                                                    <span class="checkmark"></span>
+                                                                </label>
+                                                            </td>
+                                                            <td class="w18">
+                                                                <label class="checkbox-container f-600">
+                                                                    Addition
+                                                                    <input type="radio" class="inpDisable" name="chkIMAC" id="chkAddition" value="Addition" onclick="getIMACType()">
+                                                                    <span class="checkmark"></span>
+                                                                </label>
+                                                            </td>
+                                                            <td class="align w-20">
+                                                                <label class="checkbox-container f-600">
+                                                                    Change
+                                                                    <input type="radio" class="inpDisable" name="chkIMAC" id="chkChange" value="Change" onclick="getIMACType()">
+                                                                    <span class="checkmark"></span>
+                                                                </label>
+                                                            </td>
+                                                            <td>
+                                                                <input type="hidden" name="IMACtype" id="chkIMACtype" value="">
+                                                                @*<input type="hidden" name="chkActionType" id="chkActionType" value="">*@
+                                                            </td>
+                                                        </tr>
+
+
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="col-md-4 col-lg-4 col-12"></div>
+                                            <div class="col-md-12 col-lg-12 col-12" id="imac_tbl">
+                                                <table class="row mx-auto table table-border form-border text-center" style="display:table;table-layout: fixed;" id="tblIMACData">
+                                                    <thead class="form-head-1" style="margin-left:inherit !important;">
+
+                                                        @*<tr>
+                                                            <th>Asset Name</th>
+                                                            <th>Sub Category</th>
+                                                            <th>Make</th>
+                                                            <th>Model</th>
+                                                            <th>Asset Type</th>
+                                                            <th>Remark</th>
+                                                            <th>Acknowledgement</th>
+                                                            <th>Type</th>
+                                                            <th>Serial No</th>
+                                                            <th>Host Name</th>
+                                                            <th>Location</th>
+                                                            <th class="temp_from">From</th>
+                                                            <th class="temp_to">To</th>
+
+                                                            <th></th>
+                                                        </tr>*@
+                                                        <tr>
+                                                            <th>Asset Name</th>
+                                                            <th>Sub Category</th>
+                                                            <th>Make</th>
+                                                            <th>Model</th>
+                                                            <th>Asset Type</th>
+
+                                                            <th>Acknowledgement</th>
+
+                                                            <th>Serial No</th>
+                                                            <th>Host Name</th>
+                                                            <th>Location</th>
+                                                            <th>Type</th>
+                                                            <th class="temp_from hide">From</th>
+                                                            <th class="temp_to hide">To</th>
+                                                            <th></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody class="form-border tableSoftware" id="softwareBody">
+
+                                                        <tr id="row1" class="tr_input">
+                                                            <td class="text-center input-block">
+
+
+                                                                <select class="form-control " name="AssetName" id="drpAssets_1" onchange="loadSubCategory(this)" required="">
+                                                                    <option value="-1" style="display:none;">Select</option>
+                                                                    <option value="Office Laptop">Office Laptop</option>
+                                                                    <option value="Office Desktop">Office Desktop</option>
+                                                                    <option value="Workstation Laptop">Workstation Laptop</option>
+                                                                    <option value="Workstation Desktop">Workstation Desktop</option>
+                                                                    <option value="iPad">iPad</option>
+                                                                    <option value="Monitor">Monitor</option>
+                                                                    <option value="Tablet">Tablet</option>
+                                                                    <option value="iPhone">iPhone</option>
+                                                                    <option value="Jabra Speaker">Jabra Speaker</option>
+                                                                    <option value="DeskPhone">DeskPhone</option>
+                                                                    <option value="HeadPhone">HeadPhone</option>
+                                                                    <option value="Toughbook">Toughbook</option>
+                                                                    <option value="Mobile Phone">Mobile Phone</option>
+                                                                    <option value="LAN Cable">LAN Cable</option>
+                                                                    <option value="Mouse">Mouse</option>
+                                                                    <option value="Keyboard">Keyboard</option>
+                                                                    <option value="Adaptor">Adaptor</option>
+                                                                    <option value="Cables">Cables</option>
+                                                                </select>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <select class="form-control " name="SubAssetName" id="drpSubAssets_1" onchange="checkSelect('drpSubAssets_1')">   </select>
+
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <input type="text" name="Make" id="txtMake_1">
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <input type="text" name="Modal" id="txtModel_1">
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <select name="AssetType" class="" id="ddAssetType_1" onchange="checkSelect('ddAssetType_1')">
+                                                                    <option value="" class="d-none"></option>
+                                                                    <option value="First Asset">First Asset</option>
+                                                                    <option value="Additional">Additional</option>
+                                                                </select>
+
+
+                                                            </td>
+
+                                                            <td class="text-center">
+                                                                <select name="Acknowledgement" class="" id="ddlAcknowledgement_1" onchange="checkSelect('ddlAcknowledgement')">
+                                                                    <option value="" class="d-none"></option>
+                                                                    <option value="Assigned">Assigned</option>
+                                                                    <option value="Returned">Returned</option>
+                                                                    @*<option value="Returned">Returned</option>*@
+                                                                </select>
+
+                                                            </td>
+
+                                                            <td class="text-center">
+
+                                                                <input type="text" name="SerialNo" id="txtSerialNo_1">
+
+                                                            </td>
+
+                                                            <td class="text-center">
+
+                                                                <input type="text" name="HostName" id="txtHostName_1">
+
+                                                            </td>
+
+                                                            <td class="text-center">
+
+                                                                <input type="text" name="Location" id="txtLocation_1">
+
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <select class="form-control requestType" id="ddlrequestType_1" name="AssignType" onchange="showHideDates(this)">
+                                                                    <option value="Permanent">Permanent</option>
+                                                                    <option value="Temporary">Temporary</option>
+                                                                </select>
+                                                            </td>
+
+                                                            <td class="text-center txt_replacement temp_from">
+                                                                <input type="date" name="FromDate" id="txt_from_date_1" class="temp_from_input" value="@(IMAC?.FromDate.ToString("dd-MM-yyyy"))" />
+                                                                @*<input type="date" name="FromDate" id="txt_from_date_1" class="temp_from_input" value="@(IMAC?.FromDate.ToString("dd-MM-yyyy"))">*@
+                                                                @*value="@(IMAC?.FromDate.ToString("yyyy-MM-dd")!="0001-01-01" ? IMAC?.FromDate.ToString("yyyy-MM-dd"):"")">*@
+
+                                                            </td>
+                                                            <td class="text-center txt_replacement temp_to">
+                                                                @*<input type="date" name="ToDate" id="txt_to_date_1" class="temp_from_input">*@
+                                                                <input type="date" name="ToDate" id="txt_to_date_1" class="temp_from_input" value="@(IMAC?.ToDate.ToString("dd-MM-yyyy"))">
+                                                            </td>
+                                                            <td class="text-center" style="background-color:white; max-width:123px; vertical-align:central;">
+                                                                <input class="remove-btn remove align-center" type="image" src="/assets/img/remove.png" alt="Remove" id="remove_1" style="max-width: 85%; background-color: white; border:none;">
+                                                            </td>
+
+                                                        </tr>
+
+
+
+                                                    </tbody>
+                                                </table>
+                                                <div class="col-md-12 mt-3" align="right" id="addbtn">
+                                                    <button type="button" class="btn btn-sm submit-btn d-flex float-right mb-2 bl-1 " onclick="addTableRow()">
+                                                        @*<button type="button" class="btn btn-sm submit-btn d-flex float-right mb-2 bl-1 " onclick="AddIMACRows()">*@
+                                                        + Add
+                                                    </button>
+                                                    <input type="hidden" name="totalrows" id="totalrows">
+                                                </div>
+                                            </div>
+
+
+                                            <div class="w-100">
+                                                <div class="per row col-12" style="padding: 0;">
+                                                    <label class="col-md-12 col-lg-12"><b>Business Justification</b></label>
+                                                    <textarea class="form-control col-md-12 col-lg-12" name="BusinessJustification" id="txtBusinessJustification" rows="4"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                }
+                @if (IsViewMode || IsEditMode)
+                {
+
+                    <div id="accordion">
+                        <div class="card">
+                            <div class="card-header collapsed" id="headingThree" data-toggle="collapse" data-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                                <h5 class="mb-0">
+                                    <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                                        <img src="/assets/img/transactionIcon.svg" width="24" height="24" class="mr-2">Transaction Fields
+                                    </button>
+                                </h5>
+                            </div>
+                            <div id="collapseThree" class="collapse show" aria-labelledby="headingThree" style="">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-12 col-lg-12 col-12">
+                                            <div class="col-md-8 col-lg-8 col-12">
+                                                <table class="table row mainTbl form-table-container-2">
+                                                    <tbody>
+
+                                                        <tr>
+                                                            <td class="actionTypeWidth"><label id="lblActionType" class="f-600">IMAC: </label></td>
+                                                            <td class="w18">
+                                                                <label class="checkbox-container f-600">
+                                                                    Install
+                                                                    <input type="radio" class="inpDisable" name="chkIMAC" id="chkInstall" value="Install" onclick="getIMACType()" @(IMAC.IMACtype == "Install" ? "checked" : "") disabled>
+                                                                    <span class="checkmark"></span>
+                                                                </label>
+                                                            </td>
+                                                            <td class="align w-20">
+                                                                <label class="checkbox-container f-600">
+                                                                    Movement
+                                                                    <input type="radio" class="inpDisable" name="chkIMAC" id="chkMovement" value="Movement" onclick="getIMACType()" @(IMAC.IMACtype == "Movement" ? "checked" : "") disabled>
+
+                                                                    <span class="checkmark"></span>
+                                                                </label>
+                                                            </td>
+                                                            <td class="w18">
+                                                                <label class="checkbox-container f-600">
+                                                                    Addition
+                                                                    <input type="radio" class="inpDisable" name="chkIMAC" id="chkAddition" value="Addition" onclick="getIMACType()" @(IMAC.IMACtype == "Addition" ? "checked" : "") disabled>
+                                                                    <span class="checkmark"></span>
+                                                                </label>
+                                                            </td>
+                                                            <td class="align w-20">
+                                                                <label class="checkbox-container f-600">
+                                                                    Change
+                                                                    <input type="radio" class="inpDisable" name="chkIMAC" id="chkChange" value="Change" onclick="getIMACType()" @(IMAC.IMACtype == "Change" ? "checked" : "") disabled>
+                                                                    <span class="checkmark"></span>
+                                                                </label>
+                                                            </td>
+                                                            <td>
+                                                                <input type="hidden" name="IMACtype" id="chkIMACtype" value="">
+                                                            </td>
+                                                        </tr>
+
+
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="col-md-4 col-lg-4 col-12"></div>
+                                            <div class="col-md-12 col-lg-12 col-12" id="imac_tbl">
+                                                <table class="row mx-auto table table-border form-border text-center" style="display:table;table-layout: fixed;" id="tblIMACData">
+                                                    <thead class="form-head-1" style="margin-left:inherit !important;">
+
+                                                        <tr>
+                                                            <th>Asset Name</th>
+                                                            <th>Sub Category</th>
+                                                            <th>Make</th>
+                                                            <th>Model</th>
+                                                            <th>Asset Type</th>
+
+                                                            <th>Acknowledgement</th>
+
+                                                            <th>Serial No</th>
+                                                            <th>Host Name</th>
+                                                            <th>Location</th>
+                                                            <th>Type</th>
+                                                            <th class="temp_from hide">From</th>
+                                                            <th class="temp_to hide">To</th>
+                                                        
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody class="form-border tableSoftware" id="softwareBody">
+
+
+                                                        @foreach (var item in IMACFormDataList)
+                                                        {
+                                                            <tr id="row1" class="tr_input">
+
+                                                                <td class="text-center input-block">
+
+
+                                                                    <select class="form-control " name="AssetName" id="drpAssets_1" onchange="loadSubCategory(this)" required disabled>
+                                                                        <option value="-1" style="display:none;" @(item?.AssetName == "" || item?.AssetName == null ? "selected" : "")>Select</option>
+                                                                        <option value="Office Laptop" @(item?.AssetName == "Office Laptop" ? "selected" : "")>Office Laptop</option>
+                                                                        <option value="Office Desktop" @(item?.AssetName == "Office Desktop" ? "selected" : "")>Office Desktop</option>
+                                                                        <option value="Workstation Laptop" @(item?.AssetName == "Workstation Laptop" ? "selected" : "")>Workstation Laptop</option>
+                                                                        <option value="Workstation Desktop" @(item?.AssetName == "Workstation Desktop" ? "selected" : "")>Workstation Desktop</option>
+                                                                        <option value="iPad" @(item?.AssetName == "iPad" ? "selected" : "")>iPad</option>
+                                                                        <option value="Monitor" @(item?.AssetName == "Monitor" ? "selected" : "")>Monitor</option>
+                                                                        <option value="Tablet" @(item?.AssetName == "Tablet" ? "selected" : "")>Tablet</option>
+                                                                        <option value="iPhone" @(item?.AssetName == "iPhone" ? "selected" : "")>iPhone</option>
+                                                                        <option value="Jabra Speaker" @(item?.AssetName == "Jabra Speaker" ? "selected" : "")>Jabra Speaker</option>
+                                                                        <option value="DeskPhone" @(item?.AssetName == "DeskPhone" ? "selected" : "")>DeskPhone</option>
+                                                                        <option value="HeadPhone" @(item?.AssetName == "HeadPhone" ? "selected" : "")>HeadPhone</option>
+                                                                        <option value="Toughbook" @(item?.AssetName == "Toughbook" ? "selected" : "")>Toughbook</option>
+                                                                        <option value="Mobile Phone" @(item?.AssetName == "Mobile Phone" ? "selected" : "")>Mobile Phone</option>
+                                                                        <option value="LAN Cable" @(item?.AssetName == "LAN Cable" ? "selected" : "")>LAN Cable</option>
+                                                                        <option value="Mouse" @(item?.AssetName == "Mouse" ? "selected" : "")>Mouse</option>
+                                                                        <option value="Keyboard" @(item?.AssetName == "Keyboard" ? "selected" : "")>Keyboard</option>
+                                                                        <option value="Adaptor" @(item?.AssetName == "Adaptor" ? "selected" : "")>Adaptor</option>
+                                                                        <option value="Cables" @(item?.AssetName == "Cables" ? "selected" : "")>Cables</option>
+                                                                    </select>
+
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <select class="form-control " name="SubAssetName" id="drpSubAssets_1" onchange="checkSelect('drpSubAssets_1')" disabled>
+                                                                        <option value="">@(item?.SubAssetName)</option>
+                                                                    </select>
+
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <input type="text" name="Make" id="txtMake_1" value="@(item?.Make)" disabled>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <input type="text" name="Modal" id="txtModel_1" value="@(item?.Modal)" disabled>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <select name="AssetType" class="" id="ddAssetType_1" onchange="checkSelect('ddAssetType_1')" disabled>
+                                                                        <option value="" class="d-none"></option>
+                                                                        <option value="First Asset" @(item?.AssetType == "First Asset" ? "selected" : "")>First Asset</option>
+                                                                        <option value="Additional" @(item?.AssetType == "Additional" ? "selected" : "")>Additional</option>
+                                                                    </select>
+
+
+                                                                </td>
+                                                              
+                                                                <td class="text-center">
+                                                                    <select name="Acknowledgement" class="" id="ddlAcknowledgement_1" onchange="checkSelect('ddlAcknowledgement')" disabled>
+                                                                        <option value="" class="d-none"></option>
+                                                                        <option value="Assigned" @(item?.Acknowledgement == "Assigned" ? "selected" : "")>Assigned</option>
+                                                                        <option value="Returned" @(item?.Acknowledgement == "Returned" ? "selected" : "")>Returned</option>
+                                                                        @*<option value="Returned">Returned</option>*@
+                                                                    </select>
+
+                                                                </td>
+
+
+                                                                <td class="text-center">
+
+                                                                    <input type="text" name="SerialNo" id="txtSerialNo_1" value="@(item?.SerialNo)" disabled>
+
+                                                                </td>
+
+                                                                <td class="text-center">
+
+                                                                    <input type="text" name="HostName" id="txtHostName_1" value="@(item?.HostName)" disabled>
+
+                                                                </td>
+
+                                                                <td class="text-center">
+
+                                                                    <input type="text" name="Location" id="txtLocation_1" value="@(item?.Location)" disabled>
+
+                                                                </td>
+
+                                                                <td class="text-center">
+                                                                    <select class="form-control requestType" id="ddlrequestType_1" name="AssignType" disabled>
+                                                                        <option value="" @(item.AssignType == null ? "selected" : "")></option>
+                                                                        <option value="Permanent" @(item?.AssignType == "Permanent" ? "selected" : "")>Permanent</option>
+                                                                        <option value="Temporary" @(item?.AssignType == "Temporary" ? "selected" : "")>Temporary</option>
+                                                                    </select>
+                                                                </td>
+
+                                                                <td class="text-center txt_replacement temp_from">
+                                                                    <input type="text" name="FromDate" id="txt_from_date_1" class="temp_from_input" value="@(item?.FromDate.ToString("yyyy-MM-dd") == "0001-01-01" ? "" : item?.FromDate.ToString("yyyy-MM-dd"))" disabled>
+                                                                    @*value="@(IMAC?.FromDate.ToString("yyyy-MM-dd")!="0001-01-01" ? IMAC?.FromDate.ToString("yyyy-MM-dd"):"")">*@
+
+                                                                </td>
+                                                                <td class="text-center txt_replacement temp_to">
+                                                                    <input type="text" name="ToDate" id="txt_to_date_1" class="temp_from_input" value="@(item?.ToDate.ToString("yyyy-MM-dd") == "0001-01-01" ? "" : item?.ToDate.ToString("yyyy-MM-dd"))" disabled>
+                                                                </td>
+
+
+                                                            </tr>
+
+
+                                                        }
+
+
+                                                    </tbody>
+                                                </table>
+                                                @*<div class="col-md-12 mt-3" align="right" id="addbtn">
+                <button type="button" class="btn btn-sm submit-btn d-flex float-right mb-2 bl-1 " onclick="addTableRow()">
+                    + Add
+                </button>
+                <input type="hidden" name="totalrows" id="totalrows">
+            </div>*@
+                                            </div>
+
+                                            <div class="w-100">
+                                                <div class="per row col-12" style="padding: 0;">
+                                                    <label class="col-md-12 col-lg-12"><b>Business Justification</b></label>
+                                                    <input class="form-control col-md-12 col-lg-12" name="BusinessJustification" rows="4" value="@(IMAC?.BusinessJustification)" disabled>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                }
+
+
+                @* Approval Section And Action Section *@
+                @*@if (IsViewMode || IsEditMode)
+                    {
+                        //Approval Section
+                        <div id="accordion">
+                            <div class="card">
+                                <div class="card-header collapsed" id="headingFour" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                                    <h5 class="mb-0">
+                                        <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                                            <img src="~/assets/img/approvalTracking.svg" width="24" height="24" class="mr-2" />Approval Tracking
+                                        </button>
+                                    </h5>
+                                </div>
+                                <div id="collapseFour" class="collapse" aria-labelledby="headingFour">
+                                    <div class="card-body">
+                                        <div class="form-row">
+                                            <div class="col-12">
+                                                <table class="table w-100 td-border showBorder">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Name</th>
+                                                            <th>Role</th>
+                                                            <th style="display: @(appList.Any(x => !string.IsNullOrEmpty(x.ExtraDetails)) ? " " : " none")">Content</th>
+                                                            <th>Processed on</th>
+                                                            <th>Status</th>
+                                                            <th class="text-center">Comments</th>
+                                                            <th class="text-center">Approval Level</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @if (IsViewMode || IsEditMode)
+                                                        {
+                                                            Html.RenderPartial("_ApprovalTracking", appList);
+                                                        }
+
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }*@
+
+                @* Buttons *@
+                @if (IsNewMode)
+                {
+
+                    <div>
+                        <p class="text-left f-600">SF_SO/1_018.00</p>
+                    </div>
+                    <div class="card-footer align-content-center">
+                        <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                            Submit
+                        </button>
+                        <button type="reset" class="btn btn-danger btn-sm cancl-btn" id="btnCancel">
+                            Cancel
+                        </button>
+                    </div>
+                }
+                @*else if (IsEditMode)
+                {
+                    <div class="card-footer align-content-center">
+                        <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                            Re-Submit
+                        </button>
+                        <button type="reset" class="btn btn-danger btn-sm cancl-btn" id="btnCancel">
+                            Cancel
+                        </button>
+                    </div>
+                }*@
+
+            </form>
+
+            @*<div>
+                    <p class="text-left f-600">SF_II_024</p>
+                </div>*@
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="successModel" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header modelHeader">
+                <span class="modal-title modalMsgTitle" id="modalTitle"></span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label id="modalBody" class="lableMsg">  </label>
+                <input type="hidden" id="tab" value="0" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="submitBomBtn publishBtn" id="modalOkButton" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var spinner = $('#loader');
+    var currentUserDesgn = @Html.Raw(Json.Encode(CurrentUserDesgn));
+    var IsNew = @Html.Raw(Json.Encode(IsNew));
+    var IsEdit = @Html.Raw(Json.Encode(IsEdit));
+    var IsNewMode = @Html.Raw(Json.Encode(IsNewMode));
+    var IsEditMode = @Html.Raw(Json.Encode(IsEditMode));
+    var IsViewMode = @Html.Raw(Json.Encode(IsViewMode));
+    var IMAC = @Html.Raw(Json.Encode(IMAC));
+    var appRowId = @Html.Raw(Json.Encode(AppRowId));
+    var approvalType =@Html.Raw(Json.Encode(ApprovalType));
+    var FlagRedirect = @Html.Raw(Json.Encode(FlagRedirect));
+    var SecurityDesgnString = @Html.Raw(Json.Encode(SecurityDesgnString));
+     pageLoad();
+    var errorCount = 0;
+    var errors = "";
+   // pageLoad();
+    function pageLoad() {
+        spinner.hide();
+        $("#headingErr").addClass('d-none');
+        $("#rdOnBehalfOptionOthersLabel").text('Blue Collar Employee');
+       }
+
+
+    $(document).ready(function () {
+        var Employeetype = $("#drpRequestSubmissionFor option:selected").val();
+        if (Employeetype == "OnBehalf") {
+            var EmpNamee = $("#txtOtherEmployeeName").val();
+            $("#txtBuyerName").val(EmpNamee).prop("readOnly", true);
+        } else {
+            if ('@IsNewMode' == true || '@IsNewMode' == "True" ) {
+                $("#txtBuyerName").val("@currentUser.FirstName @currentUser.LastName").prop("readOnly", true);
+            }
+
+        }
+        if (@CurrentUserLevel == 1) {
+
+            $("#btnApprove").hide();
+            $("#btnEnquire").hide();
+            $("#btnReject").hide();
+            $("#btnClose").hide();
+            var objDiv = $("#myModal5");
+
+            var h = objDiv.get(0).scrollHeight;
+            objDiv.animate({ scrollTop: h });
+            $(this).parent().css("border-color", "#98DB82");
+            $('#btnEnquire').parent().css("border-color", "white");
+            $('#btnReject').parent().css("border-color", "white");
+            $("#approveFooter").show();
+            $("#rejectFooter").hide();
+            $("#enquireFooter").hide();
+        } else {
+
+            $("#btnApprove").show();
+        }
+
+    });
+
+
+
+
+     $.ajax({
+            url: '/IMACForm/GetAssets',
+            type: 'GET',
+            data: { },
+            dataType: 'JSON',
+            success: (function(data) {
+                @*var s = '<option value="" style="display:none;">@IMAC.AssetName</option>'*@
+                /* var s = '<option value="" style="display:none;"></option>';*/
+                var s;
+                for (var i = 0; i < data.length; i++) {
+                        s += '<option value="' + data[i].AssetName + '">' + data[i].AssetName + '</option>';
+                    }
+                $("#drpAssets3").html(s);
+
+                }),
+            error: (function(data) {
+                    //code
+                })
+        })
+
+    $.ajax({
+        url: '/IMACForm/GetAssets',
+            type: 'GET',
+            data: {},
+            dataType: 'JSON',
+            success: (function (data) {
+                @*var s = '<option value="" style="display:none;">@IMAC.AssetName1</option>'*@
+                 var s = '<option value="" style="display:none;"></option>';
+               /* var s;*/
+                for (var i = 0; i < data.length; i++) {
+                    s += '<option value="' + data[i].AssetName + '">' + data[i].AssetName + '</option>';
+                }
+                $("#drpAssets4").html(s);
+
+            }),
+            error: (function (data) {
+                //code
+            })
+        })
+
+
+   function getIMACType() {
+        ////
+
+            if ($("#chkInstall").prop("checked") == true) {
+                $('input[id="chkInstall"]').prop('disabled', true);
+                $('input[id="chkMovement"]').prop('checked', false).change();
+                $('input[id="chkMovement"]').prop("disabled", false);
+                $('input[id="chkAddition"]').prop('checked', false).change();
+                $('input[id="chkAddition"]').prop("disabled", false);
+                $('input[id="chkChange"]').prop('checked', false).change();
+                $('input[id="chkChange"]').prop("disabled", false);
+                $("#chkIMACtype").val('Install');
+            }
+
+                 if ($("#chkMovement").prop("checked") == true) {
+                $('input[id="chkMovement"]').prop('disabled', true);
+                $('input[id="chkInstall"]').prop("checked", false).change();
+                $('input[id="chkInstall"]').prop("disabled", false);
+                $('input[id="chkAddition"]').prop('checked', false).change();
+                $('input[id="chkAddition"]').prop("disabled", false);
+                $('input[id="chkChange"]').prop('checked', false).change();
+                $('input[id="chkChange"]').prop("disabled", false);
+                $("#chkIMACtype").val('Movement');
+            }
+
+              if ($("#chkAddition").prop("checked") == true) {
+                $('input[id="chkAddition"]').prop('disabled', true);
+                $('input[id="chkChange"]').prop("checked", false).change();
+                $('input[id="chkChange"]').prop("disabled", false);
+                $('input[id="chkInstall"]').prop('checked', false).change();
+                $('input[id="chkInstall"]').prop("disabled", false);
+                $('input[id="chkMovement"]').prop('checked', false).change();
+                $('input[id="chkMovement"]').prop("disabled", false);
+                $("#chkIMACtype").val('Addition');
+            }
+
+            if ($("#chkChange").prop("checked") == true) {
+                $('input[id="chkChange"]').prop('disabled', true);
+                $('input[id="chkInstall"]').prop("checked", false).change();
+                $('input[id="chkInstall"]').prop("disabled", false);
+                $('input[id="chkMovement"]').prop('checked', false).change();
+                $('input[id="chkMovement"]').prop("disabled", false);
+                $('input[id="chkAddition"]').prop('checked', false).change();
+                $('input[id="chkAddition"]').prop("disabled", false);
+                $("#chkIMACtype").val('Change');
+            }
+
+    }
+
+    function checkSelect(id) {
+        //////
+        if ($('#' + id).val() != '') {
+            $('#' + id).addClass('spanUpperSide');
+        }
+    }
+
+    function FormApproval(status, appRowId, comment, approvalType, text) {
+        //
+        spinner.show();
+        $.ajax({
+            url: '/List/SaveResponse',
+            type: 'POST',
+            data: { response: status, appRowId: appRowId, comment: comment, approvalType: approvalType },
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data.Result == 1) {
+                    successIMACModal(text);
+                    spinner.hide();
+                    //setTimeout(FilterMyTasks, 5000);
+                    spinner.hide();
+                }
+                else {
+                    failureModal();
+                    spinner.hide();
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+                spinner.hide();
+            })
+        })
+
+        $("#tab").val(1);
+    }
+
+    function saveResponse(text) {
+        var status = '', comment = '';
+        comment = $("#comment-" + text).val();
+        switch (text) {
+        case 'approve': {
+        status = 'Approved';
+        if (@CurrentUserLevel == "1") {
+         //addBidIMACApprovalDate(status, appRowId, comment, approvalType, text);
+            FormApproval(status, appRowId, comment, approvalType, text);
+        }
+        else {
+        FormApproval(status, appRowId, comment, approvalType, text);
+        }
+        break;
+        }
+        case 'reject': {
+        status = 'Rejected';
+        if (comment == '') {
+        validityModal(text);
+        return;
+        }
+        else {
+        FormApproval(status, appRowId, comment, approvalType, text);
+        }
+        break;
+        }
+        case 'enquire': {
+        status = 'Enquired';
+        if (comment == '') {
+        validityModal(text);
+        return;
+        }
+        else {
+        FormApproval(status, appRowId, comment, approvalType, text);
+        }
+        break;
+        }
+        }
+
+        $("#tab").val(1);
+    }
+
+    function addBidIMACApprovalDate(status, appRowId, comment, approvalType, text) {
+
+        var form = $("#IMACForm");
+        var formData = new FormData(form[0]);
+        $.ajax({
+            url: '/IMACForm/UpdateBidApprovalDate',
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            dataType: 'JSON',
+            data: formData,
+            enctype: 'multipart/form-data',
+            success: (function (data) {
+                if (data == 1) {
+                    FormApproval(status, appRowId, comment, approvalType, text);
+                }
+                else {
+                    failureModal(data.Message);
+
+                    console.log("failure");
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+
+
+            })
+        })
+
+    }
+
+    function IMACUpdate(status, appRowId, comment, approvalType, text) {
+       /* */
+        var form = $("#IMACForm").serialize();
+        $.ajax({
+            url: '/IMACForm/UpdateData',
+            type: 'POST',
+            data: form,
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data == 1) {
+                    FormApproval(status, appRowId, comment, approvalType, text);
+                }
+                else {
+                    failureModal();
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+            })
+        })
+
+    }
+
+    $("#btnSubmit").on('click', function (e) {
+       
+        errors = "";
+        errorCount = "";
+        validateSubmitter();
+        validateApplicant();
+        getIMACType();
+       var lblActionType = $("#chkIMACtype").val();
+
+
+
+
+
+
+
+        if (errors.length) {
+            $('#loader').hide();
+            errors = "<ol id='errorList'>" + errors + "</ol>";
+            $("#headingErr").removeClass('d-none');
+            document.getElementById("add_to_me").innerHTML = errors;
+            errors = "";
+            errorCount = 0;
+            //if (IsEditMode) {
+            //    $("#myModalEdit").scrollTop(0);
+            //    $("#myModalRequest").scrollTop(0);
+            //}
+            //else {
+            //    $(window).scrollTop(0);
+            //}
+            return false;
+        }
+        $("#headingErr").addClass('d-none');
+        document.getElementById("add_to_me").innerHTML = '';
+        $('#ddEmpDesignation').prop("disabled", false);
+        $('#txtOnBehalfdesignation').prop("disabled", false);
+        $("#pageLoader").removeClass('invisible');
+
+        //$("#ddOtherNewEmpDesignation").prop("disabled", false);
+        //$("input").prop('disabled', false);
+        /*$("#tab").val(2);*/
+        var serializedArray = $("#IMACForm").serializeArray();
+       /* var form = $("#IMACForm").serialize();*/
+        var form = {
+
+        };
+     
+        serializedArray.forEach((x, index) => {
+            form[x.name] = x.value;
+        });
+        var n1 = document.getElementById("softwareBody").rows.length;
+        if (n1 == 0) {
+            alert("Fill transaction table data fields.");
+            $('#loader').hide();
+            return false;
+        }
+        var IMACFormDataList = [];
+
+        var valuesFormDate = [];
+        $("input[name='FromDate']").each(function () {
+            valuesFormDate.push($(this).val());
+        });
+        var valuesToDate = [];
+        $("input[name='ToDate']").each(function () {
+            valuesToDate.push($(this).val());
+        });
+
+        var i = 0, j = 0;
+
+        for (i = 0; i < n1; i++) { // for columns
+
+            var n2 = document.getElementById("softwareBody").rows[i].cells.length;
+            var element = {};
+            for (j = 0; j < n2; j++) { // for Rows
+                var x = document.getElementById("softwareBody").rows[i].cells.item(j).innerHTML;
+                if (j == 0) {
+                    element.SrNo = i + 1;
+                } else if (j == 1) {
+                    element.AssetName = $("#drpAssets_" + (i + 1) + "").val();
+                    if (element.AssetName == "" || element.AssetName == "-1" || element.AssetName == null || element.AssetName == undefined) {
+                        $("#drpAssets_" + (i + 1) + "").focus();
+                        alert("Fill Asset Name field.");
+                        $('#loader').hide();
+                        return false;
+                    }
+                } else if (j == 2) {
+                    element.SubAssetName = $("#drpSubAssets_" + (i + 1) + "").val();
+                    if (element.SubAssetName == "" || element.SubAssetName == "-1" || element.SubAssetName == null || element.SubAssetName == undefined) {
+                        $("#drpSubAssets_" + (i + 1) + "").focus();
+                        alert("Fill Sub Asset Name field.");
+                        $('#loader').hide();
+                        return false;
+                    }
+                } else if (j == 3) {
+                    element.Make = $("#txtMake_" + (i + 1) + "").val();
+                    if (element.Make == "") {
+                        $("#txtMake_" + (i + 1) + "").focus();
+                        alert("Fill Make field.");
+                        $('#loader').hide();
+                        return false;
+                    }
+                } else if (j == 4) {
+                    element.Modal = $("#txtModel_" + (i + 1) + "").val();
+                    if (element.Modal == "") {
+                        $("#txtModel_" + (i + 1) + "").focus();
+                        alert("Fill Model field.");
+                        $('#loader').hide();
+                        return false;
+                    }
+                } else if (j == 5) {
+                    element.AssetType = $("#ddAssetType_" + (i + 1) + "").val();
+                    if (element.AssetType == "" || element.AssetType == null || element.AssetType == undefined) {
+                        $("#ddAssetType_" + (i + 1) + "").focus();
+                        alert("Fill Asset Type field.");
+                        $('#loader').hide();
+                        return false;
+                    }
+                } else if (j == 6) {
+                    element.SerialNo = $("#txtSerialNo_" + (i + 1) + "").val();
+                    if (element.SerialNo == "" || element.SerialNo == null || element.SerialNo == undefined) {
+                        $("#txtSerialNo_" + (i + 1) + "").focus();
+                        alert("Fill Serial No field.");
+                        $('#loader').hide();
+                        return false;
+                    }
+                } else if (j == 7) {
+                    element.Acknowledgement = $("#ddlAcknowledgement_" + (i + 1) + "").val();
+                    if (element.Acknowledgement == "" || element.Acknowledgement == null || element.Acknowledgement == undefined) {
+                        $("#ddlAcknowledgement_" + (i + 1) + "").focus();
+                        alert("Fill Acknowledgement field.");
+                        $('#loader').hide();
+                        return false;
+                    }
+                } else if (j == 8) {
+                    element.AssignType = $("#ddlrequestType_" + (i + 1) + "").val();
+                    if (element.AssignType == "" || element.AssignType == null || element.AssignType == undefined) {
+                        $("#ddlrequestType_" + (i + 1) + "").focus();
+                        alert("Fill Type field.");
+                        $('#loader').hide();
+                        return false;
+                    }
+                } else if (j == 9) {
+                    element.FromDate = valuesFormDate[i];
+
+                } else if (j == 10) {
+                    element.ToDate = valuesToDate[i];
+                } else if (j == 11) {
+                    element.HostName = $("#txtHostName_" + (i + 1) + "").val();
+                    if (element.HostName == "" || element.HostName == null || element.HostName == undefined) {
+                        $("#txtHostName_" + (i + 1) + "").focus();
+                        alert("Fill Host Name field.");
+                        $('#loader').hide();
+                        return false;
+                    }
+                } else if (j == 12) {
+                    element.Location = $("#txtLocation_" + (i + 1) + "").val();
+                    if (element.Location == "" || element.Location == null || element.Location == undefined) {
+                        $("#txtLocation_" + (i + 1) + "").focus();
+                        alert("Fill Location field.");
+                        $('#loader').hide();
+                        return false;
+                    }
+                }
+            }
+
+            if (element.AssignType == "Temporary") {
+                if (element.FromDate == "" || element.FromDate == undefined || element.FromDate == null) {
+                    alert("Select from date for asset name: " + element.AssetName + ", sub category: " + element.SubAssetName +" field.");
+                    $('#loader').hide();
+                    return false;
+                }
+                if (element.ToDate == "" || element.ToDate == undefined || element.ToDate == null) {
+                    alert("Select to date for asset name: " + element.AssetName + ", sub category: " + element.SubAssetName + " field.");
+                    $('#loader').hide();
+                    return false;
+                }
+
+                if (element.FromDate != "" && element.ToDate != "" && Date.parse(element.FromDate) > Date.parse(element.ToDate)) {
+                    alert("From date is greater than to date for asset name: " + element.AssetName + ", sub category: " + element.SubAssetName + " field.");
+                    $('#loader').hide();
+                    return false;
+                }
+            }
+            IMACFormDataList.push(element);
+        }
+
+        var txtBusinessJustification = $("#txtBusinessJustification").val();
+        if (txtBusinessJustification == "" || txtBusinessJustification == undefined) {
+            alert("Fill Business Justification field.");
+            $('#loader').hide();
+            return false;
+        }
+
+        $("#btnSubmit").text('Saving');
+        $("#btnSubmit").prop("disabled", true);
+        $("#btnCancel").prop("disabled", true);
+
+        form['AssetName'] = $('#AssetName').val();
+        form['SubAssetName'] = $('#SubAssetName').val();
+        form['Make'] = $('#Make').val();
+        form['Modal'] = $('#Modal').val();
+        form['AssetType'] = $('#AssetType').val();
+        form['Remarks'] = $('#Remarks').val();
+        form['Acknowledgement'] = $('#Acknowledgement').val();
+        form['AssignType'] = $('#AssignType').val();
+        form['FromDate'] = $('#FromDate').val();
+        form['ToDate'] = $('#ToDate').val();
+        form['IMACFormDataList'] = IMACFormDataList;
+
+       /* var form = $("#IMACForm").serialize();*/
+        $('#loader').show();
+        console.log(form);
+        $.ajax({
+            url: '/IMACForm/SaveData',
+            type: 'POST',
+            data: form,
+            cache: false,
+            dataType: 'JSON',
+            success: (function (data) {
+                
+                $('#loader').hide();
+
+                if (data.Status == 200) {
+                    
+                    console.log(data);
+                    $("#pageLoader").addClass('invisible');
+                    if (IsNewMode) {
+                        $("#btnSubmit").text('Submit');
+                    }
+                    else {
+
+                        $("#btnSubmit").text('Re-Submit');
+                    }
+                    $("#btnSubmit").prop("disabled", false);
+                    $("#btnCancel").prop("disabled", false);
+                    successIMACModal(data.Message);
+
+                }
+                else {
+                    failureModal(data.Message);
+                    $("#IMACForm").trigger("reset");
+                    if (IsNewMode) {
+                        $("#btnSubmit").text('Submit');
+                    }
+                    else {
+                        $("#btnSubmit").text('Re-Submit');
+                    }
+                    $("#pageLoader").addClass('invisible');
+                    $("#btnSubmit").prop("disabled", false);
+                    $("#btnCancel").prop("disabled", false);
+                    //$("#ECFForm").trigger("reset");
+                }
+            }),
+            error: (function (data) {
+                $('#loader').hide();
+                failureModal(data.Message);
+                console.log("error");
+                if (IsNewMode && IsEditMode) {
+                    $("#btnSubmit").text('Submit');
+                }
+                else {
+                    $("#btnSubmit").text('Re-Submit');
+                }
+                $("#pageLoader").addClass('invisible');
+                $("#btnSubmit").prop("disabled", false);
+                $("#btnCancel").prop("disabled", false);
+                //$("#ECFForm").trigger("reset");
+            })
+        })
+
+    });
+
+    $("#btnCancel").on('click', function (e) {
+        //
+        $("#headingErr").addClass('d-none');
+        document.getElementById("add_to_me").innerHTML = '';
+        if ($('#myModalRequest').hasClass('show'))
+            $('#myModalRequest').modal('hide');
+        else
+            $('#myModalEdit').modal('hide');
+        if (IsNewMode) {
+            window.location = "../Dashboard";
+        }
+    });
+
+
+    function loadSubCategory(thisVal) {
+
+        var tableIndex = thisVal.id;
+        tableIndex = parseInt(tableIndex.split("_")[1])
+        var dept = $("#drpAssets_" + tableIndex +" option:selected").text();
+        if (dept != "") {
+            $.ajax({
+                url: '/IMACForm/GetSubAssets',
+                type: 'GET',
+                data: { AssetName: dept },
+                dataType: 'JSON',
+                success: (function (data) {
+                    var s = '<option value="-1" style="display:none;">Select</option>';
+                    /* var s = '<option value="" style="display:none;"></option>';*/
+                    for (var i = 0; i < data.length; i++) {
+                        s += '<option value="' + data[i].SubAssetName + '">' + data[i].SubAssetName + '</option>';
+                    }
+                    $("#drpSubAssets_" + tableIndex +"").html(s);
+
+                }),
+                error: (function (data) {
+                    //code
+                })
+            })
+        }
+        $("#drpSubAssets_" + tableIndex + "").removeClass('spanUpperSide');
+    }
+
+
+
+
+    //function failureModal() {
+    //    $('#modalTitle').html('Failure');
+    //    $('#modalBody').html('Some error occurred!');
+    //    $("#modalOkButton").attr('data-dismiss', 'modal');
+    //    $("#successModel").modal('show');
+    //}
+
+
+    function allowNumbersOnly(e) {
+        var code = (e.which) ? e.which : e.keyCode;
+        if (code > 31 && (code < 48 || code > 57)) {
+            e.preventDefault();
+        }
+    }
+
+    function successIMACModal(txt) {
+        //
+        $('#modalTitle').html('Success');
+        if (txt == "approve") {
+            $('#modalBody').html('Form has been approved!');
+        }
+        else if (txt == "reject") {
+            $('#modalBody').html('Form has been rejected!');
+        }
+        else if (txt == "enquire") {
+            $('#modalBody').html('Form has been enquired!');
+        }
+        else if (txt == "cancelled") {
+            $('#modalBody').html('Form has been cancelled!');
+        }
+        else {
+            if (IsEditMode) {
+                $('#modalBody').html('Your form with ID: IMAC' + txt + ' has been re-submitted! Kindly use this for future reference');
+            }
+            else {
+                $('#modalBody').html('Your form with ID: IMAC' + txt + ' has been submitted! Kindly use this for future reference');
+            }
+
+        }
+        FlagRedirect = txt;
+        //$("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+
+    }
+
+    function failureModal(txt) {
+        if (txt == null) {
+            $('#modalBody').html('Some error occurred!');
+        }
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html(txt);
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function permissionModal() {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html('No permssion granted since the device is not SAVWIPL owned!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function requiredModal(text) {
+        $('#modalTitle').html('Required!');
+        $('#modalBody').html(text);
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function AddIMACRows() {
+        
+        var softTotal = document.getElementsByClassName("tr_input").length;
+        // console.log(softTotal);
+        rowIdx = softTotal;
+        var newCount = rowIdx + 1;
+
+        if (newCount <= 10) {
+            var row = '<tr id="row1" class="tr_input">'
+                        +'<td class="text-center input-block">'
+                +'<select class="form-control " name="AssetName" id="drpAssets" onchange="checkSelect("drpAssets_1")">'
+                    +'<option value=""></option>'
+                    +'</select>'
+
+                    +'</td>'
+                    +'<td class="editor-field">'
+                    +'<select class="form-control " name="SubAssetName" id="drpSubAssets" onchange="checkSelect("drpSubAssets_1")">'
+                        +'<option value=""></option>'
+                        +'</select>'
+
+                        +'</td>'
+                        +'<td class="text-center">'
+                        +'<input type="text" name="Make" id="txtMake" value="">'
+                        +'</td>'
+                        +'<td class="text-center">'
+                        +'<input type="text" name="Modal" id="txtModel" value="">'
+                        +'</td>'
+                        +'<td class="text-center">'
+                        +'<select name="AssetType" class="" id="ddAssetType" onchange="checkSelect("ddAssetType")">'
+                            +'<option value="" class="d-none"></option>'
+                            +'<option value="First Asset">First Asset</option>'
+                            +'<option value="Additional">Additional</option>'
+                        +'</select>'
+                        +'</td>'
+                        +'<td class="text-center">'
+                        +'<input class="form-control" name="Remarks" id="txtRemarks" value="">'
+                            +'</td>'
+                        +'<td class="text-center">'
+                        +'<select name="Acknowledgement" class="" id="ddlAcknowledgement" onchange="checkSelect("ddlAcknowledgement")">'
+                            +'<option value="" class="d-none"></option>'
+                            +'<option value="Assigned">Assigned</option>'
+                            +'<option value="Returned">Returned</option>'
+                            +'</select>'
+                            +'</td>'
+                            +'<td class="text-center">'
+                            +'<select class="form-control requestType" id="ddlrequestType" name="AssignType">'
+                            +'<option value="Permanent">Permanent</option>'
+                            +'<option value="Temporary">Temporary</option>'
+                            +'</select>'
+                            +'</td>'
+                            +'<td class="text-center txt_replacement temp_from">'
+                            +'<input type="date" name="FromDate" id="txt_from_date_1" class="temp_from_input" value="">'
+                            +'</td>'
+                            +'<td class="text-center txt_replacement temp_to">'
+                            +'<input type="date" name="ToDate" id="txt_to_date_1" class="temp_from_input" value="">'
+                            +'</td>'
+                            +'</tr>';
+
+            if (newCount == 1) {
+                $('.tableSoftware').prepend(row);
+            }
+            else {
+                $(".tableSoftware tr:last").after(row);
+            }
+            count = newCount;
+
+            rowIdx++;
+        }
+        else {
+            alert('Maximum 10 Softwares can be added.');
+        }
+
+        var requestType2 = document.querySelectorAll(".requestType");
+        var requestType_arr2 = [];
+
+        for (var i = 0; i < requestType2.length; i++) {
+            requestType_arr2.push(requestType2[i]['value']);
+        };
+
+        if (requestType_arr2.includes("Temporary")) {
+            $(".temp_from").removeClass('hide');
+            $(".temp_to").removeClass('hide');
+            $(".requestType").each(function (index) {
+                if ($(this).val() == 'Permanent') {
+                    $(this).parent().parent().find('.temp_from_input').attr('disabled', 'disabled');
+                    $(this).parent().parent().find('.temp_to_input').attr('disabled', 'disabled');
+                }
+                else {
+                    $(this).parent().parent().find('.temp_from_input').removeAttr('disabled', 'disabled');
+                    $(this).parent().parent().find('.temp_to_input').removeAttr('disabled', 'disabled');
+                }
+            });
+        }
+        else {
+            $(".temp_from").addClass('hide');
+            $(".temp_to").addClass('hide');
+        }
+
+        var sel_asset_name = document.querySelectorAll(".sel_asset_name");
+        var sel_asset_name_arr = [];
+        var sel_value = "";
+
+        for (var i = 0; i < sel_asset_name.length; i++) {
+            sel_asset_name_arr.push(sel_asset_name[i]['value']);
+        };
+        var getByLabel = '';
+        $(".sel_asset_name").each(function (index) {
+            var main2 = document.querySelector(".sel_subcategory");
+            var alloption = main2.querySelectorAll('.sel_subcategory optgroup');
+            getByLabel = main2.querySelector('[label="' + $(this).val() + '"]');
+            alloption.forEach(function (element) {
+                element.style.display = "none";
+            });
+
+
+
+        });
+        //alert(getByLabel['label']);
+        //alert(sel_value);
+        $('.sel_subcategory optgroup').each(function () {
+
+            var currentLbl = $(this).attr('label');
+            if (getByLabel['label'] == currentLbl) {
+                alert('in second if');
+                $(this).removeAttr('style');
+            }
+
+        });
+
+
+        $(".requestType").change(function () {
+            var requestType2 = document.querySelectorAll(".requestType");
+            var requestType_arr2 = [];
+
+            for (var i = 0; i < requestType2.length; i++) {
+                requestType_arr2.push(requestType2[i]['value']);
+            };
+
+            if (requestType_arr2.includes("Temporary")) {
+                $(".temp_from").removeClass('hide');
+                $(".temp_to").removeClass('hide');
+                $(".requestType").each(function (index) {
+                    if ($(this).val() == 'Permanent') {
+
+                        $(this).parent().parent().find('.temp_from_input').attr('disabled', 'disabled');
+                        $(this).parent().parent().find('.temp_to_input').attr('disabled', 'disabled');
+                    }
+                    else {
+                        $(this).parent().parent().find('.temp_from_input').removeAttr('disabled', 'disabled');
+                        $(this).parent().parent().find('.temp_to_input').removeAttr('disabled', 'disabled');
+                    }
+                });
+            }
+            else {
+                $(".temp_from").addClass('hide');
+                $(".temp_to").addClass('hide');
+            }
+        });
+
+
+
+        $(".sel_asset_name").change(function () {
+            var sel_asset_name = document.querySelectorAll(".sel_asset_name");
+            var sel_asset_name_arr = [];
+            var sel_value = "";
+
+            for (var i = 0; i < sel_asset_name.length; i++) {
+                sel_asset_name_arr.push(sel_asset_name[i]['value']);
+            };
+            var getByLabel = '';
+            $(".sel_asset_name").each(function (index) {
+                
+                var main2 = document.querySelector(".sel_subcategory");
+                var alloption = main2.querySelectorAll('.sel_subcategory optgroup');
+                getByLabel = main2.querySelector('[label="' + $(this).val() + '"]');
+                alloption.forEach(function (element) {
+                    element.style.display = "none";
+                });
+
+
+
+            });
+            //alert(getByLabel['label']);
+            //alert(sel_value);
+            $('.sel_subcategory optgroup').each(function () {
+
+                var currentLbl = $(this).attr('label');
+                if (getByLabel['label'] == currentLbl) {
+                    alert('in second if');
+                    $(this).removeAttr('style');
+                }
+
+            });
+        });
+    }
+
+    $(document).ready(function () {
+        /* For Request Type*/
+        var request_type = document.querySelectorAll(".requestType");
+        var requestType_arr = [];
+
+        for (var i = 0; i < request_type.length; i++) {
+            requestType_arr.push(request_type[i]['value']);
+        };
+
+        if (requestType_arr.includes("Temporary")) {
+            $(".temp_from").removeClass('hide');
+            $(".temp_to").removeClass('hide');
+            $(".requestType").each(function (index) {
+                if ($(this).val() == 'Permanent') {
+                    $(this).parent().parent().find('.txt_replacement input').attr('disabled', 'disabled');
+                    $(this).parent().parent().find('.txt_replacement input').attr('disabled', 'disabled');
+                }
+                else {
+                    $(this).parent().parent().find('.temp_from_input').removeAttr('disabled', 'disabled');
+                    $(this).parent().parent().find('.temp_to_input').removeAttr('disabled', 'disabled');
+                }
+            });
+        }
+        else {
+            $(".temp_from").addClass('hide');
+            $(".temp_to").addClass('hide');
+        }
+
+
+        $(".requestType").change(function () {
+
+            var id = $(this).attr('id');
+
+            var getParticularRowNum = parseInt(id.split("_")[1]);
+
+            var requestType2 = document.querySelectorAll(".requestType");
+            var requestType_arr2 = [];
+
+            for (var i = 0; i < requestType2.length; i++) {
+                requestType_arr2.push(requestType2[i]['value']);
+            };
+
+            if (requestType_arr2.includes("Temporary")) {
+                $(".temp_from").removeClass('hide');
+                $(".temp_to").removeClass('hide');
+                $(".requestType").each(function (index) {
+                    if ($(this).val() == 'Permanent') {
+                        $(this).parent().parent().find('.temp_from_input').attr('disabled', 'disabled');
+                        $(this).parent().parent().find('.temp_to_input').attr('disabled', 'disabled');
+                    }
+                    else {
+                        $(this).parent().parent().find('.temp_from_input').removeAttr('disabled', 'disabled');
+                        $(this).parent().parent().find('.temp_to_input').removeAttr('disabled', 'disabled');
+                    }
+                });
+            }
+            else {
+                $(".temp_from").addClass('hide');
+                $(".temp_to").addClass('hide');
+            }
+        });
+
+
+
+        $(".sel_asset_name").change(function () {
+            var sel_asset_name = document.querySelectorAll(".sel_asset_name");
+            var sel_asset_name_arr = [];
+            var sel_value = "";
+
+            for (var i = 0; i < sel_asset_name.length; i++) {
+                sel_asset_name_arr.push(sel_asset_name[i]['value']);
+            };
+            var getByLabel = '';
+            $(".sel_asset_name").each(function (index) {
+                
+                var main2 = document.querySelector(".sel_subcategory");
+                var alloption = main2.querySelectorAll('.sel_subcategory optgroup');
+                getByLabel = main2.querySelector('[label="' + $(this).val() + '"]');
+                alloption.forEach(function (element) {
+                    element.style.display = "none";
+                });
+
+
+
+            });
+            alert(getByLabel['label']);
+            //alert(sel_value);
+            $('.sel_subcategory optgroup').each(function () {
+
+                var currentLbl = $(this).attr('label');
+                if (getByLabel['label'] == currentLbl) {
+
+                    $(this).removeAttr('style');
+                }
+
+            });
+        });
+
+    })
+    var SrNo = 0;
+    var $tr = $('#row1');
+    function addTableRow() {
+        
+        SrNo = $('#tblIMACData tr').length - 1;
+        SrNo = SrNo + 1;
+        var $clone = $tr.clone();
+        var rows = SrNo;
+        $clone.removeClass('d-none');
+        $clone.find('.sNo').html('' + rows);
+        $clone.find(':text, textarea, number, select, input[type="date"], date').val('');
+        var newRowId = 'row' + rows;
+        $('#Module_' + rows).val('');
+        $($clone).prop('id', newRowId);
+        console.log($clone)
+        $('#softwareBody').append($clone);
+        var selector = "#" + newRowId + " input[type='text'], " + "#" + newRowId + " textarea, " + "#" + newRowId + " select, " + "#" + newRowId + " input[type='image'], " + "#" + newRowId + " input[type='date']," + "#" + newRowId+" date";
+
+        console.log(selector)
+
+        $(selector).each(function (i, x) {
+            x.id = x.id.replace(/_.*/, "_" + rows);
+            x.classList.remove("errorIcon");
+            x.classList.remove("errorIconDropDown");
+            x.classList.remove("errorIconTextarea");
+        });
+
+        AddTableElementsEvent();
+        $('#UserIdTableRowCount').val(rows);
+
+    }
+
+
+    function AddTableElementsEvent() {
+        $(".requestType").off('change');
+        $(".module").off('change');
+        $(".requestType").change(function () {
+            var requestType2 = document.querySelectorAll(".requestType");
+            var requestType_arr2 = [];
+            for (var i = 0; i < requestType2.length; i++) {
+                requestType_arr2.push(requestType2[i]['value']);
+            };
+        });
+    }
+
+    $('#softwareBody').on('click', '.remove', function () {
+        var rows = parseInt($('#UserIdTableRowCount').val());
+        var id = $(this).attr('id');
+
+        var deleteRowNum = parseInt(id.split("_")[1]);
+        $('#row' + deleteRowNum).remove();
+        var index = deleteRowNum;
+        //Below code will normalise the row number and the ids of the input
+        $('#softwareBody').children().each(function () {
+            var trId = $(this).attr('id');
+            var rowNum = parseInt(trId.replace("row", ""));
+            if (rowNum > deleteRowNum) {
+                var selector = "#" + trId + " input[type='text'], " + "#" + trId + " textarea, " + "#" + trId + " select, " + "#" + trId + " input[type='image']";
+                $(selector).each(function (i, x) {
+                    x.id = x.id.replace(/_.*/, "_" + index);
+                });
+                $("#" + trId).find('.sNo').html('' + index);
+                $(this).attr('id', 'row' + index);
+                index++;
+            }
+        });
+        --rows;
+        $('#UserIdTableRowCount').val(rows);
+    });
+
+    function showHideDates(thisInput) {
+        
+        var id = thisInput.id;
+
+        var getParticularRowNum = parseInt(id.split("_")[1]);
+
+        var requestType2 = document.querySelectorAll(".requestType");
+        var requestType_arr2 = [];
+
+        for (var i = 0; i < requestType2.length; i++) {
+            requestType_arr2.push(requestType2[i]['value']);
+        };
+        if (requestType_arr2.includes("Temporary")) {
+            $(".temp_from").removeClass('hide');
+            $(".temp_to").removeClass('hide');
+            $(".requestType").each(function (index) {
+
+                if (this.value == 'Permanent') {
+                    $(this).closest('td').next('td').find('input').attr('disabled', 'disabled');
+                    $(this).closest('td').next('td').next('td').find('input').attr('disabled', 'disabled');
+
+                }
+                else {
+                    $(this).closest('td').next('td').find('input').removeAttr('disabled', 'disabled');
+                    $(this).closest('td').next('td').next('td').find('input').removeAttr('disabled', 'disabled');
+
+
+                }
+            });
+        } else {
+            $(".temp_from").addClass('hide');
+            $(".temp_to").addClass('hide');
+        }
+        //if (requestType_arr2.includes("Temporary")) {
+        //    $(".temp_from").removeClass('hide');
+        //    $(".temp_to").removeClass('hide');
+        //    $(".requestType").each(function (index) {
+
+        //        if (index.value == 'Permanent') {
+        //            $(this).parent().parent().find('.temp_from_input').attr('disabled', 'disabled');
+        //            $(this).parent().parent().find('.temp_to_input').attr('disabled', 'disabled');
+        //        }
+        //        else {
+        //            $(this).parent().parent().find('.temp_from_input').removeAttr('disabled', 'disabled');
+        //            $(this).parent().parent().find('.temp_to_input').removeAttr('disabled', 'disabled');
+        //        }
+        //    });
+        //}
+        //else {
+        //    $(".temp_from").addClass('hide');
+        //    $(".temp_to").addClass('hide');
+        //}
+    }
+
+    //New Code for TableAdd New
+    $("#modalOkButton").click(function () {
+        window.location = "../Dashboard";
+    })
+
+
+    function showhideDates() {
+        var requestType2 = document.querySelectorAll(".requestType");
+        var requestType_arr2 = [];
+
+        for (var i = 0; i < requestType2.length; i++) {
+            requestType_arr2.push(requestType2[i]['value']);
+        };
+
+        if (requestType_arr2.includes("Temporary")) {
+            $(".temp_from").removeClass('hide');
+            $(".temp_to").removeClass('hide');
+            $(".requestType").each(function (index) {
+                if ($(this).val() == 'Permanent') {
+
+                    $(this).parent().parent().find('.temp_from_input').attr('disabled', 'disabled');
+                    $(this).parent().parent().find('.temp_to_input').attr('disabled', 'disabled');
+                }
+                else {
+                    $(this).parent().parent().find('.temp_from_input').removeAttr('disabled', 'disabled');
+                    $(this).parent().parent().find('.temp_to_input').removeAttr('disabled', 'disabled');
+                }
+            });
+        }
+        else {
+            $(".temp_from").addClass('hide');
+            $(".temp_to").addClass('hide');
+        }
+    }
+</script>
+
+
+
+
+

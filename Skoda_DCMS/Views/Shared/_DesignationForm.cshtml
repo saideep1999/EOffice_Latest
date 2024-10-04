@@ -1,0 +1,134 @@
+﻿
+
+<div id="CreateDiv">
+    @*<h2>User Details</h2>*@
+    <form action="" method="post" id="SUForm">
+        <div class="row">
+
+            <div class="col-12 mb-4">
+
+                <div class="row">
+                    <input type="hidden" id="SUId" name="SUId" value="">
+                    @*<div class="form-group col-md-4 col-lg-4 col-12 input-block">
+                            <input type="text" class="w-100" id="txtEmployeeCodeSU" name="EmployeeCode" value=""
+                                   onkeypress="allowNumbersOnly(event)" required>
+                            <span class="placeholder">Employee Code<span class="astColor">*</span></span>
+                        </div>*@
+                    <div class="form-group input-block">
+                        <input type="text" class="w-100" id="txtDesignation" name="Designation" value="" required autocomplete="off">
+                        <span class="placeholder">Designation<span class="astColor">*</span></span>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </form>
+
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-success btn-sm submit-btn" id="btnSave" onclick="SaveDesignation();">
+        Save
+    </button>
+    <button type="button" class="btn btn-danger btn-sm cancl-btn" id="btnClose" data-dismiss="modal">
+        Close
+    </button>
+
+</div>
+<div class="modal fade" id="successModel" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header modelHeader">
+                <span class="modal-title modalMsgTitle" id="modalTitle"></span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label id="modalBody" class="lableMsg">  </label>
+                <input type="hidden" id="tab" value="0" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="submitBomBtn publishBtn" id="modalOkButton" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    //$(document).ready(function () { $('#txtDesignation').value = ""; })
+    function SaveDesignation() {
+        var txtDesignation = $('#txtDesignation').val();
+        DesignationbtnDisable();
+        $.ajax({
+            url: '/List/SaveDesignationData',
+            type: 'POST',
+            data: { Designation: txtDesignation},
+            dataType: 'JSON',
+            success: (function (data) {
+                
+                if (data.Status == 200) {
+
+                    $('#SignUpForm').modal('hide');
+                    successModal("success");
+                    DesignationbtnEnable();
+                }
+                else {
+                    failureModal(data.Message);
+                    DesignationbtnEnable();
+                }
+            }),
+            error: (function (data) {
+                failureModal(data.Message);
+                DesignationbtnEnable();
+            })
+        })
+        $("#txtDesignation").val("");
+    }
+    function successModal(txt) {
+        $('#modalTitle').html('Success');
+        if (txt == "success") {
+            $('#modalBody').html('Data has been saved successfully');
+        }
+        else if (txt == "reject") {
+            $('#modalBody').html('Data has been rejected!');
+        }
+        else if (txt == "IsActive") {
+            $('#modalBody').html('User has been Deleted!');
+        }
+        else if (txt == "enquire") {
+            $('#modalBody').html('Form has been enquired!');
+        }
+        else if (txt == "cancelled") {
+            $('#modalBody').html('Form has been cancelled!');
+        }
+        else {
+            if (isEditMode) {
+                $('#modalBody').html('Your form with ID: DARF' + txt + ' has been re-submitted! Kindly use this for future reference');
+            }
+            else {
+                $('#modalBody').html('Your form with ID: DARF' + txt + ' has been submitted! Kindly use this for future reference');
+            }
+            FlagRedirect = txt;
+        }
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+    function failureModal(txt) {
+
+        if (txt == null) {
+            $('#modalBody').html('Some error occurred!');
+        }
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html(txt);
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+    function DesignationbtnEnable(Id) {
+        $("#btnSave").removeAttr("disabled");
+        $("#btnClose").removeAttr("disabled");
+    }
+    function DesignationbtnDisable(Id) {
+        $("#btnSave").attr("disabled", true);
+        $("#btnClose").attr("disabled", true);
+    }
+</script>

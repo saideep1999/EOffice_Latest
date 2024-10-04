@@ -1,0 +1,161 @@
+﻿@model Skoda_DCMS.Models.DashboardModel
+@{
+    ViewBag.Title = "Form Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var user = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    var pvToBeRendered = Model.Data.PartialViewName;
+    var UniqueFormName = Model.Data.UniqueFormName;
+    var UniqueFormId = Model.Data.FormParentId;
+    var FormName = Model.Data.FullFormName;
+    var Department = Model.Data.Department;
+    var FormOwner = Model.Data.FormOwner;
+    var ControllerName = Model.Data.ControllerName;
+}
+
+<div class="container body">
+    <div class="main_container">
+        <div class="modal fade" id="myModal" role="dialog">
+            <div class="modal-dialog modal-dialog-width">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header modal_header_block">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="viewForm"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- top navigation -->
+        <!-- page content -->
+        <div class="right_col" role="main">
+            <div class="eform-container container">
+
+                <div class="breadcrumb-container">
+                    <div>
+                        <ol class="breadcrumb">
+                            @for (int i = 0; i < Model.Data.BreadCrumbs.Count; i++)
+                            {
+                                <li>
+                                    @if (i == Model.Data.BreadCrumbs.Count - 1)
+                                    {
+                                        @Model.Data.BreadCrumbs[i].Key
+                                    }
+                                    else
+                                    {
+                                        <a href="@Model.Data.BreadCrumbs[i].Value">
+                                            @Model.Data.BreadCrumbs[i].Key
+                                        </a>
+                                    }
+                                </li>
+                            }
+                            @*<li class="active">@Model.Data.BreadCrumbTitleFirst</li>*@
+                        </ol>
+                    </div>
+                </div>
+                <div class="form-main-container">
+                    <div class="row topContent">
+                        <div class="col-lg-9 col-md-7 padd_space">
+
+                            @for (int i = 0; i < Model.Data.BreadCrumbs.Count; i++)
+                            {
+
+                                if (i == Model.Data.BreadCrumbs.Count - 1)
+                                {
+                                    @Model.Data.BreadCrumbs[i].Key
+                                }
+                                if (Model.Data.Forms.Count != 0)
+                                {
+                                    UniqueFormName = Model.Data.Forms[0].UniqueFormName;
+                                    UniqueFormId = Model.Data.Forms[0].FormParent.Id;
+                                    FormName = Model.Data.Forms[0].FormName;                              
+                                }
+                            }
+                        </div>
+                        <div class="col-lg-3 col-md-7 padd_space float-right text-right">
+                            @Department  | @FormOwner
+                        </div>
+
+
+                    </div>
+                </div>
+                <br />
+                <div class="row top_tiles">
+                    <a class="animated">
+                        <div class="tile-stats tile-stats_gold submitted status-color-4">
+                            <div class="icon icon_success"></div>
+                            <div class="count">@Model.Data.StatusCount.Submitted</div>
+                            <p>Submitted</p>
+                        </div>
+                    </a>
+                    <a class="animated">
+                        <div class="tile-stats tile-stats_gray status-color-2">
+                            <div class="icon icon_downld"></div>
+                            <div class="count">@Model.Data.StatusCount.Approved</div>
+                            <p>Approved</p>
+                        </div>
+                    </a>
+                    <a class="animated">
+                        <div class="tile-stats tile-stats_blue status-color-1">
+                            <div class="icon icon_eye"></div>
+                            <div class="count">@Model.Data.StatusCount.Processed</div>
+                            <p>Pending</p>
+                        </div>
+                    </a>
+
+                    <a class="animated">
+                        <div class="tile-stats tile-stats_maroon status-color-3">
+                            <div class="icon icon_user"></div>
+                            <div class="count">@Model.Data.StatusCount.Rejected</div>
+                            <p>Rejected</p>
+                        </div>
+                    </a>
+                    <a class="animated">
+                        <div class="tile-stats tile-stats_gold status-color-4">
+                            <div class="icon icon_used"></div>
+                            <div class="count">@Model.Data.StatusCount.Cancelled</div>
+                            <p>Cancelled</p>
+                        </div>
+                    </a>
+                    <a class="animated col-lg-2 col-md-3 col-sm-4 col-xs-4">
+
+                    </a>
+                </div>
+                <div class="form-main-container">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 text-right">
+                            <a class="btn btn-success addPage my-3 mr-2" href="@Url.Action("CreateForm", "List", new { uniqueFormName = UniqueFormName, formParentId = UniqueFormId, formName = FormName, ControllerName = ControllerName})">
+                                Add New
+                            </a>
+                        </div>
+                    </div>
+                    <div class="form-status-table">
+                        @{
+
+                            Html.RenderPartial(pvToBeRendered, Model);
+                        }
+                    </div>
+
+                </div>
+                <br />
+                @*<div class="row animated topMargin">
+                    <div class="animated  col-sm-6 col-md-6 col-xs-12">
+                        <div class="best_practise_card newly_added_form itbest-color">
+                            <h3 class="text-capitalize gridHeadings"><i class="fa fa-chevron-right"></i> Administration | Report</h3>
+                        </div>
+                    </div>
+                    <div class="animated  col-sm-6 col-md-6 col-xs-12">
+                        <div class="best_practise_card buss-color ">
+                            <h3 class="gridHeadings"><i class="fa fa-chevron-right"></i> Analytics reports</h3>
+                        </div>
+                    </div>
+                </div>*@
+            </div>
+        </div>
+        <!-- /Add new process -->
+    </div>
+</div>
+
+

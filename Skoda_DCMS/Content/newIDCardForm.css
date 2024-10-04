@@ -1,0 +1,107 @@
+::-webkit-input-placeholder { /* Edge */
+    color: #8c8c8c;
+    font-size: 10px;
+    text-align: center;
+
+}
+
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+    color: #8c8c8c;
+    font-size: 10px;
+    text-align: center;
+
+}
+
+::placeholder {
+    color: #8c8c8c;
+    font-size: 10px;
+    text-align: center;
+}
+
+.heading {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #212221;
+    line-height: 2rem;
+    text-align: center;
+    border-left: 1px solid #8c8c8c;
+    border-top: 1px solid #8c8c8c !important;
+    border-right: 1px solid #8c8c8c;
+    border-bottom: 1px solid #8c8c8c;
+}
+.subHeading {
+    font-size: 13px;
+    font-weight: 600;
+    color: #212221;
+    line-height: 18px;
+    text-align: center;
+    border-left: 1px solid #8c8c8c;
+    border-bottom: 1px solid #8c8c8c;
+    border-right: 1px solid #8c8c8c;
+}
+.subHeading span {
+    display: inline-block;
+    margin-top: 20px;
+}
+
+.allFormLables {
+    font-size: 12px;
+    font-weight: 600;
+    color: #212221;
+    line-height: 18px;
+}
+
+small {
+    font-size: 10px !important;
+    font-weight: 200;
+    color: #8c8c8c;
+    line-height: 16px;
+}
+
+input[type=checkbox]{
+    width: 30px;
+    height:30px;
+    border-radius: 0;
+    vertical-align: middle;
+}
+.mainTbl td:not(.heading) {
+    padding: 0.2rem 0.3rem;
+    vertical-align: inherit !important;
+    border-top:none !important;
+}
+
+
+.noTopBorder table td {
+    padding: 0.2rem 0rem !important;
+}
+.dateInputs > input {
+     width: 30px;
+     padding: 2px 5px 7px 5px;
+    height: 25px;
+}
+
+.forYearInput {
+    width: 60px !important;
+}
+
+.noBorders td {
+    border:none !important;
+}
+
+.w41 {
+    width: 44.5%;
+}
+.otherWidth {
+    width: 54.5%;
+}
+.borderLTB {
+    border-left: 1px solid #8c8c8c;
+    border-top: 1px solid #8c8c8c;
+    border-right: 1px solid #8c8c8c;
+    border-bottom: 1px solid #8c8c8c;
+}
+.noTopBorder {
+    border-right: 1px solid #8c8c8c;
+    border-left: 1px solid #8c8c8c;
+    border-bottom: 1px solid #8c8c8c;
+}

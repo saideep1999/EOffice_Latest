@@ -1,0 +1,947 @@
+﻿@model dynamic
+@{
+    ViewBag.Title = "Server Requisition Form";
+    var user = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    bool IsNew = true;
+    bool IsEdit = true;
+    dynamic SRCF = null;
+    Layout = ViewBag.Layout;
+    int RowId = 0, FormId = 0, AppRowId = 0, ApprovalType = 0;
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IsNew = ViewBag.IsNew;
+        IsEdit = ViewBag.IsEdit;
+        SRCF = ViewBag.Model;
+        RowId = ViewBag.RowId;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+    }
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SAVWIPL - Server Requisition Form</title>
+    <style type="text/css">
+        *:visited, *:focus {
+            box-shadow: none;
+        }
+
+        input, select, input:focus, select:focus, textarea, textarea:focus {
+            border: 1px solid #000;
+        }
+
+        input, textarea {
+            padding: 5px;
+        }
+
+        table td {
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <table style="width: 100%; font-size: 14px; color: #000; font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+        <tr>
+            <td>
+                <table style="width: 100%;" cellspadding="0" cellspacing="0">
+                    <tr>
+                        <td colspan="6" width="60%" style="text-align: right;">
+                            <img style="width: 50%;" src='@Server.MapPath("~/assets/img/SAVWIPL_Merger_Logo.JPG")'>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="6" align="center" style="font-weight: bold;">
+                <h2>Server Requisition / Change Form</h2>
+            </td>
+        </tr>
+
+
+        <tr>
+            <td style="padding: 15px;">
+                <table cellspacing="0" cellpadding="0" width="100%" border="1">
+
+                    @if (SRCF.one[0].RequestSubmissionFor == "Self")
+                    {
+
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Employee Name
+                            </td>
+                            <td style="width: 30%; font-weight: normal;" colspan="2" align='left'>
+                                <span style="height: 25px; width:85%; border-radius: 0; "> @(SRCF.one[0].EmployeeName)  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Employee Code
+                            </td>
+                            <td style="width: 30%; font-weight: normal;" colspan="2" align='left'>
+                                <span style="height: 25px; width:85%; border-radius: 0; "> @(SRCF.one[0].EmployeeCode) </span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Designatiion
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SRCF.one[0].Designation) </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Location
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SRCF.one[0].Location) </span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Department
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SRCF.one[0].Department) </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Contact Number
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SRCF.one[0].ContactNo) </span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Cost Center Number
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SRCF.one[0].CostCenterNo)  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                UserID
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SRCF.one[0].UserID)  </span>
+                            </td>
+
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Employee Name
+                            </td>
+                            <td style="width: 30%" colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SRCF.one[0].OnBehalfEmployeeNumber)  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Employee Code
+                            </td>
+                            <td style="width: 30%" colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SRCF.one[0].OnBehalfEmployeeNumber) </span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Designatiion
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SRCF.one[0].Designation) </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Location
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SRCF.one[0].OnBehalfLocation) </span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Department
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SRCF.one[0].OnBehlafDepartment) </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Contact Number
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SRCF.one[0].OnBehalfMobile) </span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Cost Center Number
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SRCF.one[0].OnBehalfCostCenterNo)  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                UserID
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SRCF.one[0].OnBehalfUserID)  </span>
+                            </td>
+
+                        </tr>
+                    }
+
+
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Requirement(To be Filled by Requester)
+                        </td>
+                        <td colspan="5" align='left' style="font-weight: normal">
+                            <span style="width:85%; border-radius: 0; ">
+                                @if (SRCF.one[0].ServerCreationType == "New Server Creation")
+                                {
+                                    <span>
+                                        <input type="checkbox" checked /> New Server Creation &nbsp;
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span>
+                                        <input type="checkbox" /> New Server Creation &nbsp;
+                                    </span>
+                                }
+                                @if (SRCF.one[0].ServerCreationType == "Existing Server Modification")
+                                {
+                                    <span>
+                                        <input type="checkbox" checked /> Existing Server Notification
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span>
+                                        <input type="checkbox" /> Existing Server Notification
+                                    </span>
+                                }
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style=" font-weight: bold;">
+                            Server Location
+                        </td>
+                        <td colspan="5" align='left' style="font-weight: normal;">
+                            <span style="width:85%; border-radius: 0; ">
+                                @if (SRCF.one[0].ServerLocation == "Pune")
+                                {
+                                    <span>
+                                        <input type="checkbox" checked />
+                                        Pune &nbsp;
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span>
+                                        <input type="checkbox" />
+                                        Pune &nbsp;
+                                    </span>
+                                }
+
+                                @if (SRCF.one[0].ServerLocation == "Mumbai")
+                                {
+                                    <span>
+                                        <input type="checkbox" checked />
+                                        Mumbai &nbsp;
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span>
+                                        <input type="checkbox" />
+                                        Mumbai &nbsp;
+                                    </span>
+                                }
+                                @if (SRCF.one[0].ServerLocation == "Aurangabad")
+                                {
+                                    <span>
+                                        <input type="checkbox" checked />
+                                        Aurangabad &nbsp;
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span>
+                                        <input type="checkbox" />
+                                        Aurangabad &nbsp;
+                                    </span>
+                                }
+
+                            </span>
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Server Owner Name
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">  @(SRCF.one[0].ServerOwnerName)  </span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">
+                            Admin Account
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">  @(SRCF.one[0].AdminAccount)  </span>
+                        </td>
+
+                    </tr>
+                    @if (SRCF.one[0].ServerCreationType == "Existing Server Modification")
+                    {
+                        <tr class="ExistingServer">
+                            <td style="width:20%; font-weight: bold;">
+                                Host Name
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">  @(SRCF.one[0].HostName)  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                IP Address
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">  @(SRCF.one[0].IPAddress)  </span>
+                            </td>
+
+                        </tr>
+                    }
+
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Server Role
+                        </td>
+                        <td colspan="5" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">  @(SRCF.one[0].ServerRole)  </span>
+                        </td>
+                    </tr>
+                    @if (SRCF.one[0].ServerCreationType == "New Server Creation")
+                    {
+                        <tr class="newSERVER">
+                            <td style=" font-weight: bold;">
+                                Server Environment
+                            </td>
+                            <td colspan="5" align='left' style="font-weight: normal;">
+                                <span style="width:85%; border-radius: 0; ">
+                                    @if (SRCF.one[0].ServerEnvironment == "Office")
+                                    {
+                                        <span>
+                                            <input type="checkbox" checked />
+                                            Office &nbsp;
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>
+                                            <input type="checkbox" />
+                                            Office &nbsp;
+                                        </span>
+                                    }
+
+                                    @if (SRCF.one[0].ServerEnvironment == "Production")
+                                    {
+                                        <span>
+                                            <input type="checkbox" checked />
+                                            Production &nbsp;
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>
+                                            <input type="checkbox" />
+                                            Production &nbsp;
+                                        </span>
+                                    }
+                                    @if (SRCF.one[0].ServerEnvironment == "DMZ")
+                                    {
+                                        <span>
+                                            <input type="checkbox" checked />
+                                            DMZ &nbsp;
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>
+                                            <input type="checkbox" />
+                                            DMZ &nbsp;
+                                        </span>
+                                    }
+                                    @if (SRCF.one[0].ServerEnvironment == "Cloud")
+                                    {
+                                        <span>
+                                            <input type="checkbox" checked />
+                                            Cloud &nbsp;
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>
+                                            <input type="checkbox" />
+                                            Cloud &nbsp;
+                                        </span>
+                                    }
+                                </span>
+                            </td>
+
+                        </tr>
+
+                        <tr class="newSERVER">
+                            <td style=" font-weight: bold;">
+                                Server Hardware
+                            </td>
+                            <td colspan="5" align='left' style="font-weight: normal;">
+                                <span style="width:85%; border-radius: 0; ">
+                                    @if (SRCF.one[0].ServerHardware == "Virtual")
+                                    {
+                                        <span>
+                                            <input type="checkbox" checked />
+                                            Virtual &nbsp;
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>
+                                            <input type="checkbox" />
+                                            Virtual &nbsp;
+                                        </span>
+                                    }
+                                    @if (SRCF.one[0].ServerHardware == "Physical")
+                                    {
+                                        <span>
+                                            <input type="checkbox" checked />
+                                            Physical &nbsp;
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>
+                                            <input type="checkbox" />
+                                            Physical &nbsp;
+                                        </span>
+                                    }
+
+                                </span>
+                            </td>
+
+                        </tr>
+
+                        <tr class="newSERVER">
+                            <td style="width:20%; font-weight: bold;">
+                                RAM in GB
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">  @(SRCF.one[0].RAM)   </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                No. Of CPU
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">  @(SRCF.one[0].NoofCPU)  </span>
+                            </td>
+
+                        </tr>
+
+                        <tr class="newSERVER">
+                            <td style="width:20%; font-weight: bold;">
+                                No. of Network Parts
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SRCF.one[0].NoofNetworkPorts) </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Storage Details
+                            </td>
+                            <td colspan="2" align='left' style="font-weight: normal;">
+                                HDD or Extra disk-space (excluding OS partition)
+                            </td>
+
+                        </tr>
+
+                        <tr class="newSERVER">
+                            <td style="width:20%; font-weight: bold;">
+                                Size (GB/TB)
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SRCF.one[0].StorageSize)  </span>
+                            </td>
+                            <td colspan="3" align='left' style="font-weight: normal;">
+                                <span style="width:85%; border-radius: 0; ">
+                                    @if (SRCF.one[0].TwoRoom == "TwoRoom")
+                                    {
+                                        <span>
+                                            <input type="checkbox" checked />
+                                            Two Rooms &nbsp;
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>
+                                            <input type="checkbox" />
+                                            Two Rooms &nbsp;
+                                        </span>
+                                    }
+                                    @if (SRCF.one[0].TwoRoom == "NonTwoRoom")
+                                    {
+                                        <span>
+                                            <input type="checkbox" checked />
+                                            Non-Two Rooms &nbsp;
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>
+                                            <input type="checkbox" />
+                                            Non-Two Rooms &nbsp;
+                                        </span>
+                                    }
+
+                                </span>
+                            </td>
+
+
+                        </tr>
+
+                        <tr class="newSERVER">
+                            <td style=" font-weight: bold;">
+                                Operating System Details
+                            </td>
+                            <td colspan="5" align='left' style="font-weight: normal">
+                                <span style="width:85%; border-radius: 0; ">
+                                    @if (SRCF.one[0].OperatingSystem == "Windows")
+                                    {
+                                        <span>
+                                            <input type="checkbox" checked />
+                                            Windows &nbsp;
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>
+                                            <input type="checkbox" />
+                                            Windows &nbsp;
+                                        </span>
+                                    }
+                                    @if (SRCF.one[0].OperatingSystem == "Linux")
+                                    {
+                                        <span>
+                                            <input type="checkbox" checked />
+                                            Linux OS &nbsp;
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>
+                                            <input type="checkbox" />
+                                            Linux OS &nbsp;
+                                        </span>
+                                    }
+                                    @if (SRCF.one[0].OperatingSystem == "Others OS")
+                                    {
+                                        <span>
+                                            <input type="checkbox" checked />
+                                            Others OS &nbsp;
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>
+                                            <input type="checkbox" />
+                                            Others OS &nbsp;
+                                        </span>
+                                    }
+
+                                </span>
+                            </td>
+
+                        </tr>
+
+                        <tr class="newSERVER">
+                            @if (SRCF.one[0].OperatingSystem == "Windows")
+                            {
+                                <td style="width:20%; font-weight: bold;">
+                                    OS Name
+                                </td>
+                                <td colspan="5" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SRCF.one[0].OSName)   </span>
+                                </td>
+                            }
+                            else if (SRCF.one[0].OperatingSystem == "Linux")
+                            {
+                                <td style="width:20%; font-weight: bold;">
+                                    Linux OS Name
+                                </td>
+                                <td colspan="5" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SRCF.one[0].OSName)   </span>
+                                </td>
+                            }
+                            else if (SRCF.one[0].OperatingSystem == "Others OS")
+                            {
+                                <td style="width:20%; font-weight: bold;">
+                                    Others OS Name
+                                </td>
+                                <td colspan="5" align='left'>
+                                    <span style="height: 25px; width: 85%; font-weight: normal; border-radius: 0; "> @(SRCF.one[0].OSName)   </span>
+                                </td>
+                            }
+
+                        </tr>
+
+                        <tr class="newSERVER">
+                            <td style="width:20%; font-weight: bold;">
+                                Edition
+                            </td>
+                            <td align='left' colspan="2">
+                                <span style="height: 25px; width: 85%; font-weight: normal; border-radius: 0; "> @(SRCF.one[0].OSEdition)  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Architecture (32/64 Bit)
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; width: 85%; font-weight: normal; border-radius: 0; "> @(SRCF.one[0].Architecture)  </span>
+                            </td>
+                        </tr>
+
+                        <tr class="newSERVER">
+                            <td style="width:20%; font-weight: bold;">
+                                DB Name
+                            </td>
+                            <td align='left'>
+                                <span style="height: 25px; width: 85%; font-weight: normal; border-radius: 0; "> @(SRCF.one[0].DBName)   </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Edition
+                            </td>
+                            <td align='left'>
+                                <span style="height: 25px; width: 85%; font-weight: normal; border-radius: 0; "> @(SRCF.one[0].DBEdition)  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Server Criticality
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; width: 85%; font-weight: normal; border-radius: 0; "> @(SRCF.one[0].ServerCriticality)  </span>
+                            </td>
+                        </tr>
+
+                        <tr class="newSERVER">
+                            <td style=" font-weight: bold;">
+                                Server Type
+                            </td>
+                            <td colspan="2" align='left' style="font-weight: normal">
+                                <span style="width:85%; border-radius: 0; ">
+                                    @if (SRCF.one[0].ServerType == "Permanent")
+                                    {
+                                        <span>
+                                            <input type="checkbox" checked />
+                                            Permanent &nbsp;
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>
+                                            <input type="checkbox" />
+                                            Permanent &nbsp;
+                                        </span>
+                                    }
+                                    @if (SRCF.one[0].ServerType == "Temporary")
+                                    {
+                                        <span>
+                                            <input type="checkbox" checked />
+                                            Temporary &nbsp;
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>
+                                            <input type="checkbox" />
+                                            Temporary &nbsp;
+                                        </span>
+                                    }
+
+                                </span>
+                            </td>
+                            <td colspan="3" align='left'>
+                                @if (SRCF.one[0].ServerType == "Temporary")
+                                {
+                                    <span style="width: 85%; font-weight: normal; border-radius: 0; ">
+                                        From Date: @(SRCF.one[0].Temporaryfrom.ToString("yyyy-MM-dd")) and To Date:@(SRCF.one[0].TemporaryTo.ToString("yyyy-MM-dd"))
+
+                                    </span>
+                                }
+                            </td>
+
+                        </tr>
+
+                        <tr class="newSERVER">
+                            <td style=" font-weight: bold;">
+                                Server Backup required
+                            </td>
+                            <td colspan="5" align='left' style="font-weight: normal;">
+                                <span style="width:85%; border-radius: 0; ">
+                                    @if (SRCF.one[0].BackupRequired == "Yes")
+                                    {
+                                        <span>
+                                            <input type="checkbox" checked />
+                                            Yes &nbsp;
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>
+                                            <input type="checkbox" />
+                                            Yes &nbsp;
+                                        </span>
+                                    }
+                                    @if (SRCF.one[0].BackupRequired == "No")
+                                    {
+                                        <span>
+                                            <input type="checkbox" checked />
+                                            No &nbsp;
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>
+                                            <input type="checkbox" />
+                                            No &nbsp;
+                                        </span>
+                                    }
+                                </span>
+                            </td>
+
+
+                        </tr>
+
+                    }
+                    @if (SRCF.one[0].ServerCreationType == "Existing Server Modification")
+                    {
+                        if (SRCF.one[0].ServerCpu == "Cpu")
+                        {
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Cpu <br />Current Cpu
+                                </td>
+                                <td align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SRCF.one[0].CurrentCpu)   </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Increment Cpu
+                                </td>
+                                <td align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SRCF.one[0].IncrementCpu)  </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Total Cpu
+                                </td>
+                                <td align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SRCF.one[0].TotalCpu)   </span>
+                                </td>
+                            </tr>
+                        }
+                        if (SRCF.one[0].ServerMemory == "Memory")
+                        {
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Memory <br />Current Memory
+                                </td>
+                                <td align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SRCF.one[0].CurrentMemory)   </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Increment Memory
+                                </td>
+                                <td align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SRCF.one[0].IncrementMemory)  </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Total Memory
+                                </td>
+                                <td align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SRCF.one[0].TotalMemory)   </span>
+                                </td>
+                            </tr>
+                        }
+                        if (SRCF.one[0].ServerDisk == "Disk")
+                        {
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Disk <br />Current Disk
+                                </td>
+                                <td align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SRCF.one[0].CurrentDisk)   </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Increment Disk
+                                </td>
+                                <td align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SRCF.one[0].IncrementDisk)  </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Total Disk
+                                </td>
+                                <td align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SRCF.one[0].TotalDisk)   </span>
+                                </td>
+                            </tr>
+                        }
+                        if (SRCF.one[0].ServerLan == "LAN")
+                        {
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Lan <br />Current Lan
+                                </td>
+                                <td align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SRCF.one[0].CurrentLan)   </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Increment Lan
+                                </td>
+                                <td align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SRCF.one[0].IncrementLan)  </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Total Lan
+                                </td>
+                                <td align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SRCF.one[0].TotalLan)   </span>
+                                </td>
+                            </tr>
+                        }
+                        if (SRCF.one[0].ServerOwn == "OwnerChange")
+                        {
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Owner Change <br />Current Owner
+                                </td>
+                                <td align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SRCF.one[0].CurrentOwner)   </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    New Owner
+                                </td>
+                                <td align='left' colspan="3">
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SRCF.one[0].NewOwner)  </span>
+                                </td>
+                            </tr>
+                        }
+                    }
+
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Week No.
+                        </td>
+                        <td align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SRCF.one[0].WeekNo)   </span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">
+                            Day
+                        </td>
+                        <td align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SRCF.one[0].Day)  </span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">
+                            Tiem Frame
+                        </td>
+                        <td align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SRCF.one[0].TimeFrame)   </span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="6">
+                            Reason For Server Requisition
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="6">
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(SRCF.one[0].ReasonForServerRequisition)   </span>
+                        </td>
+                    </tr>
+                    @{
+                        var appList = SRCF.three as List<Skoda_DCMS.Models.ApprovalDataModel>;
+                    }
+
+                    @if (appList.Count > 0)
+                    {
+                        <tr>
+                            <td colspan="2">Name</td>
+                            <td colspan="2">Proccessed On</td>
+                            <td colspan="1">Status</td>
+                            <td colspan="1">Level</td>
+                        </tr>
+                        foreach (var item in appList)
+                        {
+                            <tr>
+                                <td colspan="2" style="font-weight: normal;">
+                                    <div style="margin-bottom:10px;">
+                                        <div>@item.UserName</div>
+                                        <div>@item.Designation</div>
+                                    </div>
+                                </td>
+                                <td colspan="2" style="font-weight: normal;">
+                                    @if (item.Logic == "OR")
+                                    {
+                                        if (item.ApproverStatus != "Pending")
+                                        {
+                                            <div>
+                                                @item.TimeStamp
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div>
+                                            @item.TimeStamp
+                                        </div>
+                                    }
+                                </td>
+                                <td colspan="1" style="font-weight: normal;">
+                                    @if (item.Logic == "OR")
+                                    {
+                                        if (item.ApproverStatus != "Pending")
+                                        {
+                                            <div>
+                                                @item.ApproverStatus
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div>
+                                            @item.ApproverStatus
+                                        </div>
+                                    }
+                                </td>
+                                <td colspan="1" style="font-weight: normal;">
+                                    <div>
+                                        @item.Level
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+<script>
+    $(document).ready(function () {
+        var ServerType = '@SRCF.one[0].ServerCreationType';
+        if (ServerType == "New Server Creation") {
+            $(".newSERVER").show();
+            $(".ExistingServer").hide();
+        } else {
+            $(".newSERVER").hide();
+            $(".ExistingServer").show();
+        }
+    }
+</script>

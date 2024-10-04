@@ -1,0 +1,2396 @@
+﻿@model dynamic
+@{
+    bool IsNew = true;
+    dynamic CBRF = null;
+    dynamic FlagRedirect = null;
+    bool IsValidityCheck = true;
+    bool IsEdit = true;
+    bool IsOHC = true;
+    int FormId = 0, AppRowId = 0, ApprovalType = 0;
+    Layout = ViewBag.Layout;
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IsNew = ViewBag.IsNew;
+        CBRF = ViewBag.Model;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+        IsValidityCheck = ViewBag.IsValidityCheck != null ? (bool)ViewBag.IsValidityCheck : false;
+        IsEdit = ViewBag.IsEdit;
+
+    }
+    var currentUser = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    ViewBag.Title = "Cab Booking Request Form";
+    int count = 0;
+}
+@*<link href="https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>*@
+
+<style>
+
+    .form-table-container-2 tr td:nth-child(2) {
+        text-align: left !important;
+        padding-left: 10px !important;
+    }
+
+    .text-heading {
+        text-align: center !important;
+    }
+
+    .cab-authorize input {
+        margin-left: 7px !important;
+        /* text-align: left; */
+        align-items: flex-start;
+        display: flex;
+        border: 1px solid rgb(75,168,46) !important;
+        padding-left: 3px !important;
+        padding-right: 3px !important;
+    }
+
+    .select-items option:hover {
+        background-color: #4ba82e;
+    }
+
+    option:hover {
+        background-color: #4ba82e;
+    }
+
+    .select-items {
+        position: absolute;
+        background-color: #4ba82e;
+        top: 100%;
+        left: 0;
+        right: 0;
+        z-index: 99;
+    }
+
+    .choose-select {
+        display: flex;
+        text-align: right;
+    }
+
+        .choose-select select:first-child {
+            margin-right: 10px;
+        }
+
+        .choose-select select {
+            font-size: 14px;
+            padding: 3px 0px;
+            height: 27.5px !important;
+            margin-left: 10px !important;
+            text-align: right;
+            align-items: flex-start;
+            border: 1px solid rgb(75,168,46) !important;
+        }
+
+    .pos-rel {
+        position: relative;
+    }
+
+    .pos-calender {
+        position: absolute;
+        right: 12px;
+        top: 12px;
+    }
+
+    .pos-calender-1 {
+        position: absolute;
+        right: 57px;
+        top: 12px;
+    }
+
+    .emp-name-input {
+        height: 0%;
+        border-radius: 0;
+    }
+
+    .starting-date {
+        width: 41%;
+    }
+
+    .photogrphy-textarea {
+        padding: 7px;
+        max-width: 434px;
+    }
+
+    .f-16 {
+        font-size: 18px !important;
+    }
+
+    table.dataTable thead th, table.dataTable tbody td, table.dataTable tfoot th {
+        font-size: 16px;
+    }
+
+    .cab-section {
+        text-align: left !important;
+        font-weight: 600;
+    }
+
+    .right-col {
+        background-color: rgb(219,238,213) !important;
+    }
+
+    .form-table-container-2 tr td:first-child {
+        text-align: left !important;
+        padding-left: 6px !important;
+    }
+
+    .form-table-container-2 tr:nth-child(5) td:nth-child(2) input {
+        width: 100% !important;
+    }
+
+    .form-table-container-2 tr:nth-child(5) td:nth-child(3) input {
+        width: 100% !important;
+    }
+
+    .authorize-td input {
+        width: 95% !important;
+        margin-left: 4px !important;
+        text-align: left;
+        align-items: flex-start;
+        /* display: flex; */
+        border: 1px solid rgb(75,168,46) !important;
+        padding-left: 5px !important;
+        padding-right: 5px !important;
+    }
+
+    .cab-authorize-td input {
+        margin-left: 10px !important;
+        text-align: left;
+        align-items: flex-start;
+        /* display: flex; */
+        border: 1px solid rgb(75,168,46) !important;
+        padding-left: 5px !important;
+        padding-right: 5px !important;
+    }
+
+    .cab-authorize-td select {
+        font-size: 14px;
+        padding: 3px 0px;
+        height: 27.5px !important;
+        margin-left: 10px !important;
+        text-align: left;
+        align-items: flex-start;
+        /* display: flex; */
+        border: 1px solid rgb(75,168,46) !important;
+        padding-left: 5px !important;
+        padding-right: 5px !important;
+    }
+
+    .bg-color td, .bg-color th {
+        border: 1px solid #dee2e6;
+        background-color: rgb(219,238,213) !important;
+    }
+
+    .bg-color-2 td {
+        background-color: rgba(75,168,46,0.4) !important;
+        border: 1px solid rgba(75,168,46,0.1) !important;
+    }
+
+    .bg-color-2 th {
+        background-color: rgba(75,168,46,0.4) !important;
+        border: 1px solid rgba(75,168,46,0.1) !important;
+    }
+
+    .bg-color-3 td {
+        background-color: rgba(75,168,46,0.2) !important;
+        border: 1px solid rgba(75,168,46,0.1) !important;
+        border-bottom: 1px solid rgba(75,168,46,0.1) !important;
+    }
+</style>
+@*Loader*@
+<style type="text/css">
+    #loader {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        background: rgba(0,0,0,0.75) url(../../assets/img/Loading.gif) no-repeat center center;
+        z-index: 10000;
+    }
+</style>
+<div id="loader"></div>
+@*Loader*@
+<body>
+    <form action="/OCRF/SaveCBRF" id="CBRFForm" method="post">
+        <div class="right_col" role="main">
+            <div class="container">
+                @if (IsNew)
+                {
+                    if (!IsEdit)
+                    {
+                        foreach (var item in CBRF.one)
+                        {
+                            <input type="hidden" id="hiddentxtEmail" name="hiddentxtEmail" value="" />
+                            <input type="hidden" id="FormSrId" name="FormSrId" value="@(CBRF.one[0].Id)" />
+                            <input type="hidden" id="FormId" name="FormId" value="@(FormId)" />
+                            <input type="hidden" id="AppRowId" name="AppRowId" value="@(AppRowId)" />
+                            <div class="container form-container">
+                                <div class="container">
+                                    <table class="table mainTbl table-bordered form-table-container bg-color">
+                                        <tr>
+                                            <td>
+                                                <table class="table mainTbl table-bordered form-table-container-2 bg-color">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td class="w-30 br-0">
+                                                                Form ID:  <input type="text" name="txtFormId" class="inpDisable" value="@(!IsNew ||!IsEdit ? ("CBRF"+FormId ?? "" ) : "" )" readonly>
+                                                            </td>
+                                                            <td class="bl-0"></td>
+                                                            <td rowspan="2" class="text-right"><img class="img-fluid img-box" src="~/assets/img/skoda.png"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="br-0">
+                                                            </td>
+                                                            <td class="bl-0"><b>Cab Booking Form</b></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="br-0">Date:</td>
+                                                            <td class="bl-0">
+                                                                <input type="text" name="txtDate" placeholder="/ /" class="inpDisable" value="@(!IsNew ||!IsEdit ? (Convert.ToDateTime(CBRF.two[0].FormId.Created).ToShortDateString()) : DateTime.Now.ToShortDateString())" readonly>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                                <table class="w-100 form-border bg-color">
+                                                    <tr>
+                                                        <td class="w-25"><label class="f-600">Designation</label></td>
+                                                        <td class="text-center" colspan="4">
+                                                            <select name="ddEmpDesignation" class="drpSize" id="ddEmpDesignation"></select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="w-25"><llabel class="f-600">Department</llabel></td>
+                                                        <td class="text-center" colspan="4">
+                                                            <input type="text" name="txtDepartment" autocomplete="off" class="inpDisable" id="txtDepartment" value="@(!IsNew ||!IsEdit ? (CBRF.one[0].Department ?? " ") : " ")">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><label class="f-600">Cost Center Number</label></td>
+                                                        <td class="text-center underline" colspan="4">
+                                                            <input type="text" name="txtCostCenterNumber" autocomplete="off" class="inpDisable" id="txtCostCenterNumber" value="@(!IsNew ||!IsEdit ? (CBRF.one[0].CostCenterNumber ?? "") : "")">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><label class="f-600">Shopping Cart No.</label></td>
+                                                        <td class="text-center underline" colspan="4">
+                                                            <input type="text" name="txtShoppingCartNo" autocomplete="off" class="inpDisable" id="txtShoppingCartNo" value="@(!IsNew ||!IsEdit ? (CBRF.one[0].ShoppingCartNo ?? "") : "")">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td rowspan="2"><label class="f-600">Booked By & Contact Number</label></td>
+                                                        <td class="text-center" colspan="2"><label class="f-600">Name</label></td>
+                                                        <td class="text-center" colspan="2"><label class="f-600">Contact Number</label></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-center" colspan="2">
+                                                            <input type="text" name="txtName" autocomplete="off" class="inpDisable" id="txtName" value="@(!IsNew || !IsEdit ? (CBRF.one[0].Name ?? " ") : "")">
+                                                        </td>
+                                                        <td class="text-center" colspan="2">
+                                                            <input type="text" name="txtContactNumber" autocomplete="off" class="inpDisable" id="txtContactNumber" value="@(!IsNew || !IsEdit ? (CBRF.one[0].ContactNumber ?? "") : "")">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td rowspan="2"><label class="f-600">Car Required From</label></td>
+                                                        <td colspan="2" class="text-center"><label class="f-600">From  (DD-MM-YY) & Time</label></td>
+                                                        <td colspan="2" class="text-center"><label class="f-600">To (DD-MM-YY) & Time</label></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-center underline">
+                                                            <input type="date" name="txtCarRequiredFromDate" autocomplete="off" class="inpDisable" id="txtCarRequiredFromDate" value="@(!IsNew  || !IsEdit ? (CBRF.one[0].CarRequiredFromDate.ToString("yyyy-MM-dd") ?? "") : "")">
+                                                        </td>
+                                                        <td class="text-center underline">
+                                                            @*<input type="text" name="txtCarRequiredFromTime" autocomplete="off" class="inpDisable" id="txtCarRequiredFromTime" value="@(!IsNew || !IsEdit ? (CBRF.one[0].CarRequiredFromTime ?? "") : "")">*@
+                                                            <select name="drpCarRequiredFromTimeHours" id="drpCarRequiredFromTimeHours" class="drpDisable">
+                                                                <option @(CBRF.one[0].CarRequiredFromTimeHours == "1" ? "selected" : "" ) value="1">1</option>
+                                                                <option @(CBRF.one[0].CarRequiredFromTimeHours == "2" ? "selected" : "" ) value="2">2</option>
+                                                                <option @(CBRF.one[0].CarRequiredFromTimeHours == "3" ? "selected" : "" ) value="3">3</option>
+                                                                <option @(CBRF.one[0].CarRequiredFromTimeHours == "4" ? "selected" : "" ) value="4">4</option>
+                                                                <option @(CBRF.one[0].CarRequiredFromTimeHours == "5" ? "selected" : "" ) value="5">5</option>
+                                                                <option @(CBRF.one[0].CarRequiredFromTimeHours == "6" ? "selected" : "" ) value="6">6</option>
+                                                                <option @(CBRF.one[0].CarRequiredFromTimeHours == "7" ? "selected" : "" ) value="7">7</option>
+                                                                <option @(CBRF.one[0].CarRequiredFromTimeHours == "8" ? "selected" : "" ) value="8">8</option>
+                                                                <option @(CBRF.one[0].CarRequiredFromTimeHours == "9" ? "selected" : "" ) value="9">9</option>
+                                                                <option @(CBRF.one[0].CarRequiredFromTimeHours == "10" ? "selected" : "" ) value="10">10</option>
+                                                                <option @(CBRF.one[0].CarRequiredFromTimeHours == "11" ? "selected" : "" ) value="11">11</option>
+                                                                <option @(CBRF.one[0].CarRequiredFromTimeHours == "12" ? "selected" : "" ) value="12">12</option>
+                                                            </select>
+                                                            <select name="drpCarRequiredFromTimeAMPM" id="drpCarRequiredFromTimeAMPM" class="drpDisable">
+                                                                <option @(CBRF.one[0].CarRequiredFromTimeAMPM == "AM" ? "selected" : "" ) value="AM">AM</option>
+                                                                <option @(CBRF.one[0].CarRequiredFromTimeAMPM == "PM" ? "selected" : "" ) value="PM">PM</option>
+                                                            </select>
+
+                                                        </td>
+                                                        <td class="text-center underline">
+                                                            <input type="date" name="txtCarRequiredToDate" autocomplete="off" class="inpDisable" id="txtCarRequiredToDate" value="@(!IsNew || !IsEdit ? (CBRF.one[0].CarRequiredToDate.ToString("yyyy-MM-dd") ?? "") : "")">
+                                                        </td>
+                                                        <td class="text-center">
+                                                            @*<input type="text" name="txtCarRequiredToTime" autocomplete="off" class="inpDisable" id="txtCarRequiredToTime" value="@(!IsNew || !IsEdit ? (CBRF.one[0].CarRequiredToTime ?? "") : "")">*@
+                                                            <select name="drpCarRequiredToTimeHours" id="drpCarRequiredToTimeHours" class="drpDisable">
+                                                                <option @(CBRF.one[0].CarRequiredToTimeHours == "1" ? "selected" : "" ) value="1">1</option>
+                                                                <option @(CBRF.one[0].CarRequiredToTimeHours == "2" ? "selected" : "" ) value="2">2</option>
+                                                                <option @(CBRF.one[0].CarRequiredToTimeHours == "3" ? "selected" : "" ) value="3">3</option>
+                                                                <option @(CBRF.one[0].CarRequiredToTimeHours == "4" ? "selected" : "" ) value="4">4</option>
+                                                                <option @(CBRF.one[0].CarRequiredToTimeHours == "5" ? "selected" : "" ) value="5">5</option>
+                                                                <option @(CBRF.one[0].CarRequiredToTimeHours == "6" ? "selected" : "" ) value="6">6</option>
+                                                                <option @(CBRF.one[0].CarRequiredToTimeHours == "7" ? "selected" : "" ) value="7">7</option>
+                                                                <option @(CBRF.one[0].CarRequiredToTimeHours == "8" ? "selected" : "" ) value="8">8</option>
+                                                                <option @(CBRF.one[0].CarRequiredToTimeHours == "9" ? "selected" : "" ) value="9">9</option>
+                                                                <option @(CBRF.one[0].CarRequiredToTimeHours == "10" ? "selected" : "" ) value="10">10</option>
+                                                                <option @(CBRF.one[0].CarRequiredToTimeHours == "11" ? "selected" : "" ) value="11">11</option>
+                                                                <option @(CBRF.one[0].CarRequiredToTimeHours == "12" ? "selected" : "" ) value="12">12</option>
+                                                            </select>
+                                                            <select name="drpCarRequiredToTimeAMPM" id="drpCarRequiredToTimeAMPM" class="drpDisable">
+                                                                <option @(CBRF.one[0].CarRequiredToTimeAMPM == "AM" ? "selected" : "" ) value="AM">AM</option>
+                                                                <option @(CBRF.one[0].CarRequiredToTimeAMPM == "PM" ? "selected" : "" ) value="PM">PM</option>
+                                                            </select>
+
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td rowspan="3"><label class="f-600">Booked For</label></td>
+                                                        <td class="text-center"><label class="f-600">User Name</label></td>
+                                                        <td class="text-center"><label class="f-600">User Contact Number</label></td>
+                                                        <td class="text-center"><label class="f-600">Reporting Place with address</label></td>
+                                                        <td class="text-center"><label class="f-600">Reporting Time</label></td>
+
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-center">
+                                                            <input type="text" name="txtUserName" autocomplete="off" class="inpDisable" id="txtUserName" value="@(!IsNew || !IsEdit ? (CBRF.one[0].UserName ?? "") : "")">
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <input type="text" name="txtUserContactNumber" autocomplete="off" class="inpDisable" id="txtUserContactNumber" value="@(!IsNew ||!IsEdit ? (CBRF.one[0].UserContactNumber ?? "") : "")">
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <textarea class="form-control input-width-1 mx-auto" rows="5" name="txtReportingPlaceWithAddress" id="txtReportingPlaceWithAddress">@(!IsNew || !IsEdit ? (CBRF.one[0].ReportingPlaceWithAddress ?? " "): " ")</textarea>
+                                                        </td>
+                                                        <td class="text-center underline">
+                                                            @*<input type="text" name="txtReportingTime" autocomplete="off" class="inpDisable" id="txtReportingTime" value="@(!IsNew || !IsEdit ? (CBRF.one[0].ReportingTime ?? " ") : " ")">*@
+
+                                                            <select name="drpReportingTimeHours" id="drpReportingTimeHours" class="drpDisable">
+                                                                <option @(CBRF.one[0].ReportingTimeHours == "1" ? "selected" : "" ) value="1">1</option>
+                                                                <option @(CBRF.one[0].ReportingTimeHours == "2" ? "selected" : "" ) value="2">2</option>
+                                                                <option @(CBRF.one[0].ReportingTimeHours == "3" ? "selected" : "" ) value="3">3</option>
+                                                                <option @(CBRF.one[0].ReportingTimeHours == "4" ? "selected" : "" ) value="4">4</option>
+                                                                <option @(CBRF.one[0].ReportingTimeHours == "5" ? "selected" : "" ) value="5">5</option>
+                                                                <option @(CBRF.one[0].ReportingTimeHours == "6" ? "selected" : "" ) value="6">6</option>
+                                                                <option @(CBRF.one[0].ReportingTimeHours == "7" ? "selected" : "" ) value="7">7</option>
+                                                                <option @(CBRF.one[0].ReportingTimeHours == "8" ? "selected" : "" ) value="8">8</option>
+                                                                <option @(CBRF.one[0].ReportingTimeHours == "9" ? "selected" : "" ) value="9">9</option>
+                                                                <option @(CBRF.one[0].ReportingTimeHours == "10" ? "selected" : "" ) value="10">10</option>
+                                                                <option @(CBRF.one[0].ReportingTimeHours == "11" ? "selected" : "" ) value="11">11</option>
+                                                                <option @(CBRF.one[0].ReportingTimeHours == "12" ? "selected" : "" ) value="12">12</option>
+                                                            </select>
+                                                            <select name="drpReportingTimeAMPM" id="drpReportingTimeAMPM" class="drpDisable">
+                                                                <option @(CBRF.one[0].ReportingTimeAMPM == "AM" ? "selected" : "" ) value="AM">AM</option>
+                                                                <option @(CBRF.one[0].ReportingTimeAMPM == "PM" ? "selected" : "" ) value="PM">PM</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="br-1">
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><label class="f-600">Reason for booking</label></td>
+                                                        <td class="text-center" colspan="4">
+                                                            <textarea class="form-control input-width-1 mx-auto" rows="5" name="txtReasonforBooking" id="txtReasonforBooking">@(!IsNew || !IsEdit ? (CBRF.one[0].ReasonforBooking ?? ""): "")</textarea>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><label class="f-600">Destination</label></td>
+                                                        <td class="text-center" colspan="4">
+                                                            <input type="text" name="txtDestination" autocomplete="off" class="inpDisable" id="txtDestination" value="@(!IsNew || !IsEdit ? (CBRF.one[0].Destination ?? "") : "")">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td rowspan="2"><label class="f-600">Car</label></td>
+                                                        <td colspan="2" class="text-center"><label class="f-600">Type of Car</label></td>
+                                                        <td colspan="2" class="text-center"><label class="f-600">Vehicle Number</label></td>
+                                                        <td colspan="2" class="text-center"><label class="f-600">Number of Users</label></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="2" class="text-left pl-1 cab-authorize-td">
+                                                            <select name="ddTypeofCar" class="drpSize" id="ddTypeofCar" disabled></select>
+                                                            <input type="text" name="txtTypeofCarOther" autocomplete="off" class="inpDisable" id="txtTypeofCarOther" value="@(!IsNew ? (CBRF.one[0].TypeofCarOther ?? "") : "")" readonly>
+
+                                                        </td>
+                                                        <td colspan="2" class="text-left pl-1 cab-authorize-td">
+                                                            <select name="ddVehicleNumber" class="drpSize" id="ddVehicleNumber" disabled></select>
+                                                            <input type="text" name="txtVehicleNumberOther" autocomplete="off" class="inpDisable" id="txtVehicleNumberOther" value="@(!IsNew ? (CBRF.one[0].VehicleNumberOther ?? "") : "")" readonly>
+                                                        </td>
+                                                        <td colspan="2" class="text-center">
+                                                            <input type="text" name="txtNumberofUsers" autocomplete="off" class="inpDisable" id="txtNumberofUsers" value="@(!IsNew || !IsEdit ? (CBRF.one[0].NumberofUsers ?? "") : "")">
+                                                        </td>
+
+                                                    </tr>
+                                                    <tr>
+                                                    </tr>
+                                                    <tr>
+                                                        <td rowspan="3"><label class="f-600">Flight No & Time (Incase it is Airport Pickup or Drop)</label></td>
+                                                        <td class="text-center"><label class="f-600">Airport Pick Up Drop</label></td>
+                                                        <td class="text-center"><label class="f-600">Flight No</label></td>
+                                                        <td class="text-center"><label class="f-600">Flight Time</label></td>
+                                                        <td></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-center">
+                                                            <select name="drpAirportPickUpDrop" id="drpAirportPickUpDrop" class="drpDisable">
+                                                                <option @(CBRF.one[0].AirportPickUpDrop == "No" ? "selected" : "" ) value="No">No</option>
+                                                                <option @(CBRF.one[0].AirportPickUpDrop == "Yes" ? "selected" : "" ) value="Yes">Yes</option>
+                                                            </select>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <input type="text" name="txtFlightNo" autocomplete="off" class="inpDisable" id="txtFlightNo" value="@(!IsNew || !IsEdit ? (CBRF.one[0].FlightNo ?? "") : "")">
+                                                        </td>
+                                                        <td class="text-center">
+                                                            @*<input type="text" name="txtFlightTime" autocomplete="off" class="inpDisable" id="txtFlightTime" value="@(!IsNew || !IsEdit ? (CBRF.one[0].FlightTime ?? "") : "")">*@
+                                                            <select name="drpFlightTimeHours" id="drpFlightTimeHours" class="drpDisable">
+                                                                <option @(CBRF.one[0].FlightTimeHours == "" ? "selected" : "" ) value="">Choose</option>
+                                                                <option @(CBRF.one[0].FlightTimeHours == "1" ? "selected" : "" ) value="1">1</option>
+                                                                <option @(CBRF.one[0].FlightTimeHours == "2" ? "selected" : "" ) value="2">2</option>
+                                                                <option @(CBRF.one[0].FlightTimeHours == "3" ? "selected" : "" ) value="3">3</option>
+                                                                <option @(CBRF.one[0].FlightTimeHours == "4" ? "selected" : "" ) value="4">4</option>
+                                                                <option @(CBRF.one[0].FlightTimeHours == "5" ? "selected" : "" ) value="5">5</option>
+                                                                <option @(CBRF.one[0].FlightTimeHours == "6" ? "selected" : "" ) value="6">6</option>
+                                                                <option @(CBRF.one[0].FlightTimeHours == "7" ? "selected" : "" ) value="7">7</option>
+                                                                <option @(CBRF.one[0].FlightTimeHours == "8" ? "selected" : "" ) value="8">8</option>
+                                                                <option @(CBRF.one[0].FlightTimeHours == "9" ? "selected" : "" ) value="9">9</option>
+                                                                <option @(CBRF.one[0].FlightTimeHours == "10" ? "selected" : "" ) value="10">10</option>
+                                                                <option @(CBRF.one[0].FlightTimeHours == "11" ? "selected" : "" ) value="11">11</option>
+                                                                <option @(CBRF.one[0].FlightTimeHours == "12" ? "selected" : "" ) value="12">12</option>
+                                                            </select>
+                                                            <select name="drpFlightTimeAMPM" id="drpFlightTimeAMPM" class="drpDisable">
+                                                                <option @(CBRF.one[0].FlightTimeAMPM == "" ? "selected" : "" ) value="">Choose</option>
+                                                                <option @(CBRF.one[0].FlightTimeAMPM == "AM" ? "selected" : "" ) value="AM">AM</option>
+                                                                <option @(CBRF.one[0].FlightTimeAMPM == "PM" ? "selected" : "" ) value="PM">PM</option>
+                                                            </select>
+                                                        </td>
+                                                        <td id="hiddenApproverInformation"></td>
+                                                    </tr>
+                                                </table>
+                                                <table class="table mainTbl table-bordered form-table-container-2 bg-color">
+                                                    @if (CBRF.one[0].attachmentlist.attachmentData.Count != 0)
+                                                    {
+                                                        foreach (var attachment in CBRF.one[0].attachmentlist.attachmentData)
+                                                        {
+                                                            <tr>
+                                                                <td class="allFormLables borderLTB f-600">
+                                                                    <label class="f-600">File Upload:</label><br>
+                                                                </td>
+                                                                <td colspan="2" class="borderLTB">
+                                                                    <input type="file" id="fileToUpload" name="fileToUpload" />
+                                                                    <input type="hidden" id="attachedfile" name="attachedfile" value="@System.Configuration.ConfigurationManager.AppSettings["SharepointSiteURL"]@attachment.ServerRelativeUrl" />
+                                                                    <input type="hidden" id="attachedfileName" name="attachedfileName" value="@attachment.FileName" />
+                                                                    <a href=@System.Configuration.ConfigurationManager.AppSettings["SharepointSiteURL"]@attachment.ServerRelativeUrl download=@attachment.FileName target="_blank">@attachment.FileName </a>
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <tr>
+                                                            <td class="allFormLables borderLTB f-600">
+                                                                <label class="f-600">File Upload:</label><br>
+                                                            </td>
+                                                            <td colspan="2" class="borderLTB">
+                                                                <input type="file" id="fileToUpload" name="fileToUpload" />
+                                                            </td>
+                                                        </tr>
+
+                                                    }
+                                                </table>
+                                                <table>
+                                                    <tr>
+                                                        <td><label class="f-600">Note</label> :- If the above details are  not filled properly or are left incomplete the booking will be not be considered</td>
+                                                    </tr>
+                                                </table>
+                                                <table class="w-100 form-border bg-color">
+                                                    <tr>
+                                                        <td colspan="4" class="text-center"><label class="f-600">To be filled by the service Provider</label></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="w-30"><label class="f-600">KM</label></td>
+                                                        <td colspan="2">
+                                                            <label class="f-600">Starting KM -</label>
+                                                            <input type="text" name="txtStartingKM" autocomplete="off" class="inpDisable" id="txtStartingKM" value="@(!IsNew ? (CBRF.one[0].StartingKM ?? " ") : " ")" readonly>
+                                                        </td>
+                                                        <td colspan="2">
+                                                            <label class="f-600">Closing KM -</label>
+                                                            <input type="text" name="txtClosingKM" autocomplete="off" class="inpDisable" id="txtClosingKM" value="@(!IsNew ? (CBRF.one[0].ClosingKM ?? " ") : " ")" readonly>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><label class="f-600">Timing</label></td>
+                                                        <td colspan="2">
+                                                            <label class="f-600">Starting Time -</label>
+                                                            <input type="text" name="txtStartingTime" autocomplete="off" class="inpDisable" id="txtStartingTime" value="@(!IsNew ? (CBRF.one[0].StartingTime ?? " ") : " ")" readonly>
+                                                        </td>
+                                                        <td colspan="2">
+                                                            <label class="f-600">Closing Time -</label>
+                                                            <input type="text" name="txtEndingTime" autocomplete="off" class="inpDisable" id="txtEndingTime" value="@(!IsNew ? (CBRF.one[0].EndingTime ?? " ") : " ")" readonly>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><label class="f-600">Date</label></td>
+                                                        <td colspan="2">
+                                                            <label class="f-600">Starting Date -</label>
+                                                            <input type="text" name="txtStartingDate" autocomplete="off" class="inpDisable" id="txtStartingDate" readonly>
+                                                        </td>
+                                                        <td colspan="2">
+                                                            <label class="f-600">Closing Date -</label>
+                                                            <input type="text" name="txtClosingDate" autocomplete="off" class="inpDisable" id="txtClosingDate" readonly>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                                <table>
+                                                    <tr>
+                                                        <td><label class="f-600">User Signature</label></td>
+                                                    </tr>
+                                                </table>
+
+                                            </td>
+                                        </tr>
+                                    </table>
+
+                                    <table class="detail-sec-p">
+                                        <tr>
+                                            <td class="text-center">SF_S_034</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        }
+
+                    }
+                    else
+                    {
+                        <input type="hidden" id="hiddentxtEmail" name="hiddentxtEmail" value="" />
+                        <div class="container form-container">
+                            <div class="container">
+                                <table class="table mainTbl table-bordered form-table-container bg-color">
+                                    <tr>
+                                        <td>
+                                            <table class="w-100 form-border bg-color">
+                                                <tbody>
+                                                    <tr>
+                                                        <td rowspan="2" class="text-right"><img class="img-fluid img-box" src="/assets/img/skoda.png"></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <table class="table mainTbl table-bordered form-table-container bg-color">
+                                                <tbody>
+                                                    <tr>
+                                                        <td colspan="6" class="heading form-heading">
+                                                            <span class="form-heading">Cab Booking Form</span>
+                                                        </td>
+                                                    </tr>
+                                            </table>
+                                            <table class="table mainTbl table-bordered form-table-container-2 bg-color">
+
+                                                <tr>
+                                                    <td class="allFormLables borderLTB f-600">
+                                                        <label class="f-600">Form Id:</label><br>
+                                                    </td>
+                                                    <td colspan="2" class="borderLTB">
+                                                        <input type="text" name="txtFormId" class="w-100 inpDisable" value="" readonly="" disabled="disabled">
+                                                    </td>
+                                                    <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                        <label class="f-600 pl-2">Date:</label><br>
+                                                    </td>
+                                                    <td class="borderLTB">
+                                                        <input type="text" name="txtDate" placeholder="/ /" class="w-100 inpDisable" value="@(!IsNew ||!IsEdit ? (Convert.ToDateTime(CBRF.two[0].FormId.Created).ToShortDateString()) : DateTime.Now.ToShortDateString())" readonly>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="allFormLables borderLTB f-600">
+                                                        <label class="f-600">Request Submission Type:</label><br>
+                                                    </td>
+                                                    <td colspan="2" class="borderLTB p-left">
+                                                        <select name="drpRequestSubType" id="drpRequestSubType" class="drpSize" onchange="RequestSubmission()">
+                                                            <option value="null" selected>Choose</option>
+                                                            <option value="Self">Self</option>
+                                                            <option value="OnBehalf">On Behalf</option>
+                                                        </select>
+                                                    </td>
+                                                    <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                        <label class="f-600 pl-2">Employee Name:</label><br>
+                                                    </td>
+                                                    <td class="borderLTB">
+                                                        <input type="text" name="txtOtherEmpname" id="txtOtherEmpname" placeholder="Type at least 4 letters" class="inpDisable form-control emp-name-input d-inline" required="required">
+                                                        <input type="hidden" id="hiddentxtEmail" name="hiddentxtEmail" value="" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="allFormLables borderLTB f-600">
+                                                        <label class="f-600">Designation:</label><br>
+                                                    </td>
+                                                    <td colspan="2" class="borderLTB">
+                                                        <select name="ddEmpDesignation" class="drpSize" id="ddEmpDesignation"></select>
+                                                    </td>
+                                                    <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                        <label class="f-600 pl-2">Department:</label><br>
+                                                    </td>
+                                                    <td class="borderLTB">
+                                                        <input type="text" name="txtDepartment" autocomplete="off" class="w-100 inpDisable" id="txtDepartment" value="@(!IsNew ? (CBRF.one[0].Department ?? " ") : " ")">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="allFormLables borderLTB f-600">
+                                                        <label class="f-600">Cost Center Number:</label><br>
+                                                    </td>
+                                                    <td colspan="2" class="borderLTB">
+                                                        <input type="text" name="txtCostCenterNumber" autocomplete="off" class="w-100 inpDisable" id="txtCostCenterNumber" onkeypress="allowNumbersOnly(event)" value="@(!IsNew ? (CBRF.one[0].CostCenterNumber ?? "") : "")">
+                                                    </td>
+                                                    <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                        <label class="f-600 pl-2">Shopping Cart No:</label><br>
+                                                    </td>
+                                                    <td class="borderLTB">
+                                                        <input type="text" name="txtShoppingCartNo" autocomplete="off" class="w-100 inpDisable" id="txtShoppingCartNo" onkeypress="allowNumbersOnly(event)" value="@(!IsNew ? (CBRF.one[0].ShoppingCartNo ?? "") : "")">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="w-20 allFormLables borderLTB f-600">
+                                                        <label>Booked By &amp; Contact Number:</label>
+                                                    </td>
+                                                    <td class="borderLTB" colspan="2">
+                                                        <input type="text" name="txtName" autocomplete="off" class="d-block inpDisable" id="txtName" onkeypress="alphaOnly(event)" value="@(!IsNew ? (CBRF.one[0].Name ?? " ") : "")">
+                                                        <small class="f-600 f-12">(Name)</small>
+                                                    </td>
+
+                                                    <td class="borderLTB" colspan="2">
+                                                    </td>
+                                                    <td class="borderLTB text-left pl-5">
+                                                        <input type="text" name="txtContactNumber" autocomplete="off" class="w-100 inpDisable d-block" id="txtContactNumber" onkeypress="allowNumbersOnly(event)" value="@(!IsNew ? (CBRF.one[0].ContactNumber ?? "") : "")">
+                                                        <small class="pl-0 f-600 f-12">(Contact Number)</small>
+                                                    </td>
+                                                </tr>
+
+
+                                            </table>
+                                            <table class="w-100 form-border bg-color">
+
+                                                <tr>
+                                                    <td class="text-left" rowspan="2"><label class="f-600">Car Required From</label></td>
+                                                    <td colspan="2" class="text-left pl-3"><label class="f-600">From  (DD-MM-YY) &amp; Time</label></td>
+                                                    <td colspan="2" class="text-left pl-3"><label class="f-600">To (DD-MM-YY) &amp; Time</label></td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="text-left cab-authorize-td pos-rel">
+                                                        <input type="date" name="txtCarRequiredFromDate" autocomplete="off" class="w-95 inpDisable" id="txtCarRequiredFromDate" onclick="setStartDate()" value="@(!IsNew ? (CBRF.one[0].CarRequiredFromDate ?? "") : "")">
+                                                        @*<input type="text" id="datepick" />*@
+                                                        @*<span class="pos-calender"><i class="fa fa-calendar" aria-hidden="true"></i></span>*@
+                                                    </td>
+                                                    <td class="text-center cab-authorize-td">
+                                                        <select name="drpCarRequiredFromTimeHours" id="drpCarRequiredFromTimeHours">
+                                                            <option class="select-items" value="" selected>Choose</option>
+                                                            <option value="01">01</option>
+                                                            <option value="02">02</option>
+                                                            <option value="03">03</option>
+                                                            <option value="04">04</option>
+                                                            <option value="05">05</option>
+                                                            <option value="06">06</option>
+                                                            <option value="07">07</option>
+                                                            <option value="08">08</option>
+                                                            <option value="09">09</option>
+                                                            <option value="10">10</option>
+                                                            <option value="11">11</option>
+                                                            <option value="12">12</option>
+                                                        </select>
+
+                                                        <select name="drpCarRequiredFromTimeAMPM" id="drpCarRequiredFromTimeAMPM" class="w-40">
+                                                            <option value="" selected>Choose</option>
+                                                            <option value="AM">AM</option>
+                                                            <option value="PM">PM</option>
+                                                        </select>
+                                                    </td>
+                                                    <td class="text-left cab-authorize-td pos-rel">
+                                                        <input type="date" name="txtCarRequiredToDate" autocomplete="off" class="w-95 inpDisable" id="txtCarRequiredToDate" onclick="date_val_end()" value="@(!IsNew ? (CBRF.one[0].CarRequiredToDate ?? "") : "")">
+                                                        @*<input type="text" id="datepick2" />*@
+                                                        @*<span class="pos-calender-1"><i class="fa fa-calendar" aria-hidden="true"></i></span>*@
+                                                    </td>
+                                                    <td class="text-right cab-authorize-td d-flex">
+                                                        <select name="drpCarRequiredToTimeHours" class="m-right" id="drpCarRequiredToTimeHours">
+                                                            <option value="" selected>Choose</option>
+                                                            <option value="01">01</option>
+                                                            <option value="02">02</option>
+                                                            <option value="03">03</option>
+                                                            <option value="04">04</option>
+                                                            <option value="05">05</option>
+                                                            <option value="06">06</option>
+                                                            <option value="07">07</option>
+                                                            <option value="08">08</option>
+                                                            <option value="09">09</option>
+                                                            <option value="10">10</option>
+                                                            <option value="11">11</option>
+                                                            <option value="12">12</option>
+                                                        </select>
+                                                        <select name="drpCarRequiredToTimeAMPM" class="" id="drpCarRequiredToTimeAMPM">
+                                                            <option value="" selected>Choose</option>
+                                                            <option value="AM">AM</option>
+                                                            <option value="PM">PM</option>
+                                                        </select>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="text-left" rowspan="3"><label class="f-600">Booked For</label></td>
+                                                    <td class="text-left pl-3"><label class="f-600">User Name</label></td>
+                                                    <td class="text-left pl-3"><label class="f-600">User Contact Number</label></td>
+                                                    <td class="text-left"><label class="f-600">Reporting Place with address</label></td>
+                                                    <td class="text-left pl-3"><label class="f-600">Reporting Time</label></td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td class="text-center cab-authorize-td">
+                                                        <input type="text" name="txtUserName" autocomplete="off" class="inpDisable" id="txtUserName" onkeypress="alphaOnly(event)" value="@(!IsNew ? (CBRF.one[0].UserName ?? " ") : " ")">
+                                                    </td>
+                                                    <td class="text-center cab-authorize-td">
+                                                        <input type="text" name="txtUserContactNumber" autocomplete="off" class="inpDisable" id="txtUserContactNumber" onkeypress="allowNumbersOnly(event)" value="@(!IsNew ? (CBRF.one[0].UserContactNumber ?? "") : "")">
+                                                    </td>
+                                                    <td class="text-center cab-authorize-td">
+                                                        <textarea cols="30" rows="3" id="txtReportingPlaceWithAddress" name="txtReportingPlaceWithAddress"></textarea>
+                                                    </td>
+                                                    <td class="text-right cab-authorize-td d-flex">
+                                                        <select name="drpReportingTimeHours" class="" id="drpReportingTimeHours">
+                                                            <option value="" selected>Choose</option>
+                                                            <option value="01">01</option>
+                                                            <option value="02">02</option>
+                                                            <option value="03">03</option>
+                                                            <option value="04">04</option>
+                                                            <option value="05">05</option>
+                                                            <option value="06">06</option>
+                                                            <option value="07">07</option>
+                                                            <option value="08">08</option>
+                                                            <option value="09">09</option>
+                                                            <option value="10">10</option>
+                                                            <option value="11">11</option>
+                                                            <option value="12">12</option>
+                                                        </select>
+                                                        <select name="drpReportingTimeAMPM" class="m-right" id="drpReportingTimeAMPM">
+                                                            <option value="" selected>Choose</option>
+                                                            <option value="AM">AM</option>
+                                                            <option value="PM">PM</option>
+                                                        </select>
+                                                    </td>
+                                                </tr>
+
+                                                <tr class="br-1">
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="text-left"><label class="f-600">Reason for booking</label></td>
+                                                    <td class="text-left pl-3 cab-authorize-td" colspan="4">
+                                                        <textarea class="form-control textareawidth photogrphy-textarea select-border emp-name-input " rows="2" id="txtReasonforBooking" name="txtReasonforBooking"></textarea>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="text-left"><label class="f-600">Destination</label></td>
+                                                    <td class="text-left pl-2 cab-authorize-td" colspan="4">
+                                                        <input type="text" name="txtDestination" autocomplete="off" class="inpDisable" id="txtDestination" value="@(!IsNew ? (CBRF.one[0].Destination ?? "") : "")">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="text-left" rowspan="2"><label class="f-600">Car</label></td>
+                                                    <td colspan="2" class="text-left pl-3"><label class="f-600">Type of Car</label></td>
+                                                    <td colspan="2" class="text-left pl-3"><label class="f-600">Vehicle Number</label></td>
+                                                    <td colspan="2" class="text-center"><label class="f-600 pl-4" style="padding-left: 150px !important;">Number of Users</label></td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="2" class="text-left pl-1 cab-authorize-td">
+                                                        <select name="ddTypeofCar" class="drpSize" id="ddTypeofCar" disabled></select>
+                                                        <input type="text" name="txtTypeofCarOther" autocomplete="off" class="inpDisable" id="txtTypeofCarOther" value="@(!IsNew ? (CBRF.one[0].TypeofCarOther ?? "") : "")" readonly>
+
+                                                    </td>
+                                                    <td colspan="2" class="text-left pl-1 cab-authorize-td">
+                                                        <select name="ddVehicleNumber" class="drpSize" id="ddVehicleNumber" disabled></select>
+                                                        <input type="text" name="txtVehicleNumberOther" autocomplete="off" class="inpDisable" id="txtVehicleNumberOther" value="@(!IsNew ? (CBRF.one[0].VehicleNumberOther ?? "") : "")" readonly>
+                                                    </td>
+                                                    <td colspan="2" class="text-right cab-authorize-td">
+                                                        <input type="text" name="txtNumberofUsers" autocomplete="off" class="inpDisable" id="txtNumberofUsers" onkeypress="allowNumbersOnly(event)" value="@(!IsNew ? (CBRF.one[0].NumberofUsers ?? "") : "")">
+                                                    </td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td class="text-left" rowspan="3"><label class="f-600">Flight No &amp; Time (Incase it is Airport Pickup or Drop)</label></td>
+                                                    <td class="text-left pl-3"><label class="f-600">Airport Pick Up Drop</label></td>
+                                                    <td class="text-left pl-3"><label class="f-600">Flight No</label></td>
+                                                    <td class="text-center pl-3"><label class="f-600">Flight Time</label></td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="cab-authorize-td pl-1">
+                                                        <select name="drpAirportPickUpDrop" class="w-95" id="drpAirportPickUpDrop" onchange="FlightEnableDisable()">
+                                                            <option value="" selected>Choose</option>
+                                                            <option value="No">No</option>
+                                                            <option value="Yes">Yes</option>
+                                                        </select>
+                                                    </td>
+                                                    <td class="text-left pl-0 cab-authorize-td">
+                                                        <input type="text" name="txtFlightNo" autocomplete="off" class="inpDisable" id="txtFlightNo" value="@(!IsNew ? (CBRF.one[0].FlightNo ?? "") : "")">
+                                                    </td>
+                                                    <td class="text-right cab-authorize-td">
+                                                        <select name="drpFlightTimeHours" id="drpFlightTimeHours">
+                                                            <option value="" selected>Choose</option>
+                                                            <option value="01">01</option>
+                                                            <option value="02">02</option>
+                                                            <option value="03">03</option>
+                                                            <option value="04">04</option>
+                                                            <option value="05">05</option>
+                                                            <option value="06">06</option>
+                                                            <option value="07">07</option>
+                                                            <option value="08">08</option>
+                                                            <option value="09">09</option>
+                                                            <option value="10">10</option>
+                                                            <option value="11">11</option>
+                                                            <option value="12">12</option>
+                                                        </select>
+                                                        <select name="drpFlightTimeAMPM" id="drpFlightTimeAMPM">
+                                                            <option value="" selected>Choose</option>
+                                                            <option value="AM">AM</option>
+                                                            <option value="PM">PM</option>
+                                                        </select>
+                                                    </td>
+                                                    <td id="hiddenApproverInformation"></td>
+                                                </tr>
+                                            </table>
+                                            <table class="table mainTbl table-bordered form-table-container-2 bg-color">
+                                                <tr>
+                                                    <td class="allFormLables borderLTB f-600">
+                                                        <label class="f-600">File Upload:</label><br>
+                                                    </td>
+                                                    <td colspan="2" class="borderLTB">
+                                                        <input type="file" id="fileToUpload" name="fileToUpload" />
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            <table class="table mainTbl table table-bordered table-sm dataTable no-footer border-none bg-color">
+                                                <tr class="bg-color-2">
+                                                    <td colspan="4" class="f-16 text-left"><label class="f-600">Note</label> :-<label class="f-600">If the above details are  not filled properly or are left incomplete the booking will be not be considered</label> </td>
+                                                </tr>
+
+                                            </table>
+                                            <table class="w-100 form-border bg-color" id="ServiceProvider">
+                                                <tr class="bg-color-2">
+                                                    <td colspan="4" class="text-center f-16"><label class="f-600">To be filled by the service Provider</label></td>
+                                                </tr>
+                                                <tr class="bg-color-2">
+                                                    <td class="w-30 cab-section"><label class="">KM</label></td>
+                                                    <td colspan="1" class="cab-authorize-td text-right">
+                                                        <label class="f-600">Starting KM -</label>
+                                                        <input type="text" name="txtStartingKM" autocomplete="off" class="inpDisable" id="txtStartingKM" onkeypress="alphaOnly(event)" value="@(!IsNew ? (CBRF.one[0].StartingKM ?? " ") : " ")" readonly>
+                                                    </td>
+                                                    <td colspan="2" class="cab-authorize-td text-right">
+                                                        <label class="f-600">Closing KM -</label>
+                                                        <input type="text" name="txtClosingKM" autocomplete="off" class="inpDisable" id="txtClosingKM" onkeypress="alphaOnly(event)" value="@(!IsNew ? (CBRF.one[0].ClosingKM ?? " ") : " ")" readonly>
+                                                    </td>
+                                                </tr>
+                                                <tr class="bg-color-2">
+                                                    <td class="cab-section"><label>Timing</label></td>
+                                                    <td colspan="1" class="cab-authorize-td text-right">
+                                                        <label class="f-600">Starting Time -</label>
+                                                        <input type="text" name="txtStartingTime" autocomplete="off" class="inpDisable" id="txtStartingTime" onkeypress="alphaOnly(event)" value="@(!IsNew ? (CBRF.one[0].StartingTime ?? " ") : " ")" readonly>
+                                                    </td>
+                                                    <td colspan="2" class="cab-authorize-td text-right">
+                                                        <label class="f-600">Closing Time -</label>
+                                                        <input type="text" name="txtEndingTime" autocomplete="off" class="inpDisable" id="txtEndingTime" onkeypress="alphaOnly(event)" value="@(!IsNew ? (CBRF.one[0].EndingTime ?? " ") : " ")" readonly>
+                                                    </td>
+                                                </tr>
+                                                <tr class="bg-color-2">
+                                                    <td class="cab-section"><label>Date</label></td>
+                                                    <td colspan="1" class="cab-authorize-td text-right">
+                                                        <label class="f-600">Starting Date -</label>
+                                                        <input type="date" name="txtStartingDate" autocomplete="off" class="inpDisable starting-date" id="txtStartingDate" onkeypress="alphaOnly(event)" value="@(!IsNew ? (CBRF.one[0].StartingDate ?? " ") : " ")" readonly>
+                                                    </td>
+                                                    <td colspan="2" class="cab-authorize-td text-right">
+                                                        <label class="f-600">Closing Date -</label>
+                                                        <input type="date" name="txtClosingDate" autocomplete="off" class="inpDisable starting-date" id="txtClosingDate" onkeypress="alphaOnly(event)" value="@(!IsNew ? (CBRF.one[0].ClosingDate ?? " ") : " ")" readonly>
+                                                    </td>
+                                                </tr>
+
+                                            </table>
+                                            <table>
+                                                <tr>
+                                                    <td><b>User Signature</b></td>
+                                                </tr>
+                                            </table>
+
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <table class="detail-sec-p">
+                                    <tr>
+                                        <td class="text-center">SF_S_034</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    foreach (var item in CBRF.one)
+                    {
+                        <input type="hidden" id="hiddentxtEmail" name="hiddentxtEmail" value="" />
+                        <input type="hidden" id="FormSrId" name="FormSrId" value="@(CBRF.one[0].Id)" />
+                        <input type="hidden" id="FormId" name="FormId" value="@(FormId)" />
+                        <input type="hidden" id="AppRowId" name="AppRowId" value="@(AppRowId)" />
+                        <div class="container form-container">
+                            <div class="container">
+                                <table class="table mainTbl table-bordered form-table-container bg-color">
+                                    <tr>
+                                        <td>
+                                            <table class="w-100 form-border bg-color">
+                                                <tbody>
+                                                    <tr>
+                                                        <td rowspan="2" class="text-right"><img class="img-fluid img-box" src="~/assets/img/skoda.png"></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <table class="table mainTbl table-bordered form-table-container bg-color">
+                                                <tr>
+                                                    <td colspan="6" class="heading form-heading">
+                                                        <span class="form-heading">Cab Booking Form</span>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            <table class="table mainTbl table-bordered form-table-container-2 bg-color">
+                                                <tr>
+                                                    <td class="allFormLables borderLTB f-600">
+                                                        <label class="f-600">Form ID:</label><br>
+                                                    </td>
+                                                    <td colspan="2" class="borderLTB">
+                                                        <input type="text" name="txtFormId" class="w-100 inpDisable" value="@(!IsNew ||!IsEdit ? ("CBRF"+FormId ?? "" ) : "" )" readonly>
+                                                    </td>
+                                                    <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                        <label class="f-600 pl-2">Date:</label><br>
+                                                    </td>
+                                                    <td class="borderLTB">
+                                                        <input type="text" name="txtDate" placeholder="/ /" class="w-100 inpDisable" value="@(!IsNew ||!IsEdit ? (Convert.ToDateTime(CBRF.two[0].FormId.Created).ToShortDateString()) : DateTime.Now.ToShortDateString())" readonly>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="allFormLables borderLTB f-600">
+                                                        <label class="f-600">Designation:</label><br>
+                                                    </td>
+                                                    <td colspan="2" class="borderLTB">
+                                                        <input type="text" class="w-100 txtDisable" name="txtdesignation" id="txtdesignation" value="@(!IsNew ? (CBRF.one[0].Designation ?? "") : "")" readonly />
+                                                    </td>
+                                                    <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                        <label class="f-600 pl-2">Department:</label><br>
+                                                    </td>
+                                                    <td class="borderLTB">
+                                                        <input type="text" name="txtDepartment" autocomplete="off" class="w-100 inpDisable" id="txtDepartment" value="@(!IsNew ? (CBRF.one[0].Department ?? " ") : " ")">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="allFormLables borderLTB f-600">
+                                                        <label class="f-600">Cost Center Number:</label><br>
+                                                    </td>
+                                                    <td colspan="2" class="borderLTB">
+                                                        <input type="text" name="txtCostCenterNumber" autocomplete="off" class="w-100 inpDisable" id="txtCostCenterNumber" value="@(!IsNew ? (CBRF.one[0].CostCenterNumber ?? "") : "")">
+                                                    </td>
+                                                    <td colspan="2" class="allFormLables borderLTB f-600 align">
+                                                        <label class="f-600 pl-2">Shopping Cart No:</label><br>
+                                                    </td>
+                                                    <td class="borderLTB">
+                                                        <input type="text" name="txtShoppingCartNo" autocomplete="off" class="w-100 inpDisable" id="txtShoppingCartNo" value="@(!IsNew ? (CBRF.one[0].ShoppingCartNo ?? "") : "")">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="w-20 allFormLables borderLTB f-600">
+                                                        <label>Booked By & Contact Number:</label>
+                                                    </td>
+                                                    <td class="borderLTB" colspan="2">
+                                                        <input type="text" name="txtName" autocomplete="off" class="w-100 d-block inpDisable" id="txtName" value="@(!IsNew ? (CBRF.one[0].Name ?? " ") : "")">
+                                                        <small class="f-600 f-12">(Name)</small>
+                                                    </td>
+
+                                                    <td class="borderLTB text-left" colspan="2">
+                                                    </td>
+                                                    <td class="borderLTB text-left pl-4">
+                                                        <input type="text" name="txtContactNumber" autocomplete="off" class="w-100 d-block inpDisable" id="txtContactNumber" value="@(!IsNew ? (CBRF.one[0].ContactNumber ?? "") : "")">
+                                                        <small class="f-600 f-12">(Contact Number)</small>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            <table class="w-100 form-border bg-color">
+                                                <tr>
+                                                    <td class="w-30 text-left" rowspan="2"><label class="f-600">Car Required From</label></td>
+                                                    <td colspan="2" class="text-left pl-3"><label class="f-600">From  (DD-MM-YY) & Time</label></td>
+                                                    <td colspan="2" class="text-left pl-3"><label class="f-600">To (DD-MM-YY) & Time</label></td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="text-center cab-authorize-td">
+                                                        <input type="text" name="txtCarRequiredFromDate" autocomplete="off" class="inpDisable" id="txtCarRequiredFromDate" value="@(!IsNew ? (CBRF.one[0].CarRequiredFromDate.ToString("dd-MM-yy") ?? "") : "")">
+                                                    </td>
+                                                    <td class="text-center cab-authorize-td">
+                                                        @*<input type="text" name="txtCarRequiredFromTime" autocomplete="off" class="inpDisable" id="txtCarRequiredFromTime" value="@(!IsNew ? (CBRF.one[0].CarRequiredFromTime ?? " ") : "")">*@
+                                                        <select name="drpCarRequiredFromTimeHours" id="drpCarRequiredFromTimeHours" class="w-40 drpDisable select-border">
+                                                            <option @(CBRF.one[0].CarRequiredFromTimeHours == "1" ? "selected" : "" ) value="1">1</option>
+                                                            <option @(CBRF.one[0].CarRequiredFromTimeHours == "2" ? "selected" : "" ) value="2">2</option>
+                                                            <option @(CBRF.one[0].CarRequiredFromTimeHours == "3" ? "selected" : "" ) value="3">3</option>
+                                                            <option @(CBRF.one[0].CarRequiredFromTimeHours == "4" ? "selected" : "" ) value="4">4</option>
+                                                            <option @(CBRF.one[0].CarRequiredFromTimeHours == "5" ? "selected" : "" ) value="5">5</option>
+                                                            <option @(CBRF.one[0].CarRequiredFromTimeHours == "6" ? "selected" : "" ) value="6">6</option>
+                                                            <option @(CBRF.one[0].CarRequiredFromTimeHours == "7" ? "selected" : "" ) value="7">7</option>
+                                                            <option @(CBRF.one[0].CarRequiredFromTimeHours == "8" ? "selected" : "" ) value="8">8</option>
+                                                            <option @(CBRF.one[0].CarRequiredFromTimeHours == "9" ? "selected" : "" ) value="9">9</option>
+                                                            <option @(CBRF.one[0].CarRequiredFromTimeHours == "10" ? "selected" : "" ) value="10">10</option>
+                                                            <option @(CBRF.one[0].CarRequiredFromTimeHours == "11" ? "selected" : "" ) value="11">11</option>
+                                                            <option @(CBRF.one[0].CarRequiredFromTimeHours == "12" ? "selected" : "" ) value="12">12</option>
+                                                        </select>
+                                                        <select name="drpCarRequiredFromTimeAMPM" id="drpCarRequiredFromTimeAMPM" class="w-40 drpDisable select-border">
+                                                            <option @(CBRF.one[0].CarRequiredFromTimeAMPM == "AM" ? "selected" : "" ) value="AM">AM</option>
+                                                            <option @(CBRF.one[0].CarRequiredFromTimeAMPM == "PM" ? "selected" : "" ) value="PM">PM</option>
+                                                        </select>
+                                                    </td>
+                                                    <td class="text-center cab-authorize-td">
+                                                        <input type="text" name="txtCarRequiredToDate" autocomplete="off" class="inpDisable" id="txtCarRequiredToDate" value="@(!IsNew ? (CBRF.one[0].CarRequiredToDate.ToString("dd-MM-yy") ?? "") : "")">
+                                                    </td>
+                                                    <td class="w-25 text-right cab-authorize-td">
+                                                        @*<input type="text" name="txtCarRequiredToTime" autocomplete="off" class="inpDisable" id="txtCarRequiredToTime" value="@(!IsNew ? (CBRF.one[0].CarRequiredToTime ?? "") : "")">*@
+                                                        <select name="drpCarRequiredToTimeHours" id="drpCarRequiredToTimeHours" class="w-40 drpDisable select-border">
+                                                            <option @(CBRF.one[0].CarRequiredToTimeHours == "1" ? "selected" : "" ) value="1">1</option>
+                                                            <option @(CBRF.one[0].CarRequiredToTimeHours == "2" ? "selected" : "" ) value="2">2</option>
+                                                            <option @(CBRF.one[0].CarRequiredToTimeHours == "3" ? "selected" : "" ) value="3">3</option>
+                                                            <option @(CBRF.one[0].CarRequiredToTimeHours == "4" ? "selected" : "" ) value="4">4</option>
+                                                            <option @(CBRF.one[0].CarRequiredToTimeHours == "5" ? "selected" : "" ) value="5">5</option>
+                                                            <option @(CBRF.one[0].CarRequiredToTimeHours == "6" ? "selected" : "" ) value="6">6</option>
+                                                            <option @(CBRF.one[0].CarRequiredToTimeHours == "7" ? "selected" : "" ) value="7">7</option>
+                                                            <option @(CBRF.one[0].CarRequiredToTimeHours == "8" ? "selected" : "" ) value="8">8</option>
+                                                            <option @(CBRF.one[0].CarRequiredToTimeHours == "9" ? "selected" : "" ) value="9">9</option>
+                                                            <option @(CBRF.one[0].CarRequiredToTimeHours == "10" ? "selected" : "" ) value="10">10</option>
+                                                            <option @(CBRF.one[0].CarRequiredToTimeHours == "11" ? "selected" : "" ) value="11">11</option>
+                                                            <option @(CBRF.one[0].CarRequiredToTimeHours == "12" ? "selected" : "" ) value="12">12</option>
+                                                        </select>
+                                                        <select name="drpCarRequiredToTimeAMPM" id="drpCarRequiredToTimeAMPM" class="w-40 drpDisable select-border">
+                                                            <option @(CBRF.one[0].CarRequiredToTimeAMPM == "AM" ? "selected" : "" ) value="AM">AM</option>
+                                                            <option @(CBRF.one[0].CarRequiredToTimeAMPM == "PM" ? "selected" : "" ) value="PM">PM</option>
+                                                        </select>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="text-left" rowspan="3"><label class="f-600">Booked For</label></td>
+                                                    <td class="text-left pl-3"><label class="f-600">User Name</label></td>
+                                                    <td class="text-left pl-3"><label class="f-600">User Contact Number</label></td>
+                                                    <td class="text-center pl-3"><label class="f-600">Reporting Place with address</label></td>
+                                                    <td class="text-left pl-3"><label class="f-600 pl-2">Reporting Time</label></td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td class="text-center cab-authorize-td">
+                                                        <input type="text" name="txtUserName" autocomplete="off" class="inpDisable" id="txtUserName" value="@(!IsNew ? (CBRF.one[0].UserName ?? " ") : " ")">
+                                                    </td>
+                                                    <td class="text-center cab-authorize-td">
+                                                        <input type="text" name="txtUserContactNumber" autocomplete="off" class="inpDisable" id="txtUserContactNumber" value="@(!IsNew ? (CBRF.one[0].UserContactNumber ?? "") : "")">
+                                                    </td>
+                                                    <td class="text-center cab-authorize-td">
+                                                        <textarea class="contact-w form-control input-width-1 mx-auto select-border emp-name-input" rows="2" id="txtReportingPlaceWithAddress" disabled>@(!IsNew || !IsEdit ? (CBRF.one[0].ReportingPlaceWithAddress ?? " "): " ")</textarea>
+                                                    </td>
+                                                    <td class="text-right cab-authorize-td">
+                                                        @*<input type="text" name="txtReportingTime" autocomplete="off" class="inpDisable" id="txtReportingTime" value="@(!IsNew ? (CBRF.one[0].ReportingTime ?? " ") : " ")">*@
+                                                        <select name="drpReportingTimeHours" id="drpReportingTimeHours" class="w-40 drpDisable select-border">
+                                                            <option @(CBRF.one[0].ReportingTimeHours == "1" ? "selected" : "" ) value="1">1</option>
+                                                            <option @(CBRF.one[0].ReportingTimeHours == "2" ? "selected" : "" ) value="2">2</option>
+                                                            <option @(CBRF.one[0].ReportingTimeHours == "3" ? "selected" : "" ) value="3">3</option>
+                                                            <option @(CBRF.one[0].ReportingTimeHours == "4" ? "selected" : "" ) value="4">4</option>
+                                                            <option @(CBRF.one[0].ReportingTimeHours == "5" ? "selected" : "" ) value="5">5</option>
+                                                            <option @(CBRF.one[0].ReportingTimeHours == "6" ? "selected" : "" ) value="6">6</option>
+                                                            <option @(CBRF.one[0].ReportingTimeHours == "7" ? "selected" : "" ) value="7">7</option>
+                                                            <option @(CBRF.one[0].ReportingTimeHours == "8" ? "selected" : "" ) value="8">8</option>
+                                                            <option @(CBRF.one[0].ReportingTimeHours == "9" ? "selected" : "" ) value="9">9</option>
+                                                            <option @(CBRF.one[0].ReportingTimeHours == "10" ? "selected" : "" ) value="10">10</option>
+                                                            <option @(CBRF.one[0].ReportingTimeHours == "11" ? "selected" : "" ) value="11">11</option>
+                                                            <option @(CBRF.one[0].ReportingTimeHours == "12" ? "selected" : "" ) value="12">12</option>
+                                                        </select>
+                                                        <select name="drpReportingTimeAMPM" id="drpReportingTimeAMPM" class="w-40 drpDisable select-border">
+                                                            <option @(CBRF.one[0].ReportingTimeAMPM == "AM" ? "selected" : "" ) value="AM">AM</option>
+                                                            <option @(CBRF.one[0].ReportingTimeAMPM == "PM" ? "selected" : "" ) value="PM">PM</option>
+                                                        </select>
+                                                    </td>
+                                                </tr>
+                                                <tr class="br-1">
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="text-left"><label class="f-600">Reason for booking</label></td>
+                                                    <td class="text-left pl-3 cab-authorize-td" colspan="4">
+                                                        <textarea class="form-control textareawidth photogrphy-textarea select-border" rows="2" id="txtReasonforBooking" disabled>@(!IsNew || !IsEdit ? (CBRF.one[0].ReasonforBooking ?? ""): "")</textarea>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="text-left"><label class="f-600">Destination</label></td>
+                                                    <td class="text-left pl-2 cab-authorize-td" colspan="4">
+                                                        <input type="text" name="txtDestination" autocomplete="off" class="inpDisable" id="txtDestination" value="@(!IsNew ? (CBRF.one[0].Destination ?? "") : "")">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="text-left" rowspan="2"><label class="f-600">Car</label></td>
+                                                    <td colspan="2" class="text-left pl-3"><label class="f-600">Type of Car</label></td>
+                                                    <td colspan="2" class="text-center"><label class="f-600">Vehicle Number</label></td>
+                                                    <td colspan="2" class="text-center"><label class="f-600" style="padding-left: 190px !important;">Number of Users</label></td>
+                                                </tr>
+                                                <tr>
+                                                    @if (!IsValidityCheck)
+                                                    {
+                                                        @*<td colspan="2" class="text-left pl-0 cab-authorize-td">
+                                                                <input type="text" name="txtTypeofCar" autocomplete="off" class="" id="txtTypeofCar" value="@(!IsNew ? (CBRF.one[0].TypeofCar ?? "") : "")">
+                                                            </td>*@
+                                                        <td colspan="2" class="text-left pl-1 cab-authorize-td">
+                                                            <select name="ddTypeofCar" class="drpSize" id="ddTypeofCar" onchange="TypeOfCarEnableDisable()"></select>
+                                                            <input type="text" name="txtTypeofCarOther" autocomplete="off" class="inpDisable" id="txtTypeofCarOther" value="@(!IsNew ? (CBRF.one[0].TypeofCarOther ?? "") : "")">
+
+                                                        </td>
+                                                        <td colspan="2" class="text-left pl-1 cab-authorize-td">
+                                                            <select name="ddVehicleNumber" class="drpSize" id="ddVehicleNumber" onchange="VehicleNumberEnableDisable()"></select>
+                                                            <input type="text" name="txtVehicleNumberOther" autocomplete="off" class="inpDisable" id="txtVehicleNumberOther" value="@(!IsNew ? (CBRF.one[0].VehicleNumberOther ?? "") : "")">
+                                                        </td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td colspan="2" class="text-left pl-1 cab-authorize-td">
+                                                            <input type="text" name="ddTypeofCar" autocomplete="off" class="inpDisable" id="ddTypeofCar" value="@(!IsNew ? (CBRF.one[0].TypeofCar ?? "") : "")" readonly>
+                                                            <input type="text" name="txtTypeofCarOther" autocomplete="off" class="inpDisable" id="txtTypeofCarOther" value="@(!IsNew ? (CBRF.one[0].TypeofCarOther ?? "") : "")" readonly>
+
+                                                        </td>
+                                                        <td colspan="2" class="text-left pl-1 cab-authorize-td">
+                                                            <input type="text" name="ddVehicleNumber" autocomplete="off" class="inpDisable" id="ddVehicleNumber" value="@(!IsNew ? (CBRF.one[0].VehicleNumber ?? "") : "")" readonly>
+                                                            <input type="text" name="txtVehicleNumberOther" autocomplete="off" class="inpDisable" id="txtVehicleNumberOther" value="@(!IsNew ? (CBRF.one[0].VehicleNumberOther ?? "") : "")" readonly>
+                                                        </td>
+                                                        @*<td colspan="2" class="text-left pl-1 cab-authorize-td">
+                                                                <input type="text" name="txtTypeofCar" autocomplete="off" class="inpDisable" id="txtTypeofCar" value="@(!IsNew ? (CBRF.one[0].TypeofCar ?? "") : "")" readonly>
+                                                            </td>*@
+                                                    }
+
+                                                    <td colspan="2" class="text-right cab-authorize-td">
+                                                        <input type="text" name="txtNumberofUsers" autocomplete="off" class="inpDisable" id="txtNumberofUsers" value="@(!IsNew ? (CBRF.one[0].NumberofUsers ?? "") : "")">
+                                                    </td>
+
+                                                </tr>
+                                                <tr>
+                                                </tr>
+                                                <tr>
+                                                    <td class="text-left" rowspan="3"><label class="f-600">Flight No & Time (Incase it is Airport Pickup or Drop)</label></td>
+                                                    <td class="text-left pl-3"><label class="f-600">Airport Pick Up Drop</label></td>
+                                                    <td class="text-left pl-3"><label class="f-600">Flight No</label></td>
+                                                    <td class="text-left"><label class="f-600 pl-4">Flight Time</label></td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="cab-authorize-td pl-1">
+                                                        <select name="drpAirportPickUpDrop" id="drpAirportPickUpDrop" class="w-95 drpDisable select-border">
+                                                            <option @(CBRF.one[0].AirportPickUpDrop == "No" ? "selected" : "" ) value="No">No</option>
+                                                            <option @(CBRF.one[0].AirportPickUpDrop == "Yes" ? "selected" : "" ) value="Yes">Yes</option>
+                                                        </select>
+                                                    </td>
+                                                    <td class="text-left pl-0 cab-authorize-td">
+                                                        <input type="text" name="txtFlightNo" autocomplete="off" class="inpDisable" id="txtFlightNo" value="@(!IsNew ? (CBRF.one[0].FlightNo ?? "") : "")">
+                                                    </td>
+                                                    <td class="text-right cab-authorize-td pl-0">
+                                                        @*<input type="text" name="txtFlightTime" autocomplete="off" class="inpDisable" id="txtFlightTime" value="@(!IsNew ? (CBRF.one[0].FlightTime ?? " ") : " ")">*@
+                                                        <select name="drpFlightTimeHours" id="drpFlightTimeHours" class="w-40 drpDisable select-border">
+                                                            <option @(CBRF.one[0].FlightTimeHours == "" ? "selected" : "" ) value="">Choose</option>
+                                                            <option @(CBRF.one[0].FlightTimeHours == "1" ? "selected" : "" ) value="1">1</option>
+                                                            <option @(CBRF.one[0].FlightTimeHours == "2" ? "selected" : "" ) value="2">2</option>
+                                                            <option @(CBRF.one[0].FlightTimeHours == "3" ? "selected" : "" ) value="3">3</option>
+                                                            <option @(CBRF.one[0].FlightTimeHours == "4" ? "selected" : "" ) value="4">4</option>
+                                                            <option @(CBRF.one[0].FlightTimeHours == "5" ? "selected" : "" ) value="5">5</option>
+                                                            <option @(CBRF.one[0].FlightTimeHours == "6" ? "selected" : "" ) value="6">6</option>
+                                                            <option @(CBRF.one[0].FlightTimeHours == "7" ? "selected" : "" ) value="7">7</option>
+                                                            <option @(CBRF.one[0].FlightTimeHours == "8" ? "selected" : "" ) value="8">8</option>
+                                                            <option @(CBRF.one[0].FlightTimeHours == "9" ? "selected" : "" ) value="9">9</option>
+                                                            <option @(CBRF.one[0].FlightTimeHours == "10" ? "selected" : "" ) value="10">10</option>
+                                                            <option @(CBRF.one[0].FlightTimeHours == "11" ? "selected" : "" ) value="11">11</option>
+                                                            <option @(CBRF.one[0].FlightTimeHours == "12" ? "selected" : "" ) value="12">12</option>
+                                                        </select>
+                                                        <select name="drpFlightTimeAMPM" id="drpFlightTimeAMPM" class="w-40 drpDisable select-border">
+                                                            <option @(CBRF.one[0].FlightTimeAMPM == "" ? "selected" : "" ) value="">Choose</option>
+                                                            <option @(CBRF.one[0].FlightTimeAMPM == "AM" ? "selected" : "" ) value="AM">AM</option>
+                                                            <option @(CBRF.one[0].FlightTimeAMPM == "PM" ? "selected" : "" ) value="PM">PM</option>
+                                                        </select>
+                                                    </td>
+                                                    <td id="hiddenApproverInformation"></td>
+                                                </tr>
+                                            </table>
+                                            <table class="table mainTbl table-bordered form-table-container-2 bg-color">
+                                                @if (CBRF.one[0].attachmentlist.attachmentData.Count != 0)
+                                                {
+                                                    foreach (var attachment in CBRF.one[0].attachmentlist.attachmentData)
+                                                    {
+                                                        <tr>
+                                                            <td class="allFormLables borderLTB f-600">
+                                                                <label class="f-600">File Upload:</label><br>
+                                                            </td>
+                                                            <td colspan="2" class="borderLTB">
+                                                                <a href=@System.Configuration.ConfigurationManager.AppSettings["SharepointSiteURL"]@attachment.ServerRelativeUrl download=@attachment.FileName target="_blank">@attachment.FileName </a>
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <tr>
+                                                        <td class="allFormLables borderLTB f-600">
+                                                            <label class="f-600">File Upload:</label><br>
+                                                        </td>
+                                                        <td colspan="2" class="borderLTB">
+                                                            <input type="text" id="fileToUpload" name="fileToUpload" disabled />
+                                                        </td>
+                                                    </tr>
+
+                                                }
+                                            </table>
+                                            <table class="table mainTbl table table-bordered table-sm dataTable no-footer border-none bg-color">
+                                                <tr class="bg-color-2">
+                                                    <td colspan="4" class="f-16 text-left"><label class="f-600">Note</label> :-<label class="f-600">If the above details are  not filled properly or are left incomplete the booking will be not be considered</label> </td>
+                                                </tr>
+                                                <tr class="bg-color-2">
+                                                    <td colspan="4" class="text-center f-16"><label class="f-600">To be filled by the service Provider</label></td>
+                                                </tr>
+                                                <tr class="bg-color-2">
+                                                    <td class="w-30 cab-section"><label class="">KM</label></td>
+                                                    <td colspan="1" class="w-40 cab-authorize-td cab-section">
+                                                        <label>Starting KM -</label>
+                                                        <input type="text" name="txtStartingKM" autocomplete="off" class="inpDisable" id="txtStartingKM" value="@(!IsNew ? (CBRF.one[0].StartingKM ?? " ") : " ")" readonly>
+                                                    </td>
+                                                    <td colspan="2" class="cab-authorize-td text-right">
+                                                        <label class="f-600">Closing KM -</label>
+                                                        <input type="text" name="txtClosingKM" autocomplete="off" class="inpDisable" id="txtClosingKM" value="@(!IsNew ? (CBRF.one[0].ClosingKM ?? " ") : " ")" readonly>
+                                                    </td>
+                                                </tr>
+                                                <tr class="bg-color-2">
+                                                    <td class="cab-section"><label>Timing</label></td>
+                                                    <td colspan="1" class="w-40 cab-authorize-td cab-section pl-0">
+                                                        <label>Starting Time -</label>
+                                                        <input type="text" name="txtStartingTime" autocomplete="off" class="inpDisable" id="txtStartingTime" value="@(!IsNew ? (CBRF.one[0].StartingTime ?? " ") : " ")" readonly>
+                                                    </td>
+
+                                                    <td colspan="2" class="cab-authorize-td text-right">
+                                                        <label class="f-600">Closing Time -</label>
+                                                        <input type="text" name="txtEndingTime" autocomplete="off" class="inpDisable" id="txtEndingTime" value="@(!IsNew ? (CBRF.one[0].EndingTime ?? " ") : " ")" readonly>
+                                                    </td>
+                                                </tr>
+                                                <tr class="bg-color-2">
+                                                    <td class="cab-section"><label>Date</label></td>
+                                                    <td colspan="1" class="w-40 cab-authorize-td cab-section">
+                                                        <label>Starting Date -</label>
+                                                        <input type="text" name="txtStartingDate" autocomplete="off" class="inpDisable" id="txtStartingDate" readonly>
+                                                    </td>
+                                                    <td colspan="2" class="cab-authorize-td text-right">
+                                                        <label class="f-600">Closing Date -</label>
+                                                        <input type="text" name="txtClosingDate" autocomplete="off" class="inpDisable" id="txtClosingDate" readonly>
+                                                    </td>
+                                                </tr>
+                                                @if (CBRF.one[0].Designation == "Managing Director" || CBRF.one[0].Designation == "Vice President" || CBRF.one[0].Designation == "Chief General Manager" || CBRF.one[0].Designation == "Senior General Manager" || CBRF.one[0].Designation == "General Manager" || CBRF.one[0].Designation == "Deputy General Manager" || CBRF.one[0].Designation == "Asst. General Manager")
+                                                {
+                                                    <tr class="bg-color-2">
+                                                        <td colspan="4" class="f-16"><label class="f-600">Authorization by Immediate supervisor</label></td>
+                                                    </tr>
+                                                }
+                                                else
+                                                {
+                                                    <tr class="bg-color-2">
+                                                        <td colspan="4" class="f-16"><label class="f-600">Authorization by Immediate supervisor</label></td>
+                                                    </tr>
+                                                }
+                                                <tr class="bg-color-2">
+                                                    <td colspan="1" class="authorize-td">
+                                                        <label class="f-600 pl-1">Name:</label>
+                                                        <input type="text" name="" class="inpDisable input-width-1 author-width" value="@(CBRF.three[0].UserName)" disabled="disabled">
+                                                    </td>
+                                                    <td class="authorize-td comment-box-2" colspan="2">
+                                                        <div class="form-group">
+                                                            <label class="f-600 align" for="comment">Approver Comment:</label>
+                                                            <textarea class="form-control textareawidth photogrphy-textarea" rows="2" id="comment" disabled="">@(CBRF.three[0].Comment) </textarea>
+                                                        </div>
+                                                    </td>
+
+                                                    <td class="authorize-td"><label class="f-600 pl-2">Signature:</label> <input type="text" name="" class="inpDisable input-width-1 author-width" value="@(CBRF.three[0].ApproverStatus != " Pending" ? (CBRF.three[0].ApproverStatus + " on " + Convert.ToDateTime(CBRF.two[0].Modified).ToShortDateString() + " " + Convert.ToDateTime(CBRF.two[0].Modified).ToShortTimeString()):"")"></td>
+                                                </tr>
+
+                                                <tr class="bg-color-2">
+                                                    <td colspan="4" class="f-16"><label class="f-600">Authorization by Admin</label></td>
+                                                </tr>
+                                                <tr class="bg-color-2">
+                                                    <td colspan="1" class="authorize-td">
+                                                        <label class="f-600 pl-1">Name:</label>
+                                                        <input type="text" name="" class="inpDisable input-width-1 author-width" value="@(CBRF.three[1].UserName)">
+                                                    </td>
+                                                    <td class="authorize-td comment-box-2" colspan="2">
+                                                        <div class="form-group">
+                                                            <label class="f-600 align" for="comment">Approver Comment:</label>
+                                                            <textarea class="form-control textareawidth photogrphy-textarea" rows="2" id="comment" disabled="">@(CBRF.three[1].Comment) </textarea>
+                                                        </div>
+                                                    </td>
+
+                                                    <td class="authorize-td" colspan="2"><label class="f-600 pl-2">Signature:</label><input type="text" name="" class="inpDisable input-width-1 author-width" value="@(CBRF.three[1].ApproverStatus != " Pending" ? (CBRF.three[1].ApproverStatus + " on " + Convert.ToDateTime(CBRF.two[1].Modified).ToShortDateString() + " " + Convert.ToDateTime(CBRF.two[1].Modified).ToShortTimeString()):"")"></td>
+                                                </tr>
+                                            </table>
+                                            <table>
+                                                <tr>
+                                                    <td><b>User Signature</b></td>
+                                                </tr>
+                                            </table>
+
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <table class="detail-sec-p">
+                                    <tr>
+                                        <td class="text-center">SF_S_034</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    }
+                }
+
+                @if (IsNew)
+                {
+                    if (!IsEdit)
+                    {
+                        <div class="card-footer align-content-center">
+                            <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                                Re-Submit
+                            </button>
+                            <button type="reset" class="btn btn-danger btn-sm cancl-btn">
+                                Cancel
+                            </button>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="card-footer align-content-center">
+                            <button type="button" class="btn btn-primary btn-sm submit-btn btn-lg" id="btnSubmit">
+                                Submit
+                            </button>
+                            <button type="reset" class="btn btn-danger btn-sm cancl-btn btn-lg">
+                                Cancel
+                            </button>
+                        </div>
+                    }
+                }
+
+            </div>
+        </div>
+    </form>
+</body>
+
+<div class="modal fade" id="successModel" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header modelHeader">
+                <span class="modal-title modalMsgTitle" id="modalTitle"></span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label id="modalBody" class="lableMsg">  </label>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="submitBomBtn publishBtn" id="modalOkButton">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var spinner = $('#loader');
+     var IsNew = @Html.Raw(Json.Encode(IsNew));
+    var CBRF = @Html.Raw(Json.Encode(CBRF));
+    var appRowId = @Html.Raw(Json.Encode(AppRowId));
+    var approvalType =@Html.Raw(Json.Encode(ApprovalType));
+    var IsEdit = @Html.Raw(Json.Encode(IsEdit));
+    var IsValidityCheck = @Html.Raw(Json.Encode(IsValidityCheck));
+    var FlagRedirect = @Html.Raw(Json.Encode(FlagRedirect));
+    pageLoad();
+
+    function pageLoad() {
+        spinner.hide();
+        getTypeOfCar();
+        getVehicleNumber();
+        var data = "";
+        if (!IsNew) {
+            $(".inpDisable").attr("disabled", "disabled");
+        }
+        if (!IsNew) {
+            $(".drpDisable").attr("disabled", "disabled");
+
+        }
+        if (IsNew) {
+            FlightEnableDisable();
+            $("#ServiceProvider").hide();
+            GetTime();
+            GetApprovers();
+            getDesignations();
+            $(".inpIsNewDisable").attr("disabled", "disabled");
+        }
+        if (!IsEdit) {
+            GetTime();
+            getDesignations();
+        }
+
+    };
+
+    function setStartDate() {
+        var today = new Date().toISOString().split('T')[0];
+
+        document.getElementsByName("txtCarRequiredFromDate")[0].setAttribute("min", today);
+    }
+
+    function date_val_end() {
+        //debugger
+        var week_string = document.getElementsByName("txtCarRequiredFromDate")[0].value;
+        console.log(week_string);
+        var parts = week_string.split("-");
+        var date = new Date(parts[0], parts[1] - 1, parts[2]);
+        var min_date = date;
+        min_date.setDate(min_date.getDate() + 1);
+        var initial_date = min_date.toISOString().split('T')[0];
+        document.getElementsByName("txtCarRequiredToDate")[0].setAttribute("min", initial_date);
+    }
+
+    function GetTime(){
+       // debugger
+       // if (IsNew) {
+       //     if (!IsEdit) {
+       //         var value = JSON.stringify(CBRF[0]);
+       //         var value_1 = JSON.parse(value);
+       //         var selectCarRequiredFromTime = value_1.Value[0].CarRequiredFromTime;
+       //         var selectCarRequiredToTime = value_1.Value[0].CarRequiredToTime;
+       //         var selectReportingTime = value_1.Value[0].ReportingTime;
+       //         var selectFlightTime = value_1.Value[0].FlightTime;
+
+
+       //         $('#txtCarRequiredFromTime').timepicker({
+       //             pickDate: false,
+       //             minuteStepping: 30,
+       //             format: 'hh:mm',
+       //             pickTime: true,
+       //             defaultDate: new Date(1979, 0, 1, 8, 0, 0, 0),
+       //             language: 'en',
+       //             use24hours: true,
+       //             scrollbar: true,
+       ///*             defaultTime: selectCarRequiredFromTime*/
+       //         });
+
+
+       //         $('#txtCarRequiredToTime').timepicker({
+       //             pickDate: false,
+       //             minuteStepping: 30,
+       //             format: 'hh:mm',
+       //             pickTime: true,
+       //             defaultDate: new Date(1979, 0, 1, 8, 0, 0, 0),
+       //             language: 'en',
+       //             use24hours: true,
+       //             scrollbar: true
+       //         });
+
+       //         $('#txtReportingTime').timepicker({
+       //             pickDate: false,
+       //             minuteStepping: 30,
+       //             format: 'hh:mm',
+       //             pickTime: true,
+       //             defaultDate: new Date(1979, 0, 1, 8, 0, 0, 0),
+       //             language: 'en',
+       //             use24hours: true,
+       //             scrollbar: true
+       //         });
+
+
+       //         $('#txtFlightTime').timepicker({
+       //             pickDate: false,
+       //             minuteStepping: 30,
+       //             format: 'hh:mm',
+       //             pickTime: true,
+       //             defaultDate: new Date(1979, 0, 1, 8, 0, 0, 0),
+       //             language: 'en',
+       //             use24hours: true,
+       //             scrollbar: true
+       //         });
+       //     }
+       //     else {
+       //         $('#txtCarRequiredFromTime').timepicker({
+       //             pickDate: false,
+       //             minuteStepping: 30,
+       //             format: 'hh:mm',
+       //             pickTime: true,
+       //             defaultDate: new Date(1979, 0, 1, 8, 0, 0, 0),
+       //             language: 'en',
+       //             use24hours: true,
+       //             scrollbar: true
+       //         });
+
+
+       //         $('#txtCarRequiredToTime').timepicker({
+       //             pickDate: false,
+       //             minuteStepping: 30,
+       //             format: 'hh:mm',
+       //             pickTime: true,
+       //             defaultDate: new Date(1979, 0, 1, 8, 0, 0, 0),
+       //             language: 'en',
+       //             use24hours: true,
+       //             scrollbar: true
+       //         });
+
+       //         $('#txtReportingTime').timepicker({
+       //             pickDate: false,
+       //             minuteStepping: 30,
+       //             format: 'hh:mm',
+       //             pickTime: true,
+       //             defaultDate: new Date(1979, 0, 1, 8, 0, 0, 0),
+       //             language: 'en',
+       //             use24hours: true,
+       //             scrollbar: true
+       //         });
+
+
+       //         $('#txtFlightTime').timepicker({
+       //             pickDate: false,
+       //             minuteStepping: 30,
+       //             format: 'hh:mm',
+       //             pickTime: true,
+       //             defaultDate: new Date(1979, 0, 1, 8, 0, 0, 0),
+       //             language: 'en',
+       //             use24hours: true,
+       //             scrollbar: true
+       //         });
+
+       //     }
+       // }
+
+
+
+
+    }
+
+    function FlightEnableDisable() {
+        //debugger
+        var drpAirportPickUpDrop = $("#drpAirportPickUpDrop option:selected").val();
+
+        if (drpAirportPickUpDrop == "Yes") {
+            document.getElementById("txtFlightNo").disabled = false;
+            document.getElementById("drpFlightTimeHours").disabled = false;
+            document.getElementById("drpFlightTimeAMPM").disabled = false;
+        }
+        else {
+
+            $('#txtFlightNo').val('');
+            $('#drpFlightTimeHours').prop('selectedIndex', '');
+            $('#drpFlightTimeAMPM').prop('selectedIndex', '');
+            document.getElementById("txtFlightNo").disabled = true;
+            document.getElementById("drpFlightTimeHours").disabled = true;
+            document.getElementById("drpFlightTimeAMPM").disabled = true;
+        }
+
+    }
+
+    function getDesignations() {
+        //debugger
+        if (IsNew) {
+            if (!IsEdit) {
+                var value = JSON.stringify(CBRF[0]);
+                var value_1 = JSON.parse(value);
+                var selectDesignation = value_1.Value[0].Designation;
+                console.log(selectDesignation);
+
+                $.ajax({
+                    type: "POST",
+                    url: "/List/GetDesignations",
+                    contentType: "application/json; charset=utf-8",
+                    datatype: 'json',
+                    cache: false,
+                    async: false,
+                    success: function (response) {
+                        console.log(response);
+                        $("#ddEmpDesignation option").remove();
+                        $("#ddEmpDesignation").append('<option value="' + response.Id + '">' + 'Select' + '</option>');
+                        $.each(response, function (i, response) {
+
+                            if (response.JobTitle == selectDesignation) {
+                                $("#ddEmpDesignation").append('<option value="' + response.JobTitle + '" selected>' + response.JobTitle + '</option>');
+                            }
+                            else {
+                                $("#ddEmpDesignation").append('<option value="' + response.JobTitle + '">' + response.JobTitle + '</option>');
+                            }
+                        });
+
+                    },          ////success
+                    error: function () {
+                        //alert('Failed to retrieve modules.');
+                    }
+                });
+            }
+            else {
+                $.ajax({
+                    type: "POST",
+                    url: "/List/GetDesignations",
+                    contentType: "application/json; charset=utf-8",
+                    datatype: 'json',
+                    cache: false,
+                    async: false,
+                    success: function (response) {
+                        console.log(response);
+                        $("#ddEmpDesignation option").remove();
+                        $("#ddEmpDesignation").append('<option value="' + response.Id + '">' + 'Select' + '</option>');
+                        $.each(response, function (i, response) {
+                            $("#ddEmpDesignation").append('<option value="' + response.JobTitle + '">' + response.JobTitle + '</option>');
+                        });
+
+                    },          ////success
+                    error: function () {
+                        //alert('Failed to retrieve modules.');
+                    }
+                });
+            }
+        }
+
+
+
+
+    }
+
+    function getTypeOfCar() {
+        //debugger
+        if (IsNew) {
+                  if (!IsEdit) {
+                      var value = JSON.stringify(CBRF[0]);
+                      var value_1 = JSON.parse(value);
+                      var selectCarName = value_1.Value[0].CarName;
+                      console.log(selectCarName);
+
+                $.ajax({
+                      type: "GET",
+                    url: "/CabBookingRequest/GetTypeofCar",
+                    contentType: "application/json; charset=utf-8",
+                    datatype: 'json',
+                    cache: false,
+                    async: false,
+                    success: function (response) {
+                              console.log(response);
+                        $("#ddTypeofCar option").remove();
+                        $("#ddTypeofCar").append('<option value="' + response.CarName + '">' + 'Select' + '</option>');
+                        $.each(response, function (i, response) {
+
+                                  if (response.CarName == selectCarName) {
+                                $("#ddTypeofCar").append('<option value="' + response.CarName + '" selected>' + response.CarName + '</option>');
+                                  }
+                                  else {
+                                $("#ddTypeofCar").append('<option value="' + response.CarName + '">' + response.CarName + '</option>');
+                                  }
+                              });
+
+                          },          ////success
+                    error: function () {
+                              //alert('Failed to retrieve modules.');
+                          }
+                      });
+                  }
+                  else {
+                $.ajax({
+                      type: "GET",
+                    url: "/CabBookingRequest/GetTypeofCar",
+                    contentType: "application/json; charset=utf-8",
+                    datatype: 'json',
+                    cache: false,
+                    async: false,
+                    success: function (response) {
+                              console.log(response);
+                        $("#ddTypeofCar option").remove();
+                        $("#ddTypeofCar").append('<option value="' + response.CarName + '">' + 'Select' + '</option>');
+                        $.each(response, function (i, response) {
+                            $("#ddTypeofCar").append('<option value="' + response.CarName + '">' + response.CarName + '</option>');
+                              });
+
+                          },          ////success
+                    error: function () {
+                              //alert('Failed to retrieve modules.');
+                          }
+                      });
+                  }
+              }
+        else {
+            var value = JSON.stringify(CBRF[0]);
+            var value_1 = JSON.parse(value);
+            var selectCarName = value_1.Value[0].TypeofCar;
+            console.log(selectCarName);
+
+            $.ajax({
+                type: "GET",
+                url: "/CabBookingRequest/GetTypeofCar",
+                contentType: "application/json; charset=utf-8",
+                datatype: 'json',
+                cache: false,
+                async: false,
+                success: function (response) {
+                    console.log(response);
+                    $("#ddTypeofCar option").remove();
+                    $("#ddTypeofCar").append('<option value="' + response.CarName + '">' + 'Select' + '</option>');
+                    $.each(response, function (i, response) {
+
+                        if (response.CarName == selectCarName) {
+                            $("#ddTypeofCar").append('<option value="' + response.CarName + '" selected>' + response.CarName + '</option>');
+                        }
+                        else {
+                            $("#ddTypeofCar").append('<option value="' + response.CarName + '">' + response.CarName + '</option>');
+                        }
+                    });
+
+                },          ////success
+                error: function () {
+                    //alert('Failed to retrieve modules.');
+                }
+            });
+        }
+    }
+
+    function getVehicleNumber() {
+        //debugger
+        if (IsNew) {
+            if (!IsEdit) {
+                var value = JSON.stringify(CBRF[0]);
+                var value_1 = JSON.parse(value);
+                var selectVehicleNumber = value_1.Value[0].VehicleNumber;
+                console.log(selectVehicleNumber);
+
+                $.ajax({
+                    type: "GET",
+                    url: "/CabBookingRequest/GetVehicleNumber",
+                    contentType: "application/json; charset=utf-8",
+                    datatype: 'json',
+                    cache: false,
+                    async: false,
+                    success: function (response) {
+                        console.log(response);
+                        $("#ddVehicleNumber option").remove();
+                        $("#ddVehicleNumber").append('<option value="' + response.VehicleNumber + '">' + 'Select' + '</option>');
+                        $.each(response, function (i, response) {
+
+                            if (response.VehicleNumber == selectVehicleNumber) {
+                                $("#ddVehicleNumber").append('<option value="' + response.VehicleNumber + '" selected>' + response.VehicleNumber + '</option>');
+                            }
+                            else {
+                                $("#ddVehicleNumber").append('<option value="' + response.VehicleNumber + '">' + response.VehicleNumber + '</option>');
+                            }
+                        });
+
+                    },          ////success
+                    error: function () {
+                        //alert('Failed to retrieve modules.');
+                    }
+                });
+            }
+            else {
+                $.ajax({
+                    type: "GET",
+                    url: "/CabBookingRequest/GetVehicleNumber",
+                    contentType: "application/json; charset=utf-8",
+                    datatype: 'json',
+                    cache: false,
+                    async: false,
+                    success: function (response) {
+                        console.log(response);
+                        $("#ddVehicleNumber option").remove();
+                        $("#ddVehicleNumber").append('<option value="' + response.VehicleNumber + '">' + 'Select' + '</option>');
+                        $.each(response, function (i, response) {
+                            $("#ddVehicleNumber").append('<option value="' + response.VehicleNumber + '">' + response.VehicleNumber + '</option>');
+                        });
+
+                    },          ////success
+                    error: function () {
+                        //alert('Failed to retrieve modules.');
+                    }
+                });
+            }
+        }
+        else {
+            var value = JSON.stringify(CBRF[0]);
+            var value_1 = JSON.parse(value);
+            var selectVehicleNumber = value_1.Value[0].VehicleNumber;
+            console.log(selectVehicleNumber);
+
+            $.ajax({
+                type: "GET",
+                url: "/CabBookingRequest/GetVehicleNumber",
+                contentType: "application/json; charset=utf-8",
+                datatype: 'json',
+                cache: false,
+                async: false,
+                success: function (response) {
+                    console.log(response);
+                    $("#ddVehicleNumber option").remove();
+                    $("#ddVehicleNumber").append('<option value="' + response.VehicleNumber + '">' + 'Select' + '</option>');
+                    $.each(response, function (i, response) {
+
+                        if (response.VehicleNumber == selectVehicleNumber) {
+                            $("#ddVehicleNumber").append('<option value="' + response.VehicleNumber + '" selected>' + response.VehicleNumber + '</option>');
+                        }
+                        else {
+                            $("#ddVehicleNumber").append('<option value="' + response.VehicleNumber + '">' + response.VehicleNumber + '</option>');
+                        }
+                    });
+
+                },          ////success
+                error: function () {
+                    //alert('Failed to retrieve modules.');
+                }
+            });
+        }
+    }
+
+    function TypeOfCarEnableDisable() {
+        //debugger
+        var ddTypeofCar = $("#ddTypeofCar option:selected").val();
+        if (ddTypeofCar == "Other") {
+            document.getElementById("txtTypeofCarOther").disabled = false;
+        }
+        else {
+            $('#txtTypeofCarOther').val('');
+            document.getElementById("txtTypeofCarOther").disabled = true;
+        }
+    }
+
+    function VehicleNumberEnableDisable() {
+        //debugger
+        var ddVehicleNumber = $("#ddVehicleNumber option:selected").val();
+        if (ddVehicleNumber == "Other") {
+            document.getElementById("txtVehicleNumberOther").disabled = false;
+        }
+        else {
+            $('#txtVehicleNumberOther').val('');
+            document.getElementById("txtVehicleNumberOther").disabled = true;
+        }
+    }
+
+    function allowNumbersOnly(e) {
+        var code = (e.which) ? e.which : e.keyCode;
+        if (code > 31 && (code < 48 || code > 57)) {
+            e.preventDefault();
+        }
+    }
+
+    function alphaOnly(e) {
+        var key = e.keyCode;
+        if (key > 32 && (key < 65 || key > 122 || key == 91 || key == 92 || key == 93 || key == 94 || key == 95 || key == 96)) {
+            e.preventDefault();
+        }
+    }
+
+    function GetData() {
+        //debugger
+        var name = document.getElementById("txtName");
+        var department = document.getElementById("txtDepartment");
+        var txtCostCenterNumber = document.getElementById("txtCostCenterNumber");
+        var txtContactNumber = document.getElementById("txtContactNumber");
+        var txtUserName = document.getElementById("txtUserName");
+        var txtUserContactNumber = document.getElementById("txtUserContactNumber");
+        name.value = "@currentUser.FirstName" + " " + "@currentUser.LastName";
+        department.value = "@currentUser.Department";
+        txtCostCenterNumber.value = "@currentUser.CostCenter";
+        txtContactNumber.value = "@currentUser.PhoneNumber";
+        txtUserName.value = "@currentUser.FirstName" + " " + "@currentUser.LastName";
+        txtUserContactNumber.value = "@currentUser.PhoneNumber";
+    }
+
+    function GetApprovers() {
+        $.ajax({
+            url: '/CabBookingRequest/GetCBRFApprovalList',
+            type: 'GET',
+            data: {},
+            dataType: 'JSON',
+            success: (function (data) {
+                //debugger
+                approverData = data;
+                console.log(data);
+                var row = "";
+                for (var i = 0; i < data.length; i++) {
+                                                            row += '<input type="hidden" id="hidden' + data[i].Department + 'Approver" name="hidden' + data[i].Department + 'Approver" value="' + data[i].ApproverEmailId + '">';
+                                                            }
+                                                            $("#hiddenApproverInformation").html(row);
+
+                                                            }),
+                                                            error: (function (data) {
+                                                            //code
+                                                            })
+                                                            })
+
+                                                            }
+
+    function successModal(txt) {
+                                                            //debugger
+                                                            $('#modalTitle').html('Success');
+                                                            if (txt == "approve") {
+                                                            $('#modalBody').html('Form has been approved!');
+                                                            }
+                                                            else if (txt == "reject") {
+                                                            $('#modalBody').html('Form has been rejected!');
+                                                            }
+                                                            else if (txt == "enquire") {
+                                                            $('#modalBody').html('Form has been enquired!');
+                                                            }
+                                                            else if (txt == "cancelled") {
+                                                            $('#modalBody').html('Form has been cancelled!');
+                                                            }
+                                                            else {
+                                                            $('#modalBody').html('Your form with ID: CBRF' + txt + ' has been submitted! Kindly use this for future reference');
+
+                                                            }
+        FlagRedirect = txt;
+                                                            //$("#modalOkButton").attr('data-dismiss', 'modal');
+                                                            $("#successModel").modal('show');
+                                                            }
+
+    function failureModal() {
+                                                            $('#modalTitle').html('Failure');
+                                                            $('#modalBody').html('Some error occured!');
+                                                            $("#modalOkButton").attr('data-dismiss', 'modal');
+                                                            $("#successModel").modal('show');
+                                                            }
+
+    function permissionModal() {
+                                                            $('#modalTitle').html('Failure');
+                                                            $('#modalBody').html('No permssion granted since the device is not SAVWIPL owned!');
+                                                            $("#modalOkButton").attr('data-dismiss', 'modal');
+                                                            $("#successModel").modal('show');
+                                                            }
+
+    function requiredModal(text) {
+                                                            $('#modalTitle').html('Required!');
+                                                            $('#modalBody').html(text);
+                                                            $("#modalOkButton").attr('data-dismiss', 'modal');
+                                                            $("#successModel").modal('show');
+                                                            }
+
+    function validityModal(txt) {
+                                                            //debugger
+                                                            if (txt == 'approve') {
+                                                                DisplayAlert('error', 'Error', 'Please select the Type of Car');
+                                                            }
+                                                            else if (txt == 'reject') {
+                                                            DisplayAlert('error', 'Warning', 'Please type in the reason for rejecting the form');
+                                                            }
+                                                            else if (txt == 'enquire') {
+                                                            DisplayAlert('error', 'Warning', 'Please type in the reason for enquiring the form');
+                                                            }
+
+                                                            }
+
+     function mobileLengthModal() {
+                                                            $('#modalTitle').html('Required');
+                                                            $('#modalBody').html('Please enter a 10-Digit Contact No.!');
+                                                            $("#modalOkButton").attr('data-dismiss', 'modal');
+                                                            $("#successModel").modal('show');
+                                                            }
+
+     $("#btnSubmit").on('click', function (e) {
+         //debugger
+
+         //File Checking if it is re-uploaded or not on edit mode
+         if (!IsEdit) {
+             var fileToUpload = $("#fileToUpload").val();
+             if (fileToUpload != "") {
+                 $("#attachedfile").val('');
+                 $("#attachedfileName").val('');
+             }
+         }
+
+         var drpRequestSubType = $("#drpRequestSubType option:selected").val();
+         if (drpRequestSubType == "null") {
+             requiredModal("Please select the Request Submission Type");
+             return false;
+         }
+
+
+         if (drpRequestSubType == "OnBehalf") {
+             var txtOtherEmpname = document.getElementById("txtOtherEmpname").value;
+             if (txtOtherEmpname == "") {
+                 requiredModal("Please enter the Employee Name");
+                 return false;
+             }
+         }
+
+         var ddEmpDesignation = $("#ddEmpDesignation option:selected").val();
+         if (ddEmpDesignation == "undefined") {
+                                                            requiredModal("Please select the Designation");
+                                                            return false;
+                                                            }
+
+         var txtDepartment = document.getElementById("txtDepartment").value;
+         if (txtDepartment == "") {
+                                                            requiredModal("Please enter the Department");
+                                                            return false;
+                                                            }
+         var txtCostCenterNumber = document.getElementById("txtCostCenterNumber").value;
+         if (txtCostCenterNumber == "") {
+         requiredModal("Please enter the Cost Center Number");
+         return false;
+         }
+         var txtName = document.getElementById("txtName").value;
+         if (txtName == "") {
+         requiredModal("Please enter the Name");
+         return false;
+         }
+         var txtContactNumber = document.getElementById("txtContactNumber").value;
+         if (txtContactNumber == "") {
+         requiredModal("Please enter the Contact Number");
+         return false;
+         }
+         var mobileLen = $("#txtContactNumber").val().length;
+         if (mobileLen < 10 || mobileLen > 10) {
+         mobileLengthModal();
+         return false;
+         }
+
+         var txtCarRequiredFromDate = document.getElementById("txtCarRequiredFromDate").value;
+         if (txtCarRequiredFromDate == "") {
+         requiredModal("Please select the Car Required From Date");
+         return false;
+         }
+         var drpCarRequiredFromTimeHours = $("#drpCarRequiredFromTimeHours option:selected").val();
+         if (drpCarRequiredFromTimeHours == "") {
+             requiredModal("Please select the Car Required From Time");
+             return false;
+         }
+         var drpCarRequiredFromTimeAMPM = $("#drpCarRequiredFromTimeAMPM option:selected").val();
+         if (drpCarRequiredFromTimeAMPM == "") {
+             requiredModal("Please select the Car Required From Time");
+             return false;
+         }
+         var txtCarRequiredToDate = document.getElementById("txtCarRequiredToDate").value;
+         if (txtCarRequiredToDate == "") {
+             requiredModal("Please select the Car Required To Date");
+             return false;
+         }
+         var drpCarRequiredToTimeHours = $("#drpCarRequiredToTimeHours option:selected").val();
+         if (drpCarRequiredToTimeHours == "") {
+             requiredModal("Please select the Car Required To Time");
+             return false;
+         }
+         var drpCarRequiredToTimeAMPM = $("#drpCarRequiredToTimeAMPM option:selected").val();
+         if (drpCarRequiredToTimeAMPM == "") {
+             requiredModal("Please select the Car Required To Time");
+             return false;
+         }
+         var txtUserName = document.getElementById("txtUserName").value;
+         if (txtUserName == "") {
+             requiredModal("Please enter the User Name");
+             return false;
+         }
+         var txtUserContactNumber = document.getElementById("txtUserContactNumber").value;
+         if (txtUserContactNumber == "") {
+             requiredModal("Please enter the User Contact Number");
+             return false;
+         }
+         var txtReportingPlaceWithAddress = document.getElementById("txtReportingPlaceWithAddress").value;
+         if (txtReportingPlaceWithAddress == "") {
+             requiredModal("Please enter the Reporting Place With Address");
+             return false;
+         }
+         var drpReportingTimeHours = $("#drpReportingTimeHours option:selected").val();
+         if (drpReportingTimeHours == "") {
+             requiredModal("Please select the Reporting Time");
+             return false;
+         }
+         var drpReportingTimeAMPM = $("#drpReportingTimeAMPM option:selected").val();
+         if (drpReportingTimeAMPM == "") {
+             requiredModal("Please select the Reporting Time");
+             return false;
+         }
+         var txtReasonforBooking = document.getElementById("txtReasonforBooking").value;
+         if (txtReasonforBooking == "") {
+             requiredModal("Please enter the Reason for Booking");
+             return false;
+         }
+         var txtDestination = document.getElementById("txtDestination").value;
+         if (txtDestination == "") {
+         requiredModal("Please enter the Destination");
+         return false;
+         }
+         var txtNumberofUsers = document.getElementById("txtNumberofUsers").value;
+         if (txtNumberofUsers == "") {
+         requiredModal("Please enter the Number of Users");
+         return false;
+         }
+
+         var txtNumberofUsers = document.getElementById("txtNumberofUsers").value;
+         if (txtNumberofUsers == "") {
+             requiredModal("Please enter the Number of Users");
+             return false;
+         }
+
+         $("#pageLoader").removeClass('invisible');
+         //var form = $("#CBRFForm").serialize();
+
+         var form = $("#CBRFForm");
+         var formData = new FormData(form[0]);
+         //console.log(form);
+
+         $.ajax({
+             url: '/CabBookingRequest/SaveCBRF',
+             processData: false,
+             contentType: false,
+             type: 'POST',
+             data: formData,
+             enctype: 'multipart/form-data',
+             //dataType: 'JSON',
+             success: (function (data) {
+                 if (data[0].Value == 1) {
+                     $("#pageLoader").addClass('invisible');
+                     successModal(data[1].Value);
+                 }
+                 else {
+                     $("#pageLoader").addClass('invisible');
+                     failureModal();
+
+                 }
+             }),
+             error: (function (data) {
+                 $("#pageLoader").addClass('invisible');
+                 failureModal();
+
+             })
+         })
+
+     });
+
+    function saveResponse(text) {
+       //debugger
+
+        if (!IsValidityCheck) {
+             //To check Type of Car
+             var ddTypeofCar = $("#ddTypeofCar option:selected").val();
+             if (ddTypeofCar == "undefined") {
+                 if (text == 'approve') {
+                     DisplayAlert('error', 'Error', 'Please select the Type of Car');
+                     return;
+                 }
+             }
+            if (ddTypeofCar == "Other") {
+                 var txtTypeofCarOther = document.getElementById("txtTypeofCarOther").value;
+                 if (txtTypeofCarOther == "") {
+                     if (text == 'approve') {
+                         DisplayAlert('error', 'Error', 'Please enter the Type of Car');
+                         return;
+                     }
+                 }
+             }
+            //To check Vehicle Number
+            var ddVehicleNumber = $("#ddVehicleNumber option:selected").val();
+            if (ddVehicleNumber == "undefined") {
+                if (text == 'approve') {
+                    DisplayAlert('error', 'Error', 'Please select the Vehicle Number');
+                    return;
+                }
+            }
+            if (ddVehicleNumber == "Other") {
+                var txtVehicleNumberOther = document.getElementById("txtVehicleNumberOther").value;
+                if (txtVehicleNumberOther == "") {
+                    if (text == 'approve') {
+                        DisplayAlert('error', 'Error', 'Please enter the Vehicle Number');
+                        return;
+                    }
+                }
+            }
+        }
+
+
+
+                                                            var status = '', comment = '';
+                                                            comment = $("#comment-" + text).val();
+                                                            switch (text) {
+                                                            case 'approve': {
+                                                            status = 'Approved';
+                                                            if (comment != '') {
+                                                            //validityModal(text);
+                                                            //return;
+                                                            }
+                                                            break;
+                                                            }
+                                                            case 'reject': {
+                                                            status = 'Rejected';
+                                                            if (comment == '') {
+                                                            validityModal(text);
+                                                            return;
+                                                            }
+                                                            break;
+                                                            }
+                                                            case 'enquire': {
+                                                            status = 'Enquired';
+                                                            if (comment == '') {
+                                                            validityModal(text);
+                                                            return;
+                                                            }
+                                                            break;
+                                                            }
+        }
+
+        spinner.show();
+                                                            $.ajax({
+                                                            url: '/List/SaveResponse',
+                                                            type: 'POST',
+                                                            data: { response: status, appRowId: appRowId, comment: comment, approvalType: approvalType },
+                                                            dataType: 'JSON',
+                                                            success: (function (data) {
+                                                            if (data == 1) {
+                                                                successModal(text);
+                                                                spinner.hide();
+                                                            if (!IsValidityCheck) {
+                                                            TypeOfCarUpdate();
+                                                            }
+                                                            $("#CBRFForm").trigger("reset");
+                                                                setTimeout(FilterMyTasks, 5000);
+                                                                spinner.hide();
+                                                            }
+                                                            else {
+                                                            failureModal();
+                                                                $("#CBRFForm").trigger("reset");
+                                                                spinner.hide();
+                                                            }
+                                                            }),
+                                                            error: (function (data) {
+                                                            failureModal();
+                                                                $("#CBRFForm").trigger("reset");
+                                                                     spinner.hide();
+                                                            })
+                                                            })
+    }
+
+    function TypeOfCarUpdate() {
+                                                            //debugger
+                                                            var form = $("#CBRFForm").serialize();
+                                                            $.ajax({
+                                                            url: '/CabBookingRequest/TypeOfCarUpdate',
+                                                            type: 'POST',
+                                                            data: form,
+                                                            dataType: 'JSON',
+                                                            success: (function (data) {
+                                                            if (data == 1) {
+                                                            $("#CBRFForm").trigger("reset");
+                                                            }
+                                                            else {
+                                                            failureModal();
+                                                            $("#CBRFForm").trigger("reset");
+                                                            }
+                                                            }),
+                                                            error: (function (data) {
+                                                            failureModal();
+                                                            $("#CBRFForm").trigger("reset");
+                                                            })
+                                                            })
+
+                                                            }
+
+    $("#modalOkButton").on('click', function () {
+                                                            //debugger
+                                                            if (FlagRedirect != null) {
+                                                            window.location = "../Dashboard";
+                                                            }
+    });
+
+    function RequestSubmission() {
+        //debugger
+        var drpRequestSubType = $("#drpRequestSubType option:selected").val();
+
+        if (drpRequestSubType == "OnBehalf") {
+            $('#txtDepartment').val('');
+            $('#txtCostCenterNumber').val('');
+            $('#txtName').val('');
+            $('#txtContactNumber').val('');
+            $('#txtUserName').val('');
+            $('#txtUserContactNumber').val('');
+            document.getElementById("txtOtherEmpname").disabled = false;
+        }
+        else {
+            GetData();
+
+
+            $('#txtOtherEmpname').val('');
+            document.getElementById("txtOtherEmpname").disabled = true;
+        }
+    }
+
+    $("#txtOtherEmpname").autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                url: "/List/GetPAFEmployeeDetails",
+                dataType: "json",
+                cache: false,
+                async: false,
+                data: {
+                    searchText: $("#txtOtherEmpname").val()
+                },
+                success: function (data) {
+                    //debugger;
+                    response($.map(data, function (item) {
+                        console.log(data, 'data');
+                        return { label: item.UserName, value: item.UserName, raw: item };
+                    }));
+                }
+            });
+        },
+        search: function (event, ui) {
+            var value = $("#txtOtherEmpname").val();
+            // If less than three chars, cancel the search event
+            if (value.length < 4) {
+                event.preventDefault();
+            }
+        },
+        min_length: 4,
+        delay: 0,
+        select: function (event, ui) {
+            var empOtherDetails = ui.item['raw'];
+
+            //Get the other details like Cost Center Code, Employee Number from DB.
+            $.ajax({
+                url: "/List/GetPAFExistingEmployeeDetails",
+                dataType: "json",
+                cache: false,
+                async: false,
+                data: {
+                    otherEmpUserId: empOtherDetails.UserId,
+                    //otherEmpEmail: empOtherDetails.Email
+                },
+                success: function (data) {
+                    console.log(data, 'data');
+
+                    $('#txtDepartment').val(data.Department);
+                    $('#txtName').val(data.FirstName + " " + data.LastName);
+                    $('#txtContactNumber').val(data.PhoneNumber);
+                    $('#txtCostCenterNumber').val(data.CostCenter);
+                    $('#txtUserName').val(data.FirstName + " " + data.LastName);
+                    $('#txtUserContactNumber').val(data.PhoneNumber);
+
+                    $('#hiddentxtEmail').val(data.Email);
+
+                }
+            });
+        }
+    });
+
+
+</script>
+<script>
+                                    //$(function () {
+                                    //    $("#datepick").datepicker();
+                                    //});
+</script>
+<script>
+                                    //$(function () {
+                                    //    $("#datepick2").datepicker();
+                                    //});
+</script>

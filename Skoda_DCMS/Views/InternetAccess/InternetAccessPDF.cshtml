@@ -1,0 +1,565 @@
+﻿
+@{
+    Layout = null;
+    dynamic IAF = null;
+    if (ViewBag != null)
+    {
+        IAF = ViewBag.Model;
+    }
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+
+<style type="text/css">
+    *:visited, *:focus {
+        box-shadow: none;
+    }
+
+    input, select, input:focus, select:focus, textarea, textarea:focus {
+        border: 1px solid #000;
+    }
+
+    input, textarea {
+        padding: 5px;
+    }
+
+    .signature-table thead td {
+        border-bottom: 1px solid black;
+        border-left: 1px solid black;
+        border-collapse: collapse;
+    }
+
+    .signature-table tbody, .signature-table td {
+        border: none;
+        border-left: 1px solid black;
+        border-collapse: collapse;
+        padding: 5px;
+    }
+
+        .signature-table td:first-child {
+            border-left: none;
+        }
+
+    .signature-table {
+        border: 1px solid black;
+    }
+
+    @@font-face {
+        font-family: 'SKODANext-Black';
+        src: url('../../fonts/SKODANextfont/SKODANext-Black.ttf') format('truetype');
+        src: url('../../fonts/SKODANextfont/SKODANext-Bold.ttf') format('truetype');
+        src: url('../../fonts/SKODANextfont/SKODANext-Light.ttf') format('truetype');
+        src: url('../../fonts/SKODANextfont/SKODANext-Regular.ttf') format('truetype');
+    }
+
+    body {
+        font-family: 'SKODANext-Black';
+    }
+
+    .form_lbl {
+        color: #000;
+        font-weight: 600;
+    }
+</style>
+    </head>
+<body>
+    <center>
+        <table style="width: 100%; font-size: 14px; color: rgb(110,110,110); font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+            <tr>
+                <td>
+                    <table style="width: 100%;" cellspadding="0" cellspacing="0">
+                        <tr>
+                            <td width="20%" style="text-align: center; border-right: 1px solid #000; border-bottom: 1px solid #000;">
+                                Classification
+                            </td>
+                            <td width="20%" style="text-align: center; border-right: 1px solid #000; border-bottom: 1px solid #000;">
+                                Internal
+                            </td>
+                            <td rowspan="2" width="60%" style="text-align: right;">
+                                <img style="width: 50%;" src='@Server.MapPath("~/assets/img/SAVWIPL_Merger_Logo.JPG")'>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center; border-right: 1px solid #000;">
+                                Version
+                            </td>
+                            <td style="text-align: center; border-right: 1px solid #000;">
+                                01
+                            </td>
+
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td style="height: 45px; text-align: center; border-left: 1px solid #000; border-right: 1px solid #000; border-bottom: 1px solid #000;">
+                    Internet Access Form
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 15px;">
+                    <table cellspacing="0" cellpadding="0" width="100%">
+                        @if (IAF.one[0].RequestSubmissionFor != "OnBehalf")
+                        {
+                            <tr>
+                                <td class="form_lbl">
+                                    Type of Employee
+                                </td>
+                                <td>
+                                    @if (IAF.one[0].EmployeeType == "Internal")
+                                    {
+                                        <input type="checkbox" id="internal" name="chkTyprEmp" value="Internal" checked>
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" id="internal" name="chkTyprEmp" value="Internal">
+                                    }
+                                    <label for="vehicle1"> Internal</label>
+                                </td>
+                                <td>
+                                    @if (IAF.one[0].EmployeeType == "External")
+                                    {
+                                        <input type="checkbox" id="external" name="chkTyprEmp" value="Internal" checked>
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" id="external" name="chkTyprEmp" value="Internal">
+                                    }
+                                    <label for="vehicle1"> External</label>
+                                </td>
+                                <td colspan="3">
+                                    @if (IAF.one[0].EmployeeType == "External")
+                                    {
+                                        @(IAF.one[0].ExternalOtherOrganizationName ?? "")
+                                        @*<input type="text" placeholder="External Company Name" style="height: 25px; border-radius: 0; " value="" />*@
+                                    }
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="height: 15px;">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="form_lbl">
+                                    Employee Code
+                                </td>
+                                <td>
+                                    @(IAF.one[0].EmployeeCode ?? "")
+                                    @*<input type="text" style="height: 25px; border-radius: 0; " value=")" />*@
+                                </td>
+                                <td class="form_lbl">
+                                    Cost Center No.
+                                </td>
+                                <td>
+                                    @(IAF.one[0].EmployeeCCCode ?? "")
+                                    @*<input type="text" style="height: 25px; border-radius: 0; " value="" />*@
+                                </td>
+                                <td class="form_lbl">
+                                    UserId
+                                </td>
+                                <td>
+                                    @(IAF.one[0].EmployeeUserId ?? "")
+                                    @*<input type="text" style="height: 25px; border-radius: 0; width: 100%; " value="" />*@
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style="height: 15px;">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="form_lbl">
+                                    Employee Name
+                                </td>
+                                <td>
+                                    @(IAF.one[0].EmployeeName ?? "")
+                                    @*<input type="text" style="height: 25px; border-radius: 0; " value="" />*@
+                                </td>
+                                <td class="form_lbl">
+                                    Department
+                                </td>
+                                <td>
+                                    @(IAF.one[0].EmployeeDepartment ?? "")
+                                    @*<input type="text" style="height: 25px; border-radius: 0; " value="" />*@
+                                </td>
+                                <td class="form_lbl">
+                                    Contact No.
+                                </td>
+                                <td>
+                                    @(IAF.one[0].EmployeeContactNo ?? "")
+                                    @*<input type="text" style="height: 25px; border-radius: 0; width: 100%; " value="" />*@
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="height: 25px;">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="form_lbl">
+                                    Designation
+                                </td>
+                                <td>
+                                    @(IAF.one[0].EmployeeDesignation ?? "")
+                                    @*<input type="text" style="height: 25px; border-radius: 0;  " value="" />*@
+                                </td>
+                                <td class="form_lbl">
+                                    Location
+                                </td>
+                                <td>
+                                    @(IAF.one[0].EmployeeLocation ?? "")
+                                    @*<input type="text" style="height: 25px; border-radius: 0;  " value="" />*@
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr>
+                                <td class="form_lbl">
+                                    Type of Employee
+                                </td>
+                                <td>
+                                    @if (IAF.one[0].OtherEmployeeType == "Internal")
+                                    {
+                                        <input type="checkbox" id="internal" name="chkTyprEmp" value="Internal" checked>
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" id="internal" name="chkTyprEmp" value="Internal">
+                                    }
+                                    <label for="vehicle1"> Internal</label>
+                                </td>
+                                <td>
+                                    @if (IAF.one[0].OtherEmployeeType == "External")
+                                    {
+                                        <input type="checkbox" id="external" name="chkTyprEmp" value="Internal" checked>
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" id="external" name="chkTyprEmp" value="Internal">
+                                    }
+                                    <label for="vehicle1"> External</label>
+                                </td>
+                                <td colspan="3">
+                                    @if (IAF.one[0].OtherEmployeeType == "External")
+                                    {
+                                        @(IAF.one[0].OtherExternalOtherOrganizationName ?? "")
+                                        @*<input type="text" placeholder="External Company Name" style="height: 25px; border-radius: 0; " value="" />*@
+                                    }
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="height: 15px;">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="form_lbl">
+                                    Employee Code
+                                </td>
+                                <td>
+                                    @(IAF.one[0].OtherEmployeeCode ?? "")
+                                    @*<input type="text" style="height: 25px; border-radius: 0; " value="" />*@
+                                </td>
+                                <td class="form_lbl">
+                                    Cost Center No.
+                                </td>
+                                <td>
+                                    @(IAF.one[0].OtherEmployeeCCCode ?? "")
+                                    @*<input type="text" style="height: 25px; border-radius: 0; " value="" />*@
+                                </td>
+                                <td class="form_lbl">
+                                    UserId
+                                </td>
+                                <td>
+                                    @(IAF.one[0].OtherEmployeeUserId ?? "")
+                                    @*<input type="text" style="height: 25px; border-radius: 0; width: 100%; " value="" />*@
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style="height: 15px;">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="form_lbl">
+                                    Employee Name
+                                </td>
+                                <td>
+                                    @(IAF.one[0].OtherEmployeeName ?? "")
+                                    @*<input type="text" style="height: 25px; border-radius: 0; " value="" />*@
+                                </td>
+                                <td class="form_lbl">
+                                    Department
+                                </td>
+                                <td>
+                                    @(IAF.one[0].OtherEmployeeDepartment ?? "")
+                                    @*<input type="text" style="height: 25px; border-radius: 0; " value="" />*@
+                                </td>
+                                <td class="form_lbl">
+                                    Contact No.
+                                </td>
+                                <td>
+                                    @(IAF.one[0].OtherEmployeeContactNo ?? "")
+                                    @*<input type="text" style="height: 25px; border-radius: 0; width: 100%; " value="" />*@
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="height: 25px;">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="form_lbl">
+                                    Designation
+                                </td>
+                                <td>
+                                    @(IAF.one[0].OtherEmployeeDesignation ?? "")
+                                    @*<input type="text" style="height: 25px; border-radius: 0;  " value="" />*@
+                                </td>
+                                <td class="form_lbl">
+                                    Location
+                                </td>
+                                <td>
+                                    @(IAF.one[0].OtherEmployeeLocation ?? "")
+                                    @*<input type="text" style="height: 25px; border-radius: 0;  " value="" />*@
+                                </td>
+                            </tr>
+                        }
+
+                        <tr>
+                            <td style="height: 25px;">
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="form_lbl">
+                                Request Type:
+                            </td>
+                            <td>
+                                @if (IAF.one[0].EmployeeRequestType == "Permanent")
+                                {
+                                    <input type="checkbox" id="permanent" name="chkTyprEmp" value="Permanent" checked>
+                                }
+                                else
+                                {
+                                    <input type="checkbox" id="permanent" name="chkTyprEmp" value="Permanent">
+                                }
+                                <label for=""> Permanent</label>
+                            </td>
+                            <td>
+                                @if (IAF.one[0].EmployeeRequestType == "Temporary")
+                                {
+                                    <input type="checkbox" id="temprory" name="chkTyprEmp" value="Temprory" checked>
+                                }
+                                else
+                                {
+                                    <input type="checkbox" id="temprory" name="chkTyprEmp" value="Temprory">
+                                }
+                                <label for=""> Temprory</label>
+                            </td>
+                            @if (IAF.one[0].EmployeeRequestType == "Temporary")
+                            {
+                                <td>
+                                    <label for="" class="form_lbl">if temprory form</label>
+                                    @(IAF.one[0].TempFrom.ToString("yyyy-MM-dd"))
+                                    @*<input type="date" id="date" name="" value="" />*@
+                                </td>
+
+                                <td>
+                                    <label for="" class="form_lbl">to</label>
+                                    @(IAF.one[0].TempTo.ToString("yyyy-MM-dd"))
+                                    @*<input type="date" id="date" name="" value="">*@
+                                </td>
+                            }
+
+                        </tr>
+
+                        <tr>
+                            <td style="height: 25px;">
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="6">
+                                @if (IAF.one[0].IsSpecialRequest == "Yes")
+                                {
+                                    <input type="checkbox" name="chkSpecialRequest" checked>
+                                }
+                                else
+                                {
+                                    <input type="checkbox" name="chkSpecialRequest">
+                                }
+                                <label for=""> Is it a special request?</label>
+
+                            </td>
+                        </tr>
+
+                        @if (IAF.one[0].IsSpecialRequest == "Yes")
+                        {
+                            <tr>
+                                <td colspan="6">
+                                    <label class="form_lbl">More Information (e.g. www.naukri.com) (Max. 500)</label>
+                                    <textarea cols="60" rows="3" maxlength="500">@(IAF.one[0].MoreInformation ?? "")    </textarea>
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td style="height: 15px;">
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <table>
+                        <tr>
+                            <td>
+                                <lable class="form_lbl">Reason for Request (Business Need)</lable>
+                                <div class="w-100" style="margin-bottom: 10px; margin-top: 10px;">
+                                    @(IAF.one[0].BusinessNeed ?? "")
+                                    @*<textarea type="text" rows="5" value="" style="width: 200%;"></textarea>*@
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+        </table>
+
+        <table style="width: 100%; font-size: 14px; color: rgb(110,110,110); font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+
+            <tr>
+                <td>
+
+                    <table class="w-100 signature-table" style="border: 1px solid #000;">
+                        @*<tr>
+                            <td style="height: 15px;">
+                            </td>
+                        </tr>*@
+                        <thead class="w-100">
+                            <tr class="w-100" style="text-align: center;">
+                                @*<td style="padding-left: 250px; text-align: center;"></td>*@
+                                <td style="width:24%;">
+                                    <lable class="form_lbl">Requester Signature</lable>
+                                    @*<div style="margin-bottom: 10px; margin-top: 10px;">
+                                        <textarea type="text" rows="5" value="" style="width: 100%;"></textarea>
+                                    </div>*@
+
+                                </td>
+                                <td style="width:24%;">
+                                    <lable class="form_lbl"> Cost Center Manager</lable>
+                                    @*<div style="margin-bottom: 10px; margin-top: 10px;">
+                                        <textarea type="text" rows="5" value="" style="width: 100%;"></textarea>
+                                    </div>*@
+
+                                </td>
+                                <td style="width:24%;">
+                                    <lable class="form_lbl"> CISO / LISO</lable>
+                                    @*<div style="margin-bottom: 10px; margin-top: 10px;">
+                                        <textarea type="text" rows="5" value="" style="width: 100%;"></textarea>
+                                    </div>*@
+
+                                </td>
+                                <td style="width:24%;">
+                                    <lable class="form_lbl">IT - Service Desk Manager</lable>
+                                    @*<div style="margin-bottom: 10px; margin-top: 10px;">
+                                        <textarea type="text" rows="5" value="" style="width: 100%;"></textarea>
+                                    </div>*@
+                                </td>
+                            </tr>
+                        </thead>
+
+                        @if (IAF.three.Count > 0)
+                        {
+                            <tbody>
+                                @{ Html.RenderPartial("_ApprovalTrackingPDF", new Skoda_DCMS.Models.PdfParameterModel { RequesterData = IAF.one, ApproverData = IAF.three });}
+                                @*<tr>
+                                    <td>@(IAF.two[0].Author.Title ?? " ")</td>
+                                    <td>@(IAF.three[0].UserName ?? "")</td>
+                                    <td>@(IAF.three[1].UserName ?? "")</td>
+                                    <td>@(IAF.three[2].UserName ?? "")</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        @("Submitted on " + Convert.ToDateTime(IAF.two[0].FormId.Created).ToShortDateString() + " "
+                                                                            + Convert.ToDateTime(IAF.two[0].FormId.Created).ToShortTimeString() ?? "")
+                                    </td>
+                                    <td>
+                                        @(IAF.three[0].ApproverStatus != "Pending"
+                                    ? (IAF.three[0].ApproverStatus + " on " + " " + Convert.ToDateTime(IAF.three[0].Modified).ToShortDateString()
+                                    + " " + Convert.ToDateTime(IAF.three[0].Modified).AddHours(5.5).ToShortTimeString())
+                                    : "" )
+                                    </td>
+                                    <td>
+                                        @(IAF.three[1].ApproverStatus != "Pending"
+                                    ? (IAF.three[1].ApproverStatus + " on " + " " + Convert.ToDateTime(IAF.three[1].Modified).ToShortDateString()
+                                    + " " + Convert.ToDateTime(IAF.three[1].Modified).AddHours(5.5).ToShortTimeString()) : "" )
+                                    </td>
+                                    <td>
+                                        @(IAF.three[2].ApproverStatus != "Pending"
+                                    ? (IAF.three[2].ApproverStatus + " on " + " " + Convert.ToDateTime(IAF.three[2].Modified).ToShortDateString()
+                                    + " " + Convert.ToDateTime(IAF.three[2].Modified).AddHours(5.5).ToShortTimeString()) : "" )
+                                    </td>
+                                </tr>*@
+                            </tbody>
+                        }
+
+
+                    </table>
+
+                </td>
+            </tr>
+        </table>
+        <table style="width: 100%; font-size: 14px; color: rgb(110,110,110); font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+            <tr>
+                <td>
+                    <table>
+                        <tr>
+                            <td style="height: 45px; padding-left: 15px; color: rgb(128, 128, 128);">
+                                <label class="form_lbl">for IT use only</label>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="vehicle1" style="padding-left: 15px;" class="form_lbl"> Ticket No.</label>
+                                <input type="text" placeholder="" style="height: 25px; border-radius: 0;   " />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="height: 15px;">
+                            </td>
+                        </tr>
+                        @*<tr>
+                        <td style="height: 15px; color: black;">
+                            This is digital form, that can be filled and digitally sign by your PKI card. Please do not take print out.
+                        </td>
+                    </tr>*@
+</table>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 15px;">
+                    <p style="font-weight: 600; color: black;">SF_FI_026</p>
+                </td>
+            </tr>
+        </table>
+        </td>
+        <tr>
+            <p style="font-size: bold;">
+                NOTE :- Requester is obliged strictly adhere to SAVWIPL Internet access rules & guidelines according
+                to form Internet – access permissions and usage. Violation is considered offence of SAVWIPL labour
+                code and will be punished appropriately. Requester is aware and knows that Internet access sessions
+                could be tracked and monitored as well.
+            </p>
+        </tr>
+        </tr>
+        </table>
+    </center>
+</body>
+</html>

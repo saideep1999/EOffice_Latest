@@ -1,0 +1,737 @@
+﻿@{
+    Layout = null;
+    Skoda_DCMS.Models.PPFData PAF = null;
+    List<Skoda_DCMS.Models.ApprovalDataModel> appList = new List<Skoda_DCMS.Models.ApprovalDataModel>();
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        PAF = ViewBag.Model.one[0] as Skoda_DCMS.Models.PPFData;
+        appList = ViewBag.Model?.three as List<Skoda_DCMS.Models.ApprovalDataModel>;
+    }
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SAVWIPL - Photography Authorization Form</title>
+    <style type="text/css">
+        *:visited, *:focus {
+            box-shadow: none;
+        }
+
+        input, select, input:focus, select:focus, textarea, textarea:focus {
+            border: 1px solid #000;
+        }
+
+        input, textarea {
+            padding: 5px;
+        }
+
+        table td {
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <table style="width: 100%; font-size: 14px; color: #000; font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+        <tr>
+            <td>
+                <table style="width: 100%;" cellspadding="0" cellspacing="0">
+                    <tr>
+                        <td colspan="6" width="60%" style="text-align: right;">
+                            <img style="width: 50%;" src='@Server.MapPath("~/assets/img/SAVWIPL_Merger_Logo.JPG")'>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="6" align="center">
+                <h2> Photography Authorization Form </h2>
+            </td>
+        </tr>
+
+
+        <tr>
+            <td style="padding: 15px;">
+                <table cellspacing="0" cellpadding="0" width="100%" border="1">
+                    @if (PAF?.RequestSubmissionFor == "Self")
+                    {
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Employee Name
+                            </td>
+                            <td style="width: 30%; font-weight: normal;" colspan="2" align='left'>
+                                <span style="height: 25px; width:85%; border-radius: 0; "> @(PAF?.EmployeeName) </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Employee Code
+                            </td>
+                            <td style="width: 30%; font-weight: normal;" colspan="2" align='left'>
+                                <span style="height: 25px; width:85%; border-radius: 0; "> @(PAF?.EmployeeCode) </span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Designatiion
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.EmployeeDesignation)  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Location
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.EmployeeLocation)  </span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Department
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.EmployeeDepartment)  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Contact Number
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.EmployeeContactNo)  </span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Cost Center Number
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.EmployeeCCCode)  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                UserID
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.EmployeeUserId)  </span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Type of Employee
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.EmployeeType)  </span>
+                            </td>
+
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Employee Name
+                            </td>
+                            <td style="width: 30%" colspan="2" align='left'>
+                                <span style="height: 25px; width: 85%; font-weight: normal; border-radius: 0; "> @(PAF?.OtherEmployeeName) </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Employee Code
+                            </td>
+                            <td style="width: 30%" colspan="2" align='left'>
+                                <span style="height: 25px; width: 85%; font-weight: normal; border-radius: 0; "> @(PAF?.OtherEmployeeCode) </span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Designatiion
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.OtherEmployeeDesignation)  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Location
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.OtherEmployeeLocation)  </span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Department
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.OtherEmployeeDepartment)  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Contact Number
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.OtherEmployeeContactNo)  </span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Cost Center Number
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.OtherEmployeeCCCode)  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                UserID
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.OtherEmployeeUserId)  </span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Type of Employee
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.OtherEmployeeType)  </span>
+                            </td>
+                        </tr>
+                    }
+
+                    <tr>
+                        <td style=" font-weight: bold;">
+                            3rd Party Photographer
+                        </td>
+                        <td colspan="5" align='left' style="font-weight: normal;">
+                            @if (PAF?.ThirdPartyPhotographer == "3rd Party Photographer")
+                            {
+                                <input type="checkbox" checked />
+                            }
+                            else
+                            {
+                                <input type="checkbox" />
+                            }
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Device
+                        </td>
+                        <td colspan="5" align='left' style="font-weight: normal;">
+                            <span style="width: 85%; font-weight: normal; border-radius: 0; ">
+                                @if (PAF?.VideoCameraDevice == "VideoCamera")
+                                {
+                                    <span class="mr-3">
+                                        <input type="checkbox" class="deviceCheck mr-1" name="chkVideoCamera" id="chkVideoCamera" value="VideoCamera" checked> Video Camera
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="mr-3">
+                                        <input type="checkbox" /> Video Camera
+                                    </span>
+                                }
+                                @if (PAF?.CameraDevice == "Camera")
+                                {
+                                    <span class="mr-3">
+                                        <input type="checkbox" class="deviceCheck mr-1" name="chkCamera" id="chkCamera" value="Camera" checked> Business Camera
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="mr-3">
+                                        <input type="checkbox" /> Business Camera
+                                    </span>
+                                }
+                                @if (PAF?.MobileDevice == "Mobile")
+                                {
+                                    <span class="mr-3">
+                                        <input type="checkbox" class="deviceCheck mr-1" name="chkMobile" id="chkMobile" value="Mobile" checked>
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="mr-3">
+                                        <input type="checkbox" /> Company Mobile
+                                    </span>
+                                }
+                                @if (PAF?.TabletDevice == "Tablet")
+                                {
+                                    <span>
+                                        <input type="checkbox" class="deviceCheck mr-1" name="chkTablet" id="chkTablet" value="Tablet" checked>
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="mr-3">
+                                        <input type="checkbox" /> Company Tablet
+                                    </span>
+                                }
+                            </span>
+                        </td>
+                    </tr>
+
+                    @if (PAF?.VideoCameraDevice == "VideoCamera")
+                    {
+                        <tr>
+                            <td colspan="6" style="font-weight: bold;">Video Camera </td>
+                        </tr>
+
+
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Make
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.VideoCameraMake)  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Model
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.VideoCameraModel) </span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Serial/IMEI Number
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.VideoCameraSerialIMEINo)  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                SAVWIPL Owned
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">  @(PAF?.VideoCameraSAVWIPLOwned)  </span>
+                            </td>
+
+                        </tr>
+
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Capture Voice/Sound
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.VideoCameraCaptureVoiceSound)   </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Capture Voice/Sound
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.VideoCameraCaptureVideo)  </span>
+                            </td>
+
+                        </tr>
+
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Capture Images
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.VideoCameraCaptureImages) </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Bluetooth/Wireless
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.VideoCameraBluetoothWireless) </span>
+                            </td>
+
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Other
+                            </td>
+                            <td colspan="5">
+
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.VideoCameraOther)  </span>
+
+                            </td>
+                        </tr>
+
+                    }
+
+                    @if (PAF?.CameraDevice == "Camera")
+                    {
+                        <tr>
+                            <td colspan="6" style="font-weight: bold;">Business Camera </td>
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Make
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.CameraMake)  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Model
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">  @(PAF?.CameraModel) </span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Serial/IMEI Number
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">  @(PAF?.CameraSerialIMEINo)   </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                SAVWIPL Owned
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">  @(PAF?.CameraSAVWIPLOwned)  </span>
+                            </td>
+
+                        </tr>
+
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Capture Voice/Sound
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">  @(PAF?.CameraCaptureVoiceSound)  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Capture Voice/Sound
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">  @(PAF?.CameraCapture)  </span>
+                            </td>
+
+                        </tr>
+
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Capture Images
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">  @(PAF?.CameraCaptureImages)   </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Bluetooth/Wireless
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">  @(PAF?.CameraBluetoothWireless)  </span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Other
+                            </td>
+                            <td colspan="5">
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">  @(PAF?.CameraOther)  </span>
+                            </td>
+                        </tr>
+
+                    }
+
+                    @if (PAF?.MobileDevice == "Mobile")
+                    {
+                        <tr>
+                            <td colspan="6" style="font-weight: bold;">Company Mobile </td>
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Make
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.MobileMake)   </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Model
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.MobileModel)  </span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Serial/IMEI Number
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.MobileSerialIMEINo)   </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                SAVWIPL Owned
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.MobileSAVWIPLOwned)  </span>
+                            </td>
+
+                        </tr>
+
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Capture Voice/Sound
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.MobileCaptureVoiceSound)   </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Capture Voice/Sound
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.MobileCapture) </span>
+                            </td>
+
+                        </tr>
+
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Capture Images
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.MobileCaptureImages)  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Bluetooth/Wireless
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.MobileBluetoothWireless)  </span>
+                            </td>
+
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Other
+
+                            </td>
+                            <td colspan="5">
+
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.MobileOther)  </span>
+
+                            </td>
+                        </tr>
+                        <tr>
+                        </tr>
+                    }
+
+                    @if (PAF?.TabletDevice == "Tablet")
+                    {
+                        <tr>
+                            <td colspan="6" style="font-weight: bold;">Company Tablet </td>
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Make
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @PAF?.TabletMake)   </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Model
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.TabletModel)   </span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Serial/IMEI Number
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.TabletSerialIMEINo)   </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                SAVWIPL Owned
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.TabletSAVWIPLOwned)  </span>
+                            </td>
+
+                        </tr>
+
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Capture Voice/Sound
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.TabletCaptureVoiceSound)   </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Capture Voice/Sound
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.TabletCapture)   </span>
+                            </td>
+
+                        </tr>
+
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Capture Images
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @PAF?.TabletCaptureImages)   </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Bluetooth/Wireless
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.TabletBluetoothWireless)   </span>
+                            </td>
+
+                        </tr>
+
+                        <tr>
+                            <td>
+
+                                Other
+
+                            </td>
+                            <td colspan="5">
+
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.TabletOther)   </span>
+
+                            </td>
+                        </tr>
+                        <tr>
+                        </tr>
+
+                    }
+
+
+
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Location
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.PAFLocation)  </span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">
+                            Zone
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">  @(PAF?.Zone) </span>
+                        </td>
+
+                    </tr>
+
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Per-series or prototype?
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.PreSeriesCarOrPart)   </span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">
+                            Exceptional Photo
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(PAF?.ExceptionalPhoto)  </span>
+                        </td>
+
+                    </tr>
+
+                    <tr>
+                        <td>
+                            Purpose
+                        </td>
+                        <td colspan="5">
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">  @(PAF?.Purpose) </span>
+                        </td>
+                    </tr>
+
+
+
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">
+                            Valid From
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">  @(PAF?.ValidFrom.ToString("yyyy-MM-dd")) </span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">
+                            Valid To
+                        </td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; ">  @(PAF?.ValidTo.ToString("yyyy-MM-dd")) </span>
+                        </td>
+
+                    </tr>
+
+
+                    @if (appList.Count > 0)
+                    {
+                        <tr>
+                            <td colspan="2">Name</td>
+                            <td colspan="2">Proccessed On</td>
+                            <td colspan="1">Status</td>
+                            <td colspan="1">Level</td>
+                        </tr>
+                        foreach (var item in appList)
+                        {
+                            <tr>
+                                <td colspan="2">
+                                    <div style="margin-bottom:10px;">
+                                        <div>@item.UserName</div>
+                                        <div>@item.Designation</div>
+                                    </div>
+                                </td>
+                                <td colspan="2">
+                                    @if (item.Logic == "OR")
+                                    {
+                                        if (item.ApproverStatus != "Pending")
+                                        {
+                                            <div>
+                                                @item.TimeStamp
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div>
+                                            @item.TimeStamp
+                                        </div>
+                                    }
+                                </td>
+                                <td colspan="1">
+                                    @if (item.Logic == "OR")
+                                    {
+                                        if (item.ApproverStatus != "Pending")
+                                        {
+                                            <div>
+                                                @item.ApproverStatus
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div>
+                                            @item.ApproverStatus
+                                        </div>
+                                    }
+                                </td>
+                                <td colspan="1">
+                                    <div>
+                                        @item.Level
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+
+                    <tr>
+                        <td colspan="6" style="height: 15px;">
+                        </td>
+                    </tr>
+
+
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

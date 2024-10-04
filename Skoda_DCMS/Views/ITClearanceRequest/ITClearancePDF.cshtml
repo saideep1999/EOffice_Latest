@@ -1,0 +1,557 @@
+﻿
+@{
+    Layout = null;
+    dynamic ITCF = null;
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        ITCF = ViewBag.Model;
+    }
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <style type="text/css">
+
+        *:visited, *:focus {
+            box-shadow: none;
+        }
+
+        input, select, input:focus, select:focus, textarea, textarea:focus {
+            border: 1px solid #000;
+        }
+
+        input, textarea {
+            padding: 5px;
+        }
+
+        .asset {
+            border: 1px solid black;
+        }
+
+        .signature-table thead td {
+            border-bottom: 1px solid black;
+            border-left: 1px solid black;
+            border-collapse: collapse;
+        }
+
+        .signature-table tbody, .signature-table td {
+            border: none;
+            border-left: 1px solid black;
+            border-collapse: collapse;
+            padding: 5px;
+        }
+
+        .signature-table td:first-child {
+            border-left: none;
+        }
+
+        .signature-table {
+            border: 1px solid black;
+        }
+
+        @@font-face {
+            font-family: 'SKODANext-Black';
+            src: url('../../fonts/SKODANextfont/SKODANext-Black.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Bold.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Light.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Regular.ttf') format('truetype');
+        }
+
+        body {
+            font-family: 'SKODANext-Black';
+        }
+
+        .form_lbl {
+            color: #000;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <center>
+        <table style="width: 100%; font-size: 14px; color: rgb(110,110,110); font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+            <tr>
+                <td>
+                    <table style="width: 100%;" cellspadding="0" cellspacing="0">
+                        <tr>
+                            <td width="20%" style="text-align: center; border-right: 1px solid #000; border-bottom: 1px solid #000;">
+                                Classification
+                            </td>
+                            <td width="20%" style="text-align: center; border-right: 1px solid #000; border-bottom: 1px solid #000;">
+                                Internal
+                            </td>
+                            <td rowspan="2" width="60%" style="text-align: right;">
+                                <img style="width: 50%;" src='@Server.MapPath("~/assets/img/SAVWIPL_Merger_Logo.JPG")'>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center; border-right: 1px solid #000;">
+                                Version
+                            </td>
+                            <td style="text-align: center; border-right: 1px solid #000;">
+                                11
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td style="height: 45px; text-align: center; border-left: 1px solid #000; border-right: 1px solid #000; border-bottom: 1px solid #000;">
+                    IT Clearance
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 15px;">
+                    <table cellspacing="0" cellpadding="0" width="100%">
+                        @if (ITCF.one[0].RequestSubmissionFor != "OnBehalf")
+                        {
+                            <tr>
+                                <td class="form_lbl">
+                                    Type of Employee
+                                </td>
+                                <td>
+                                    @if (ITCF.one[0].EmployeeType == "Internal")
+                                    {
+                                        <input type="checkbox" id="internal" name="chkTyprEmp" value="Internal" checked>
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" id="internal" name="chkTyprEmp" value="Internal">
+                                    }
+                                    <label for="vehicle1"> Internal</label>
+                                </td>
+                                <td>
+                                    @if (ITCF.one[0].EmployeeType == "External")
+                                    {
+                                        <input type="checkbox" id="internal" name="chkTyprEmp" value="Internal" checked>
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" id="internal" name="chkTyprEmp" value="Internal">
+                                    }
+                                    <label for="vehicle1"> External</label>
+                                </td>
+                                <td colspan="3">
+                                    @if (ITCF.one[0].EmployeeType == "External")
+                                    {
+                                        <input type="text" placeholder="External Company Name" style="height: 25px; border-radius: 0; " value="@(ITCF.one[0].ExternalOtherOrganizationName ?? "")" />
+                                    }
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="height: 15px;">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="form_lbl">
+                                    Employee Code
+                                </td>
+                                <td>
+                                    @(ITCF.one[0].EmployeeCode ?? "")
+                                    @*<input type="text" style="height: 25px; border-radius: 0; " value="" />*@
+                                </td>
+                                <td class="form_lbl">
+                                    Cost Center No.
+                                </td>
+                                <td>
+                                    @(ITCF.one[0].EmployeeCCCode ?? "")
+                                    @*<input type="text" style="height: 25px; border-radius: 0; " value="" />*@
+                                </td>
+                                <td class="form_lbl">
+                                    UserId
+                                </td>
+                                <td>
+                                    @(ITCF.one[0].EmployeeUserId ?? "")
+                                    @*<input type="text" style="height: 25px; border-radius: 0; width: 100%; " value="" />*@
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style="height: 15px;">
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td class="form_lbl">
+                                    Employee Name
+                                </td>
+                                <td>
+                                    @(ITCF.one[0].EmployeeName ?? "")
+                                    @*<input type="text" style="height: 25px; border-radius: 0; " value="" />*@
+                                </td>
+                                <td class="form_lbl">
+                                    Department
+                                </td>
+                                <td>
+                                    @(ITCF.one[0].EmployeeDepartment ?? "")
+                                    @*<input type="text" style="height: 25px; border-radius: 0; " value="" />*@
+                                </td>
+                                <td class="form_lbl">
+                                    Contact No.
+                                </td>
+                                <td>
+                                    @(ITCF.one[0].EmployeeContactNo ?? "")
+                                    @*<input type="text" style="height: 25px; border-radius: 0; width: 100%; " value="" />*@
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style="height: 15px;">
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr>
+                                <td class="form_lbl">
+                                    Type of Employee
+                                </td>
+                                <td>
+                                    @if (ITCF.one[0].OtherEmployeeType == "Internal")
+                                    {
+                                        <input type="checkbox" id="internal" name="chkTyprEmp" value="Internal" checked>
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" id="internal" name="chkTyprEmp" value="Internal">
+                                    }
+                                    <label for="vehicle1"> Internal</label>
+                                </td>
+                                <td>
+                                    @if (ITCF.one[0].OtherEmployeeType == "External")
+                                    {
+                                        <input type="checkbox" id="internal" name="chkTyprEmp" value="Internal" checked>
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" id="internal" name="chkTyprEmp" value="Internal">
+                                    }
+                                    <label for="vehicle1"> External</label>
+                                </td>
+                                <td colspan="3">
+                                    @if (ITCF.one[0].OtherEmployeeType == "External")
+                                    {
+                                        @(ITCF.one[0].OtherExternalOtherOrganizationName ?? "")
+                                        @*<input type="text" placeholder="External Company Name" style="height: 25px; border-radius: 0; " value="" />*@
+                                    }
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="height: 15px;">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="form_lbl">
+                                    Employee Code
+                                </td>
+                                <td>
+                                    @(ITCF.one[0].OtherEmployeeCode ?? "")
+                                    @*<input type="text" style="height: 25px; border-radius: 0; " value="" />*@
+                                </td>
+                                <td class="form_lbl">
+                                    Cost Center No.
+                                </td>
+                                <td>
+                                    @(ITCF.one[0].OtherEmployeeCCCode ?? "")
+                                    @*<input type="text" style="height: 25px; border-radius: 0; " value="" />*@
+                                </td>
+                                <td class="form_lbl">
+                                    UserId
+                                </td>
+                                <td>
+                                    @(ITCF.one[0].OtherEmployeeUserId ?? "")
+                                    @*<input type="text" style="height: 25px; border-radius: 0; width: 100%; " value="" />*@
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style="height: 15px;">
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td class="form_lbl">
+                                    Employee Name
+                                </td>
+                                <td>
+                                    @(ITCF.one[0].OtherEmployeeName ?? "")
+                                    @*<input type="text" style="height: 25px; border-radius: 0; " value="" />*@
+                                </td>
+                                <td class="form_lbl">
+                                    Department
+                                </td>
+                                <td>
+                                    @(ITCF.one[0].OtherEmployeeDepartment ?? "")
+                                    @*<input type="text" style="height: 25px; border-radius: 0; " value="" />*@
+                                </td>
+                                <td class="form_lbl">
+                                    Contact No.
+                                </td>
+                                <td>
+                                    @(ITCF.one[0].OtherEmployeeContactNo ?? "")
+                                    @*<input type="text" style="height: 25px; border-radius: 0; width: 100%; " value="" />*@
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style="height: 15px;">
+                                </td>
+                            </tr>
+                        }
+
+                        <tr>
+                            <td class="form_lbl">
+                                Last working day
+                            </td>
+                            <td>
+                                @((ITCF.one[0].LastWorkingDay.ToShortDateString() ?? ""))
+                                @*<input type="text" style="height: 25px; border-radius: 0;  " value="" />*@
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="height: 15px;">
+                            </td>
+                        </tr>
+                    </table>
+
+                    <table cellspacing="0" cellpadding="0" width="100%" class="signature-table">
+                        <thead>
+                            <tr class="form_lbl">
+                                <td>
+                                    @* height: 150px; margin-left: 160px; *@
+                                    Employee Signature
+                                </td>
+                                <td>
+                                    Data to be handed over to :
+                                </td>
+                                <td>
+                                    HOD / Cost Center Manager
+                                </td>
+                            </tr>
+                        </thead>
+                        @*<tr style="display: flex; justify-content: space-between;">
+                                <th style="border: 2px solid; height: 150px; width: 200px; margin-left: 160px; ">
+                                    Employee Signature
+                                </th>
+                                <td>
+                                </td>
+
+                                <th style="border: 2px solid; height: 150px; width: 200px;">
+                                    Data to be handed over to :
+                                </th>
+                                <td>
+                                    @((ITCF.one[0].HandedDataToName ?? ""))
+                                </td>
+                                <th style="border: 2px solid; height: 150px; width: 200px;">
+                                    HOD / Cost Center Manager
+                                </th>
+                                <td>
+                                </td>
+                            </tr>*@
+                        @if ((ITCF.two.Count > 0) || (ITCF.three.Count > 0))
+                        {
+                            <tbody>
+                                @*<tr>
+                                    <td>@(ITCF.two[0].Author.Title ?? " ")</td>
+                                    <td>@(ITCF.three[0].UserName ?? "")</td>
+                                    <td>@(ITCF.three[1].UserName ?? "")</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        @("Submitted on " + Convert.ToDateTime(ITCF.two[0].FormId.Created).ToShortDateString() + " "
+                                                                            + Convert.ToDateTime(ITCF.two[0].FormId.Created).ToShortTimeString() ?? "")
+                                    </td>
+                                    <td>
+                                        @(ITCF.three[0].ApproverStatus != "Pending"
+                                    ? (ITCF.three[0].ApproverStatus + " on " + " " + Convert.ToDateTime(ITCF.three[0].Modified).ToShortDateString()
+                                    + " " + Convert.ToDateTime(ITCF.three[0].Modified).AddHours(5.5).ToShortTimeString())
+                                    : "" )
+                                    </td>
+                                    <td>
+                                        @(ITCF.three[1].ApproverStatus != "Pending"
+                                    ? (ITCF.three[1].ApproverStatus + " on " + " " + Convert.ToDateTime(ITCF.three[1].Modified).ToShortDateString()
+                                    + " " + Convert.ToDateTime(ITCF.three[1].Modified).AddHours(5.5).ToShortTimeString()) : "" )
+                                    </td>
+                                </tr>*@
+
+                                
+                                @{ Html.RenderPartial("_ApprovalTrackingPDF", new Skoda_DCMS.Models.PdfParameterModel { RequesterData = ITCF.two, ApproverData = ITCF.three});}
+
+                                @*@if (ITCF.three[0].ApproverStatus != "Pending")
+                                {
+                                    <tr class="f-600">
+                                        <td></td>
+                                        <td>
+                                            <span>
+                                                <label name="txtHod">
+                                                    <textarea cols="30" rows="15" readonly>@(ITCF.three[0].Comment ?? "")</textarea>
+                                                </label>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span>
+                                                @if (ITCF.three[1].ApproverStatus != "Pending")
+                                                {
+
+                                                    <label name="txtKeyuser">
+                                                        <textarea cols="30" rows="15" readonly> @(ITCF.three[1].Comment ?? "")</textarea>
+                                                    </label>
+                                                }
+                                            </span>
+                                        </td>
+                                    </tr>
+                                }*@
+                            </tbody>
+                        }
+                    </table>
+                    <p style="color: #000;"><b>* Data handed over to:- Includes transfer of share folder ownership, documentation of shared IT assets, etc.</b></p>
+                </td>
+            </tr>
+        </table>
+
+        <table style="width: 100%; font-size: 14px; color: rgb(110,110,110); font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+            <tr style="width: 100%;">
+                <td style="width: 100%;">
+                    <table style="width: 100%;" cellpadding="0" cellspacing="0">
+                        <tr style="width: 100%; padding: 0; margin: 0; ">
+                            <td style="height: 45px; padding-left: 15px; color: rgb(128, 128, 128);">
+                                for IT use only - - ServiceDeskIndia@volkswagen.co.in
+                            </td>
+                            <td>
+                                <label for="vehicle1"> CR No.</label>
+                                <input type="text" placeholder="" style="height: 25px; border-radius: 0; " />
+                            </td>
+                        </tr>
+                        <tr style="width: 100%;">
+                            <td style="height: 45px; color: rgb(129, 125, 125);" colspan="2">
+                                Please tick on the Assigned Assets
+                            </td>
+                        </tr>
+                        <tr style="width: 100%;">
+                            <td style="width: 100%;" colspan="2">
+                                <table class="assets w-100" style="width: 100%;text-align: justify;border: 1px solid black;" border="1" cellspacing="0">
+                                    <tr class="width: 100%;">
+                                        <th class="asset" style="padding: 7px;">Name of the Asset</th>
+                                        <th style="text-align: center; padding: 7px;" class="asset">Y/N</th>
+                                        <th class="asset" style="padding: 7px;">Recived by Name & Signature</th>
+                                        <th style="text-align: center; padding: 7px;" class="asset">Remarks</th>
+                                    </tr>
+                                    <tr>
+                                        <td class="asset">Desktop</td>
+                                        <td class="asset"> <input type="checkbox" class="form-check-input" id="exampleCheck1"> </td>
+                                        <td> IT Asset Team Name & Signature</td>
+                                        <td class="asset"> </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="asset">Laptop</td>
+                                        <td class="asset"><input type="checkbox" class="form-check-input" id="exampleCheck1"></td>
+                                        <td></td>
+                                        <td class="asset"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="asset">SIM Card</td>
+                                        <td class="asset"><input type="checkbox" class="form-check-input" id="exampleCheck1"></td>
+                                        <td></td>
+                                        <td class="asset"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="asset">Mobile Handset</td>
+                                        <td class="asset"><input type="checkbox" class="form-check-input" id="exampleCheck1"></td>
+                                        <td></td>
+                                        <td class="asset"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="asset">Landline</td>
+                                        <td class="asset"><input type="checkbox" class="form-check-input" id="exampleCheck1"></td>
+                                        <td>
+                                            assetadmin.vwvi.r.india@v
+                                            olkswagen.co.in
+                                        </td>
+                                        <td class="asset"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="asset">Data Card</td>
+                                        <td class="asset"><input type="checkbox" class="form-check-input" id="exampleCheck1"></td>
+                                        <td style="border-top:1px solid black ;"></td>
+                                        <td class="asset"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Other 1</td>
+                                        <td class="asset"><input type="checkbox" class="form-check-input" id="exampleCheck1"></td>
+                                        <td></td>
+                                        <td class="asset"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Other 2</td>
+                                        <td class="asset"><input type="checkbox" class="form-check-input" id="exampleCheck1"></td>
+                                        <td></td>
+                                        <td class="asset"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Other 3</td>
+                                        <td class="asset"><input type="checkbox" class="form-check-input" id="exampleCheck1"></td>
+                                        <td></td>
+                                        <td class="asset"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Other 4</td>
+                                        <td class="asset"><input type="checkbox" class="form-check-input" id="exampleCheck1"></td>
+                                        <td style="border-top:1px solid black ;"></td>
+                                        <td class="asset"></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4" style="text-align:center; border: 1px solid #000;">
+                                            IND-UAM team Name - INDKAM@volkswagen.co.in
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="asset">USER ID</td>
+                                        <td class="asset"><input type="checkbox" class="form-check-input" id="exampleCheck1"></td>
+                                        <td style="border-top:1px solid black ;"></td>
+                                        <td class="asset"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="asset">RSA Card</td>
+                                        <td class="asset"><input type="checkbox" class="form-check-input" id="exampleCheck1"></td>
+                                        <td></td>
+                                        <td class="asset"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="asset">Resource ID</td>
+                                        <td class="asset"><input type="checkbox" class="form-check-input" id="exampleCheck1"></td>
+                                        <td></td>
+                                        <td class="asset"></td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr style="width: 100%; border: 1px solid #ff0000;">
+                            <td style="width:100%;" colspan="2">
+                                <table style="width: 25%; border: 1px solid black; float: right; " cellspacing="0">
+                                    <tr>
+                                        <th class="asset" style="padding: 7px;">IT - Service Desk Manager</th>
+                                    </tr>
+                                    <tr>
+                                        <td style="height: 150px;width: 200px;"></td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        @*<tr>
+                                <td style="height: 45px; padding-left: 15px; color: rgb(5, 5, 5);">
+                                    This is digital form, that can be filled and digitally sign by your PKI card. Please do not take print.
+                                </td>
+                            </tr>*@
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 15px;">
+                    <p style="font-weight: 600; color: black;">SF_II_009</p>
+                </td>
+            </tr>
+        </table>
+    </center>
+</body>
+</html>

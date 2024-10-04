@@ -1,0 +1,760 @@
+﻿
+@{
+    Layout = null;
+    Skoda_DCMS.Models.OCRFData OCRF = null;
+    List<Skoda_DCMS.Models.ApprovalDataModel> appList = new List<Skoda_DCMS.Models.ApprovalDataModel>();
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        OCRF = ViewBag.Model.one[0] as Skoda_DCMS.Models.OCRFData;
+        appList = ViewBag.Model?.three as List<Skoda_DCMS.Models.ApprovalDataModel>;
+    }
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SAVWIPL - Organisation Change Request Form (OCRF)</title>
+    <style type="text/css">
+
+        * {
+            font-family: SKODANext-Black;
+        }
+
+            *:visited, *:focus {
+                box-shadow: none;
+            }
+
+        input, select, input:focus, select:focus, textarea, textarea:focus {
+            border: 1px solid #000;
+        }
+
+        input, textarea {
+            padding: 5px;
+        }
+
+        table td {
+            padding: 5px;
+        }
+
+        @@font-face {
+            font-family: 'SKODANext-Black';
+            src: url('../../fonts/SKODANextfont/SKODANext-Black.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Bold.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Light.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Regular.ttf') format('truetype');
+        }
+
+        body {
+            font-family: 'SKODANext-Black';
+        }
+    </style>
+</head>
+<body>
+
+    <table style="width: 100%; font-size: 14px; color: #000; font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+        <tr>
+            <td colspan="6">
+                <table style="width: 100%;" cellspadding="0" cellspacing="0">
+                    <tr>
+
+                        <td colspan="6" width="60%" style="text-align: right;">
+                            <img style="width: 50%;" src='@Server.MapPath("~/assets/img/SAVWIPL_Merger_Logo.JPG")'>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td style="height: 45px; text-align: center; border-left: 1px solid #000; border-right: 1px solid #000; border-bottom: 1px solid #000;" colspan="6">
+                SAVWIPL - Organisation Change Request Form (OCRF)
+            </td>
+        </tr>
+
+
+        <tr>
+            <td style="padding: 15px;" colspan="6">
+                <table cellspacing="0" cellpadding="0" width="100%">
+
+                    <tr>
+                        <td>
+                            Request Type <span style="font-weight: normal;">@(OCRF?.RequestType)</span>
+                            @*<input type="text" style="height: 25px; margin-left:23px; width:80%; font-weight: normal; border-radius: 0; " value="@(OCRF?.RequestType)" />*@
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            Type of Change: <span style="display: inline-block; margin-right: 20px;">
+                                <input style="font-weight: normal;" type="checkbox"
+                                       @(OCRF?.ChkEmployeeTransfer == "Employee Transfer" ? "checked" : "")><span style="font-weight: normal;"> Employee </span>
+                            </span>
+                            <span style="display: inline-block; margin-right: 20px;">
+                                <input style="font-weight: normal;" type="checkbox"
+                                       @(OCRF?.ChkCostCenter == "Cost Center" ? "checked" : "")> <span style="font-weight: normal;">
+                                    Cost Center
+                                </span>
+                            </span>
+                            <span style="display: inline-block; margin-right: 20px;">
+                                <input style="font-weight: normal;" type="checkbox"
+                                       @(OCRF?.ChkReportingAuthority == "Reporting Authority" ? "checked" : "")><span style="font-weight: normal;">
+                                    Reporting Authority
+                                </span>
+                            </span>
+                        </td>
+
+
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <b> Details of Organisartional Change </b>
+                        </td>
+                    </tr>
+                    @if (OCRF?.RequestType == "Organisation Change Request Form")
+                    {
+                        <tr>
+                            <td>
+                                Position: <span style="display: inline-block; margin-right: 20px; font-weight: normal;">
+                                    <input type="checkbox"
+                                           @(OCRF?.ChkPosition == "Empl moves with his/her position" ? "checked" : "")> Empl moves with his/her position
+                                </span>
+                                <span style="display: inline-block; margin-right: 20px; font-weight: normal;">
+                                    <input type="checkbox"
+                                           @(OCRF?.ChkPosition == "Transfer to available position in new dept" ? "checked" : "")> Transfer to available position in new dept
+                                </span>
+                            </td>
+
+                        </tr>
+                    }
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td style="height: 25px;" colspan="6">
+            </td>
+        </tr>
+
+        @*<tr>
+                <td>
+                    Current Status
+                </td>
+                <td colspan="2">
+                    attachement comes here
+                </td>
+                <td>
+                    Proposed Status
+                </td>
+                <td colspan="2">
+                    attachement comes here
+                </td>
+
+            </tr>
+            <tr>
+                <td style="height: 15px;">
+                </td>
+            </tr>*@
+        @*<tr>
+                <td>
+                    Position
+                </td>
+                <td colspan="5">
+                    <input type="text" name="">
+                </td>
+            </tr>*@
+        <tr>
+            <td style="width:20%;">
+                Reason of Change
+            </td>
+            <td colspan="5" style="border: none; font-weight: normal;">
+                @(OCRF?.ReasonforChange ?? "")
+            </td>
+        </tr>
+
+        <tr>
+            <td style="height: 25px;" colspan="6">
+            </td>
+        </tr>
+        <tr>
+            <td style="width:20%;">
+                Employee Name
+            </td>
+            <td style="width:30%; font-weight: normal;" colspan="2" align='left'>
+                @(OCRF?.RequestSubmissionFor == "OnBehalf" ? OCRF?.OtherEmployeeName : OCRF?.EmployeeName ?? "")
+            </td>
+            <td style="width:20%;">
+                Employee Code
+            </td>
+            <td style="width: 30%; font-weight: normal;" colspan="2" align='left'>
+                @(OCRF?.RequestSubmissionFor == "OnBehalf" ? OCRF?.OtherEmployeeCode : OCRF?.EmployeeCode)
+            </td>
+
+        </tr>
+        <tr>
+            <td>
+                Designatiion
+            </td>
+            <td colspan="2" align='left' style="font-weight: normal;">
+                @(OCRF?.RequestSubmissionFor == "OnBehalf" ? OCRF?.OtherEmployeeDesignation : OCRF?.EmployeeDesignation.ToString() ?? "")
+            </td>
+            <td>
+                Transfer Effective Date
+            </td>
+            <td colspan="2" align='left' style="font-weight: normal;">
+                @(OCRF?.TransferEffectiveDate.ToString("yyyy-MM-dd")  ?? "")
+            </td>
+
+        </tr>
+        <tr>
+            <td style="height: 25px;" colspan="6">
+            </td>
+        </tr>
+
+
+
+        <tr>
+            <td colspan="6">
+                <table cellspacing="0" cellpadding="0" width="100%" border="1">
+                    <tr>
+                        <th style="width:33%;">
+                            Details
+                        </th>
+                        <th style="width:33%;">
+                            From
+                        </th>
+
+                        <th style="width:33%;">
+                            To
+                        </th>
+                    </tr>
+                    @if (OCRF?.RequestType == "Transfer Request Form (Blue Collar)")
+                    {
+                        <tr>
+                            <td>
+                                Employee Category
+                            </td>
+                            <td style="font-weight: normal;">
+                                @(OCRF?.EmployeeCategoryFromTRF ?? "")
+                            </td>
+
+                            <td style="font-weight: normal;">
+                                @(OCRF?.EmployeeCategoryToTRF ?? "")
+                            </td>
+                        </tr>
+                    }
+                    @if (OCRF?.RequestType == "Organisation Change Request Form")
+                    {
+                        <tr>
+                            <td>
+                                Current Role
+                            </td>
+                            <td style="font-weight: normal;">
+                                @(OCRF?.CurrentRoleFrom ?? "")
+                            </td>
+
+                            <td style="font-weight: normal;">
+                                @(OCRF?.CurrentRoleTo ?? "")
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Work Contract
+                            </td>
+                            <td style="font-weight: normal;">
+                                @(OCRF?.WorkContractFrom)
+                            </td>
+
+                            <td style="font-weight: normal;">
+                                @(OCRF?.WorkContractTo)
+                            </td>
+                        </tr>
+                    }
+                    <tr>
+                        <td>
+                            Reporting Mangger (Name, EMp No.)
+                        </td>
+                        <td style="font-weight: normal;">
+                            @(OCRF?.ReportingManagerFrom ?? "")
+                        </td>
+
+                        <td style="font-weight: normal;">
+                            @(OCRF?.ReportingManagerTo ?? "")
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Cost Center
+                        </td>
+                        <td style="font-weight: normal;">
+                            @(OCRF?.CostCentreFrom ?? "")
+                        </td>
+
+                        <td style="font-weight: normal;">
+                            @(OCRF?.CostCentreTo ?? "")
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Division
+                        </td>
+                        <td style="font-weight: normal;">
+                            @(OCRF?.DivisionFrom ?? "")
+                        </td>
+
+                        <td style="font-weight: normal;">
+                            @(OCRF?.DivisionTo ?? "")
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Department
+                        </td>
+                        <td style="font-weight: normal;">
+                            @(OCRF?.DepartmentFrom ?? "")
+                        </td>
+
+                        <td style="font-weight: normal;">
+                            @(OCRF?.DepartmentTo ?? "")
+                        </td>
+                    </tr>
+                    @if (OCRF?.RequestType == "Organisation Change Request Form")
+                    {
+                        <tr>
+                            <td>
+                                Sub-department
+                            </td>
+                            <td style="font-weight: normal;">
+                                @(OCRF?.SubDepartmentFrom ?? "")
+                            </td>
+
+                            <td style="font-weight: normal;">
+                                @(OCRF?.SubDepartmentTo ?? "")
+                            </td>
+                        </tr>
+                    }
+                    @if (OCRF?.RequestType == "Transfer Request Form (Blue Collar)")
+                    {
+                        <tr>
+                            <td>
+                                Sub-department 1
+                            </td>
+                            <td style="font-weight: normal;">
+                                @(OCRF?.SubDepartment1FromTRF ?? "")
+                            </td>
+
+                            <td style="font-weight: normal;">
+                                @(OCRF?.SubDepartment1ToTRF ?? "")
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Sub-department 2
+                            </td>
+                            <td style="font-weight: normal;">
+                                @(OCRF?.SubDepartment2FromTRF ?? "")
+                            </td>
+
+                            <td style="font-weight: normal;">
+                                @(OCRF?.SubDepartment2ToTRF ?? "")
+                            </td>
+                        </tr>
+                    }
+
+                    @if (OCRF?.RequestType == "Organisation Change Request Form")
+                    {
+                        <tr>
+                            <td>
+                                Work Location (Physical location of employee)
+                            </td>
+                            <td style="font-weight: normal;">
+                                @(OCRF?.WorkLocationFrom ?? "")
+                            </td>
+
+                            <td style="font-weight: normal;">
+                                @(OCRF?.WorkLocationTo ?? "")
+                            </td>
+                        </tr>
+                    }
+
+                </table>
+            </td>
+        </tr>
+
+        <tr>
+            <td style="height: 25px;" colspan="6">
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="6">
+
+                <table cellpadding="0" cellspacing="0" border="1" width="100%">
+                    <tr>
+                        <td colspan="6" style="font-weight: bold; text-align: center; background-color: #ccc;">
+                            Approved By
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px;">
+                            Name and Date Signature
+                        </td>
+                        <td style="padding: 5px; font-weight: normal;">
+                            @{
+                                var rm = appList.Where(x => x.Level == 1 && x.ApproverStatus.ToLower() == "approved").FirstOrDefault();
+                                <div>@(rm?.UserName ?? "")</div>
+                                <div>
+                                    @(rm != null ?
+                                        rm?.ApproverStatus + " on " + Convert.ToDateTime(rm?.TimeStamp).ToShortDateString() + " " + Convert.ToDateTime(rm?.TimeStamp).AddHours(5.5).ToShortTimeString()
+                                        : "")
+                                </div>
+                            }
+                        </td>
+                        <td style="padding: 5px; font-weight: normal">
+                            @{
+                                var hod = appList.Where(x => x.Level == 2 && x.ApproverStatus.ToLower() == "approved").FirstOrDefault();
+                                <div>@(hod?.UserName ?? "")</div>
+                                <div>
+                                    @(hod != null ?
+                                        (hod?.ApproverStatus + " on " + Convert.ToDateTime(hod?.TimeStamp).ToShortDateString() + " " + Convert.ToDateTime(hod?.TimeStamp).AddHours(5.5).ToShortTimeString())
+                                        : "")
+                                </div>
+                            }
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding: 5px; text-align: center; background-color: #ccc;">
+                        </td>
+                        <td style="padding: 5px; text-align: center; background-color: #ccc;">
+                            Requesting Manager
+                        </td>
+                        <td style="padding: 5px; text-align: center; background-color: #ccc;">
+                            Head of Department
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding: 5px; font-weight: normal; text-align: center; background-color: #ccc;" colspan="3">
+                            Requesting / Proposed Department - where Employee is getting transferred
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px;">
+                            Name and Date Signature
+                        </td>
+                        <td style="padding: 5px; font-weight: normal;">
+                            @{
+                                var rms = appList.Where(x => x.Level == 3 && x.ApproverStatus.ToLower() == "approved").FirstOrDefault();
+                                <div>@(rms?.UserName ?? "")</div>
+                                <div>
+                                    @(rms != null ?
+                                        rms?.ApproverStatus + " on " + Convert.ToDateTime(rms?.TimeStamp).ToShortDateString() + " " + Convert.ToDateTime(rms?.TimeStamp).AddHours(5.5).ToShortTimeString()
+                                        : "")
+                                </div>
+                            }
+                        </td>
+                        <td style="padding: 5px; font-weight: normal;">
+                            @{
+                                var hod1 = appList.Where(x => x.Level == 4 && x.ApproverStatus.ToLower() == "approved").FirstOrDefault();
+                                <div>@(hod1?.UserName ?? "")</div>
+                                <div>
+                                    @(hod1 != null ?
+                                        (hod1?.ApproverStatus + " on " + Convert.ToDateTime(hod1?.TimeStamp).ToShortDateString() + " " + Convert.ToDateTime(hod1?.TimeStamp).AddHours(5.5).ToShortTimeString())
+                                        : "")
+                                </div>
+                            }
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding: 5px; text-align: center; background-color: #ccc;">
+                        </td>
+                        <td style="padding: 5px; text-align: center; background-color: #ccc;">
+                            Reporting Manager / Superior
+                        </td>
+                        <td style="padding: 5px; text-align: center; background-color: #ccc;">
+                            Head of Department
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding: 5px; font-weight: normal; text-align: center; background-color: #ccc;" colspan="3">
+                            Existing Department - where Employee is currently working
+                        </td>
+
+                    </tr>
+
+                    @*Based on Reqyest Type*@
+                    @if (OCRF?.RequestType == "Organisation Change Request Form")
+                    {
+                        <tr>
+                            <td style="padding: 5px;">
+                                Name and Date Signature
+                            </td>
+                            <td style="padding: 5px; font-weight: normal">
+                                @{
+                                    var hohp = appList.Where(x => x.Level == 5 && x.ApproverStatus.ToLower() == "approved").FirstOrDefault();
+                                    <div>@(hohp?.UserName ?? "")</div>
+                                    <div>
+                                        @(hohp != null ?
+                                        hohp?.ApproverStatus + " on " + Convert.ToDateTime(hohp?.TimeStamp).ToShortDateString() + " " + Convert.ToDateTime(hohp?.TimeStamp).AddHours(5.5).ToShortTimeString()
+                                        : "")
+                                    </div>
+                                }
+                            </td>
+                            <td style="padding: 5px; font-weight: normal;">
+                                @{
+                                    var hfc = appList.Where(x => x.Level == 6 && x.ApproverStatus.ToLower() == "approved").FirstOrDefault();
+                                    <div>@(hfc?.UserName ?? "")</div>
+                                    <div>
+                                        @(hfc != null ?
+                                        hfc?.ApproverStatus + " on " + Convert.ToDateTime(hfc?.TimeStamp).ToShortDateString() + " " + Convert.ToDateTime(hfc?.TimeStamp).AddHours(5.5).ToShortTimeString()
+                                        : "")
+                                    </div>
+                                }
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding: 5px; text-align: center; background-color: #ccc;">
+                            </td>
+
+                            <td style="padding: 5px; text-align: center; background-color: #ccc;">
+                                BZ Head
+                            </td>
+
+                            <td style="padding: 5px; text-align: center; background-color: #ccc;">
+                                Respective HRC Head
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding: 5px;">
+                                Name and Date Signature
+                            </td>
+
+                            <td style="padding: 5px; font-weight: normal;">
+                                @{
+                                    var hdfc = appList.Where(x => x.Designation == "Head Finance Controlling" && x.ApproverStatus.ToLower() == "approved").FirstOrDefault();
+                                    <div>@(hdfc?.UserName ?? "")</div>
+                                    <div>
+                                        @(hdfc != null ?
+                                        hdfc?.ApproverStatus + " on " + Convert.ToDateTime(hdfc?.TimeStamp).ToShortDateString() + " " + Convert.ToDateTime(hdfc?.TimeStamp).AddHours(5.5).ToShortTimeString()
+                                        : "")
+                                    </div>
+                                }
+                            </td>
+                            <td style="padding: 5px;">
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding: 5px; text-align: center; background-color: #ccc;">
+                            </td>
+                            <td style="padding: 5px; text-align: center; background-color: #ccc;">
+                                Head Finance Controlling
+                                (Only in case of Cost Center change)
+                            </td>
+                            <td style="padding: 5px; text-align: center; background-color: #ccc;">
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding: 5px;">
+                                Name and Date Signature
+                            </td>
+                            <td style="padding: 5px; font-weight: normal;">
+                                @{
+                                    var ho = appList.Where(x => x.Designation == "Head OM, Payroll and Central HR" && x.ApproverStatus.ToLower() == "approved").FirstOrDefault();
+                                    <div>@(ho?.UserName ?? "")</div>
+                                    <div>
+                                        @(ho != null ?
+                                        ho?.ApproverStatus + " on " + Convert.ToDateTime(ho?.TimeStamp).ToShortDateString() + " " + Convert.ToDateTime(ho?.TimeStamp).AddHours(5.5).ToShortTimeString()
+                                        : "")
+                                    </div>
+                                }
+                            </td>
+                            <td style="padding: 5px; font-weight: normal;">
+                                @{
+                                    var it = appList.Where(x => x.Designation == "IT Service Desk" && x.ApproverStatus.ToLower() == "approved").FirstOrDefault();
+                                    <div>@(it?.UserName ?? "")</div>
+                                    <div>
+                                        @(it != null ?
+                                        it?.ApproverStatus + " on " + Convert.ToDateTime(it?.TimeStamp).ToShortDateString() + " " + Convert.ToDateTime(it?.TimeStamp).AddHours(5.5).ToShortTimeString()
+                                        : "")
+                                    </div>
+                                }
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding: 5px; text-align: center; background-color: #ccc;">
+                            </td>
+                            <td style="padding: 5px; text-align: center; background-color: #ccc;">
+                                Head OM, Payroll and Central HR
+                            </td>
+                            <td style="padding: 5px; text-align: center; background-color: #ccc;">
+                                IT Service Desk
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding: 5px;">
+                                Name and Date Signature
+                            </td>
+                            <td style="padding: 5px; font-weight: normal;">
+                                @{
+                                    var ia = appList.Where(x => x.Designation == "IT Asset Team" && x.ApproverStatus.ToLower() == "approved").FirstOrDefault();
+                                    <div>@(ia?.UserName ?? "")</div>
+                                    <div>
+                                        @(ia != null ?
+                                        ia?.ApproverStatus + " on " + Convert.ToDateTime(ia?.TimeStamp).ToShortDateString() + " " + Convert.ToDateTime(ia?.TimeStamp).AddHours(5.5).ToShortTimeString()
+                                        : "")
+                                    </div>
+                                }
+                            </td>
+                            <td style="padding: 5px; font-weight: normal;">
+                                @{
+                                    var im = appList.Where(x => x.Designation == "IT Manager" && x.ApproverStatus.ToLower() == "approved").FirstOrDefault();
+                                    <div>@(im?.UserName ?? "")</div>
+                                    <div>
+                                        @(im != null ?
+                                        im?.ApproverStatus + " on " + Convert.ToDateTime(im?.TimeStamp).ToShortDateString() + " " + Convert.ToDateTime(im?.TimeStamp).AddHours(5.5).ToShortTimeString()
+                                        : "")
+                                    </div>
+                                }
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding: 5px; text-align: center; background-color: #ccc;">
+                            </td>
+                            <td style="padding: 5px; text-align: center; background-color: #ccc;">
+                                IT Asset Team
+                            </td>
+                            <td style="padding: 5px; text-align: center; background-color: #ccc;">
+                                IT Manager
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding: 5px; font-weight: normal; text-align: center; background-color: #ccc;" colspan="3">
+                                HR & IT related changes (Payroll, SAP, LMS, IT related assets/ authorization/access/ system rights)
+                            </td>
+
+                        </tr>
+
+                        <tr>
+                            <td style="padding: 5px;">
+                                Name and Date Signature
+                            </td>
+                            <td style="padding: 5px; font-weight: normal">
+                                @{
+                                    var edhra = appList.Where(x => x.Designation == "Exec. Director - HR & Admin" && x.ApproverStatus.ToLower() == "approved").FirstOrDefault();
+                                    <div>@(edhra?.UserName ?? "")</div>
+                                    <div>
+                                        @(edhra != null ?
+    edhra?.ApproverStatus + " on " + Convert.ToDateTime(edhra?.TimeStamp).ToShortDateString() + " " + Convert.ToDateTime(edhra?.TimeStamp).AddHours(5.5).ToShortTimeString()
+    : "")
+                                    </div>
+                                }
+                            </td>
+                            <td style="padding: 5px; font-weight: normal;">
+                                @{
+                                    var md = appList.Where(x => x.Designation == "Managing Director" && x.ApproverStatus.ToLower() == "approved").FirstOrDefault();
+                                    <div>@(md?.UserName ?? "")</div>
+                                    <div>
+                                        @(md != null ?
+                                            md?.ApproverStatus + " on " + Convert.ToDateTime(md?.TimeStamp).ToShortDateString() + " " + Convert.ToDateTime(md?.TimeStamp).AddHours(5.5).ToShortTimeString()
+                                            : "")
+                                    </div>
+                                }
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding: 5px; text-align: center; background-color: #ccc;">
+                            </td>
+                            <td style="padding: 5px; text-align: center; background-color: #ccc;">
+                                Exec. Director - HR & Admin.
+                            </td>
+                            <td style="padding: 5px; text-align: center; background-color: #ccc;">
+                                Managing Director
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding: 5px;  text-align: center; background-color: #ccc;" colspan="3">
+                                Approved by: To be obtained only in case of GM & Above transfers
+                            </td>
+
+                        </tr>
+                    }
+
+                    @if (OCRF?.RequestType == "Transfer Request Form (Blue Collar)")
+                    {
+                        <tr>
+                            <td style="padding: 5px;">
+                                Name and Date Signature
+                            </td>
+                            <td style="padding: 5px; font-weight: normal">
+                                @{
+                                    var hohp = appList.Where(x => x.Level == 5 && x.ApproverStatus.ToLower() == "approved").FirstOrDefault();
+                                    <div>@(hohp?.UserName ?? "")</div>
+                                    <div>
+                                        @(hohp != null ?
+                                        hohp?.ApproverStatus + " on " + Convert.ToDateTime(hohp?.TimeStamp).ToShortDateString() + " " + Convert.ToDateTime(hohp?.TimeStamp).AddHours(5.5).ToShortTimeString()
+                                        : "")
+                                    </div>
+                                }
+                            </td>
+                            <td style="padding: 5px; font-weight: normal;">
+                                @{
+                                    var hfc = appList.Where(x => x.Designation == "Head Finance Controlling" && x.ApproverStatus.ToLower() == "approved").FirstOrDefault();
+                                    <div>@(hfc?.UserName ?? "")</div>
+                                    <div>
+                                        @(hfc != null ?
+                                        hfc?.ApproverStatus + " on " + Convert.ToDateTime(hfc?.TimeStamp).ToShortDateString() + " " + Convert.ToDateTime(hfc?.TimeStamp).AddHours(5.5).ToShortTimeString()
+                                        : "")
+                                    </div>
+                                }
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding: 5px; text-align: center; background-color: #ccc;">
+                            </td>
+
+                            <td style="padding: 5px; text-align: center; background-color: #ccc;">
+                                Head of HRBP Production
+                            </td>
+
+                            <td style="padding: 5px; text-align: center; background-color: #ccc;">
+                                Head Finance Controlling
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </td>
+        </tr>
+
+        @if (OCRF?.RequestType == "Organisation Change Request Form")
+        {
+            <tr>
+                <td style="padding-top: 10px;" colspan="6">
+                    <small>Note : - Requesting Manager has to give approved MPR for the department in which the employee is getting transferred.</small>
+                </td>
+            </tr>
+        }
+        else if (OCRF?.RequestType == "Transfer Request Form (Blue Collar)")
+        {
+            <tr>
+                <td style="padding-top: 10px;" colspan="6">
+                    <small>Note- In case of Indirect TM category, requesting Manager must submit approved MPR for dept. where the employee is getting transferred.</small>
+                </td>
+            </tr>
+        }
+    </table>
+</body>
+</html>
+
