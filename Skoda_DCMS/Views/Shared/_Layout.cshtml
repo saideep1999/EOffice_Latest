@@ -849,7 +849,8 @@
         .navSet {
             min-height: 91vh;
             width: 265px;
-            background-color: #404e67;
+            background-color: #074559;
+            /*background-color: #404e67;*/
             position: absolute;
             top: 0px;
             left: 00;
@@ -882,16 +883,18 @@
             width: 265px;
             display: flex;
             align-items: center;
-            padding: 0 30px 0 20px;
+            padding: 7px 30px 7px 20px;
             gap: 30px;
             transition: all 0.1s ease-in-out;
             color: white;
             cursor: pointer;
+            border-top-left-radius: 20px;
+            border-bottom-left-radius: 20px;
+            margin-bottom: 10px;
         }
-        /*.nav-option:hover {
-        border: 2px solid #fff;
-        cursor: pointer;
-        }*/
+        .nav-option:hover {
+            background-color: #0C6980;
+        }
         .navSet-img {
             height: 30px;
         }
@@ -977,7 +980,7 @@
         }
 
         .report-header {
-            height: 80px;
+            height: 60px;
             width: 100%;
             display: flex;
             align-items: center;
@@ -1413,7 +1416,7 @@
                     @*<img src="assets/img/mobinext-logo.png" alt="" style="height: 40px;width: 150px;">*@
                     <h2 class="headerOfc">E|OFFICE</h2>
                 </div>
-                <img src="https://media.geeksforgeeks.org/wp-content/uploads/20221210182541/Untitled-design-(30).png" class="icn menuicn" id="menuicn" alt="menu-icon" style="width:15px; height: 15px;">
+                <img src="https://media.geeksforgeeks.org/wp-content/uploads/20221210182541/Untitled-design-(30).png" class="icn menuicn" id="menuicn" alt="menu-icon" style="width:20px; height: 25px;">
             </div>
 
             @*<div>
@@ -1421,7 +1424,7 @@
                 </div>*@
 
             <div class="message">
-                <label style="margin-top:10px;"> Hello, @(user == null ? "" : $"{user.FirstName}") </label>
+                <label style="margin-top:10px;"> Hello, @(user == null ? "" : user.FirstName) </label>
                 <a href="" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                     <img src="~/assets/img/userIcon.png" alt="" style="height: 30px;width: 30px;">
                 </a>
@@ -1595,7 +1598,7 @@
                     </div>
 
                     <div id="myNav" class="overlay">
-                        <div style="margin-top:5px;"><span class="username">Hello, @(user == null ? "" : $"{user.FirstName}")</span></div>
+                        <div style="margin-top:5px;"><span class="username">Hello, @(user == null ? "" : user.FirstName)</span></div>
                         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
                         <div class="overlay-content">
                             <a href="../dashboard" type="" data-toggle="tooltip" data-placement="right"><i class="fa fa-home"></i>&nbsp;&nbsp; Home</a>

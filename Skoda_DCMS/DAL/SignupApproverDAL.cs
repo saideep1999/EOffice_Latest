@@ -192,49 +192,49 @@ namespace Skoda_DCMS.DAL
                 adapter.Fill(ds);
                 con.Close();
 
-                if (ds.Rows.Count > 0)
-                {
-                    for (int i = 0; i < ds.Rows.Count; i++)
-                    {
-                        SAFData.Status = Convert.ToInt32(ds.Rows[i]["Status"]);
-                        SAFData.Message = Convert.ToString(ds.Rows[i]["Message"]);
-                        if (SAFData.Status == 200)
-                        {
-                            string smtpHost = ConfigurationManager.AppSettings["smtpHost"];
-                            string smtpEmail = ConfigurationManager.AppSettings["smtpEmailId"];
-                            string password = ConfigurationManager.AppSettings["smtpPassword"];
-                            string url = ConfigurationManager.AppSettings["AppHostUrl"];
-                            string sender = "Mobinext Team";
-                            MailMessage mailMessage = new MailMessage();
-                            mailMessage.From = new MailAddress(smtpEmail);
-                            mailMessage.To.Add(Convert.ToString(EmailID));
-                            mailMessage.Subject = "User Account Status";
-                            StringBuilder sb = new StringBuilder();
-                            sb.Append("<h4>Hello User, </h4>");
-                            sb.AppendLine("Your Account has been approved");
-                            sb.AppendLine("<br/>");
-                            sb.AppendLine("<br/>");
-                            sb.Append("kindly login with this url ");
-                            sb.Append("<br/>");
-                            sb.Append(url);
-                            sb.AppendLine("<br/>");
-                            sb.AppendLine("<br/>");
-                            sb.AppendLine("Regards,");
-                            sb.AppendLine("<br/>");
-                            sb.AppendLine(sender);
+                //if (ds.Rows.Count > 0)
+                //{
+                //    for (int i = 0; i < ds.Rows.Count; i++)
+                //    {
+                //        SAFData.Status = Convert.ToInt32(ds.Rows[i]["Status"]);
+                //        SAFData.Message = Convert.ToString(ds.Rows[i]["Message"]);
+                //        if (SAFData.Status == 200)
+                //        {
+                //            string smtpHost = ConfigurationManager.AppSettings["smtpHost"];
+                //            string smtpEmail = ConfigurationManager.AppSettings["smtpEmailId"];
+                //            string password = ConfigurationManager.AppSettings["smtpPassword"];
+                //            string url = ConfigurationManager.AppSettings["AppHostUrl"];
+                //            string sender = "Mobinext Team";
+                //            MailMessage mailMessage = new MailMessage();
+                //            mailMessage.From = new MailAddress(smtpEmail);
+                //            mailMessage.To.Add(Convert.ToString(EmailID));
+                //            mailMessage.Subject = "User Account Status";
+                //            StringBuilder sb = new StringBuilder();
+                //            sb.Append("<h4>Hello User, </h4>");
+                //            sb.AppendLine("Your Account has been approved");
+                //            sb.AppendLine("<br/>");
+                //            sb.AppendLine("<br/>");
+                //            sb.Append("kindly login with this url ");
+                //            sb.Append("<br/>");
+                //            sb.Append(url);
+                //            sb.AppendLine("<br/>");
+                //            sb.AppendLine("<br/>");
+                //            sb.AppendLine("Regards,");
+                //            sb.AppendLine("<br/>");
+                //            sb.AppendLine(sender);
 
-                            mailMessage.Body = sb.ToString(); ;
-                            mailMessage.IsBodyHtml = true;
-                            var smtpClient = new SmtpClient(smtpHost);
-                            smtpClient.Port = 587;
-                            smtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
-                            smtpClient.UseDefaultCredentials = false;
-                            smtpClient.EnableSsl = true;
-                            smtpClient.Credentials = new NetworkCredential(smtpEmail, password);
-                            smtpClient.Send(mailMessage);
-                        }
-                    }
-                }
+                //            mailMessage.Body = sb.ToString(); ;
+                //            mailMessage.IsBodyHtml = true;
+                //            var smtpClient = new SmtpClient(smtpHost);
+                //            smtpClient.Port = 587;
+                //            smtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
+                //            smtpClient.UseDefaultCredentials = false;
+                //            smtpClient.EnableSsl = true;
+                //            smtpClient.Credentials = new NetworkCredential(smtpEmail, password);
+                //            smtpClient.Send(mailMessage);
+                //        }
+                //    }
+                //}
             }
             catch (Exception ex)
             {
@@ -306,48 +306,48 @@ namespace Skoda_DCMS.DAL
                 adapter.Fill(ds);
                 con.Close();
 
-                if (ds.Rows.Count > 0)
-                {
-                    for (int i = 0; i < ds.Rows.Count; i++)
-                    {
-                        SAFData.Status = Convert.ToInt32(ds.Rows[i]["Status"]);
-                        SAFData.Message = Convert.ToString(ds.Rows[i]["Message"]);
-                        if (SAFData.Status == 200)
-                        {
-                            string smtpHost = ConfigurationManager.AppSettings["smtpHost"];
-                            string smtpEmail = ConfigurationManager.AppSettings["smtpEmailId"];
-                            string password = ConfigurationManager.AppSettings["smtpPassword"];
-                            string url = ConfigurationManager.AppSettings["AppHostUrl"];
-                            string sender = "Mobinext Team";
-                            MailMessage mailMessage = new MailMessage();
-                            mailMessage.From = new MailAddress(smtpEmail);
-                            mailMessage.To.Add(Convert.ToString(EmailID));
-                            mailMessage.Subject = "User Account Status";
-                            StringBuilder sb = new StringBuilder();
-                            sb.Append("<h4>Hello User, </h4>");
-                            sb.AppendLine("Your Account has been rejected");
-                            sb.AppendLine("<br/>");
-                            sb.AppendLine("<br/>");
-                            sb.Append("Reason for rejection is : ");
-                            sb.Append(RejectReason);
-                            sb.Append("<br/>");
-                            sb.AppendLine("<br/>");
-                            sb.AppendLine("Regards,");
-                            sb.AppendLine("<br/>");
-                            sb.AppendLine(sender);
+                //if (ds.Rows.Count > 0)
+                //{
+                //    for (int i = 0; i < ds.Rows.Count; i++)
+                //    {
+                //        SAFData.Status = Convert.ToInt32(ds.Rows[i]["Status"]);
+                //        SAFData.Message = Convert.ToString(ds.Rows[i]["Message"]);
+                //        if (SAFData.Status == 200)
+                //        {
+                //            string smtpHost = ConfigurationManager.AppSettings["smtpHost"];
+                //            string smtpEmail = ConfigurationManager.AppSettings["smtpEmailId"];
+                //            string password = ConfigurationManager.AppSettings["smtpPassword"];
+                //            string url = ConfigurationManager.AppSettings["AppHostUrl"];
+                //            string sender = "Mobinext Team";
+                //            MailMessage mailMessage = new MailMessage();
+                //            mailMessage.From = new MailAddress(smtpEmail);
+                //            mailMessage.To.Add(Convert.ToString(EmailID));
+                //            mailMessage.Subject = "User Account Status";
+                //            StringBuilder sb = new StringBuilder();
+                //            sb.Append("<h4>Hello User, </h4>");
+                //            sb.AppendLine("Your Account has been rejected");
+                //            sb.AppendLine("<br/>");
+                //            sb.AppendLine("<br/>");
+                //            sb.Append("Reason for rejection is : ");
+                //            sb.Append(RejectReason);
+                //            sb.Append("<br/>");
+                //            sb.AppendLine("<br/>");
+                //            sb.AppendLine("Regards,");
+                //            sb.AppendLine("<br/>");
+                //            sb.AppendLine(sender);
 
-                            mailMessage.Body = sb.ToString(); ;
-                            mailMessage.IsBodyHtml = true;
-                            var smtpClient = new SmtpClient(smtpHost);
-                            smtpClient.Port = 587;
-                            smtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
-                            smtpClient.UseDefaultCredentials = false;
-                            smtpClient.EnableSsl = true;
-                            smtpClient.Credentials = new NetworkCredential(smtpEmail, password);
-                            smtpClient.Send(mailMessage);
-                        }
-                    }
-                }
+                //            mailMessage.Body = sb.ToString(); ;
+                //            mailMessage.IsBodyHtml = true;
+                //            var smtpClient = new SmtpClient(smtpHost);
+                //            smtpClient.Port = 587;
+                //            smtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
+                //            smtpClient.UseDefaultCredentials = false;
+                //            smtpClient.EnableSsl = true;
+                //            smtpClient.Credentials = new NetworkCredential(smtpEmail, password);
+                //            smtpClient.Send(mailMessage);
+                //        }
+                //    }
+                //}
             }
             catch (Exception ex) {
                 SAFData.Status = 600;

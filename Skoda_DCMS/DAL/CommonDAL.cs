@@ -1005,12 +1005,12 @@ namespace Skoda_DCMS.DAL
 
                 if (FormId == 0)
                 {
-                    cmd.Parameters.Add(new SqlParameter("@TriggerCreateWorkflow", "Yes")); ;
+                    cmd.Parameters.Add(new SqlParameter("@TriggerCreateWorkflow", "Yes")); 
                 }
                 else
                 {
                     
-                    cmd.Parameters.Add(new SqlParameter("@TriggerCreateWorkflow", "No")); ;
+                    cmd.Parameters.Add(new SqlParameter("@TriggerCreateWorkflow", "No")); 
                 }
                 cmd.Parameters.Add(new SqlParameter("@TableName", listName));
                 cmd.Parameters.Add(new SqlParameter("@FormID", formIdInput));

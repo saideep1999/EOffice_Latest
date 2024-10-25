@@ -1680,6 +1680,95 @@ namespace Skoda_DCMS.Helpers
                                 });
                                 break;
                             }
+                        case "NEIF":
+                            {
+                                var finalTeamEmailIds = new List<string>() { "eform.notifications@mobinexttech.com" };
+                                var commonBAL = new CommonBAL();
+                                emailData.ToIds = new List<string>();
+                                var tempEmailData = await commonBAL.GetNEIFBody(Convert.ToInt32(emailData.FormId), emailData.CurrentUser);
+                                emailData.Location = tempEmailData.Location;
+                                emailData.Body = tempEmailData.Body;
+
+                                finalBodyForSubmitter += emailData.Body.Replace("{assignedToSection}", string.Join(", ", emailData.ToIds));
+                                emails.Add(new EmailDataModel(commonSubject, finalBodyForSubmitter, new List<UserData>() { emailData.Sender }));
+
+                                emails.Add(new EmailDataModel()
+                                {
+                                    Subject = commonSubject,
+                                    Body = emailData.Body.Replace("{assignedToSection}", string.Join(", ", emailData.ToIds)),
+                                    ToIds = emailData.ToIds,
+                                    CCIds = emailData.CCIds,
+                                    Recipients = finalTeamEmailIds.Select(x => new UserData() { Email = x })
+                                });
+                                break;
+                            }
+
+                        case "TSF":
+                            {
+                                var finalTeamEmailIds = new List<string>() { "eform.notifications@mobinexttech.com" };
+                                var commonBAL = new CommonBAL();
+                                emailData.ToIds = new List<string>();
+                                var tempEmailData = await commonBAL.GetTSFBody(Convert.ToInt32(emailData.FormId), emailData.CurrentUser);
+                                emailData.Location = tempEmailData.Location;
+                                emailData.Body = tempEmailData.Body;
+
+                                finalBodyForSubmitter += emailData.Body.Replace("{assignedToSection}", string.Join(", ", emailData.ToIds));
+                                emails.Add(new EmailDataModel(commonSubject, finalBodyForSubmitter, new List<UserData>() { emailData.Sender }));
+
+                                emails.Add(new EmailDataModel()
+                                {
+                                    Subject = commonSubject,
+                                    Body = emailData.Body.Replace("{assignedToSection}", string.Join(", ", emailData.ToIds)),
+                                    ToIds = emailData.ToIds,
+                                    CCIds = emailData.CCIds,
+                                    Recipients = finalTeamEmailIds.Select(x => new UserData() { Email = x })
+                                });
+                                break;
+                            }
+                        case "DCAF":
+                            {
+                                var finalTeamEmailIds = new List<string>() { "eform.notifications@mobinexttech.com" };
+                                var commonBAL = new CommonBAL();
+                                emailData.ToIds = new List<string>();
+                                var tempEmailData = await commonBAL.GetDCAFBody(Convert.ToInt32(emailData.FormId), emailData.CurrentUser);
+                                emailData.Location = tempEmailData.Location;
+                                emailData.Body = tempEmailData.Body;
+
+                                finalBodyForSubmitter += emailData.Body.Replace("{assignedToSection}", string.Join(", ", emailData.ToIds));
+                                emails.Add(new EmailDataModel(commonSubject, finalBodyForSubmitter, new List<UserData>() { emailData.Sender }));
+
+                                emails.Add(new EmailDataModel()
+                                {
+                                    Subject = commonSubject,
+                                    Body = emailData.Body.Replace("{assignedToSection}", string.Join(", ", emailData.ToIds)),
+                                    ToIds = emailData.ToIds,
+                                    CCIds = emailData.CCIds,
+                                    Recipients = finalTeamEmailIds.Select(x => new UserData() { Email = x })
+                                });
+                                break;
+                            }
+                        case "ERF":
+                            {
+                                var finalTeamEmailIds = new List<string>() { "eform.notifications@mobinexttech.com" };
+                                var commonBAL = new CommonBAL();
+                                emailData.ToIds = new List<string>();
+                                var tempEmailData = await commonBAL.GetERFBody(Convert.ToInt32(emailData.FormId), emailData.CurrentUser);
+                                emailData.Location = tempEmailData.Location;
+                                emailData.Body = tempEmailData.Body;
+
+                                finalBodyForSubmitter += emailData.Body.Replace("{assignedToSection}", string.Join(", ", emailData.ToIds));
+                                emails.Add(new EmailDataModel(commonSubject, finalBodyForSubmitter, new List<UserData>() { emailData.Sender }));
+
+                                emails.Add(new EmailDataModel()
+                                {
+                                    Subject = commonSubject,
+                                    Body = emailData.Body.Replace("{assignedToSection}", string.Join(", ", emailData.ToIds)),
+                                    ToIds = emailData.ToIds,
+                                    CCIds = emailData.CCIds,
+                                    Recipients = finalTeamEmailIds.Select(x => new UserData() { Email = x })
+                                });
+                                break;
+                            }
                     }
                 }
                 return emails;

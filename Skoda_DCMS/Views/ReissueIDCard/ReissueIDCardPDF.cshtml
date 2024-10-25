@@ -96,7 +96,8 @@
             border-collapse: collapse;
             width: 100%;
         }
-            table td,th {
+
+            table td, th {
                 padding-left: 10px;
             }
     </style>
@@ -118,7 +119,7 @@
         </tr>
         <tr>
             <td colspan="6" align="center">
-                <h2 style="font-weight:bold"> SAVWIPL - Reissue ID Card </h2>
+                <h2 style="font-weight:bold"> Mobi - Reissue ID Card </h2>
             </td>
         </tr>
 
@@ -126,7 +127,7 @@
             <td style="padding: 15px;">
                 <table cellspacing="0" border="" cellpadding="0" width="100%">
                     @*@if (RIDC.one[0].RequestSubmissionFor == "Self")
-                    {*@
+        {*@
                     <tr>
                         <td colspan="6" align='left'>
                             <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Submitter Details</u></b></h6>
@@ -194,143 +195,143 @@
                     </tr>
                     @*}*@
                     @*else
-                    {*@
+        {*@
                     @if (RIDC.one[0].EmployeeType == "SAVWIPLEmployee")
                     {
-                    <tr>
-                        <td colspan="6" align='left'>
-                            <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Applicants Details</u></b></h6>
-                        </td>
-                    </tr>
-                    <tr>
+                        <tr>
+                            <td colspan="6" align='left'>
+                                <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Applicants Details</u></b></h6>
+                            </td>
+                        </tr>
+                        <tr>
 
-                        <td style="width:20%; font-weight: bold;">
-                            Employee Name
-                        </td>
-                        <td style="width: 30%" colspan="2" align='left'>
-                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeName)  </span>
-                        </td>
-                        <td style="width:20%; font-weight: bold;">
-                            Employee Code
-                        </td>
-                        <td style="width: 30%" colspan="2" align='left'>
-                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeCode) </span>
-                        </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Employee Name
+                            </td>
+                            <td style="width: 30%" colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeName)  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Employee Code
+                            </td>
+                            <td style="width: 30%" colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeCode) </span>
+                            </td>
 
-                    </tr>
-                    <tr>
-                        <td style="width:20%; font-weight: bold;">
-                            Designation
-                        </td>
-                        <td colspan="2" align='left'>
-                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeDesignation) </span>
-                        </td>
-                        <td style="width:20%; font-weight: bold;">
-                            Location
-                        </td>
-                        <td colspan="2" align='left'>
-                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeLocation) </span>
-                        </td>
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Designation
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeDesignation) </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Location
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeLocation) </span>
+                            </td>
 
-                    </tr>
-                    <tr>
-                        <td style="width:20%; font-weight: bold;">
-                            Department
-                        </td>
-                        <td colspan="2" align='left'>
-                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeDepartment) </span>
-                        </td>
-                        <td style="width:20%; font-weight: bold;">
-                            Contact Number
-                        </td>
-                        <td colspan="2" align='left'>
-                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeContactNo) </span>
-                        </td>
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Department
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeDepartment) </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Contact Number
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeContactNo) </span>
+                            </td>
 
-                    </tr>
-                    <tr>
-                        <td style="width:20%; font-weight: bold;">
-                            Cost Center Number
-                        </td>
-                        <td colspan="2" align='left'>
-                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeCCCode)  </span>
-                        </td>
-                        <td style="width:20%; font-weight: bold;">
-                            UserID
-                        </td>
-                        <td colspan="2" align='left'>
-                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeUserId)  </span>
-                        </td>
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Cost Center Number
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeCCCode)  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                UserID
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeUserId)  </span>
+                            </td>
 
-                    </tr>
+                        </tr>
                     }
                     else if (RIDC.one[0].EmployeeType == "New")
                     {
-                    <tr>
-                        <td colspan="6" align='left'>
-                            <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Applicants Details</u></b></h6>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="width:20%; font-weight: bold;">
-                            Employee Name
-                        </td>
-                        <td style="width: 30%" colspan="2" align='left'>
-                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeName)  </span>
-                        </td>
-                        <td style="width:20%; font-weight: bold;">
-                            Employee Code
-                        </td>
-                        <td style="width: 30%" colspan="2" align='left'>
-                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeCode) </span>
-                        </td>
+                        <tr>
+                            <td colspan="6" align='left'>
+                                <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Applicants Details</u></b></h6>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Employee Name
+                            </td>
+                            <td style="width: 30%" colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeName)  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Employee Code
+                            </td>
+                            <td style="width: 30%" colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeCode) </span>
+                            </td>
 
-                    </tr>
-                    <tr>
-                        <td style="width:20%; font-weight: bold;">
-                            Designation
-                        </td>
-                        <td colspan="2" align='left'>
-                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeDesignation) </span>
-                        </td>
-                        <td style="width:20%; font-weight: bold;">
-                            Location
-                        </td>
-                        <td colspan="2" align='left'>
-                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeLocation) </span>
-                        </td>
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Designation
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeDesignation) </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Location
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeLocation) </span>
+                            </td>
 
-                    </tr>
-                    <tr>
-                        <td style="width:20%; font-weight: bold;">
-                            Department
-                        </td>
-                        <td colspan="2" align='left'>
-                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeDepartment) </span>
-                        </td>
-                        <td style="width:20%; font-weight: bold;">
-                            Contact Number
-                        </td>
-                        <td colspan="2" align='left'>
-                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeContactNo) </span>
-                        </td>
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Department
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeDepartment) </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Contact Number
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeContactNo) </span>
+                            </td>
 
-                    </tr>
-                    <tr>
-                        <td style="width:20%; font-weight: bold;">
-                            Cost Center Number
-                        </td>
-                        <td colspan="2" align='left'>
-                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeCCCode)  </span>
-                        </td>
-                        <td style="width:20%; font-weight: bold;">
-                            UserID
-                        </td>
-                        <td colspan="2" align='left'>
-                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeUserId)  </span>
-                        </td>
+                        </tr>
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Cost Center Number
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeCCCode)  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                UserID
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherEmployeeUserId)  </span>
+                            </td>
 
-                    </tr>
+                        </tr>
                     }
 
                     @*}*@
@@ -350,7 +351,7 @@
                             Date Of Joining
                         </td>
                         <td colspan="2" align='left'>
-                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].DateofJoining)  </span>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].DateofJoining.ToString("dd-MM-yyyy"))  </span>
                         </td>
 
                     </tr>
@@ -376,26 +377,26 @@
                                 Reason For Reissue
                             </td>
                             <td colspan="5" align='left'>
-                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].ReasonforReissue)  </span>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].ReasonforReissue))  </span>
                             </td>
                         }
 
                     </tr>
-                    @if (RIDC.one[0].AttachmentFiles.Attachments.Count != 0)
+                    @if (RIDC.one[0].UploadPhoto != null && RIDC.one[0].UploadPhoto.Length > 0)
                     {
-                        foreach (var attachment in RIDC.one[0].AttachmentFiles.Attachments)
-                        {
-                            <tr>
-                                <td style="width:20%; font-weight: bold;">
-                                    Upload Photo
-                                </td>
-                                <td colspan="5" align='left'>
-                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @attachment.FileName  </span>
-                                </td>
-                            </tr>
-                            @*<a href=@System.Configuration.ConfigurationManager.AppSettings["SharepointSiteURL"]@attachment.ServerRelativeUrl download=@attachment.FileName target="_blank">@attachment.FileName </a>*@
+                        var uploadPhotoPath = RIDC.one[0].UploadPhoto;
+                        var fileName = System.IO.Path.GetFileName(uploadPhotoPath); // Get only the file name
 
-                        }
+                        <tr>
+                            <td style="width:20%; font-weight: bold;">
+                                Upload Photo
+                            </td>
+                            <td colspan="5" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0;">
+                                    @fileName  <!-- Show only the filename -->
+                                </span>
+                            </td>
+                        </tr>
                     }
                     <tr>
                         <td style="width:20%; font-weight: bold;">
@@ -405,86 +406,75 @@
                             <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].BusinessNeed)  </span>
                         </td>
                     </tr>
+
                     @if (appList.Count > 0)
                     {
-                        if (appList.Any(x => x.ApproverStatus.Contains("Approved")))
+                        <tr>
+                            <td colspan="2">Name</td>
+                            <td colspan="2">Proccessed On</td>
+                            <td colspan="1">Status</td>
+                            <td colspan="1">Level</td>
+                        </tr>
+                        foreach (var item in appList)
                         {
                             <tr>
-                                <td colspan="6" align='left'>
-                                    <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Approval Tracking</u></b></h6>
+                                <td colspan="2">
+                                    <div style="margin-bottom:10px;">
+                                        <div>@item.UserName</div>
+                                        <div>@item.Designation</div>
+                                    </div>
                                 </td>
-                            </tr>
-                            <tr>
-                                <td colspan="2">Name</td>
-                                <td colspan="2">Proccessed On</td>
-                                <td colspan="1">Status</td>
-                                <td colspan="1">Level</td>
-                            </tr>
-                            foreach (var item in appList)
-                            {
-                                <tr>
-                                    <td colspan="2">
-                                        <div style="margin-bottom: 10px; font-weight: normal;">
-                                            <div>@item.UserName</div>
-                                            <div>@item.Designation</div>
-                                        </div>
-                                    </td>
-                                    <td colspan="2" style="font-weight: normal;">
-                                        @if (item.Logic == "OR")
-                                        {
-                                            if (item.ApproverStatus != "Pending")
-                                            {
-                                                <div>
-                                                    @item.TimeStamp
-                                                </div>
-                                            }
-                                        }
-                                        else
+                                <td colspan="2">
+                                    @if (item.Logic == "OR")
+                                    {
+                                        if (item.ApproverStatus != "Pending")
                                         {
                                             <div>
                                                 @item.TimeStamp
                                             </div>
                                         }
-                                    </td>
-                                    <td colspan="1" style="font-weight: normal;">
-                                        @if (item.Logic == "OR")
-                                        {
-                                            if (item.ApproverStatus != "Pending")
-                                            {
-                                                <div>
-                                                    @item.ApproverStatus
-                                                </div>
-                                            }
-                                        }
-                                        else
+                                    }
+                                    else
+                                    {
+                                        if (item.ApproverStatus != "Pending")
                                         {
                                             <div>
-                                                @item.ApproverStatus
+                                                @item.TimeStamp
                                             </div>
                                         }
-                                    </td>
-                                    <td colspan="1" style="font-weight: normal;">
+                                    }
+                                </td>
+                                <td colspan="1">
+                                    @if (item.Logic == "OR")
+                                    {
+                                        //if (item.ApproverStatus != "Pending")
+                                        //{
                                         <div>
-                                            @item.Level
+                                            @item.ApproverStatus
                                         </div>
-                                    </td>
-                                </tr>
-                            }
-
+                                        //}
+                                    }
+                                    else
+                                    {
+                                        <div>
+                                            @item.ApproverStatus
+                                        </div>
+                                    }
+                                </td>
+                                <td colspan="1">
+                                    <div>
+                                        @item.Level
+                                    </div>
+                                </td>
+                            </tr>
                         }
-
                     }
-                    <tr>
-                        <td colspan="6" align='left'>
-                            <h6 style="margin-top:5px;margin-left:5px;color:black;font-weight:bold"><b>SF_II_024</b></h6>
-                        </td>
-                    </tr>
                 </table>
             </td>
         </tr>
     </table>
 
-   
+
 
     <!--<table style="width: 100%;" border="1" cellspacing="0" cellpadding="0">
         <tr>
@@ -527,14 +517,14 @@
                     <td>
                         <span style=" width: 85%; font-weight: normal; border-radius: 0; "> @(RIDC.one[0].DateofJoining)  </span>
                         <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].OtherNewUserId)  </span>-->
-                        @*<input type="date" style="height: 25px; width:200px; border-radius: 0; " value="19/01/2023" />*@
-                    <!--</td>
-                    <td class="form_lbl">
-                        <label style="width: 200px; margin-left: -40px;">&nbsp;Reason For Reissue</label>
-                    </td>
-                    <td>-->
-                        @*<span style=" width: 85%; font-weight: normal; border-radius: 0; "> @(RIDC.two[0].ReasonforReissue)  </span>*@
-                        <!--<span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].ReasonforReissue)  </span>
+    @*<input type="date" style="height: 25px; width:200px; border-radius: 0; " value="19/01/2023" />*@
+    <!--</td>
+    <td class="form_lbl">
+        <label style="width: 200px; margin-left: -40px;">&nbsp;Reason For Reissue</label>
+    </td>
+    <td>-->
+    @*<span style=" width: 85%; font-weight: normal; border-radius: 0; "> @(RIDC.two[0].ReasonforReissue)  </span>*@
+    <!--<span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(RIDC.one[0].ReasonforReissue)  </span>
                     </td>
 
                 </tr>

@@ -1,0 +1,1527 @@
+﻿
+@{
+    Layout = null;
+}
+
+@model Skoda_DCMS.Models.TSFModel
+@{
+    bool IsNew = true;
+    Skoda_DCMS.Models.TSFModel TSF = null;
+    List<Skoda_DCMS.Models.DailyHour> TSFData = new List<Skoda_DCMS.Models.DailyHour>();
+    dynamic FlagRedirect = null;
+    bool IsEdit = true, IsNewMode = true, IsEditMode = false, IsViewMode = false;
+    int FormId = 0, AppRowId = 0, ApprovalType = 0;
+    var CurrentUserDesgn = "";
+    var SecurityDesgnString = "Security";
+    Layout = ViewBag.Layout;
+    var currentUser = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    List<Skoda_DCMS.Models.ApprovalDataModel> appList = new List<Skoda_DCMS.Models.ApprovalDataModel>();
+    string disabled = "";
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IsNew = ViewBag.IsNew;
+        IsEdit = ViewBag.IsEdit;
+        IsNewMode = ViewBag.IsNewMode;
+        IsEditMode = ViewBag.IsEditMode;
+        IsViewMode = ViewBag.IsViewMode;
+        disabled = IsViewMode ? "disabled" : "";
+        TSF = ViewBag.Model.one[0] as Skoda_DCMS.Models.TSFModel;
+        TSFData = ViewBag.Model.four as List<Skoda_DCMS.Models.DailyHour>;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+        appList = ViewBag.Model?.three as List<Skoda_DCMS.Models.ApprovalDataModel>;
+        CurrentUserDesgn = appList?.Where(x => x.ApproverUserName.ToLower() == currentUser.UserName.ToLower()).Select(x => x.Designation).FirstOrDefault();
+    }
+    ViewBag.Title = "Time Sheet Form";
+}
+
+<style>
+
+    .deviationDate {
+        /*max-width: fit-content !important;*/
+        /* max-width:20px;*/
+        width: 15px;
+        margin-left: 1px;
+        margin-right: 1px;
+        height: 30px !important;
+        border: none !important;
+        max-width: 95px !important;
+        background-color: #fff !important;
+        outline: none !important;
+    }
+
+    .astColor {
+        color: red;
+    }
+
+    /*New design css start here*/
+
+    .textTrans {
+        width: 100%;
+        max-width: 99%;
+        border-radius: 5px;
+        margin-right: 0px;
+        border: 1px solid #BFBFBF !important;
+    }
+
+    .empDetailsBg {
+        background-color: #fffbef;
+    }
+
+    #accordion select {
+        color: #000;
+        width: 100% !important;
+        max-width: 100%;
+        height: 45px;
+        background-color: #fff;
+        border: 1px solid #BFBFBF;
+        box-sizing: border-box;
+        border-radius: 5px;
+        background-image: url(data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>);
+        background-repeat: no-repeat;
+        background-position: right .75rem center;
+        background-size: 16px 12px;
+    }
+
+    #accordion input[type='text'] {
+        width: 100% !important;
+        max-width: 100%;
+        height: 45px;
+        background-color: #fff;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px !important;
+    }
+
+    #accordion input[type='date'] {
+        width: 100% !important;
+        max-width: 100%;
+        height: 45px;
+        background-color: #fff;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px;
+    }
+
+    #accordion input[type='time'] {
+        height: 45px;
+    }
+
+    #accordion label {
+        font-size: 16px;
+        line-height: 22px;
+        font-weight: 600;
+        color: #201F1F;
+    }
+
+    #accordion table tr td {
+        border: none;
+        font-size: 16px;
+        line-height: 19px;
+        color: #201F1F;
+        background-color: white;
+    }
+
+    #accordion label {
+        display: block;
+    }
+
+    #accordion .card-header {
+        background: rgb(4 59 100) !important;
+        border-radius: 5px 5px 0px 0px;
+        position: relative;
+        margin-top: 15px;
+    }
+
+        #accordion .card-header.collapsed h5:after {
+            content: '+';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        #accordion .card-header h5:after {
+            content: '-';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+    #accordion h5 button {
+        font-size: 18px;
+        line-height: 22px;
+        /* identical to box height */
+        padding-left: 0px;
+        display: flex;
+        align-items: center;
+        text-transform: uppercase;
+        /* Text_white */
+
+        color: #FFFFFF;
+    }
+
+        #accordion h5 button:focus {
+            box-shadow: none;
+        }
+
+    .empDetailsFields label {
+        display: block !important;
+        margin-bottom: 0px;
+    }
+
+    .empDetailsFields .row label {
+        display: block;
+        margin-bottom: 0px;
+    }
+
+        .empDetailsFields .row label:nth-child(1) {
+            font-style: normal;
+            font-weight: normal !important;
+            font-size: 12px;
+            line-height: 18px;
+            color: #A9A9A9 !important;
+        }
+
+        .empDetailsFields .row label:nth-child(2) {
+            font-style: normal;
+            font-weight: normal;
+            font-size: 18px;
+            line-height: 22px;
+            color: #201F1F;
+        }
+
+    .firstLastName {
+        font-style: normal;
+        font-weight: normal;
+        font-size: 20px;
+        line-height: 24px;
+        /* identical to box height */
+
+        display: flex;
+        align-items: center;
+        color: #201F1F;
+    }
+
+    .submit-btn {
+        background: #3D3D3D;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #FFFFFF;
+        border-color: transparent !important;
+    }
+
+    .cancl-btn {
+        background: #FAE99B;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        border-color: transparent !important;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #212221;
+        margin-left: 10px;
+    }
+
+
+
+
+    .card-footer {
+        display: flex;
+        background-color: transparent !important;
+    }
+
+    .photo-form {
+        width: 100%;
+    }
+
+    .ui-front {
+        z-index: 9999999 !important;
+    }
+    /*Animation CSS Starts*/
+
+    div.input-block {
+        position: relative;
+    }
+
+        div.input-block input {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 188px;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block textarea {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 100%;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            background-color: #fff;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block span.placeholder {
+            position: absolute;
+            margin: 17px 0;
+            padding: 0 4px;
+            font-family: Roboto, sans-serif;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            top: -6px;
+            left: 15px;
+            transition: all 0.2s;
+            transform-origin: 0% 0%;
+            background: none;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        div.input-block textarea:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: #fff !important;
+        }
+
+        div.input-block textarea:valid + span.placeholder,
+        div.input-block textarea:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px) !important;
+            background: #fff !important;
+        }
+
+        div.input-block input:valid + span.placeholder,
+        div.input-block input:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: #fff;
+        }
+
+    .empDetailsFields div.input-block input:valid + span.placeholder,
+    .empDetailsFields div.input-block input:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: rgb(219,238,213);
+    }
+
+    div.input-block input.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: rgb(219,238,213);
+    }
+
+    .empDetailsFields div.input-block input:read-only + span.placeholder,
+    .empDetailsFields div.input-block input:read-only + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: rgb(219,238,213);
+    }
+
+    div.input-block input:read-only + span.placeholder,
+    div.input-block input:read-only + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: #fff;
+    }
+
+
+    div.inputSelect span.placeholder {
+        position: absolute;
+        margin: 17px 0;
+        padding: 0 4px;
+        font-family: Roboto, sans-serif;
+        color: #000;
+        display: flex;
+        align-items: center;
+        font-size: 1rem;
+        top: -6px;
+        left: 15px;
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+        background: none;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    div.inputSelect select:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background: #fff;
+        z-index: 9;
+    }
+
+    .empDetailsFields div.inputSelect select:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: rgb(219,238,213);
+        z-index: 9;
+    }
+
+    div.inputSelect select:not([value=""]):valid + span.placeholder {
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+    }
+
+
+
+    div.input-block input:focus + span.placeholder {
+        color: #284B63;
+    }
+
+    .breadcrumb {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+        padding: 1rem 1rem 0;
+        margin-bottom: 0;
+        list-style: none;
+        background-color: #FFFFFF;
+        border-radius: .25rem;
+    }
+
+    body.nav-sm .container.body .left_col {
+        width: 63px;
+        padding: 0;
+        position: fixed;
+        height: 100%;
+        z-index: 8;
+    }
+
+    .card {
+        position: relative;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        min-width: 0;
+        word-wrap: break-word;
+        background-color: #fff;
+        background-clip: border-box;
+        border: 0px;
+        border-radius: .25rem;
+    }
+
+    .dropdown-toggle::after {
+        display: none;
+        width: 0;
+        height: 0;
+        margin-left: .255em;
+        vertical-align: .255em;
+        content: "";
+        border-top: .3em solid;
+        border-right: .3em solid transparent;
+        border-bottom: 0;
+        border-left: .3em solid transparent;
+    }
+
+    input.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213);
+    }
+
+    inputSelect.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213) !important;
+    }
+
+    select.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background-color: #fff !important;
+        z-index: 9;
+    }
+
+    .empDetailsFields select.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background-color: rgb(219,238,213) !important;
+        ;
+        z-index: 9;
+    }
+
+    textarea.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    .TransView {
+        background-color: white !important;
+    }
+
+    @@media only screen and (min-width: 992px) {
+        div .input-block span.placeholder {
+            font-size: 15px;
+        }
+
+        div.inputSelect span.placeholder {
+            font-size: 14px;
+        }
+    }
+
+    input[type='date'].spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    .showBorder {
+        border: 1px solid #dee2e6;
+    }
+
+    .forSameHt {
+        padding-bottom: 40px;
+        height: 78px !important;
+    }
+
+    .forPoints input[type='checkbox'] {
+        margin-right: 2px;
+        position: relative;
+        top: 2px;
+    }
+
+    #lblReason {
+        font-size: 16px !important;
+    }
+
+    #drpCurrency {
+        max-width: 100% !important;
+    }
+
+    #accordion table.tblBorders tr td {
+        border: 1px solid #dee2e6 !important;
+    }
+
+    #txtAboutRoleAppliedFor {
+        padding-top: 25px !important;
+    }
+
+    #fileToUpload {
+        border: none !important;
+        width: 100% !important;
+    }
+
+    #moduleBody td {
+        vertical-align: middle;
+    }
+
+    .wd {
+        margin-top: 6px;
+    }
+
+    label#lblThirdPartyPhotographer {
+        font-size: 15px !important;
+    }
+</style>
+@*Loader*@
+<style type="text/css">
+    #loader {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        z-index: 10000;
+    }
+</style>
+<script type="text/javascript">
+
+    function checkSelect(id) {
+
+        if ($('#' + id).val() != '') {
+            $('#' + id).addClass('spanUpperSide');
+        }
+    }
+    /*$('#timedemo').pickatime({ twelvehour: true });*/
+
+</script>
+
+<div class="right_col bg-color">
+    @*class for hiding left menu*@
+    <form action="/List/SaveTSF" id="TSForm" method="post">
+
+        <div>
+            @if (IsEditMode || IsViewMode)
+            {
+                <div>
+                    <input type="hidden" id="FormSrId" name="FormSrId" value="@(ViewBag.Model.one[0].Id)" />
+                    <input type="hidden" id="FormId" name="FormId" value="@(FormId)" />
+                    <input type="hidden" id="AppRowId" name="AppRowId" value="@(AppRowId)" />
+                </div>
+            }
+
+            <div>
+                <ol class="breadcrumb pl-0">
+                    <li>
+                        <a href="/Dashboard?formName=BTF">
+                            Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        Time Sheet Form
+                    </li>
+
+                </ol>
+            </div>
+            <div class="breadcrumb-container table-bordered" style="background-color: rgb(219,238,213) !important; ">
+                <div class="col-md-2 col-lg-2">
+                    <span class="placeholder">Date : @(!IsNew || !IsEdit ? (Convert.ToDateTime(ViewBag.Model.one[0].Created_Date).ToShortDateString()) : DateTime.Now.ToShortDateString())</span>
+                </div>
+                <div class="col-md-8 col-lg-8 mt-2 mb-1 form-heading" style="text-align:center; margin-top:5px">
+                    <span>
+                        Time Sheet Form
+                    </span>
+                </div>
+                <div class="col-md-2 col-lg-2">
+                    @if (!IsNew || !IsEdit)
+                    {
+                        <span class="placeholder"> Form Id : @(!IsNew || !IsEdit ? ("TSF" + FormId ?? "") : "" )</span>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="heading d-none" id="headingErr">
+            <h1 id="" class="info-header">Following fields are mandatory. Please fill in information for<br /></h1>
+            <div id="add_to_me" class="header-list" style="color:red;"></div>
+        </div>
+
+        @{
+            Html.RenderPartial("_SubmitterDetailsWithModel", (ViewBag as object));
+        }
+        @{
+            Html.RenderPartial("_ApplicantDetailsWithModel", (ViewBag as object));
+        }
+
+
+        <div class="table photoform_table mb-0">
+            <table class="photo-form">
+                <tr>
+                    <td class="border-none p-0 skoda-auto">
+
+                        <!-- ACCORDIAN STRUCTURE START HERE-->
+                        <div id="accordion">
+                            <div class="card">
+                                <div class="card-header collapsed" id="headingTwo" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                    <h5 class="mb-0">
+                                        <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                            <img src="~/assets/img/transactionIcon.svg" width="24" height="24" class="mr-2" />  Transaction Fields
+                                        </button>
+                                    </h5>
+                                </div>
+
+                                <div id="collapseThree" class="collapse" aria-labelledby="headingThree" style="">
+                                    @if (IsViewMode || IsEditMode)
+                                    {
+                                        <div class="card-body">
+                                            <div class="form-group row">
+                                                <div class="col-md-4">
+                                                    <label for="PersonalEmail" class="col-form-label">EmployeeID</label>
+                                                    <input type="text" id="EmployeeID" name="EmployeeID" class="form-control" @(disabled) value="@(TSF?.EmployeeID ?? "")"  required>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="WeekEndingDate" class="col-form-label">Week Ending Date</label>
+                                                    <input type="date" id="WeekEndingDate" name="WeekEndingDate" class="form-control" @(disabled) value="@(TSF?.WeekEndingDate.Value.ToString("yyyy-MM-dd") )"  required>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="TotalHoursWorked" class="col-form-label">Total Hours Worked</label>
+                                                    <input type="text" id="TotalHoursWorked" name="TotalHoursWorked" class="form-control" @(disabled) value="@(TSF?.TotalHoursWorked)"  required onkeypress="return isNumberKey(event)" oninput="validateDecimal(this)">
+                                                </div>
+                                            </div>
+
+
+                                            <div class="row">
+                                                <div class="col-md-12 col-lg-12 col-12 input-block">
+                                                    <table class="mainTbl table table-border form-table-container-2">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td class="bt-0 bb-0 pr-1 pl-1">
+                                                                    <table style="width: 100%" class="w-100 mx-auto table table-border form-border text-center" id="TblTSFdata">
+                                                                        <thead class="form-head-1" style="margin-left:inherit !important;">
+                                                                            <tr>
+                                                                                <th style="width: 10%;">Cost Code</th>
+                                                                                <th style="width: 10%;">Monday</th>
+                                                                                <th style="width: 10%;">Tuesday</th>
+                                                                                <th style="width: 10%;">Wednesday</th>
+                                                                                <th style="width: 10%;">Thursday</th>
+                                                                                <th style="width: 10%;">Friday</th>
+                                                                                <th style="width: 10%;">Saturday</th>
+                                                                                <th style="width: 10%;">Sunday</th>
+                                                                                @if (IsNewMode || IsEditMode)
+                                                                                {
+                                                                                    <th style="width: 5%;">  </th>
+                                                                                }
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody class="form-border tableSoftware" id="softwareBody">
+                                                                            @if (IsViewMode || IsEditMode)
+                                                                            {
+                                                                                var count = 1;
+                                                                                foreach (var item in TSFData)
+                                                                                {
+                                                                                    <tr id="row_@count" class="tr_input">
+                                                                                        <td class="text-center" style="width: 20px !important;">
+                                                                                            <input type="hidden" id="Id_@count" name="Id_@count" value="@item.DailyHourId">
+                                                                                            <input type="text" name="CostCode_@count" id="CostCode_@count" class="form-control" value="@(!IsNewMode || !IsEditMode ? (item.CostCode ?? "") : "")" @disabled>
+                                                                                        </td>
+                                                                                        <td class="text-center">
+                                                                                            <input type="text" name="MondayHours_@count" id="MondayHours_@count" class="form-control" value="@(!IsNewMode || !IsEditMode ? (item.MondayHours == 0? 0 : item.MondayHours) : 0)" @disabled onkeypress="return isNumberKey(event)" oninput="validateDecimal(this)">
+                                                                                        </td>
+                                                                                        <td class="text-center">
+                                                                                            <input type="text" name="TuesdayHours_@count" id="TuesdayHours_@count" class="form-control" value="@(!IsNewMode || !IsEditMode ? (item.TuesdayHours == 0? 0 : item.TuesdayHours) : 0)" @disabled onkeypress="return isNumberKey(event)" oninput="validateDecimal(this)">
+                                                                                        </td>
+                                                                                        <td class="text-center">
+                                                                                            <input type="text" name="WednesdayHours_@count" id="WednesdayHours_@count" class="form-control" value="@(!IsNewMode || !IsEditMode ? (item.WednesdayHours == 0? 0 : item.WednesdayHours) : 0)" @disabled onkeypress="return isNumberKey(event)" oninput="validateDecimal(this)">
+                                                                                        </td>
+                                                                                        <td class="text-center">
+                                                                                            <input type="text" name="ThursdayHours_@count" id="ThursdayHours_@count" class="form-control" value="@(!IsNewMode || !IsEditMode ? (item.ThursdayHours == 0? 0 : item.ThursdayHours) : 0)" @disabled onkeypress="return isNumberKey(event)" oninput="validateDecimal(this)">
+                                                                                        </td>
+                                                                                        <td class="text-center">
+                                                                                            <input type="text" name="FridayHours_@count" id="FridayHours_@count" class="form-control" value="@(!IsNewMode || !IsEditMode ? (item.FridayHours == 0? 0 : item.FridayHours) : 0)" @disabled onkeypress="return isNumberKey(event)" oninput="validateDecimal(this)">
+                                                                                        </td>
+                                                                                        <td class="text-center">
+                                                                                            <input type="text" name="SaturdayHours_@count" id="SaturdayHours_@count" class="form-control" value="@(!IsNewMode || !IsEditMode ? (item.SaturdayHours == 0? 0 : item.SaturdayHours) : 0)" @disabled onkeypress="return isNumberKey(event)" oninput="validateDecimal(this)">
+                                                                                        </td>
+                                                                                        <td class="text-center">
+                                                                                            <input type="text" name="SundayHours_@count" id="SundayHours_@count" class="form-control" value="@(!IsNewMode || !IsEditMode ? (item.SundayHours == 0? 0 : item.SundayHours) : 0)" @disabled onkeypress="return isNumberKey(event)" oninput="validateDecimal(this)">
+                                                                                        </td>
+                                                                                        @if (IsNewMode || IsEditMode)
+                                                                                        {
+                                                                                            <td class="text-center">
+                                                                                                <input class="remove-btn  remove align-center" type="image" src="~/assets/img/remove.png" alt="Remove" id="remove_@count">
+                                                                                            </td>
+                                                                                        }
+                                                                                    </tr>
+                                                                                    count++;
+                                                                                }
+                                                                            }
+                                                                        </tbody>
+                                                                    </table>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            @if (IsNewMode || IsEditMode)
+                                            {
+                                                <div class="col-md-12 col-lg-12 col-12 input-block">
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <button type="button" id="addSoftwarebtn" class="btn btn-sm submit-btn d-flex mb-2 bl-1 float-right" onclick="addTableRow()">+ Add</button>
+                                                            <input type="hidden" name="totalrows" id="totalrows">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                            <input type="hidden" id="hdnTSFDataList" name="hdnTSFDataList">
+
+
+                                            <div class="form-group row">
+                                                <div class="col-md-4">
+                                                    <label for="LeaveTaken" class="col-form-label">Leave Taken</label>
+                                                    <input type="text" id="LeaveTaken" name="LeaveTaken" class="form-control" @(disabled) value="@(TSF?.LeaveTaken)" required onkeypress="return isNumberKey(event)" oninput="validateDecimal(this)">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="card-body">
+                                            <div class="form-group row">
+                                                <div class="col-md-4">
+                                                    <label for="PersonalEmail" class="col-form-label">EmployeeID</label>
+                                                    <input type="text" id="EmployeeID" name="EmployeeID" class="form-control" required>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="WeekEndingDate" class="col-form-label">Week Ending Date</label>
+                                                    <input type="date" id="WeekEndingDate" name="WeekEndingDate" class="form-control" required>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="TotalHoursWorked" class="col-form-label">Total Hours Worked</label>
+                                                    <input type="text" id="TotalHoursWorked" name="TotalHoursWorked" class="form-control" required onkeypress="return isNumberKey(event)" oninput="validateDecimal(this)">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-12 col-lg-12 col-12 input-block">
+                                                    <table class="mainTbl table table-border form-table-container-2">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td class="bt-0 bb-0 pr-1 pl-1">
+                                                                    <table style="width: 100%" class="w-100 mx-auto table table-border form-border text-center" id="TblTSFdata">
+                                                                        <thead class="form-head-1" style="margin-left:inherit !important;">
+                                                                            <tr>
+                                                                                <th>Cost Code</th>
+                                                                                <th>Monday</th>
+                                                                                <th>Tuesday</th>
+                                                                                <th>Wednesday</th>
+                                                                                <th>Thursday</th>
+                                                                                <th>Friday</th>
+                                                                                <th>Saturday</th>
+                                                                                <th>Sunday</th>
+                                                                                <th style="width: 70px;">  </th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody class="form-border tableSoftware" id="softwareBody">
+                                                                            <tr id="row_1" class="tr_input">
+                                                                                <td class="text-center">
+                                                                                    <input type="text" name="CostCode_1" id="CostCode_1" class="form-control" value="">
+                                                                                </td>
+                                                                                <td class="text-center">
+                                                                                    <input type="text" name="MondayHours_1" id="MondayHours_1" class="form-control" value="" onkeypress="return isNumberKey(event)" oninput="validateDecimal(this)">
+                                                                                </td>
+                                                                                <td class="text-center">
+                                                                                    <input type="text" name="TuesdayHours_1" id="TuesdayHours_1" class="form-control" value="" onkeypress="return isNumberKey(event)" oninput="validateDecimal(this)">
+                                                                                </td>
+                                                                                <td class="text-center">
+                                                                                    <input type="text" name="WednesdayHours_1" id="WednesdayHours_1" class="form-control" value="" onkeypress="return isNumberKey(event)" oninput="validateDecimal(this)">
+                                                                                </td>
+                                                                                <td class="text-center">
+                                                                                    <input type="text" name="ThursdayHours_1" id="ThursdayHours_1" class="form-control" value="" onkeypress="return isNumberKey(event)" oninput="validateDecimal(this)">
+                                                                                </td>
+                                                                                <td class="text-center">
+                                                                                    <input type="text" name="FridayHours_1" id="FridayHours_1" class="form-control" value="" onkeypress="return isNumberKey(event)" oninput="validateDecimal(this)">
+                                                                                </td>
+                                                                                <td class="text-center">
+                                                                                    <input type="text" name="SaturdayHours_1" id="SaturdayHours_1" class="form-control" value="" onkeypress="return isNumberKey(event)" oninput="validateDecimal(this)">
+                                                                                </td>
+                                                                                <td class="text-center">
+                                                                                    <input type="text" name="SundayHours_1" id="SundayHours_1" class="form-control" value="" onkeypress="return isNumberKey(event)" oninput="validateDecimal(this)">
+                                                                                </td>
+                                                                                <td class="text-center">
+                                                                                    <input class="remove-btn  remove align-center" type="image" src="~/assets/img/remove.png" alt="Remove" id="remove_1">
+                                                                                </td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 col-lg-12 col-12 input-block">
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <button type="button" id="addSoftwarebtn" class="btn btn-sm submit-btn d-flex mb-2 bl-1 float-right" onclick="addTableRow()">+ Add</button>
+                                                        <input type="hidden" name="totalrows" id="totalrows">
+                                                        <input type="hidden" id="hdnTSFDataList" name="hdnTSFDataList">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <div class="col-md-4">
+                                                    <label for="LeaveTaken" class="col-form-label">Leave Taken</label>
+                                                    <input type="text" id="LeaveTaken" name="LeaveTaken" class="form-control" required onkeypress="return isNumberKey(event)" oninput="validateDecimal(this)">
+                                                </div>
+                                            </div>
+                                            <br>
+
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- END HERE ACCORDIAN -->
+
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        @if (IsViewMode || IsEditMode)
+        {
+            <div id="accordion">
+                <div class="card">
+                    <div class="card-header collapsed" id="headingFour" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                        <h5 class="mb-0">
+                            <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                                <img src="~/assets/img/approvalTracking.svg" width="24" height="24" class="mr-2" />Approval Tracking
+                            </button>
+                        </h5>
+                    </div>
+                    <div id="collapseFour" class="collapse" aria-labelledby="headingFour">
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="col-12">
+                                    <table class="table w-100 td-border showBorder">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Role</th>
+                                                <th>Processed on</th>
+                                                <th>Status</th>
+                                                <th class="text-center">Comments</th>
+                                                <th class="text-center">Approval Level</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @if (!IsNew || !IsEdit)
+                                            {
+                                                Html.RenderPartial("_ApprovalTracking", appList);
+                                            }
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br />
+        }
+
+        @if (IsNew)
+        {
+            if (!IsEdit)
+            {
+                <div class="card-footer align-content-center">
+                    <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                        Re-Submit
+                    </button>
+                    <button type="reset" class="btn btn-danger btn-sm cancl-btn" id="btnCancel">
+                        Cancel
+                    </button>
+                </div>
+            }
+            else
+            {
+                <div class="card-footer align-content-center">
+                    <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                        Submit
+                    </button>
+                    <button type="reset" class="btn btn-danger btn-sm cancl-btn" id="btnCancel">
+                        Cancel
+                    </button>
+                </div>
+            }
+        }
+    </form>
+</div>
+<div class="modal fade" id="successModel" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header modelHeader">
+                <span class="modal-title modalMsgTitle" id="modalTitle"></span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label id="modalBody" class="lableMsg">  </label>
+                <input type="hidden" id="tab" value="0" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="submitBomBtn publishBtn" id="modalOkButton" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var spinner = $('#loader');
+    var currentUserDesgn = @Html.Raw(Json.Encode(CurrentUserDesgn));
+    var IsNew = @Html.Raw(Json.Encode(IsNew));
+    var IsEdit = @Html.Raw(Json.Encode(IsEdit));
+    var IsNewMode = @Html.Raw(Json.Encode(IsNewMode));
+    var IsEditMode = @Html.Raw(Json.Encode(IsEditMode));
+    var IsViewMode = @Html.Raw(Json.Encode(IsViewMode));
+    var TSF = @Html.Raw(Json.Encode(TSF));
+    var appRowId = @Html.Raw(Json.Encode(AppRowId));
+    var approvalType =@Html.Raw(Json.Encode(ApprovalType));
+    var FlagRedirect = @Html.Raw(Json.Encode(FlagRedirect));
+    var SecurityDesgnString = @Html.Raw(Json.Encode(SecurityDesgnString));
+
+    pageLoad();
+    var errorCount = 0;
+    var errors = "";
+    function pageLoad() {
+        //
+        //console.log(TSF)
+        $("#headingErr").addClass('d-none');
+
+    }
+
+    function successModal(txt) {
+        //
+        $('#modalTitle').html('Success');
+        if (txt == "approve") {
+            $('#modalBody').html('Form has been approved!');
+        }
+        else if (txt == "reject") {
+            $('#modalBody').html('Form has been rejected!');
+        }
+        else if (txt == "enquire") {
+            $('#modalBody').html('Form has been enquired!');
+        }
+        else if (txt == "cancelled") {
+            $('#modalBody').html('Form has been cancelled!');
+        }
+        else {
+            if (IsEditMode) {
+                $('#modalBody').html('Your form with ID: TSF' + txt + ' has been re-submitted! Kindly use this for future reference');
+            }
+            else {
+                $('#modalBody').html('Your form with ID: TSF' + txt + ' has been submitted! Kindly use this for future reference');
+            }
+
+        }
+        FlagRedirect = txt;
+        //$("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    //function failureModal() {
+    //    $('#modalTitle').html('Failure');
+    //    $('#modalBody').html('Some error occurred!');
+    //    $("#modalOkButton").attr('data-dismiss', 'modal');
+    //    $("#successModel").modal('show');
+    //}
+    function failureModal(txt) {
+        if (txt == null) {
+            $('#modalBody').html('Some error occurred!');
+        }
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html(txt);
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function permissionModal() {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html('No permssion granted since the device is not MobiIPL owned!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function requiredModal(text) {
+        $('#modalTitle').html('Required!');
+        $('#modalBody').html(text);
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function validityModal(txt) {
+        ////
+        if (txt == 'approve') {
+            DisplayAlert('error', 'Error', 'Please select the Type of Car');
+        }
+        else if (txt == 'reject') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for rejecting the form');
+        }
+        else if (txt == 'enquire') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for enquiring the form');
+        }
+
+    }
+
+
+    function date_val() {
+        var today = new Date().toISOString().split('T')[0];
+        document.getElementsByName("txtActivityStart")[0].setAttribute("min", today);
+    }
+
+    function setInternalYear() {
+        //
+        if (!IsEdit) {
+            var value = JSON.stringify(TSF[0]);
+            var value_1 = JSON.parse(value);
+            var activityEndDate = value_1.Value[0].ActivityEnd;
+            var regExp = /\(([^)]+)\)/;
+            var valueNumber = regExp.exec(activityEndDate);
+            var x = parseInt(valueNumber[1]);
+            var valueNumberDate = new Date(x);
+            var valueNumberDateYear = valueNumberDate.getFullYear();
+
+            var year_string = document.getElementsByName("txtActivityStart")[0].value;
+            var parts = year_string.split("-");
+            var year = new Date(parts[0], parts[1] - 1, parts[2]);
+            var min_year = year;
+            let initial_year = parseInt(parts[0]);
+            let final_year = parseInt(parts[0]) + 5;
+            var s = '<option value="-1">Choose End Year</option>';
+            for (i = initial_year + 1; i <= final_year; i++) {
+                if (i == valueNumberDateYear) {
+                    s += '<option value="' + i + '" selected>' + i + '</option>';
+                }
+                else {
+                    s += '<option value="' + i + '">' + i + '</option>';
+                }
+            }
+            $("#drpActivityEnd").html(s);
+        }
+        else {
+            var year_string = document.getElementsByName("txtActivityStart")[0].value;
+            var parts = year_string.split("-");
+            var year = new Date(parts[0], parts[1] - 1, parts[2]);
+            var min_year = year;
+            let initial_year = min_year.getFullYear();
+            let final_year = min_year.getFullYear() + 5;
+            var s = '<option value="-1">Choose End Year</option>';;
+            for (i = initial_year + 1; i <= final_year; i++) {
+                s += '<option value=" ' + i + ' ">' + i + '</option>';
+            }
+            $("#drpActivityEnd").html(s);
+        }
+
+    }
+
+    function allowNumbersOnly(e) {
+                                                                var code = (e.which) ? e.which : e.keyCode;
+                                                                if (code > 31 && (code < 48 || code > 57)) {
+                                                                e.preventDefault();
+                                                                }
+                                                                }
+
+    $("#btnSubmit").on('click', function (e) {
+        //
+        validateSubmitter();
+        validateApplicant();
+
+        // Full Name validation
+        var EmployeeID = document.getElementById("EmployeeID").value;
+        if (EmployeeID == null || EmployeeID.trim() === "") {
+            errors += "<li id='error" + errorCount + "'>Employee ID is required</li>";
+            AddError("EmployeeID", '', errorCount);
+            errorCount++;
+        }
+
+        // Date of Birth validation
+        var TotalHoursWorked = document.getElementById("TotalHoursWorked").value;
+        if (TotalHoursWorked == null || TotalHoursWorked.trim() === "") {
+            errors += "<li id='error" + errorCount + "'>Total Hours Worked is required</li>";
+            AddError("TotalHoursWorked", '', errorCount);
+            errorCount++;
+        }
+
+        // Gender validation
+        var WeekEndingDate = document.getElementById("WeekEndingDate").value;
+        if (WeekEndingDate == null || WeekEndingDate.trim() === "") {
+            errors += "<li id='error" + errorCount + "'>Week Ending Date is required</li>";
+            AddError("WeekEndingDate", '', errorCount);
+            errorCount++;
+        }
+
+
+        var n1 = document.getElementById("softwareBody").rows.length;
+        if (n1 == 0) {
+            errors += "<li id='error" + errorCount + "'>" + "Fill data for atleast 1 Table Details" + "</li>";
+            errorCount++;
+        }
+
+        var TSFFormDataList = [];
+
+        var i = 0, j = 0;
+
+        for (i = 0; i < n1; i++) { // for columns
+
+            var n2 = document.getElementById("softwareBody").rows[i].cells.length;
+            var element = {};
+            for (j = 0; j < n2; j++) { // for Rows
+                var x = document.getElementById("softwareBody").rows[i].cells.item(j).innerHTML;
+                if (j == 0) {
+
+                    element.CostCode = $("#CostCode_" + (i + 1) + "").val();
+                    if (element.CostCode == null || element.CostCode.trim() == "" || element.CostCode == undefined) {
+                        $("#CostCode_" + (i + 1) + "").focus();
+                        errors += "<li id='error" + errorCount + "'>" + "Cost Code " + (i + 1) + "</li>";
+                        AddError("CostCode_" + (i + 1) + "", 'inpSoftVersionValidate', errorCount);
+                        $('#loader').hide();
+                    }
+                    else {
+                        RemoveError("CostCode_" + (i + 1) + "", '', errorCount);
+                    }
+
+                } else if (j == 1) {
+                    element.MondayHours = $("#MondayHours_" + (i + 1) + "").val();
+                    if (element.MondayHours == null || element.MondayHours == undefined || element.MondayHours.trim() == "") {
+                        $("#MondayHours_" + (i + 1) + "").focus();
+                        errors += "<li id='error" + errorCount + "'>" + "Monday " + (i + 1) + "</li>";
+                        AddError("MondayHours_" + (i + 1) + "", 'inpSoftVersionValidate', errorCount);
+                        $('#loader').hide();
+                    }
+                    else {
+                        RemoveError("MondayHours_" + (i + 1) + "", '', errorCount);
+                    }
+                }else if (j == 3) {
+                    element.TuesdayHours = $("#TuesdayHours_" + (i + 1) + "").val();
+                    if (element.TuesdayHours == null || element.TuesdayHours == undefined || element.TuesdayHours.trim() == "") {
+                        $("#TuesdayHours_" + (i + 1) + "").focus();
+                        errors += "<li id='error" + errorCount + "'>" + "Tuesday Hours " + (i + 1) + "</li>";
+                        AddError("TuesdayHours_" + (i + 1) + "", 'inpSoftVersionValidate', errorCount);
+                        $('#loader').hide();
+                    }
+                    else {
+                        RemoveError("TuesdayHours_" + (i + 1) + "", '', errorCount);
+                    }
+                }else if (j == 4) {
+                    element.WednesdayHours = $("#WednesdayHours_" + (i + 1) + "").val();
+                    if (element.WednesdayHours == null || element.WednesdayHours == undefined || element.WednesdayHours.trim() == "") {
+                        $("#WednesdayHours_" + (i + 1) + "").focus();
+                        errors += "<li id='error" + errorCount + "'>" + "Wednesday Hours " + (i + 1) + "</li>";
+                        AddError("WednesdayHours_" + (i + 1) + "", 'inpSoftVersionValidate', errorCount);
+                        $('#loader').hide();
+                    }
+                    else {
+                        RemoveError("WednesdayHours_" + (i + 1) + "", '', errorCount);
+                    }
+                }else if (j == 5) {
+                    element.ThursdayHours = $("#ThursdayHours_" + (i + 1) + "").val();
+                    if (element.ThursdayHours == null || element.ThursdayHours == undefined || element.ThursdayHours.trim() == "") {
+                        $("#ThursdayHours_" + (i + 1) + "").focus();
+                        errors += "<li id='error" + errorCount + "'>" + "Thursday Hours " + (i + 1) + "</li>";
+                        AddError("ThursdayHours_" + (i + 1) + "", 'inpSoftVersionValidate', errorCount);
+                        $('#loader').hide();
+                    }
+                    else {
+                        RemoveError("ThursdayHours_" + (i + 1) + "", '', errorCount);
+                    }
+                }else if (j == 6) {
+                    element.FridayHours = $("#FridayHours_" + (i + 1) + "").val();
+                    if (element.FridayHours == null || element.FridayHours == undefined || element.FridayHours.trim() == "") {
+                        $("#FridayHours_" + (i + 1) + "").focus();
+                        errors += "<li id='error" + errorCount + "'>" + "Friday Hours " + (i + 1) + "</li>";
+                        AddError("FridayHours_" + (i + 1) + "", 'inpSoftVersionValidate', errorCount);
+                        $('#loader').hide();
+                    }
+                    else {
+                        RemoveError("FridayHours_" + (i + 1) + "", '', errorCount);
+                    }
+                }else if (j == 7) {
+                    element.SaturdayHours = $("#SaturdayHours_" + (i + 1) + "").val();                    
+                }else if (j == 8) {
+                    element.SundayHours = $("#SundayHours_" + (i + 1) + "").val();                   
+                }
+            }
+            TSFFormDataList.push(element);
+        }
+
+        $("#hdnTSFDataList").val(JSON.stringify(TSFFormDataList));
+        if (errors.length) {
+            errors = "<ol id='errorList'>" + errors + "</ol>";
+            $("#headingErr").removeClass('d-none');
+            document.getElementById("add_to_me").innerHTML = errors;
+            errors = "";
+            errorCount = 0;
+            if (IsEditMode) {
+                $("#myModalEdit").scrollTop(0);
+                $("#myModalRequest").scrollTop(0);
+            }
+            else {
+                $(window).scrollTop(0);
+            }
+            var mainDiv = document.querySelector(".main"); mainDiv.scrollTop = 0;
+            return false;
+        }
+        $("#headingErr").addClass('d-none');
+        document.getElementById("add_to_me").innerHTML = '';
+
+        $('#ddEmpDesignation').prop("disabled", false);
+        $('#txtOnBehalfdesignation').prop("disabled", false);
+        $(".full-screen-container").removeClass('invisible');
+        $(".full-screen-container").show();
+        $("#pageLoader").removeClass('invisible');
+        $("#btnSubmit").text('Saving');
+        $("#btnSubmit").prop("disabled", true);
+        $("#btnCancel").prop("disabled", true);
+
+       //
+        var form = $("#TSForm");
+        var formData = new FormData(form[0]);
+        $.ajax({
+            url: '/TSF/SaveTSF',
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            data: formData,
+            enctype: 'multipart/form-data',
+            success: (function (data) {
+                if (data.Status == 200) {
+                    if (IsNew && IsEdit) {
+                        $("#btnSubmit").text('Submit');
+                    }
+                    else {
+                        $("#btnSubmit").text('Re-Submit');
+                    }
+                    $("#btnSubmit").prop("disabled", false);
+                    $("#btnCancel").prop("disabled", false);
+                    successModal(data.Message);
+                }
+                else {
+                    failureModal(data.Message);
+                    if (IsNew && IsEdit) {
+                        $("#btnSubmit").text('Submit');
+                    }
+                    else {
+                        $("#btnSubmit").text('Re-Submit');
+                    }
+                    $("#btnSubmit").prop("disabled", false);
+                    $("#btnCancel").prop("disabled", false);
+                    console.log("failure");
+                }
+
+                $("#loader").addClass('invisible');
+                $(".full-screen-container").hide();
+            }),
+            error: (function (data) {
+                failureModal(data.Message);
+                //failureModal();
+                console.log("error");
+                if (IsNew && IsEdit) {
+                    $("#btnSubmit").text('Submit');
+                }
+                else {
+                    $("#btnSubmit").text('Re-Submit');
+                }
+
+                $("#loader").addClass('invisible');
+                $(".full-screen-container").hide();
+                $("#btnSubmit").prop("disabled", false);
+                $("#btnCancel").prop("disabled", false);
+            })
+        })
+
+        $("#tab").val(2);
+    });
+
+    $("#btnCancel").on('click', function (e) {
+        window.location = "../Dashboard";
+    });
+
+    function saveResponse(text) {
+        debugger;
+        $(".full-screen-container").removeClass('invisible');
+        $(".full-screen-container").show();
+        $("#pageLoader").removeClass('invisible');
+        var status = '', comment = '';
+        comment = $("#comment-" + text).val();
+        switch (text) {
+            case 'approve': {
+                status = 'Approved';
+                $(".full-screen-container").hide();
+                $("#pageLoader").addClass('invisible');
+                break;
+            }
+            case 'reject': {
+                status = 'Rejected';
+                if (comment == '') {
+                    //validityModal(text);
+                    $(".full-screen-container").hide();
+                    $("#pageLoader").addClass('invisible');
+                    //return;
+                }
+                break;
+            }
+            case 'enquire': {
+                status = 'Enquired';
+                if (comment == '') {
+                    //validityModal(text);
+                    $(".full-screen-container").hide();
+                    $("#pageLoader").addClass('invisible');
+                    //return;
+                }
+                break;
+            }
+        }
+        FormApproval(status, appRowId, comment, approvalType, text);
+        $("#tab").val(1);
+
+
+    }
+
+    function FormApproval(status, appRowId, comment, approvalType, text) {
+        $(".full-screen-container").removeClass('invisible');
+        $(".full-screen-container").show();
+        $("#pageLoader").removeClass('invisible');
+        spinner.show();
+        $.ajax({
+            url: '/List/SaveResponse',
+            type: 'POST',
+            data: { response: status, appRowId: appRowId, comment: comment, approvalType: approvalType },
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data.Result == 1) {
+                    successModal(text);
+                    spinner.hide();
+                    //setTimeout(FilterMyTasks, 5000);
+
+                    $("#loader").addClass('invisible');
+                    $(".full-screen-container").hide();
+                    $("#pageLoader").addClass('invisible');
+                }
+                else {
+                    failureModal();
+
+                    $("#loader").addClass('invisible');
+                    $(".full-screen-container").hide();
+                    $("#pageLoader").addClass('invisible');
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+                $("#pageLoader").addClass('invisible');
+
+                $("#loader").addClass('invisible');
+                $(".full-screen-container").hide();
+            })
+        })
+
+        $("#tab").val(1);
+    }
+
+    $('#successModel').on('hidden.bs.modal', function () {
+        ////
+        var tab = $("#tab").val();
+        console.log(tab);
+        if (tab == 1) {
+            GetMyTaskTab();
+        }
+        else if (tab == 2) {
+            window.location = "../Dashboard?tab=" + tab;
+        }
+    })
+
+    $('#myModal').modal({ backdrop: 'static', keyboard: false })
+
+
+    function checkSelect(id) {
+
+        if ($('#' + id).val() != '') {
+            $('#' + id).addClass('spanUpperSide');
+        }
+    }
+
+</script>
+
+<script>
+    var SrNo = 0;
+    var $tr = $('#row_1');
+    function addTableRow() {
+
+        SrNo = $('#TblTSFdata tr').length - 1;
+        SrNo = SrNo + 1;
+        var $clone = $tr.clone();
+        var rows = SrNo;
+        $clone.removeClass('d-none');
+        $clone.find('.sNo').html('' + rows);
+        $clone.find(':text, textarea, number, select, input[type="date"]').val('');
+
+        var newRowId = 'row_' + rows;
+
+        $($clone).prop('id', newRowId);
+        $('#softwareBody').append($clone);
+        var selector = "#" + newRowId + " input[type='text'], " + "#" + newRowId + " textarea, " + "#" + newRowId + " select, " + "#" + newRowId + " input[type='image'], " + "#" + newRowId + " input[type='date']" + "#" + newRowId + " input[type='number']";
+        $(selector).each(function (i, x) {
+            x.id = x.id.replace(/_.*/, "_" + rows);
+            x.classList.remove("errorIcon");
+            x.classList.remove("errorIconDropDown");
+            x.classList.remove("errorIconTextarea");
+        });
+
+        AddTableElementsEvent();
+        $('#UserIdTableRowCount').val(rows);
+    }
+    function AddTableElementsEvent() {
+        $(".requestType").off('change');
+        $(".module").off('change');
+        $(".requestType").change(function () {
+            var requestType2 = document.querySelectorAll(".requestType");
+            var requestType_arr2 = [];
+            for (var i = 0; i < requestType2.length; i++) {
+                requestType_arr2.push(requestType2[i]['value']);
+            };
+        });
+    }
+    $('#softwareBody').on('click', '.remove', function () {
+        // Get the ID of the row to be removed
+        var id = $(this).attr('id');
+        var deleteRowNum = parseInt(id.split("_")[1]);
+
+        // Remove the selected row
+        $('#row_' + deleteRowNum).remove();
+
+        // Normalize the row numbers and update IDs
+        var index = 1; // Start with Asset 1
+        $('#softwareBody').children().each(function () {
+            var $row = $(this);
+            var trId = $row.attr('id');
+
+            // Update the row ID to reflect its new order in the list
+            var newRowId = 'row_' + index;
+            $row.attr('id', newRowId);
+
+            // Update the first <td> with the correct asset number (Asset 1, Asset 2, etc.)
+            // $row.find('td:first').html('Asset ' + index);
+
+            // Update the IDs of input elements within this row
+            $row.find('input, textarea, select, img').each(function () {
+                var id = $(this).attr('id');
+                if (id) {
+                    var newId = id.replace(/_\d+$/, '_' + index); // Replace the old row number in the ID
+                    $(this).attr('id', newId);
+                }
+            });
+
+            // Increment the index for the next row
+            index++;
+        });
+
+        // Update the total row count
+        $('#UserIdTableRowCount').val(index - 1);
+    });
+    function allowAlphaNumericSpace(thisInput) {
+        var arr = thisInput.value.split('');
+        thisInput.value = thisInput.value.split(/[^0-9.]/).join('');
+        if (arr[0] === ".") {
+            thisInput.value = "";
+        }
+
+    }
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        // Allow only numbers and one dot (.)
+        if (charCode != 46 && charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+        return true;
+    }
+
+    function validateDecimal(input) {
+        // Replace multiple dots or wrong format
+        let value = input.value;
+        if (value.split('.').length > 2) {
+            input.value = value.substring(0, value.length - 1); // Remove the last entered character
+        }
+    }
+</script>
+

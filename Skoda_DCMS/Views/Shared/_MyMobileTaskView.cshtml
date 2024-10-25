@@ -1,4 +1,4 @@
-﻿@model Skoda_DCMS.Models.DashboardModel
+@model Skoda_DCMS.Models.DashboardModel
 @{
     var user = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
 }
@@ -115,6 +115,7 @@
     }
 
     function GoToEditForm(formName, rowId, formId, appRowId, ControllerName) {
+        debugger
         $(".full-screen-container").removeClass('invisible');
         $(".full-screen-container").show();
         $("#pageLoader").removeClass('invisible');

@@ -1,7 +1,7 @@
 .loading {
     position: fixed;
     top: 50%;
-    left: 45%;
+    left: 50%;
 }
 .full-screen-container {
     display: none;
@@ -24,22 +24,22 @@
 }
 
     .loading-bar:nth-child(1) {
-        background-color: #393535;
+        background-color: #074559;
         animation-delay: 0;
     }
 
     .loading-bar:nth-child(2) {
-        background-color: #393535;
+        background-color: #074559;
         animation-delay: 0.09s;
     }
 
     .loading-bar:nth-child(3) {
-        background-color: #393535;
+        background-color: #074559;
         animation-delay: .18s;
     }
 
     .loading-bar:nth-child(4) {
-        background-color: #393535;
+        background-color: #074559;
         animation-delay: .27s;
     }
 
@@ -49,7 +49,7 @@
     }
 
     20% {
-        transform: scale(1, 2.2);
+        transform: scale(1, 1.5);
     }
 
     40% {

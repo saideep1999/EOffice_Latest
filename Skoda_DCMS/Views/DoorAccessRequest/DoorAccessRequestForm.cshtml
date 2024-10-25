@@ -101,7 +101,7 @@
     }
 
     #accordion .card-header {
-        /*background: rgb(4 59 100) !important;*/
+        background: rgb(4 59 100) !important;
         border-radius: 5px 5px 0px 0px;
         position: relative;
         margin-top: 15px;
@@ -765,10 +765,6 @@
                             </div>
                         }
 
-                        <div>
-                            <p class="text-left f-600">SF_SO/1_018.00</p>
-                        </div>
-
 
                     </div>
                 </div>
@@ -1237,6 +1233,7 @@
             else {
                 $(window).scrollTop(0);
             }
+            var mainDiv = document.querySelector(".main"); mainDiv.scrollTop = 0;
             return false;
         }
         $("#headingErr").addClass('d-none');
@@ -1399,18 +1396,18 @@
             }
             case 'reject': {
                 status = 'Rejected';
-                if (comment == '') {
-                    validityModal(text);
-                    return;
-                }
+                //if (comment == '') {
+                //    validityModal(text);
+                //    return;
+                //}
                 break;
             }
             case 'enquire': {
                 status = 'Enquired';
-                if (comment == '') {
-                    validityModal(text);
-                    return;
-                }
+                //if (comment == '') {
+                //    validityModal(text);
+                //    return;
+                //}
                 break;
             }
         }

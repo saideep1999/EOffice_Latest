@@ -1,0 +1,497 @@
+﻿
+@model Skoda_DCMS.Models.TEFModel
+@{
+    bool IsNew = true;
+    Skoda_DCMS.Models.TEFModel TEF = null;
+    List<Skoda_DCMS.Models.DailyHour> TEFData = new List<Skoda_DCMS.Models.DailyHour>();
+    dynamic FlagRedirect = null;
+    bool IsEdit = true, IsNewMode = true, IsEditMode = false, IsViewMode = false;
+    int FormId = 0, AppRowId = 0, ApprovalType = 0;
+    var CurrentUserDesgn = "";
+    var SecurityDesgnString = "Security";
+    Layout = ViewBag.Layout;
+    var currentUser = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    List<Skoda_DCMS.Models.ApprovalDataModel> appList = new List<Skoda_DCMS.Models.ApprovalDataModel>();
+    string disabled = "";
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IsNew = ViewBag.IsNew;
+        IsEdit = ViewBag.IsEdit;
+        IsNewMode = ViewBag.IsNewMode;
+        IsEditMode = ViewBag.IsEditMode;
+        IsViewMode = ViewBag.IsViewMode;
+        disabled = IsViewMode ? "disabled" : "";
+        TEF = ViewBag.Model.one[0] as Skoda_DCMS.Models.TEFModel;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+        appList = ViewBag.Model?.three as List<Skoda_DCMS.Models.ApprovalDataModel>;
+        CurrentUserDesgn = appList?.Where(x => x.ApproverUserName.ToLower() == currentUser.UserName.ToLower()).Select(x => x.Designation).FirstOrDefault();
+    }
+    ViewBag.Title = "Training Evaluation Form";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+
+    <style type="text/css">
+        *:visited, *:focus {
+            box-shadow: none;
+        }
+
+        input, select, input:focus, select:focus, textarea, textarea:focus {
+            border: 1px solid #000;
+        }
+
+        input, textarea {
+            padding: 5px;
+        }
+
+        .asset {
+            border: 1px solid black;
+            height: 20px;
+        }
+
+        .signature-table thead td {
+            border-bottom: 1px solid black;
+            border-left: 1px solid black;
+            border-collapse: collapse;
+        }
+
+        .signature-table tbody, .signature-table td {
+            border: none;
+            border-left: 1px solid black;
+            border-collapse: collapse;
+            padding: 5px;
+        }
+
+            .signature-table td:first-child {
+                border-left: none;
+            }
+
+        .signature-table {
+            border: 1px solid black;
+        }
+
+        @@font-face {
+            font-family: 'SKODANext-Black';
+            src: url('../../fonts/SKODANextfont/SKODANext-Black.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Bold.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Light.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Regular.ttf') format('truetype');
+        }
+
+        body {
+            font-family: 'SKODANext-Black';
+        }
+
+        .form_lbl {
+            color: #000;
+            font-weight: 600;
+        }
+
+        #formlbl {
+            width: 250px;
+        }
+
+        label {
+            font-family: "Trebuchet MS", Verdana, Halvetica, Arial;
+            font-size: 20px;
+            font-weight: normal;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+            table td, th {
+                padding-left: 10px;
+            }
+    </style>
+
+</head>
+<body>
+
+    <table style="width: 100%; font-size: 14px; color: #000; font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+        <tr>
+            <td>
+                <table style="width: 100%;" cellspadding="0" cellspacing="0">
+                    <tr>
+                        <td colspan="6" width="60%" style="text-align: right;">
+                            @*<img style="width: 50%;" src='@Server.MapPath("~/assets/img/SAVWIPL_Merger_Logo.JPG")'>*@
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="6" align="center">
+                <h2 style="font-weight:bold"> Training Evaluation Form  </h2>
+            </td>
+        </tr>
+
+        <tr>
+            <td style="padding: 15px;">
+                <table cellspacing="0" border="" cellpadding="0" width="100%">
+                    @if (TEF.RequestSubmissionFor == "Self")
+                    {
+                        <tr>
+                            <td colspan="6" align='left'>
+                                <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Submitter Details</u></b></h6>
+                            </td>
+                        </tr>
+                        <tr style="margin-top:5px;">
+                            <td style="width:20%; font-weight: bold;">
+                                Employee Name
+                            </td>
+                            <td style="width: 30%; font-weight: normal;" colspan="2" align='left'>
+                                <span style="height: 25px; width:85%; border-radius: 0; "> @(TEF.EmployeeName)  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Employee Code
+                            </td>
+                            <td style="width: 30%; font-weight: normal;" colspan="2" align='left'>
+                                <span style="height: 25px; width:85%; border-radius: 0; "> @(TEF.EmployeeCode) </span>
+                            </td>
+
+                        </tr>
+                        <tr style="margin-top:5px;">
+                            <td style="width:20%; font-weight: bold;">
+                                Designation
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(TEF.EmployeeDesignation) </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Location
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(TEF.EmployeeLocation) </span>
+                            </td>
+
+                        </tr>
+                        <tr style="margin-top:5px;">
+                            <td style="width:20%; font-weight: bold;">
+                                Department
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(TEF.EmployeeDepartment) </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Contact Number
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(TEF.EmployeeContactNo) </span>
+                            </td>
+
+                        </tr>
+                        <tr style="margin-top:5px;">
+                            <td style="width:20%; font-weight: bold;">
+                                Cost Center Number
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(TEF.EmployeeCCCode)  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                UserID
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(TEF.EmployeeUserId)  </span>
+                            </td>
+
+                        </tr>
+                    }
+                    else
+                    {
+                        if (TEF.EmployeeType == "SAVWIPLEmployee")
+                        {
+                            <tr>
+                                <td colspan="6" align='left'>
+                                    <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Submitter Details</u></b></h6>
+                                </td>
+                            </tr>
+                            <tr>
+
+                                <td style="width:20%; font-weight: bold;">
+                                    Employee Name
+                                </td>
+                                <td style="width: 30%" colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(TEF.OtherEmployeeName)  </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Employee Code
+                                </td>
+                                <td style="width: 30%" colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(TEF.OtherEmployeeCode) </span>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Designation
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(TEF.OtherEmployeeDesignation) </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Location
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(TEF.OtherEmployeeLocation) </span>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Department
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(TEF.OtherEmployeeDepartment) </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Contact Number
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(TEF.OtherEmployeeContactNo) </span>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Cost Center Number
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(TEF.OtherEmployeeCCCode)  </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    UserID
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(TEF.OtherEmployeeUserId)  </span>
+                                </td>
+
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" align='left'>
+                                    <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Submitter Details</u></b></h6>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Employee Name
+                                </td>
+                                <td style="width: 30%" colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(TEF.OtherEmployeeName)  </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Employee Code
+                                </td>
+                                <td style="width: 30%" colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(TEF.OtherEmployeeCode) </span>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Designation
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(TEF.OtherEmployeeDesignation) </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Location
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(TEF.OtherEmployeeLocation) </span>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Department
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(TEF.OtherEmployeeDepartment) </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Contact Number
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(TEF.OtherEmployeeContactNo) </span>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Cost Center Number
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(TEF.OtherEmployeeCCCode)  </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    UserID
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(TEF.OtherEmployeeUserId)  </span>
+                                </td>
+
+                            </tr>
+                        }
+
+                    }
+                    <tr>
+                        <td colspan="6" align='left'>
+                            <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Transaction Field</u></b></h6>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 20%; font-weight: bold;">Employee ID</td>
+                        <td colspan="2" align="left">
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0;">@(TEF.TEFEmployeeID)</span>
+                        </td>
+                        <td style="width: 20%; font-weight: bold;">Training Program Title</td>
+                        <td colspan="2" align="left">
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0;">@(TEF.TrainingProgramTitle)</span>
+                        </td>
+                    </tr>
+
+                    <!-- Row for Training Date and Trainer Name -->
+                    <tr>
+                        <td style="width: 20%; font-weight: bold;">Training Date</td>
+                        <td colspan="2" align="left">
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0;">@(TEF.TrainingDate?.ToString("yyyy-MM-dd"))</span>
+                        </td>
+                        <td style="width: 20%; font-weight: bold;">Trainer Name</td>
+                        <td colspan="2" align="left">
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0;">@(TEF.TrainerName)</span>
+                        </td>
+                    </tr>
+
+                    <!-- Row for Overall Rating -->
+                    <tr>
+                        <td style="width: 20%; font-weight: bold;">Overall Rating</td>
+                        <td colspan="2" align="left">
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0;">@(TEF.OverallRating)</span>
+                        </td>
+                        <td style="width: 20%; font-weight: bold;">Trainer Rating</td>
+                        <td colspan="2" align="left">
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0;">@(TEF.TrainerRating)</span>
+                        </td>
+                    </tr>
+
+                    <!-- Row for Content Rating -->
+                    <tr>
+                        <td style="width: 20%; font-weight: bold;">Content Rating</td>
+                        <td colspan="2" align="left">
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0;">@(TEF.ContentRating)</span>
+                        </td>
+                        <td style="width: 20%; font-weight: bold;">Training Facilities Rating</td>
+                        <td colspan="2" align="left">
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0;">@(TEF.FacilitiesRating)</span>
+                        </td>
+                    </tr>
+
+                    <!-- Row for Areas for Improvement -->
+                    <tr>
+                        <td style="width: 20%; font-weight: bold;">Areas for Improvement</td>
+                        <td colspan="5" align="left">
+                            <span style="height: 25px; font-weight: normal; width: 100%; border-radius: 0;">@(TEF.ImprovementAreas)</span>
+                        </td>
+                    </tr>
+
+                    <!-- Row for Likes -->
+                    <tr>
+                        <td style="width: 20%; font-weight: bold;">What did you like about the training?</td>
+                        <td colspan="5" align="left">
+                            <span style="height: 25px; font-weight: normal; width: 100%; border-radius: 0;">@(TEF.Likes)</span>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+    <table style="width: 100%; font-size: 14px; color: #000; font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+
+        <tr>
+            <td colspan="5" align='left'>
+                <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Approval Details</u></b></h6>
+            </td>
+        </tr>
+
+        @if (appList.Count > 0)
+        {
+            <tr>
+                <th style="width: 25%;">Name</th>
+                <th style="width: 20%;">Proccessed On</th>
+                <th style="width: 15%;">Status</th>
+                <th style="width: 10%;">Level</th>
+                <th style="width: 30%;">Comment</th>
+            </tr>
+            foreach (var item in appList)
+            {
+                <tr>
+                    <td colspan="1">
+                        <div style="margin-bottom:10px;">
+                            <div>@item.UserName</div>
+                            <div>@item.Designation</div>
+                        </div>
+                    </td>
+                    <td colspan="1">
+                        @if (item.Logic == "OR")
+                        {
+                            if (item.ApproverStatus != "Pending")
+                            {
+                                <div>
+                                    @item.TimeStamp.ToShortDateString()  @Convert.ToDateTime(@item.TimeStamp).ToShortTimeString()
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            if (item.ApproverStatus != "Pending")
+                            {
+                                <div>
+                                    @item.TimeStamp.ToShortDateString()  @Convert.ToDateTime(@item.TimeStamp).ToShortTimeString()
+                                </div>
+                            }
+                        }
+                    </td>
+                    <td colspan="1">
+                        @if (item.Logic == "OR")
+                        {
+                            if (item.ApproverStatus != "Pending")
+                            {
+                                <div>
+                                    @item.ApproverStatus
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div>
+                                @item.ApproverStatus
+                            </div>
+                        }
+                    </td>
+                    <td colspan="1">
+                        <div>
+                            @item.Level
+                        </div>
+                    </td>
+                    <td colspan="1">
+                        <div>
+                            @item.Comment
+                        </div>
+                    </td>
+                </tr>
+            }
+        }
+
+    </table>
+</body>
+</html>

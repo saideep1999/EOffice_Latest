@@ -501,6 +501,11 @@ namespace Skoda_DCMS.Controllers
                                 data = await GetPOCRFReport(routeList);
                                 break;
                             }
+                        //case "NEIF":
+                        //    {
+                        //        data = await GetNEIFReport(model.Data.Forms);
+                        //        break;
+                        //    }
                         default:
                             {
                                 data = await GetAllFormRequestReport(model.Data.Forms);
@@ -2803,6 +2808,124 @@ namespace Skoda_DCMS.Controllers
             }
             return reportData;
         }
+        
+        //public async Task<byte[]> GetTSFReport(List<FormData> formsList)
+        //{
+        //    var reportData = new byte[0];
+        //    try
+        //    {
+        //        ListDAL obj = new ListDAL();
+        //        var apfplist = await obj.ViewTSFExcelData();
+        //        var finalDataList = new List<FormData>();
+
+        //        foreach (var formRow in formsList)
+        //        {
+        //            //var matchingRecords = apfplist.Where(x => Convert.ToInt32(x.FormIDId) == formRow.UniqueFormId);
+        //            var matchingRecords = apfplist.Where(x => Convert.ToInt32(x.FormIDId) == formRow.UniqueFormId);
+
+
+        //            foreach (var item in matchingRecords)
+        //            {
+        //                var formData = new FormData();
+        //                formData = formRow.Clone();
+        //                if (item.RequestSubmissionFor == "OnBehalf")
+        //                {
+        //                    formData.EmployeeName = Convert.ToString(item.OtherEmployeeName);
+        //                    formData.CostCenterNumber = Convert.ToString(item.OtherEmployeeCCCode);
+        //                    formData.EmployeeDesignation = Convert.ToString(item.OtherEmployeeDesignation);
+        //                    formData.EmployeeDepartment = Convert.ToString(item.OtherEmployeeDepartment);
+        //                }
+        //                else
+        //                {
+        //                    formData.EmployeeName = Convert.ToString(item.EmployeeName);
+        //                    formData.CostCenterNumber = Convert.ToString(item.EmployeeCCCode);
+        //                    formData.EmployeeDesignation = Convert.ToString(item.EmployeeDesignation);
+        //                    formData.EmployeeDepartment = Convert.ToString(item.EmployeeDepartment);
+        //                }
+
+        //                formData.RequestType = item.RequestType;
+        //                formData.Applicationname = item.Applicationname;
+        //                formData.Applicationurl = item.Applicationurl;
+
+        //                formData.Applicationaccess = item.Applicationaccess;
+        //                formData.Accessgroup = item.Accessgroup;
+        //                formData.RequestFromDate = item.RequestFromDate;
+        //                formData.RequestToDate = item.RequestToDate;
+        //                formData.BusinessJustification = item.BusinessJustification;
+        //                //formData.AssignType = item.AssignType;
+        //                //formData.FromDate = item.FromDate;
+        //                //formData.ToDate = item.ToDate;
+
+        //                finalDataList.Add(formData);
+        //            }
+        //        }
+
+
+        //        var newList = finalDataList.OrderByDescending(x => x.RecievedDate).ToList();
+        //        List<FormData> arrayData = newList;
+        //        ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
+        //        ExcelPackage Ep = new ExcelPackage();
+        //        ExcelWorksheet Sheet = Ep.Workbook.Worksheets.Add("Report");
+
+        //        Sheet.Cells["A1"].Value = "Form Id";
+        //        Sheet.Cells["B1"].Value = "Form Name";
+        //        Sheet.Cells["C1"].Value = "Request From";
+        //        Sheet.Cells["D1"].Value = "Details/Business Needs";
+        //        Sheet.Cells["E1"].Value = "Status";
+        //        Sheet.Cells["F1"].Value = "Recieved Date";
+        //        Sheet.Cells["G1"].Value = "Employee Name";
+        //        Sheet.Cells["H1"].Value = "Cost Center Number";
+        //        Sheet.Cells["I1"].Value = "Employee Designation";
+        //        Sheet.Cells["J1"].Value = "Employee Department";
+
+        //        Sheet.Cells["K1"].Value = "Request Type";
+        //        Sheet.Cells["L1"].Value = "from";
+        //        Sheet.Cells["M1"].Value = "to";
+        //        Sheet.Cells["N1"].Value = "Application Name";
+        //        Sheet.Cells["O1"].Value = "Application URL";
+        //        Sheet.Cells["P1"].Value = "Type Of Access";
+        //        Sheet.Cells["Q1"].Value = "Access Group";
+        //        Sheet.Cells["R1"].Value = "Business Justification";
+               
+        //        int row = 2;
+        //        foreach (var item in arrayData)
+        //        {
+
+        //            Sheet.Cells[string.Format("A{0}", row)].Value = "TSF" + item.UniqueFormId;
+        //            Sheet.Cells[string.Format("B{0}", row)].Value = item.FormName;
+        //            Sheet.Cells[string.Format("C{0}", row)].Value = item.Author.Submitter;
+        //            Sheet.Cells[string.Format("D{0}", row)].Value = item.BusinessNeed;
+        //            Sheet.Cells[string.Format("E{0}", row)].Value = item.Status;
+        //            Sheet.Cells[string.Format("F{0}", row)].Value = item.FormCreatedDate.ToString("dd-MM-yyyy");
+        //            Sheet.Cells[string.Format("G{0}", row)].Value = item.EmployeeName;
+        //            Sheet.Cells[string.Format("H{0}", row)].Value = item.CostCenterNumber;
+        //            Sheet.Cells[string.Format("I{0}", row)].Value = item.EmployeeDesignation;
+        //            Sheet.Cells[string.Format("J{0}", row)].Value = item.EmployeeDepartment;
+        //            Sheet.Cells[string.Format("K{0}", row)].Value = item.RequestType;
+
+        //            Sheet.Cells[string.Format("L{0}", row)].Value = item.RequestFromDate?.ToString("dd-MM-yyyy");
+        //            Sheet.Cells[string.Format("M{0}", row)].Value = item.RequestToDate?.ToString("dd-MM-yyyy");
+        //            Sheet.Cells[string.Format("N{0}", row)].Value = item.Applicationname;
+        //            Sheet.Cells[string.Format("O{0}", row)].Value = item.Applicationurl ;
+        //            Sheet.Cells[string.Format("P{0}", row)].Value = item.Applicationaccess;
+        //            Sheet.Cells[string.Format("Q{0}", row)].Value = item.Accessgroup;
+        //            Sheet.Cells[string.Format("R{0}", row)].Value = item.BusinessJustification;
+                  
+        //            row++;
+        //        }
+
+        //        Sheet.Cells["A:AZ"].AutoFitColumns();
+        //        reportData = Ep.GetAsByteArray();
+        //        Ep.Dispose();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Log.Error(ex.Message, ex);
+        //        Console.WriteLine(ex.Message);
+        //    }
+        //    return reportData;
+        //}
 
 
         //public async Task<ActionResult> GetCCNameByFilter(string Name)

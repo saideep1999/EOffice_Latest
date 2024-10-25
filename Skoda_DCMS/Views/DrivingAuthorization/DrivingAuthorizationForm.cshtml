@@ -316,30 +316,35 @@
         div.input-block textarea:focus + span.placeholder {
             transform: scale(0.8) translateY(-25px);
             background-color: #fff !important;
+            margin-left: 9px;
         }
 
         div.input-block textarea:valid + span.placeholder,
         div.input-block textarea:focus + span.placeholder {
             transform: scale(0.8) translateY(-25px) !important;
             background: #fff !important;
+            margin-left: 9px;
         }
 
         div.input-block input:valid + span.placeholder,
         div.input-block input:focus + span.placeholder {
             transform: scale(0.8) translateY(-25px);
             background-color: rgb(255,255,255) !important;
+            margin-left: 9px;
         }
 
 
         div.input-block input.spanUpperSide + span.placeholder {
             transform: scale(0.8) translateY(-25px);
             background-color: rgb(219,238,213);
+            margin-left: 9px;
         }
 
         div.input-block input:read-only + span.placeholder,
         div.input-block input:read-only + span.placeholder {
             transform: scale(0.8) translateY(-25px);
             background: rgb(219,238,213);
+            margin-left: 9px;
         }
 
 
@@ -548,6 +553,10 @@
     .forFileUpload a {
         text-decoration: underline;
     }
+
+    #errorList {
+        margin-left: 25px !important;
+    }
 </style>
 <script type="text/javascript">
 
@@ -604,7 +613,7 @@
                             </ol>
                         </div>
                     </div>
-                    <div class="row breadcrumb-container table-bordered  mr-1 ml-1" style="background-color: rgb(219,238,213) !important; ">
+                    <div class="row breadcrumb-container table-bordered  mr-1 ml-1" style="background-color: rgb(219,238,213) !important; margin: 0 !important; ">
                         <div class="col-md-2 col-lg-2">
                             <span class="placeholder">Date : @(IsViewMode || IsEditMode ? (Convert.ToDateTime(appList.FirstOrDefault().FormId.CreatedDate).ToShortDateString()) : DateTime.Now.ToShortDateString())</span>
                         </div>
@@ -651,12 +660,29 @@
 
                                 <div class="form-row">
                                     <div class="form-group col-md-2 col-12 d-flex input-block align-items-baseline">
-                                        
+
                                         <input type="file" id="photo" name="photo" class="d-none forFileUpload" style="background-color: transparent !important; min-width: 250px;" accept="image/*" @(disabled) />
-                                        <label for="photo" @(disabled) id="lblPhoto">
+                                        <label for="photo" @(disabled) id="lblPhoto" style="" width: 150px; height: 100px;>
                                             @{
-                                                
-                                                <img id="photoImg" src="@(DAF?.Imagepath)" alt="Photo" style="display: block; width: 100%; height: 20%; border: 1px solid; padding: 5px;" />
+                                                if (DAF == null || (DAF != null && DAF.Imagepath == null))
+                                                {
+                                                    <img id="photoImg" src="/assets/img/imageImage.png" alt="Photo" style="display: block;width: 100%;" />
+                                                }
+                                                else
+                                                {
+                                                    <img id="photoImg" src="@(DAF.Imagepath)" alt="Photo" style="display: block; width: 100%;" />
+                                                }
+
+
+                                                @*if (DAF == null || (DAF != null && DAF.Imagepath == null))
+            {
+                <img id="photoImg" src="/assets/img/imageImage.png" alt="Photo" style="display: block;width: auto; border: 1px solid;" />
+            }
+            else if(DAF.Imagepath != null)
+            {
+
+            }*@
+
                                                 <label onclick="openImgInNewTab('Photo');"><a href="#">Preview</a></label>
                                             }
                                         </label>
@@ -683,11 +709,21 @@
                                 <div class="form-row">
                                     <div class="form-group col-md-12 col-12 input-block align-items-baseline">
                                         <div class="row">
-                                            <div class="col-md-2 pr-0 col-12">
+                                            <div class="form-group col-md-2 col-12 d-flex input-block align-items-baseline">
                                                 <input type="file" id="licensePhotoCopy" name="licensePhotoCopy" class="d-none forFileUpload" style="background-color: transparent !important; min-width: 250px;" accept="image/*" @(disabled) />
-                                                <label for="licensePhotoCopy" @(disabled) id="lblLicensePhotoCopy">
+                                                <label for="licensePhotoCopy" @(disabled) id="lblLicensePhotoCopy"  width: 150px; height: 100px;>
                                                     @{
-                                                        <img id="licensePhotoCopyImg" src="@(DAF?.Imagepathforlicence)" alt="License Photocopy" style="display: block; width: 100%; height: 20%; border: 1px solid; padding: 5px;" />
+                                                        if (DAF == null || (DAF != null && DAF.Imagepathforlicence == null))
+                                                        {
+                                                            <img id="licensePhotoCopyImg" src="/assets/img/imageImage.png" alt="License Photocopy" style="display: block;width: 100%;" />
+                                                        }
+                                                        else
+                                                        {
+                                                            <img id="licensePhotoCopyImg" src="@(DAF.Imagepathforlicence)" alt="License Photocopy" style="display: block; width: 100%;" />
+                                                        }
+
+
+                                                        @*<img id="licensePhotoCopyImg" src="@(DAF == null ?"/assets/img/imageImage.png": DAF.Imagepathforlicence != null ? DAF.Imagepathforlicence :"/assets/img/imageImage.png")" alt="License Photocopy" style="display: block; width: 100%; height: 20%; border: 1px solid; padding: 5px;" />*@
                                                         <label onclick="openImgInNewTab('licensePhotoCopy');"><a href="#">Preview</a></label>
                                                     }
                                                     @*<img id="licensePhotoCopyImg" src="Test" alt="License Photocopy" style="display: block; width: 100px; height: 100px; border: 1px solid;" />*@
@@ -699,8 +735,8 @@
 
 
                                         </div>
-                                        
-                                       
+
+
                                     </div>
                                 </div>
 
@@ -714,7 +750,7 @@
                                     </div>
 
                                     <div class="form-group col-md-4 col-12 input-block">
-                                        <input type="date" id="txtValidFrom" name="txtValidFrom" class="w-100 spanUpperSide" onchange="changeValidity()" 
+                                        <input type="date" id="txtValidFrom" name="txtValidFrom" class="w-100 spanUpperSide" onchange="changeValidity()"
                                                value="@(DAF?.ValidFrom.HasValue == true ? DAF.ValidFrom.Value.ToString("yyyy-MM-dd") : "")" required @(disabled)>
                                         <span class="placeholder TransView">
                                             Valid From<span class="astColor">*</span>
@@ -723,7 +759,7 @@
 
                                     <div class="form-group col-md-4 col-12 input-block">
                                         <input type="date" class="w-100 spanUpperSide" id="txtValidTill" name="txtValidTill"
-                                                value="@(DAF?.ValidTill.HasValue == true ? DAF.ValidTill.Value.ToString("yyyy-MM-dd") : "")" @(disabled)
+                                               value="@(DAF?.ValidTill.HasValue == true ? DAF.ValidTill.Value.ToString("yyyy-MM-dd") : "")" @(disabled)
                                                required>
                                         <span class="placeholder TransView">
                                             Valid Till<span class="astColor">*</span>
@@ -736,7 +772,7 @@
                                         <input type="text" class="w-100" id="txtVehiclesDriven" autocomplete="off" name="txtVehiclesDriven" required @(disabled)
                                                value="@(DAF?.VehiclesDriven ?? "")">
                                         <span class="placeholder TransView">
-                                            Vehicles Driven<span class="astColor">*</span> 
+                                            Vehicles Driven<span class="astColor">*</span>
                                         </span>
                                     </div>
 
@@ -748,20 +784,20 @@
                                         </span>
                                     </div>
                                     @*<div class="form-group col-md-4 col-12 input-block">
-                                <input type="text" class="w-100" id="txtMobileNumber" autocomplete="off" name="txtMobileNumber" maxlength="10" onkeypress="allowNumbersOnly(event)" required
-                                       value="@(DAF?.Mobile)">
-                                <span class="placeholder TransView">
-                                    Mobile
-                                </span>
-                            </div>
+                                            <input type="text" class="w-100" id="txtMobileNumber" autocomplete="off" name="txtMobileNumber" maxlength="10" onkeypress="allowNumbersOnly(event)" required
+                                                   value="@(DAF?.Mobile)">
+                                            <span class="placeholder TransView">
+                                                Mobile
+                                            </span>
+                                        </div>
 
-                            <div class="form-group col-md-4 col-12 input-block">
-                                <input type="text" class="w-100" id="txtLandlineNumber" autocomplete="off" name="txtLandlineNumber" maxlength="10" onkeypress="allowNumbersOnly(event)" required
-                                       value="@(DAF?.LandlineNumber)">
-                                <span class="placeholder TransView">
-                                    Landline Number
-                                </span>
-                            </div>*@
+                                        <div class="form-group col-md-4 col-12 input-block">
+                                            <input type="text" class="w-100" id="txtLandlineNumber" autocomplete="off" name="txtLandlineNumber" maxlength="10" onkeypress="allowNumbersOnly(event)" required
+                                                   value="@(DAF?.LandlineNumber)">
+                                            <span class="placeholder TransView">
+                                                Landline Number
+                                            </span>
+                                        </div>*@
                                 </div>
 
                                 <div class="form-row">
@@ -848,21 +884,21 @@
                                             </td>
                                         </tr>
                                         @*<tr>
-                                    <td class="f-600">Authorization for Driving:</td>
-                                </tr>
-                                <tr>
-                                    <td class="f-600">To, <br>Safety Department,</td>
-                                </tr>
-                                <tr>
-                                    <td class="f-600">
-                                        Applicant is in need of a Driving Authorization for official purpose. Please issue him the authorization for:
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="f-600">
-                                        Internal <br> Test Track <br> External <br> Material Handling
-                                    </td>
-                                </tr>*@
+                                                <td class="f-600">Authorization for Driving:</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="f-600">To, <br>Safety Department,</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="f-600">
+                                                    Applicant is in need of a Driving Authorization for official purpose. Please issue him the authorization for:
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="f-600">
+                                                    Internal <br> Test Track <br> External <br> Material Handling
+                                                </td>
+                                            </tr>*@
 
                                         @if (CurrentUserDesgn == SafetyManagerDesgn)
                                         {
@@ -930,91 +966,90 @@
                     </div>
 
                     @* Action *@
-                    <div id="accordion">
-                        <div class="card">
-                            <div class="card-header collapsed" id="headingSix" data-toggle="collapse" data-target="#collapseSix" aria-expanded="true" aria-controls="collapseSix">
-                                <h5 class="mb-0">
-                                    <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseSix" aria-expanded="true" aria-controls="collapseSix">
-                                        <img src="~/assets/img/approvalTracking.svg" width="24" height="24" class="mr-2" /> Action
-                                    </button>
-                                </h5>
-                            </div>
-                            <div id="collapseSix" class="collapse action-accordion" aria-labelledby="headingSix">
-                                <div class="card-body actionTab">
-                                    <div class="form-row">
-                                        <div class="form-group col-md-12 col-lg-12 col-12">
-                                            <label class="f-600">
-                                                <u>To be certified by Company Doctor:</u>
-                                            </label>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-row">
-                                        <div class="form-group col-md-3 col-12 inputSelect">
-                                            <select class="w-100 selectInput" name="drpBloodGroup" id="drpBloodGroup" onchange="checkSelect('drpBloodGroup')" disabled>
-                                                <option style="display: none;"></option>
-                                                <option value="O-">O-</option>
-                                                <option value="O+">O+</option>
-                                                <option value="A-">A-</option>
-                                                <option value="A+">A+</option>
-                                                <option value="B-">B-</option>
-                                                <option value="B+">B+</option>
-                                                <option value="AB-">AB-</option>
-                                                <option value="AB+">AB+</option>
-                                            </select>
-                                            <span class="placeholder TransView">Blood Group<span class="astColor">*</span></span>
+                    @*<div id="accordion">
+                            <div class="card">
+                                <div class="card-header collapsed" id="headingSix" data-toggle="collapse" data-target="#collapseSix" aria-expanded="true" aria-controls="collapseSix">
+                                    <h5 class="mb-0">
+                                        <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseSix" aria-expanded="true" aria-controls="collapseSix">
+                                            <img src="~/assets/img/approvalTracking.svg" width="24" height="24" class="mr-2" /> Action
+                                        </button>
+                                    </h5>
+                                </div>
+                                <div id="collapseSix" class="collapse action-accordion" aria-labelledby="headingSix">
+                                    <div class="card-body actionTab">
+                                        <div class="form-row">
+                                            <div class="form-group col-md-12 col-lg-12 col-12">
+                                                <label class="f-600">
+                                                    <u>To be certified by Company Doctor:</u>
+                                                </label>
+                                            </div>
                                         </div>
 
-                                        <div class="form-group col-md-3 col-12 inputSelect">
-                                            <select class="w-100 selectInput" name="drpEyeSight" id="drpEyeSight" onchange="checkSelect('drpEyeSight')" disabled>
-                                                <option style="display: none;"></option>
-                                                <option value="OK">OK</option>
-                                                <option value="NOT OK">Not OK</option>
-                                            </select>
-                                            <span class="placeholder TransView">Eye Sight<span class="astColor">*</span></span>
-                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group col-md-3 col-12 inputSelect">
+                                                <select class="w-100 selectInput" name="drpBloodGroup" id="drpBloodGroup" onchange="checkSelect('drpBloodGroup')" disabled>
+                                                    <option style="display: none;"></option>
+                                                    <option value="O-">O-</option>
+                                                    <option value="O+">O+</option>
+                                                    <option value="A-">A-</option>
+                                                    <option value="A+">A+</option>
+                                                    <option value="B-">B-</option>
+                                                    <option value="B+">B+</option>
+                                                    <option value="AB-">AB-</option>
+                                                    <option value="AB+">AB+</option>
+                                                </select>
+                                                <span class="placeholder TransView">Blood Group<span class="astColor">*</span></span>
+                                            </div>
 
-                                        <div class="form-group col-md-3 col-12 input-block">
-                                            <input type="text" class="txt_input inputRight" id="txtLT" name="txtLT" required onkeypress="allowFloatingNumbers(event)" disabled
-                                                   value="@(DAF?.LT)">
-                                            <span class="placeholder TransView">LT<span class="astColor">*</span></span>
-                                        </div>
+                                            <div class="form-group col-md-3 col-12 inputSelect">
+                                                <select class="w-100 selectInput" name="drpEyeSight" id="drpEyeSight" onchange="checkSelect('drpEyeSight')" disabled>
+                                                    <option style="display: none;"></option>
+                                                    <option value="OK">OK</option>
+                                                    <option value="NOT OK">Not OK</option>
+                                                </select>
+                                                <span class="placeholder TransView">Eye Sight<span class="astColor">*</span></span>
+                                            </div>
 
-                                        <div class="form-group col-md-3 col-12 input-block">
-                                            <input type="text" class="txt_input inputRight" id="txtRT" name="txtRT" required onkeypress="allowFloatingNumbers(event)" disabled
-                                                   value="@(DAF?.RT)">
-                                            <span class="placeholder TransView">RT<span class="astColor">*</span></span>
-                                        </div>
+                                            <div class="form-group col-md-3 col-12 input-block">
+                                                <input type="text" class="txt_input inputRight" id="txtLT" name="txtLT" required onkeypress="allowFloatingNumbers(event)" disabled
+                                                       value="@(DAF?.LT)">
+                                                <span class="placeholder TransView">LT<span class="astColor">*</span></span>
+                                            </div>
 
-                                        <div class="form-group inputSelect col-md-6 col-12">
-                                            <select class="w-100 selectInput" name="drpHistoryOfEpilepsy" id="drpHistoryOfEpilepsy" onchange="checkSelect('drpHistoryofEpilepsy')" required disabled>
-                                                <option style="display: none;"></option>
-                                                <option value="OK">OK</option>
-                                                <option value="NOT OK">NOT OK</option>
-                                            </select>
-                                            <span class="placeholder TransView">History of Epilepsy<span class="astColor">*</span></span>
-                                        </div>
+                                            <div class="form-group col-md-3 col-12 input-block">
+                                                <input type="text" class="txt_input inputRight" id="txtRT" name="txtRT" required onkeypress="allowFloatingNumbers(event)" disabled
+                                                       value="@(DAF?.RT)">
+                                                <span class="placeholder TransView">RT<span class="astColor">*</span></span>
+                                            </div>
 
-                                        <div class="form-group inputSelect col-md-6 col-12">
-                                            <select class="w-100 selectInput" name="drpCertification" id="drpCertification" onchange="checkSelect('drpCertification')" disabled>
-                                                <option style="display: none;"></option>
-                                                <option value="PASS">PASS</option>
-                                                <option value="FAIL">FAIL</option>
-                                            </select>
-                                            <span class="placeholder TransView">Certification<span class="astColor">*</span></span>
-                                        </div>
+                                            <div class="form-group inputSelect col-md-6 col-12">
+                                                <select class="w-100 selectInput" name="drpHistoryOfEpilepsy" id="drpHistoryOfEpilepsy" onchange="checkSelect('drpHistoryofEpilepsy')" required disabled>
+                                                    <option style="display: none;"></option>
+                                                    <option value="OK">OK</option>
+                                                    <option value="NOT OK">NOT OK</option>
+                                                </select>
+                                                <span class="placeholder TransView">History of Epilepsy<span class="astColor">*</span></span>
+                                            </div>
 
-                                        <div class="form-group input-block col-md-12 col-12">
-                                            <textarea class="inputText" id="txtRemarks" name="txtRemarks" required disabled>@(DAF?.Remarks)</textarea>
-                                            <span class="placeholder TransView">Remarks<span class="astColor">*</span></span>
+                                            <div class="form-group inputSelect col-md-6 col-12">
+                                                <select class="w-100 selectInput" name="drpCertification" id="drpCertification" onchange="checkSelect('drpCertification')" disabled>
+                                                    <option style="display: none;"></option>
+                                                    <option value="PASS">PASS</option>
+                                                    <option value="FAIL">FAIL</option>
+                                                </select>
+                                                <span class="placeholder TransView">Certification<span class="astColor">*</span></span>
+                                            </div>
+
+                                            <div class="form-group input-block col-md-12 col-12">
+                                                <textarea class="inputText" id="txtRemarks" name="txtRemarks" required disabled>@(DAF?.Remarks)</textarea>
+                                                <span class="placeholder TransView">Remarks<span class="astColor">*</span></span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
+                        </div>*@
                 }
-
                 @* Buttons *@
                 @if (IsNewMode)
                 {
@@ -1039,6 +1074,8 @@
                         </button>
                     </div>
                 }
+                <br />
+                <br />
             </div>
         </div>
     </form>
@@ -1372,13 +1409,15 @@
             else {
                 $(window).scrollTop(0);
             }
+            var mainDiv = document.querySelector(".main"); mainDiv.scrollTop = 0;
             return false;
         }
         $("#headingErr").addClass('d-none');
         document.getElementById("add_to_me").innerHTML = '';
         errors = "";
         errorCount = 0;
-
+        $(".full-screen-container").removeClass('invisible');
+        $(".full-screen-container").show();
         $("#pageLoader").removeClass('invisible');
         $("#btnSubmit").text('Saving');
         $("#btnSubmit").prop("disabled", true);
@@ -1415,6 +1454,8 @@
                     else {
                         $("#btnSubmit").text('Re-Submit');
                     }
+                    $("#loader").addClass('invisible');
+                    $(".full-screen-container").hide();
                     $("#btnSubmit").prop("disabled", false);
                     $("#btnCancel").prop("disabled", false);
                     successModal("DAF" + data.Message);
@@ -1428,6 +1469,8 @@
                     else {
                         $("#btnSubmit").text('Re-Submit');
                     }
+                    $("#loader").addClass('invisible');
+                    $(".full-screen-container").hide();
                     $("#pageLoader").addClass('invisible');
                     $("#btnSubmit").prop("disabled", false);
                     $("#btnCancel").prop("disabled", false);
@@ -1442,6 +1485,8 @@
                 else {
                     $("#btnSubmit").text('Re-Submit');
                 }
+                $("#loader").addClass('invisible');
+                $(".full-screen-container").hide();
                 $("#pageLoader").addClass('invisible');
                 $("#btnSubmit").prop("disabled", false);
                 $("#btnCancel").prop("disabled", false);
@@ -1475,124 +1520,124 @@
         switch (text) {
             case 'approve': {
                 status = 'Approved';
-                if (CurrentUserDesgn === DoctorDesgnString) {
-                    var data = document.getElementById("drpBloodGroup").value;
-                    if (data == "") {
-                        errors += "<li id='error" + errorCount + "'>" + "Blood Group" + "</li>";
-                        AddError("drpBloodGroup", '', errorCount);
-                        errorCount++;
-                    }
-                    else {
-                        RemoveError("drpBloodGroup");
-                    }
+                //if (CurrentUserDesgn === DoctorDesgnString) {
+                //    var data = document.getElementById("drpBloodGroup").value;
+                //    if (data == "") {
+                //        errors += "<li id='error" + errorCount + "'>" + "Blood Group" + "</li>";
+                //        AddError("drpBloodGroup", '', errorCount);
+                //        errorCount++;
+                //    }
+                //    else {
+                //        RemoveError("drpBloodGroup");
+                //    }
 
-                    data = document.getElementById("drpEyeSight").value;
-                    if (data == "") {
-                        errors += "<li id='error" + errorCount + "'>" + "Eye Sight" + "</li>";
-                        AddError("drpEyeSight", '', errorCount);
-                        errorCount++;
-                    }
-                    else {
-                        RemoveError("drpEyeSight");
-                    }
+                //    data = document.getElementById("drpEyeSight").value;
+                //    if (data == "") {
+                //        errors += "<li id='error" + errorCount + "'>" + "Eye Sight" + "</li>";
+                //        AddError("drpEyeSight", '', errorCount);
+                //        errorCount++;
+                //    }
+                //    else {
+                //        RemoveError("drpEyeSight");
+                //    }
 
-                    data = document.getElementById("txtLT").value;
-                    if (data == "") {
-                        errors += "<li id='error" + errorCount + "'>" + "LT" + "</li>";
-                        AddError("txtLT", '', errorCount);
-                        errorCount++;
-                    }
-                    else {
-                        RemoveError("txtLT");
-                    }
+                //    data = document.getElementById("txtLT").value;
+                //    if (data == "") {
+                //        errors += "<li id='error" + errorCount + "'>" + "LT" + "</li>";
+                //        AddError("txtLT", '', errorCount);
+                //        errorCount++;
+                //    }
+                //    else {
+                //        RemoveError("txtLT");
+                //    }
 
-                    data = document.getElementById("txtRT").value;
-                    if (data == "") {
-                        errors += "<li id='error" + errorCount + "'>" + "RT" + "</li>";
-                        AddError("txtRT", '', errorCount);
-                        errorCount++;
-                    }
-                    else {
-                        RemoveError("txtRT");
-                    }
+                //    data = document.getElementById("txtRT").value;
+                //    if (data == "") {
+                //        errors += "<li id='error" + errorCount + "'>" + "RT" + "</li>";
+                //        AddError("txtRT", '', errorCount);
+                //        errorCount++;
+                //    }
+                //    else {
+                //        RemoveError("txtRT");
+                //    }
 
-                    data = document.getElementById("drpHistoryOfEpilepsy").value;
-                    if (data < 1) {
-                        errors += "<li id='error" + errorCount + "'>" + "History of Epilepsy" + "</li>";
-                        AddError("drpHistoryOfEpilepsy", '', errorCount);
-                        errorCount++;
-                    }
-                    else {
-                        RemoveError("drpHistoryOfEpilepsy");
-                    }
+                //    data = document.getElementById("drpHistoryOfEpilepsy").value;
+                //    if (data < 1) {
+                //        errors += "<li id='error" + errorCount + "'>" + "History of Epilepsy" + "</li>";
+                //        AddError("drpHistoryOfEpilepsy", '', errorCount);
+                //        errorCount++;
+                //    }
+                //    else {
+                //        RemoveError("drpHistoryOfEpilepsy");
+                //    }
 
-                    data = document.getElementById("drpCertification").value;
-                    if (data < 1) {
-                        errors += "<li id='error" + errorCount + "'>" + "Certification" + "</li>";
-                        AddError("drpCertification", '', errorCount);
-                        errorCount++;
-                    }
-                    else {
-                        RemoveError("drpCertification");
-                    }
+                //    data = document.getElementById("drpCertification").value;
+                //    if (data < 1) {
+                //        errors += "<li id='error" + errorCount + "'>" + "Certification" + "</li>";
+                //        AddError("drpCertification", '', errorCount);
+                //        errorCount++;
+                //    }
+                //    else {
+                //        RemoveError("drpCertification");
+                //    }
 
-                    data = document.getElementById("txtRemarks").value;
-                    if (data == "") {
-                        errors += "<li id='error" + errorCount + "'>" + "Remarks" + "</li>";
-                        AddError("txtRemarks", '', errorCount);
-                        errorCount++;
-                    }
-                    else {
-                        RemoveError("txtRemarks");
-                    }
+                //    data = document.getElementById("txtRemarks").value;
+                //    if (data == "") {
+                //        errors += "<li id='error" + errorCount + "'>" + "Remarks" + "</li>";
+                //        AddError("txtRemarks", '', errorCount);
+                //        errorCount++;
+                //    }
+                //    else {
+                //        RemoveError("txtRemarks");
+                //    }
 
-                    if (errors.length) {
-                        DisplayAlert('error', 'Error', 'Please enter the details in Action Section');
-                        errors = "<ol id='errorList'>" + errors + "</ol>";
-                        $("#headingErr").removeClass('d-none');
-                        document.getElementById("add_to_me").innerHTML = errors;
-                        errors = "";
-                        errorCount = 0;
-                        if (IsViewMode) {
-                            $("#myModal5").scrollTop(0);
-                        }
-                        else {
-                            $(window).scrollTop(0);
-                        }
-                        $('.action-accordion').collapse('show');
-                        return false;
-                    }
-                    $("#headingErr").addClass('d-none');
-                    document.getElementById("add_to_me").innerHTML = '';
-                    errors = "";
-                    errorCount = 0;
-                    var form = $("#DAFForm").serialize();
-                    spinner.show();
-                    $.ajax({
-                        url: '/DrivingAuthorization/SaveApproverResponse',
-                        type: 'POST',
-                        data: form,
-                        dataType: 'JSON',
-                        success: (function (data) {
-                            console.log(data);
-                            if (data) {
-                                SaveFormStatusResponse(status, appRowId, comment, approvalType, text);
-                                //$("#CBRFForm").trigger("reset");
-                            }
-                            else {
-                                failureModal();
-                                spinner.hide();
-                                //$("#CBRFForm").trigger("reset");
-                            }
-                        }),
-                        error: (function (data) {
-                            failureModal();
-                            spinner.hide();
-                            //$("#CBRFForm").trigger("reset");
-                        })
-                    })
-                    return;
-                }
+                //    if (errors.length) {
+                //        DisplayAlert('error', 'Error', 'Please enter the details in Action Section');
+                //        errors = "<ol id='errorList'>" + errors + "</ol>";
+                //        $("#headingErr").removeClass('d-none');
+                //        document.getElementById("add_to_me").innerHTML = errors;
+                //        errors = "";
+                //        errorCount = 0;
+                //        if (IsViewMode) {
+                //            $("#myModal5").scrollTop(0);
+                //        }
+                //        else {
+                //            $(window).scrollTop(0);
+                //        }
+                //        $('.action-accordion').collapse('show');
+                //        return false;
+                //    }
+                //    $("#headingErr").addClass('d-none');
+                //    document.getElementById("add_to_me").innerHTML = '';
+                //    errors = "";
+                //    errorCount = 0;
+                //    var form = $("#DAFForm").serialize();
+                //    spinner.show();
+                //    $.ajax({
+                //        url: '/DrivingAuthorization/SaveApproverResponse',
+                //        type: 'POST',
+                //        data: form,
+                //        dataType: 'JSON',
+                //        success: (function (data) {
+                //            console.log(data);
+                //            if (data) {
+                //                SaveFormStatusResponse(status, appRowId, comment, approvalType, text);
+                //                //$("#CBRFForm").trigger("reset");
+                //            }
+                //            else {
+                //                failureModal();
+                //                spinner.hide();
+                //                //$("#CBRFForm").trigger("reset");
+                //            }
+                //        }),
+                //        error: (function (data) {
+                //            failureModal();
+                //            spinner.hide();
+                //            //$("#CBRFForm").trigger("reset");
+                //        })
+                //    })
+                //    return;
+                //}
                 spinner.show();
                 SaveFormStatusResponse(status, appRowId, comment, approvalType, text);
                 break;
@@ -1621,6 +1666,8 @@
     }
 
     function SaveFormStatusResponse(status, appRowId, comment, approvalType, text) {
+        $(".full-screen-container").removeClass('invisible');
+        $(".full-screen-container").show();
         $.ajax({
             url: '/List/SaveResponse',
             type: 'POST',
@@ -1632,17 +1679,23 @@
                     spinner.hide();
                     $("#DAFForm").trigger("reset");
                     setTimeout(FilterMyTasks, 8000);
+                    $("#loader").addClass('invisible');
+                    $(".full-screen-container").hide();
                 }
                 else {
                     failureModal();
                     $("#DAFForm").trigger("reset");
                     spinner.hide();
+                    $("#loader").addClass('invisible');
+                    $(".full-screen-container").hide();
                 }
             }),
             error: (function (data) {
                 failureModal();
                 $("#DAFForm").trigger("reset");
                 spinner.hide();
+                $("#loader").addClass('invisible');
+                $(".full-screen-container").hide();
             })
         })
     }

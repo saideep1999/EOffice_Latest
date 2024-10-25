@@ -1,0 +1,1636 @@
+﻿
+@{
+    Layout = null;
+}
+
+@model Skoda_DCMS.Models.NEIFModel
+@{
+    bool IsNew = true;
+    Skoda_DCMS.Models.NEIFModel NEIF = null;
+    dynamic FlagRedirect = null;
+    bool IsEdit = true, IsNewMode = true, IsEditMode = false, IsViewMode = false;
+    int FormId = 0, AppRowId = 0, ApprovalType = 0;
+    var CurrentUserDesgn = "";
+    var SecurityDesgnString = "Security";
+    Layout = ViewBag.Layout;
+    var currentUser = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    List<Skoda_DCMS.Models.ApprovalDataModel> appList = new List<Skoda_DCMS.Models.ApprovalDataModel>();
+    string disabled = "";
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IsNew = ViewBag.IsNew;
+        IsEdit = ViewBag.IsEdit;
+        IsNewMode = ViewBag.IsNewMode;
+        IsEditMode = ViewBag.IsEditMode;
+        IsViewMode = ViewBag.IsViewMode;
+        disabled = IsViewMode ? "disabled" : "";
+        NEIF = ViewBag.Model.one[0] as Skoda_DCMS.Models.NEIFModel;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+        appList = ViewBag.Model?.three as List<Skoda_DCMS.Models.ApprovalDataModel>;
+        CurrentUserDesgn = appList?.Where(x => x.ApproverUserName.ToLower() == currentUser.UserName.ToLower()).Select(x => x.Designation).FirstOrDefault();
+    }
+    ViewBag.Title = "New Employee Information Form";
+    int count = 0;
+}
+
+<style>
+
+    .deviationDate {
+        /*max-width: fit-content !important;*/
+        /* max-width:20px;*/
+        width: 15px;
+        margin-left: 1px;
+        margin-right: 1px;
+        height: 30px !important;
+        border: none !important;
+        max-width: 95px !important;
+        background-color: #fff !important;
+        outline: none !important;
+    }
+
+    .astColor {
+        color: red;
+    }
+
+    /*New design css start here*/
+
+    .textTrans {
+        width: 100%;
+        max-width: 99%;
+        border-radius: 5px;
+        margin-right: 0px;
+        border: 1px solid #BFBFBF !important;
+    }
+
+    .empDetailsBg {
+        background-color: #fffbef;
+    }
+
+    #accordion select {
+        color: #000;
+        width: 100% !important;
+        max-width: 100%;
+        height: 45px;
+        background-color: #fff;
+        border: 1px solid #BFBFBF;
+        box-sizing: border-box;
+        border-radius: 5px;
+        background-image: url(data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>);
+        background-repeat: no-repeat;
+        background-position: right .75rem center;
+        background-size: 16px 12px;
+    }
+
+    #accordion input[type='text'] {
+        width: 100% !important;
+        max-width: 100%;
+        height: 45px;
+        background-color: #fff;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px !important;
+    }
+
+    #accordion input[type='date'] {
+        width: 100% !important;
+        max-width: 100%;
+        height: 45px;
+        background-color: #fff;
+        border: 1px solid #BFBFBF !important;
+        box-sizing: border-box;
+        border-radius: 5px;
+    }
+
+    #accordion input[type='time'] {
+        height: 45px;
+    }
+
+    #accordion label {
+        font-size: 16px;
+        line-height: 22px;
+        font-weight: 600;
+        color: #201F1F;
+    }
+
+    #accordion table tr td {
+        border: none;
+        font-size: 16px;
+        line-height: 19px;
+        color: #201F1F;
+        background-color: white;
+    }
+
+    #accordion label {
+        display: block;
+    }
+
+    #accordion .card-header {
+        background: rgb(4 59 100) !important;
+        border-radius: 5px 5px 0px 0px;
+        position: relative;
+        margin-top: 15px;
+    }
+
+        #accordion .card-header.collapsed h5:after {
+            content: '+';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        #accordion .card-header h5:after {
+            content: '-';
+            position: absolute;
+            right: 22px;
+            top: 17px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+    #accordion h5 button {
+        font-size: 18px;
+        line-height: 22px;
+        /* identical to box height */
+        padding-left: 0px;
+        display: flex;
+        align-items: center;
+        text-transform: uppercase;
+        /* Text_white */
+
+        color: #FFFFFF;
+    }
+
+        #accordion h5 button:focus {
+            box-shadow: none;
+        }
+
+    .empDetailsFields label {
+        display: block !important;
+        margin-bottom: 0px;
+    }
+
+    .empDetailsFields .row label {
+        display: block;
+        margin-bottom: 0px;
+    }
+
+        .empDetailsFields .row label:nth-child(1) {
+            font-style: normal;
+            font-weight: normal !important;
+            font-size: 12px;
+            line-height: 18px;
+            color: #A9A9A9 !important;
+        }
+
+        .empDetailsFields .row label:nth-child(2) {
+            font-style: normal;
+            font-weight: normal;
+            font-size: 18px;
+            line-height: 22px;
+            color: #201F1F;
+        }
+
+    .firstLastName {
+        font-style: normal;
+        font-weight: normal;
+        font-size: 20px;
+        line-height: 24px;
+        /* identical to box height */
+
+        display: flex;
+        align-items: center;
+        color: #201F1F;
+    }
+
+    .submit-btn {
+        background: #3D3D3D;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #FFFFFF;
+        border-color: transparent !important;
+    }
+
+    .cancl-btn {
+        background: #FAE99B;
+        border-radius: 5px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        border-color: transparent !important;
+        line-height: 173.7%;
+        /* identical to box height, or 28px */
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        text-transform: uppercase;
+        color: #212221;
+        margin-left: 10px;
+    }
+
+
+
+
+    .card-footer {
+        display: flex;
+        background-color: transparent !important;
+    }
+
+    .photo-form {
+        width: 100%;
+    }
+
+    .ui-front {
+        z-index: 9999999 !important;
+    }
+    /*Animation CSS Starts*/
+
+    div.input-block {
+        position: relative;
+    }
+
+        div.input-block input {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 188px;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block textarea {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #000;
+            width: 100%;
+            padding: 15px 15px;
+            border-bottom-left-radius: 5px !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-right-radius: 0px !important;
+            border-top-right-radius: 0px !important;
+            background-color: #fff;
+            border: 1px solid #D9D9D9;
+            outline: none;
+        }
+
+        div.input-block span.placeholder {
+            position: absolute;
+            margin: 17px 0;
+            padding: 0 4px;
+            font-family: Roboto, sans-serif;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            top: -6px;
+            left: 15px;
+            transition: all 0.2s;
+            transform-origin: 0% 0%;
+            background: none;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        div.input-block textarea:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: #fff !important;
+        }
+
+        div.input-block textarea:valid + span.placeholder,
+        div.input-block textarea:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px) !important;
+            background: #fff !important;
+        }
+
+        div.input-block input:valid + span.placeholder,
+        div.input-block input:focus + span.placeholder {
+            transform: scale(0.8) translateY(-25px);
+            background-color: #fff;
+        }
+
+    .empDetailsFields div.input-block input:valid + span.placeholder,
+    .empDetailsFields div.input-block input:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: rgb(219,238,213);
+    }
+
+    div.input-block input.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: rgb(219,238,213);
+    }
+
+    .empDetailsFields div.input-block input:read-only + span.placeholder,
+    .empDetailsFields div.input-block input:read-only + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: rgb(219,238,213);
+    }
+
+    div.input-block input:read-only + span.placeholder,
+    div.input-block input:read-only + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: #fff;
+    }
+
+
+    div.inputSelect span.placeholder {
+        position: absolute;
+        margin: 17px 0;
+        padding: 0 4px;
+        font-family: Roboto, sans-serif;
+        color: #000;
+        display: flex;
+        align-items: center;
+        font-size: 1rem;
+        top: -6px;
+        left: 15px;
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+        background: none;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    div.inputSelect select:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background: #fff;
+        z-index: 9;
+    }
+
+    .empDetailsFields div.inputSelect select:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: rgb(219,238,213);
+        z-index: 9;
+    }
+
+    div.inputSelect select:not([value=""]):valid + span.placeholder {
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+    }
+
+
+
+    div.input-block input:focus + span.placeholder {
+        color: #284B63;
+    }
+
+    .breadcrumb {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+        padding: 1rem 1rem 0;
+        margin-bottom: 0;
+        list-style: none;
+        background-color: #FFFFFF;
+        border-radius: .25rem;
+    }
+
+    body.nav-sm .container.body .left_col {
+        width: 63px;
+        padding: 0;
+        position: fixed;
+        height: 100%;
+        z-index: 8;
+    }
+
+    .card {
+        position: relative;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        min-width: 0;
+        word-wrap: break-word;
+        background-color: #fff;
+        background-clip: border-box;
+        border: 0px;
+        border-radius: .25rem;
+    }
+
+    .dropdown-toggle::after {
+        display: none;
+        width: 0;
+        height: 0;
+        margin-left: .255em;
+        vertical-align: .255em;
+        content: "";
+        border-top: .3em solid;
+        border-right: .3em solid transparent;
+        border-bottom: 0;
+        border-left: .3em solid transparent;
+    }
+
+    input.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213);
+    }
+
+    inputSelect.spanUpperSide + span.placeholder {
+        background-color: rgb(219,238,213) !important;
+    }
+
+    select.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background-color: #fff !important;
+        z-index: 9;
+    }
+
+    .empDetailsFields select.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background-color: rgb(219,238,213) !important;
+        ;
+        z-index: 9;
+    }
+
+    textarea.spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    .TransView {
+        background-color: white !important;
+    }
+
+    @@media only screen and (min-width: 992px) {
+        div .input-block span.placeholder {
+            font-size: 15px;
+        }
+
+        div.inputSelect span.placeholder {
+            font-size: 14px;
+        }
+    }
+
+    input[type='date'].spanUpperSide + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+        z-index: 9;
+    }
+
+    .showBorder {
+        border: 1px solid #dee2e6;
+    }
+
+    .forSameHt {
+        padding-bottom: 40px;
+        height: 78px !important;
+    }
+
+    .forPoints input[type='checkbox'] {
+        margin-right: 2px;
+        position: relative;
+        top: 2px;
+    }
+
+    #lblReason {
+        font-size: 16px !important;
+    }
+
+    #drpCurrency {
+        max-width: 100% !important;
+    }
+
+    #accordion table.tblBorders tr td {
+        border: 1px solid #dee2e6 !important;
+    }
+
+    #txtAboutRoleAppliedFor {
+        padding-top: 25px !important;
+    }
+
+    #fileToUpload {
+        border: none !important;
+        width: 100% !important;
+    }
+
+    #moduleBody td {
+        vertical-align: middle;
+    }
+
+    .wd {
+        margin-top: 6px;
+    }
+
+    label#lblThirdPartyPhotographer {
+        font-size: 15px !important;
+    }
+</style>
+@*Loader*@
+<style type="text/css">
+    #loader {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        z-index: 10000;
+    }
+</style>
+<script type="text/javascript">
+
+    function checkSelect(id) {
+
+        if ($('#' + id).val() != '') {
+            $('#' + id).addClass('spanUpperSide');
+        }
+    }
+    /*$('#timedemo').pickatime({ twelvehour: true });*/
+
+</script>
+
+<div class="right_col bg-color">
+    @*class for hiding left menu*@
+    <form action="/List/SaveNEIF" id="NEIForm" method="post">
+
+        <div>
+            @if (IsEditMode || IsViewMode)
+            {
+                <div>
+                    <input type="hidden" id="FormSrId" name="FormSrId" value="@(ViewBag.Model.one[0].Id)" />
+                    <input type="hidden" id="FormId" name="FormId" value="@(FormId)" />
+                    <input type="hidden" id="AppRowId" name="AppRowId" value="@(AppRowId)" />
+                </div>
+            }
+
+            <div>
+                <ol class="breadcrumb pl-0">
+                    <li>
+                        <a href="/Dashboard?formName=BTF">
+                            Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        New Employee Information Form
+                    </li>
+
+                </ol>
+            </div>
+            <div class="breadcrumb-container table-bordered" style="background-color: rgb(219,238,213) !important; ">
+                <div class="col-md-2 col-lg-2">
+                    <span class="placeholder">Date : @(!IsNew || !IsEdit ? (Convert.ToDateTime(ViewBag.Model.one[0].Created_Date).ToShortDateString()) : DateTime.Now.ToShortDateString())</span>
+                </div>
+                <div class="col-md-8 col-lg-8 mt-2 mb-1 form-heading" style="text-align:center; margin-top:5px">
+                    <span>
+                        New Employee Information Form
+                    </span>
+                </div>
+                <div class="col-md-2 col-lg-2">
+                    @if (!IsNew || !IsEdit)
+                    {
+                        <span class="placeholder"> Form Id : @(!IsNew || !IsEdit ? ("NEIF" + FormId ?? "") : "" )</span>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="heading d-none" id="headingErr">
+            <h1 id="" class="info-header">Following fields are mandatory. Please fill in information for<br /></h1>
+            <div id="add_to_me" class="header-list" style="color:red;"></div>
+        </div>
+
+        @{
+            Html.RenderPartial("_SubmitterDetailsWithModel", (ViewBag as object));
+        }
+        @{
+            Html.RenderPartial("_ApplicantDetailsWithModel", (ViewBag as object));
+        }
+
+
+        <div class="table photoform_table mb-0">
+            <table class="photo-form">
+                <tr>
+                    <td class="border-none p-0 skoda-auto">
+
+                        <!-- ACCORDIAN STRUCTURE START HERE-->
+                        <div id="accordion">
+                            <div class="card">
+                                <div class="card-header collapsed" id="headingTwo" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                    <h5 class="mb-0">
+                                        <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                            <img src="~/assets/img/transactionIcon.svg" width="24" height="24" class="mr-2" />  Transaction Fields
+                                        </button>
+                                    </h5>
+                                </div>
+
+                                <div id="collapseThree" class="collapse" aria-labelledby="headingThree" style="">
+                                    @if (IsViewMode || IsEditMode)
+                                    {
+                                        <div class="card-body">
+                                            <br />
+                                            <h4>Personal Details</h4>
+                                            <hr />
+
+                                            <!-- Full Name, Preferred Name, Date of Birth -->
+                                            <div class="form-group row">
+                                                <div class="col-md-4">
+                                                    <label for="FullName" class="col-form-label">Full Name</label>
+                                                    <input type="text" id="FullName" name="FullName" class="form-control" @(disabled) value="@(NEIF?.FullName ?? "")" required>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="PreferredName" class="col-form-label">Preferred Name</label>
+                                                    <input type="text" id="PreferredName" name="PreferredName" class="form-control" @(disabled) value="@(NEIF?.PreferredName ?? "")">
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="DateOfBirth" class="col-form-label">Date of Birth</label>
+                                                    <input type="date" id="DateOfBirth" name="DateOfBirth" class="form-control" @(disabled) value="@(NEIF?.DateOfBirth.Value.ToString("yyyy-MM-dd"))" required>
+                                                </div>
+                                            </div>
+
+                                            <!-- Gender, Marital Status, Nationality -->
+                                            <div class="form-group row">
+                                                <div class="col-md-4">
+                                                    <label for="Gender" class="col-form-label">Gender</label>
+                                                    <select id="Gender" name="Gender" class="form-control" @(disabled) required>
+                                                        <option value="" disabled selected>Select Gender</option>
+                                                        <option value="Male" @(NEIF?.Gender == "Male" ? "selected" : "")>Male</option>
+                                                        <option value="Female" @(NEIF?.Gender == "Female" ? "selected" : "")>Female</option>
+                                                        <option value="Other" @(NEIF?.Gender == "Other" ? "selected" : "")>Other</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="MaritalStatus" class="col-form-label">Marital Status</label>
+                                                    <select id="MaritalStatus" name="MaritalStatus" class="form-control" @(disabled)>
+                                                        <option value="" disabled selected>Select Marital Status</option>
+                                                        <option value="Single" @(NEIF?.MaritalStatus == "Single" ? "selected" : "")>Single</option>
+                                                        <option value="Married" @(NEIF?.MaritalStatus == "Married" ? "selected" : "")>Married</option>
+                                                        <option value="Divorced" @(NEIF?.MaritalStatus == "Divorced" ? "selected" : "")>Divorced</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="Nationality" class="col-form-label">Nationality</label>
+                                                    <input type="text" id="Nationality" name="Nationality" class="form-control" @(disabled) value="@(NEIF?.Nationality ?? "")" required>
+                                                </div>
+                                            </div>
+
+                                            <!-- Personal Email, Mobile Phone Number, Emergency Contact Name -->
+                                            <div class="form-group row">
+                                                <div class="col-md-4">
+                                                    <label for="PersonalEmail" class="col-form-label">Personal Email</label>
+                                                    <input type="text" id="PersonalEmail" name="PersonalEmail" class="form-control" @(disabled) value="@(NEIF?.PersonalEmail ?? "")" required>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="MobilePhoneNumber" class="col-form-label">Mobile Phone Number</label>
+                                                    <input type="text" id="MobilePhoneNumber" name="MobilePhoneNumber" class="form-control" @(disabled) value="@(NEIF?.MobilePhoneNumber ?? "")" required>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="EmergencyContactName" class="col-form-label">Emergency Contact Name</label>
+                                                    <input type="text" id="EmergencyContactName" name="EmergencyContactName" class="form-control" @(disabled) value="@(NEIF?.EmergencyContactName ?? "")" required>
+                                                </div>
+                                            </div>
+
+                                            <!-- Emergency Contact Relationship, Emergency Contact Phone Number, Current Address -->
+                                            <div class="form-group row">
+                                                <div class="col-md-4">
+                                                    <label for="EmergencyContactRelationship" class="col-form-label">Emergency Contact Relationship</label>
+                                                    <input type="text" id="EmergencyContactRelationship" name="EmergencyContactRelationship" class="form-control" @(disabled) value="@(NEIF?.EmergencyContactRelationship ?? "")" required>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="EmergencyContactPhoneNumber" class="col-form-label">Emergency Contact Phone Number</label>
+                                                    <input type="text" id="EmergencyContactPhoneNumber" name="EmergencyContactPhoneNumber" class="form-control" @(disabled) value="@(NEIF?.EmergencyContactPhoneNumber ?? "")" required>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="CurrentAddress" class="col-form-label">Current Address</label>
+                                                    <input type="text" id="CurrentAddress" name="CurrentAddress" class="form-control" @(disabled) value="@(NEIF?.CurrentAddress ?? "")" required>
+                                                </div>
+                                            </div>
+
+                                            <!-- Permanent Address, Postal Code -->
+                                            <div class="form-group row">
+                                                <div class="col-md-4">
+                                                    <label for="PermanentAddress" class="col-form-label">Permanent Address</label>
+                                                    <input type="text" id="PermanentAddress" name="PermanentAddress" class="form-control" @(disabled) value="@(NEIF?.PermanentAddress ?? "")">
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="PostalCode" class="col-form-label">Postal Code</label>
+                                                    <input type="text" id="PostalCode" name="PostalCode" class="form-control" @(disabled) value="@(NEIF?.PostalCode ?? "")" required>
+                                                </div>
+                                            </div>
+
+                                            <h4>Employment Details</h4>
+                                            <hr />
+
+                                            <!-- Job Title, Department, Date of Joining -->
+                                            <div class="form-group row">
+                                                <div class="col-md-4">
+                                                    <label for="JobTitle" class="col-form-label">Job Title</label>
+                                                    <input type="text" id="JobTitle" name="JobTitle" class="form-control" @(disabled) value="@(NEIF?.JobTitle ?? "")" required>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="Department" class="col-form-label">Department</label>
+                                                    <input type="text" id="Department" name="Department" class="form-control" @(disabled) value="@(NEIF?.Department ?? "")" required>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="DateOfJoining" class="col-form-label">Date of Joining</label>
+                                                    <input type="date" id="DateOfJoining" name="DateOfJoining" class="form-control" @(disabled) value="@(NEIF?.DateOfJoining.Value.ToString("yyyy-MM-dd") )" required>
+                                                </div>
+                                            </div>
+
+                                            <!-- Employment Type, Manager Name -->
+                                            <div class="form-group row">
+                                                <div class="col-md-6">
+                                                    <label for="EmploymentType" class="col-form-label">Employment Type</label>
+                                                    <select id="EmploymentType" name="EmploymentType" class="form-control" @(disabled) required>
+                                                        <option value="" disabled selected>Select Employment Type</option>
+                                                        <option value="Full-Time" @(NEIF?.EmploymentType == "Full-Time" ? "selected" : "")>Full-Time</option>
+                                                        <option value="Part-Time" @(NEIF?.EmploymentType == "Part-Time" ? "selected" : "")>Part-Time</option>
+                                                        <option value="Contract" @(NEIF?.EmploymentType == "Contract" ? "selected" : "")>Contract</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label for="ManagerName" class="col-form-label">Manager/Supervisor Name</label>
+                                                    <input type="text" id="ManagerName" name="ManagerName" class="form-control" @(disabled) value="@(NEIF?.ManagerName ?? "")" required>
+                                                </div>
+                                            </div>
+
+                                            <h4>Bank Details</h4>
+                                            <hr />
+
+                                            <!-- Bank Account Number, Bank Name, IFSC Code -->
+                                            <div class="form-group row">
+                                                <div class="col-md-4">
+                                                    <label for="BankAccountNumber" class="col-form-label">Bank Account Number</label>
+                                                    <input type="text" id="BankAccountNumber" name="BankAccountNumber" class="form-control" @(disabled) value="@(NEIF?.BankAccountNumber ?? "")" required>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="BankName" class="col-form-label">Bank Name</label>
+                                                    <input type="text" id="BankName" name="BankName" class="form-control" @(disabled) value="@(NEIF?.BankName ?? "")" required>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="IFSCCode" class="col-form-label">IFSC Code</label>
+                                                    <input type="text" id="IFSCCode" name="IFSCCode" class="form-control" @(disabled) value="@(NEIF?.IFSCCode ?? "")" required>
+                                                </div>
+                                            </div>
+
+                                            <h4>Tax Information</h4>
+                                            <hr />
+
+                                            <!-- Tax ID Number, PAN, AADHAR -->
+                                            <div class="form-group row">
+                                                <div class="col-md-4">
+                                                    <label for="TaxIDNumber" class="col-form-label">Tax ID Number</label>
+                                                    <input type="text" id="TaxIDNumber" name="TaxIDNumber" class="form-control" @(disabled) value="@(NEIF?.TaxIDNumber ?? "")" required>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="PAN" class="col-form-label">PAN</label>
+                                                    <input type="text" id="PAN" name="PAN" class="form-control" @(disabled) value="@(NEIF?.PAN ?? "")">
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="AADHAR" class="col-form-label">AADHAR</label>
+                                                    <input type="text" id="AADHAR" name="AADHAR" class="form-control" @(disabled) value="@(NEIF?.AADHAR ?? "")">
+                                                </div>
+                                            </div>
+
+                                            <!-- Driving License, Passport, Valid Visa -->
+                                            <div class="form-group row">
+                                                <div class="col-md-4">
+                                                    <label for="DrivingLicense" class="col-form-label">Driving License</label>
+                                                    <input type="text" id="DrivingLicense" name="DrivingLicense" class="form-control" @(disabled) value="@(NEIF?.DrivingLicense ?? "")" required>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="Passport" class="col-form-label">Passport</label>
+                                                    <input type="text" id="Passport" name="Passport" class="form-control" @(disabled) value="@(NEIF?.Passport ?? "")">
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="ValidVisa" class="col-form-label">Valid Visa</label>
+                                                    <input type="text" id="ValidVisa" name="ValidVisa" class="form-control" @(disabled) value="@(NEIF?.ValidVisa ?? "")">
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        }
+                                        else
+                                        {
+                                        <div class="card-body">
+                                            <br />
+                                            <h4>Personal Details</h4>
+                                            <hr />
+
+                                            <!-- Full Name, Preferred Name, Date of Birth -->
+                                            <div class="form-group row">
+                                                <div class="col-md-4">
+                                                    <label for="FullName" class="col-form-label">Full Name</label>
+                                                    <input type="text" id="FullName" name="FullName" class="form-control" required>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="PreferredName" class="col-form-label">Preferred Name</label>
+                                                    <input type="text" id="PreferredName" name="PreferredName" class="form-control">
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="DateOfBirth" class="col-form-label">Date of Birth</label>
+                                                    <input type="date" id="DateOfBirth" name="DateOfBirth" class="form-control" required>
+                                                </div>
+                                            </div>
+
+                                            <!-- Gender, Marital Status, Nationality -->
+                                            <div class="form-group row">
+                                                <div class="col-md-4">
+                                                    <label for="Gender" class="col-form-label">Gender</label>
+                                                    <select id="Gender" name="Gender" class="form-control" required>
+                                                        <option value="" disabled selected>Select Gender</option>
+                                                        <option value="Male">Male</option>
+                                                        <option value="Female">Female</option>
+                                                        <option value="Other">Other</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="MaritalStatus" class="col-form-label">Marital Status</label>
+                                                    <select id="MaritalStatus" name="MaritalStatus" class="form-control">
+                                                        <option value="" disabled selected>Select Marital Status</option>
+                                                        <option value="Single">Single</option>
+                                                        <option value="Married">Married</option>
+                                                        <option value="Divorced">Divorced</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="Nationality" class="col-form-label">Nationality</label>
+                                                    <input type="text" id="Nationality" name="Nationality" class="form-control" required>
+                                                </div>
+                                            </div>
+
+                                            <!-- Personal Email, Mobile Phone Number, Emergency Contact Name -->
+                                            <div class="form-group row">
+                                                <div class="col-md-4">
+                                                    <label for="PersonalEmail" class="col-form-label">Personal Email</label>
+                                                    <input type="text" id="PersonalEmail" name="PersonalEmail" class="form-control" required>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="MobilePhoneNumber" class="col-form-label">Mobile Phone Number</label>
+                                                    <input type="text" id="MobilePhoneNumber" name="MobilePhoneNumber" class="form-control" required>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="EmergencyContactName" class="col-form-label">Emergency Contact Name</label>
+                                                    <input type="text" id="EmergencyContactName" name="EmergencyContactName" class="form-control" required>
+                                                </div>
+                                            </div>
+
+                                            <!-- Emergency Contact Relationship, Emergency Contact Phone Number, Current Address -->
+                                            <div class="form-group row">
+                                                <div class="col-md-4">
+                                                    <label for="EmergencyContactRelationship" class="col-form-label">Emergency Contact Relationship</label>
+                                                    <input type="text" id="EmergencyContactRelationship" name="EmergencyContactRelationship" class="form-control" required>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="EmergencyContactPhoneNumber" class="col-form-label">Emergency Contact Phone Number</label>
+                                                    <input type="text" id="EmergencyContactPhoneNumber" name="EmergencyContactPhoneNumber" class="form-control" required>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="CurrentAddress" class="col-form-label">Current Address</label>
+                                                    <input type="text" id="CurrentAddress" name="CurrentAddress" class="form-control" required>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <div class="col-md-4">
+                                                    <label for="PermanentAddress" class="col-form-label">Permanent Address</label>
+                                                    <input type="text" id="PermanentAddress" name="PermanentAddress" class="form-control" required>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="PostalCode" class="col-form-label">Postal Code</label>
+                                                    <input type="tel" id="PostalCode" name="PostalCode" class="form-control" required>
+                                                </div>
+                                            </div>
+
+                                            <h4>Employment Details</h4>
+                                            <hr />
+
+                                            <!-- Job Title, Department, Date of Joining -->
+                                            <div class="form-group row">
+                                                <div class="col-md-4">
+                                                    <label for="JobTitle" class="col-form-label">Job Title</label>
+                                                    <input type="text" id="JobTitle" name="JobTitle" class="form-control" required>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="Department" class="col-form-label">Department</label>
+                                                    <input type="text" id="Department" name="Department" class="form-control" required>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="DateOfJoining" class="col-form-label">Date of Joining</label>
+                                                    <input type="date" id="DateOfJoining" name="DateOfJoining" class="form-control" required>
+                                                </div>
+                                            </div>
+
+                                            <!-- Employment Type, Manager Name -->
+                                            <div class="form-group row">
+                                                <div class="col-md-6">
+                                                    <label for="EmploymentType" class="col-form-label">Employment Type</label>
+                                                    <select id="EmploymentType" name="EmploymentType" class="form-control" required>
+                                                        <option value="" disabled selected>Select Employment Type</option>
+                                                        <option value="Full-Time">Full-Time</option>
+                                                        <option value="Part-Time">Part-Time</option>
+                                                        <option value="Contract">Contract</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label for="ManagerName" class="col-form-label">Manager/Supervisor Name</label>
+                                                    <input type="text" id="ManagerName" name="ManagerName" class="form-control" required>
+                                                </div>
+                                            </div>
+                                            <h4>Bank Details</h4>
+                                            <hr />
+
+                                            <!-- First Row -->
+                                            <div class="form-group row">
+                                                <!-- Bank Account Number -->
+                                                <div class="col-md-4">
+                                                    <label for="BankAccountNumber" class="col-form-label">Bank Account Number</label>
+                                                    <input type="text" id="BankAccountNumber" name="BankAccountNumber" class="form-control" required>
+                                                </div>
+
+                                                <!-- Bank Name -->
+                                                <div class="col-md-4">
+                                                    <label for="BankName" class="col-form-label">Bank Name</label>
+                                                    <input type="text" id="BankName" name="BankName" class="form-control" required>
+                                                </div>
+
+                                                <!-- IFSC Code -->
+                                                <div class="col-md-4">
+                                                    <label for="IFSCCode" class="col-form-label">IFSC Code</label>
+                                                    <input type="text" id="IFSCCode" name="IFSCCode" class="form-control" required>
+                                                </div>
+                                            </div>
+
+                                            <!-- Second Row -->
+                                            <div class="form-group row">
+                                                <!-- Tax ID Number -->
+                                                <div class="col-md-4">
+                                                    <label for="TaxIDNumber" class="col-form-label">Tax ID Number</label>
+                                                    <input type="text" id="TaxIDNumber" name="TaxIDNumber" class="form-control" required>
+                                                </div>
+
+                                                <!-- PAN -->
+                                                <div class="col-md-4">
+                                                    <label for="PAN" class="col-form-label">PAN</label>
+                                                    <input type="text" id="PAN" name="PAN" class="form-control">
+                                                </div>
+
+                                                <!-- AADHAR -->
+                                                <div class="col-md-4">
+                                                    <label for="AADHAR" class="col-form-label">AADHAR</label>
+                                                    <input type="text" id="AADHAR" name="AADHAR" class="form-control">
+                                                </div>
+                                            </div>
+                                            <!-- Second Row -->
+                                            <div class="form-group row">
+                                                <!-- Tax ID Number -->
+                                                <div class="col-md-4">
+                                                    <label for="DrivingLicense" class="col-form-label">Driving License</label>
+                                                    <input type="text" id="DrivingLicense" name="DrivingLicense" class="form-control" required>
+                                                </div>
+
+                                                <!-- PAN -->
+                                                <div class="col-md-4">
+                                                    <label for="Passport" class="col-form-label">Passport</label>
+                                                    <input type="text" id="Passport" name="Passport" class="form-control">
+                                                </div>
+
+                                                <!-- AADHAR -->
+                                                <div class="col-md-4">
+                                                    <label for="ValidVisa" class="col-form-label">Valid Visa</label>
+                                                    <input type="text" id="ValidVisa" name="ValidVisa" class="form-control">
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- END HERE ACCORDIAN -->
+
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            @if (IsViewMode || IsEditMode)
+            {
+                <div id="accordion">
+                    <div class="card">
+                        <div class="card-header collapsed" id="headingFour" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                            <h5 class="mb-0">
+                                <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                                    <img src="~/assets/img/approvalTracking.svg" width="24" height="24" class="mr-2" />Approval Tracking
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseFour" class="collapse" aria-labelledby="headingFour">
+                            <div class="card-body">
+                                <div class="form-row">
+                                    <div class="col-12">
+                                        <table class="table w-100 td-border showBorder">
+                                            <thead>
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>Role</th>
+                                                    <th>Processed on</th>
+                                                    <th>Status</th>
+                                                    <th class="text-center">Comments</th>
+                                                    <th class="text-center">Approval Level</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @if (!IsNew || !IsEdit)
+                                                {
+                                                    Html.RenderPartial("_ApprovalTracking", appList);
+                                                }
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br />
+            }
+
+            @if (IsNew)
+            {
+                if (!IsEdit)
+                {
+                    <div class="card-footer align-content-center">
+                        <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                            Re-Submit
+                        </button>
+                        <button type="reset" class="btn btn-danger btn-sm cancl-btn" id="btnCancel">
+                            Cancel
+                        </button>
+                    </div>
+                }
+                else
+                {
+                    <div class="card-footer align-content-center">
+                        <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                            Submit
+                        </button>
+                        <button type="reset" class="btn btn-danger btn-sm cancl-btn" id="btnCancel">
+                            Cancel
+                        </button>
+                    </div>
+                }
+            }
+        </form>
+    </div>
+    <div class="modal fade" id="successModel" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header modelHeader">
+                    <span class="modal-title modalMsgTitle" id="modalTitle"></span>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <label id="modalBody" class="lableMsg">  </label>
+                    <input type="hidden" id="tab" value="0" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="submitBomBtn publishBtn" id="modalOkButton" data-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    var spinner = $('#loader');
+    var currentUserDesgn = @Html.Raw(Json.Encode(CurrentUserDesgn));
+    var IsNew = @Html.Raw(Json.Encode(IsNew));
+    var IsEdit = @Html.Raw(Json.Encode(IsEdit));
+    var IsNewMode = @Html.Raw(Json.Encode(IsNewMode));
+    var IsEditMode = @Html.Raw(Json.Encode(IsEditMode));
+    var IsViewMode = @Html.Raw(Json.Encode(IsViewMode));
+    var NEIF = @Html.Raw(Json.Encode(NEIF));
+    var appRowId = @Html.Raw(Json.Encode(AppRowId));
+    var approvalType =@Html.Raw(Json.Encode(ApprovalType));
+    var FlagRedirect = @Html.Raw(Json.Encode(FlagRedirect));
+    var SecurityDesgnString = @Html.Raw(Json.Encode(SecurityDesgnString));
+
+    pageLoad();
+    var errorCount = 0;
+    var errors = "";
+    function pageLoad() {
+        //
+        //console.log(NEIF)
+        $("#headingErr").addClass('d-none');
+
+    }
+
+    function successModal(txt) {
+        //
+        $('#modalTitle').html('Success');
+        if (txt == "approve") {
+            $('#modalBody').html('Form has been approved!');
+        }
+        else if (txt == "reject") {
+            $('#modalBody').html('Form has been rejected!');
+        }
+        else if (txt == "enquire") {
+            $('#modalBody').html('Form has been enquired!');
+        }
+        else if (txt == "cancelled") {
+            $('#modalBody').html('Form has been cancelled!');
+        }
+        else {
+            if (IsEditMode) {
+                $('#modalBody').html('Your form with ID: NEIF' + txt + ' has been re-submitted! Kindly use this for future reference');
+            }
+            else {
+                $('#modalBody').html('Your form with ID: NEIF' + txt + ' has been submitted! Kindly use this for future reference');
+            }
+
+        }
+        FlagRedirect = txt;
+        //$("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    //function failureModal() {
+    //    $('#modalTitle').html('Failure');
+    //    $('#modalBody').html('Some error occurred!');
+    //    $("#modalOkButton").attr('data-dismiss', 'modal');
+    //    $("#successModel").modal('show');
+    //}
+    function failureModal(txt) {
+        if (txt == null) {
+            $('#modalBody').html('Some error occurred!');
+        }
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html(txt);
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function permissionModal() {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html('No permssion granted since the device is not MobiIPL owned!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function requiredModal(text) {
+        $('#modalTitle').html('Required!');
+        $('#modalBody').html(text);
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function validityModal(txt) {
+        ////
+        if (txt == 'approve') {
+            DisplayAlert('error', 'Error', 'Please select the Type of Car');
+        }
+        else if (txt == 'reject') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for rejecting the form');
+        }
+        else if (txt == 'enquire') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for enquiring the form');
+        }
+
+    }
+
+
+    function date_val() {
+        var today = new Date().toISOString().split('T')[0];
+        document.getElementsByName("txtActivityStart")[0].setAttribute("min", today);
+    }
+
+    function setInternalYear() {
+        //
+        if (!IsEdit) {
+            var value = JSON.stringify(NEIF[0]);
+            var value_1 = JSON.parse(value);
+            var activityEndDate = value_1.Value[0].ActivityEnd;
+            var regExp = /\(([^)]+)\)/;
+            var valueNumber = regExp.exec(activityEndDate);
+            var x = parseInt(valueNumber[1]);
+            var valueNumberDate = new Date(x);
+            var valueNumberDateYear = valueNumberDate.getFullYear();
+
+            var year_string = document.getElementsByName("txtActivityStart")[0].value;
+            var parts = year_string.split("-");
+            var year = new Date(parts[0], parts[1] - 1, parts[2]);
+            var min_year = year;
+            let initial_year = parseInt(parts[0]);
+            let final_year = parseInt(parts[0]) + 5;
+            var s = '<option value="-1">Choose End Year</option>';
+            for (i = initial_year + 1; i <= final_year; i++) {
+                if (i == valueNumberDateYear) {
+                    s += '<option value="' + i + '" selected>' + i + '</option>';
+                }
+                else {
+                    s += '<option value="' + i + '">' + i + '</option>';
+                }
+            }
+            $("#drpActivityEnd").html(s);
+        }
+        else {
+            var year_string = document.getElementsByName("txtActivityStart")[0].value;
+            var parts = year_string.split("-");
+            var year = new Date(parts[0], parts[1] - 1, parts[2]);
+            var min_year = year;
+            let initial_year = min_year.getFullYear();
+            let final_year = min_year.getFullYear() + 5;
+            var s = '<option value="-1">Choose End Year</option>';;
+            for (i = initial_year + 1; i <= final_year; i++) {
+                s += '<option value=" ' + i + ' ">' + i + '</option>';
+            }
+            $("#drpActivityEnd").html(s);
+        }
+
+    }
+
+    function allowNumbersOnly(e) {
+                                                                var code = (e.which) ? e.which : e.keyCode;
+                                                                if (code > 31 && (code < 48 || code > 57)) {
+                                                                e.preventDefault();
+                                                                }
+                                                                }
+
+    $("#btnSubmit").on('click', function (e) {
+        //
+        validateSubmitter();
+        validateApplicant();
+
+        // Full Name validation
+        var txtFullName = document.getElementById("FullName").value;
+        if (txtFullName == null || txtFullName.trim() === "") {
+            errors += "<li id='error" + errorCount + "'>Full Name is required</li>";
+            AddError("FullName", '', errorCount);
+            errorCount++;
+        }
+
+        // Date of Birth validation
+        var txtDateOfBirth = document.getElementById("DateOfBirth").value;
+        if (txtDateOfBirth == null || txtDateOfBirth.trim() === "") {
+            errors += "<li id='error" + errorCount + "'>Date of Birth is required</li>";
+            AddError("DateOfBirth", '', errorCount);
+            errorCount++;
+        }
+
+        // Gender validation
+        var selectGender = document.getElementById("Gender").value;
+        if (selectGender == null || selectGender.trim() === "") {
+            errors += "<li id='error" + errorCount + "'>Gender is required</li>";
+            AddError("Gender", '', errorCount);
+            errorCount++;
+        }
+
+        // Nationality validation
+        var txtNationality = document.getElementById("Nationality").value;
+        if (txtNationality == null || txtNationality.trim() === "") {
+            errors += "<li id='error" + errorCount + "'>Nationality is required</li>";
+            AddError("Nationality", '', errorCount);
+            errorCount++;
+        }
+
+        // Personal Email validation
+        var txtPersonalEmail = document.getElementById("PersonalEmail").value;
+        if (txtPersonalEmail == null || txtPersonalEmail.trim() === "") {
+            errors += "<li id='error" + errorCount + "'>Personal Email Address is required</li>";
+            AddError("PersonalEmail", '', errorCount);
+            errorCount++;
+        }
+
+        // Mobile Phone Number validation
+        var txtMobilePhoneNumber = document.getElementById("MobilePhoneNumber").value;
+        if (txtMobilePhoneNumber == null || txtMobilePhoneNumber.trim() === "") {
+            errors += "<li id='error" + errorCount + "'>Mobile Phone Number is required</li>";
+            AddError("MobilePhoneNumber", '', errorCount);
+            errorCount++;
+        }
+
+        // Emergency Contact Name validation
+        var txtEmergencyContactName = document.getElementById("EmergencyContactName").value;
+        if (txtEmergencyContactName == null || txtEmergencyContactName.trim() === "") {
+            errors += "<li id='error" + errorCount + "'>Emergency Contact Name is required</li>";
+            AddError("EmergencyContactName", '', errorCount);
+            errorCount++;
+        }
+
+        // Emergency Contact Relationship validation
+        var txtEmergencyContactRelationship = document.getElementById("EmergencyContactRelationship").value;
+        if (txtEmergencyContactRelationship == null || txtEmergencyContactRelationship.trim() === "") {
+            errors += "<li id='error" + errorCount + "'>Emergency Contact Relationship is required</li>";
+            AddError("EmergencyContactRelationship", '', errorCount);
+            errorCount++;
+        }
+
+        // Emergency Contact Phone Number validation
+        var txtEmergencyContactPhoneNumber = document.getElementById("EmergencyContactPhoneNumber").value;
+        if (txtEmergencyContactPhoneNumber == null || txtEmergencyContactPhoneNumber.trim() === "") {
+            errors += "<li id='error" + errorCount + "'>Emergency Contact Phone Number is required</li>";
+            AddError("EmergencyContactPhoneNumber", '', errorCount);
+            errorCount++;
+        }
+
+        // Current Address validation
+        var txtCurrentAddress = document.getElementById("CurrentAddress").value;
+        if (txtCurrentAddress == null || txtCurrentAddress.trim() === "") {
+            errors += "<li id='error" + errorCount + "'>Current Address is required</li>";
+            AddError("CurrentAddress", '', errorCount);
+            errorCount++;
+        }
+
+        // Postal Code validation
+        var txtPostalCode = document.getElementById("PostalCode").value;
+        if (txtPostalCode == null || txtPostalCode.trim() === "") {
+            errors += "<li id='error" + errorCount + "'>Postal Code is required</li>";
+            AddError("PostalCode", '', errorCount);
+            errorCount++;
+        }
+
+        // Job Title validation
+        var txtJobTitle = document.getElementById("JobTitle").value;
+        if (txtJobTitle == null || txtJobTitle.trim() === "") {
+            errors += "<li id='error" + errorCount + "'>Job Title is required</li>";
+            AddError("JobTitle", '', errorCount);
+            errorCount++;
+        }
+
+        // Department validation
+        var txtDepartment = document.getElementById("Department").value;
+        if (txtDepartment == null || txtDepartment.trim() === "") {
+            errors += "<li id='error" + errorCount + "'>Department is required</li>";
+            AddError("Department", '', errorCount);
+            errorCount++;
+        }
+
+        // Date of Joining validation
+        var txtDateOfJoining = document.getElementById("DateOfJoining").value;
+        if (txtDateOfJoining == null || txtDateOfJoining.trim() === "") {
+            errors += "<li id='error" + errorCount + "'>Date of Joining is required</li>";
+            AddError("DateOfJoining", '', errorCount);
+            errorCount++;
+        }
+
+        // Employment Type validation
+        var selectEmploymentType = document.getElementById("EmploymentType").value;
+        if (selectEmploymentType == null || selectEmploymentType.trim() === "") {
+            errors += "<li id='error" + errorCount + "'>Employment Type is required</li>";
+            AddError("EmploymentType", '', errorCount);
+            errorCount++;
+        }
+
+        // Manager/Supervisor Name validation
+        var txtManagerName = document.getElementById("ManagerName").value;
+        if (txtManagerName == null || txtManagerName.trim() === "") {
+            errors += "<li id='error" + errorCount + "'>Manager/Supervisor Name is required</li>";
+            AddError("ManagerName", '', errorCount);
+            errorCount++;
+        }
+
+        // Bank Account Number validation
+        var txtBankAccountNumber = document.getElementById("BankAccountNumber").value;
+        if (txtBankAccountNumber == null || txtBankAccountNumber.trim() === "") {
+            errors += "<li id='error" + errorCount + "'>Bank Account Number is required</li>";
+            AddError("BankAccountNumber", '', errorCount);
+            errorCount++;
+        }
+
+        // Bank Name validation
+        var txtBankName = document.getElementById("BankName").value;
+        if (txtBankName == null || txtBankName.trim() === "") {
+            errors += "<li id='error" + errorCount + "'>Bank Name is required</li>";
+            AddError("BankName", '', errorCount);
+            errorCount++;
+        }
+
+        // IFSC Code validation (for India)
+        var txtIFSCCode = document.getElementById("IFSCCode").value;
+        if (txtIFSCCode == null || txtIFSCCode.trim() === "") {
+            errors += "<li id='error" + errorCount + "'>IFSC Code is required</li>";
+            AddError("IFSCCode", '', errorCount);
+            errorCount++;
+        }
+
+        // Tax ID Number validation
+        var txtTaxIDNumber = document.getElementById("TaxIDNumber").value;
+        if (txtTaxIDNumber == null || txtTaxIDNumber.trim() === "") {
+            errors += "<li id='error" + errorCount + "'>Tax ID Number is required</li>";
+            AddError("TaxIDNumber", '', errorCount);
+            errorCount++;
+        }
+        if (errors.length) {
+            errors = "<ol id='errorList'>" + errors + "</ol>";
+            $("#headingErr").removeClass('d-none');
+            document.getElementById("add_to_me").innerHTML = errors;
+            errors = "";
+            errorCount = 0;
+            if (IsEditMode) {
+                $("#myModalEdit").scrollTop(0);
+                $("#myModalRequest").scrollTop(0);
+            }
+            else {
+                $(window).scrollTop(0);
+            }
+            var mainDiv = document.querySelector(".main"); mainDiv.scrollTop = 0;
+            return false;
+        }
+        $("#headingErr").addClass('d-none');
+        document.getElementById("add_to_me").innerHTML = '';
+
+        $('#ddEmpDesignation').prop("disabled", false);
+        $('#txtOnBehalfdesignation').prop("disabled", false);
+        $(".full-screen-container").removeClass('invisible');
+        $(".full-screen-container").show();
+        $("#pageLoader").removeClass('invisible');
+        $("#btnSubmit").text('Saving');
+        $("#btnSubmit").prop("disabled", true);
+        $("#btnCancel").prop("disabled", true);
+
+       //
+        var form = $("#NEIForm");
+        var formData = new FormData(form[0]);
+        $.ajax({
+            url: '/NEIF/SaveNEIF',
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            data: formData,
+            enctype: 'multipart/form-data',
+            success: (function (data) {
+                if (data.Status == 200) {
+                    if (IsNew && IsEdit) {
+                        $("#btnSubmit").text('Submit');
+                    }
+                    else {
+                        $("#btnSubmit").text('Re-Submit');
+                    }
+                    $("#btnSubmit").prop("disabled", false);
+                    $("#btnCancel").prop("disabled", false);
+                    successModal(data.Message);
+                }
+                else {
+                    failureModal(data.Message);
+                    if (IsNew && IsEdit) {
+                        $("#btnSubmit").text('Submit');
+                    }
+                    else {
+                        $("#btnSubmit").text('Re-Submit');
+                    }
+                    $("#btnSubmit").prop("disabled", false);
+                    $("#btnCancel").prop("disabled", false);
+                    console.log("failure");
+                }
+
+                $("#loader").addClass('invisible');
+                $(".full-screen-container").hide();
+            }),
+            error: (function (data) {
+                failureModal(data.Message);
+                //failureModal();
+                console.log("error");
+                if (IsNew && IsEdit) {
+                    $("#btnSubmit").text('Submit');
+                }
+                else {
+                    $("#btnSubmit").text('Re-Submit');
+                }
+
+                $("#loader").addClass('invisible');
+                $(".full-screen-container").hide();
+                $("#btnSubmit").prop("disabled", false);
+                $("#btnCancel").prop("disabled", false);
+            })
+        })
+
+        $("#tab").val(2);
+    });
+
+    $("#btnCancel").on('click', function (e) {
+        window.location = "../Dashboard";
+    });
+
+    function saveResponse(text) {
+        debugger;
+        $(".full-screen-container").removeClass('invisible');
+        $(".full-screen-container").show();
+        $("#pageLoader").removeClass('invisible');
+        var status = '', comment = '';
+        comment = $("#comment-" + text).val();
+        switch (text) {
+            case 'approve': {
+                status = 'Approved';
+                $(".full-screen-container").hide();
+                $("#pageLoader").addClass('invisible');
+                break;
+            }
+            case 'reject': {
+                status = 'Rejected';
+                if (comment == '') {
+                    //validityModal(text);
+                    $(".full-screen-container").hide();
+                    $("#pageLoader").addClass('invisible');
+                    //return;
+                }
+                break;
+            }
+            case 'enquire': {
+                status = 'Enquired';
+                if (comment == '') {
+                    //validityModal(text);
+                    $(".full-screen-container").hide();
+                    $("#pageLoader").addClass('invisible');
+                    //return;
+                }
+                break;
+            }
+        }
+        FormApproval(status, appRowId, comment, approvalType, text);
+        $("#tab").val(1);
+
+
+    }
+
+    function FormApproval(status, appRowId, comment, approvalType, text) {
+        $(".full-screen-container").removeClass('invisible');
+        $(".full-screen-container").show();
+        $("#pageLoader").removeClass('invisible');
+        spinner.show();
+        $.ajax({
+            url: '/List/SaveResponse',
+            type: 'POST',
+            data: { response: status, appRowId: appRowId, comment: comment, approvalType: approvalType },
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data.Result == 1) {
+                    successModal(text);
+                    spinner.hide();
+                    //setTimeout(FilterMyTasks, 5000);
+
+                    $("#loader").addClass('invisible');
+                    $(".full-screen-container").hide();
+                    $("#pageLoader").addClass('invisible');
+                }
+                else {
+                    failureModal();
+
+                    $("#loader").addClass('invisible');
+                    $(".full-screen-container").hide();
+                    $("#pageLoader").addClass('invisible');
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+                $("#pageLoader").addClass('invisible');
+
+                $("#loader").addClass('invisible');
+                $(".full-screen-container").hide();
+            })
+        })
+
+        $("#tab").val(1);
+    }
+
+    $('#successModel').on('hidden.bs.modal', function () {
+        ////
+        var tab = $("#tab").val();
+        console.log(tab);
+        if (tab == 1) {
+            GetMyTaskTab();
+        }
+        else if (tab == 2) {
+            window.location = "../Dashboard?tab=" + tab;
+        }
+    })
+
+    $('#myModal').modal({ backdrop: 'static', keyboard: false })
+
+
+    function checkSelect(id) {
+
+        if ($('#' + id).val() != '') {
+            $('#' + id).addClass('spanUpperSide');
+        }
+    }
+
+    </script>
+

@@ -5619,9 +5619,9 @@ div.input-block input:valid + span.placeholder_white, div.input-block input:focu
     display:none !important;
 }
 
-#accordion .card-header {
+/*#accordion .card-header {
     background-color: #0C6980 !important;
-}
+}*/
 
 .login-btn {
     background-color: #94d4cb !important;
@@ -6097,6 +6097,8 @@ input[type="password"] {
 #successModel {
     z-index: 999999999 !important;
 }
-
+#errorList {
+    margin-left: 25px !important;
+}
 
 

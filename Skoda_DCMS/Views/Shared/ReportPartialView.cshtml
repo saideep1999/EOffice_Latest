@@ -99,7 +99,7 @@
         @foreach (var item in Model.Data.Forms)
         {
             <tr>
-                <td class="align-middle">@($"{item.UniqueFormName}{item.UniqueFormId}")</td>
+                <td class="align-middle">@(item.UniqueFormName +""+item.UniqueFormId)</td>
                 <td class="align-middle">@item.FormName</td>
                 @if (item.Author != null)
                 {

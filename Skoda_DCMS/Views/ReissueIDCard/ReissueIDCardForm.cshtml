@@ -540,7 +540,7 @@
                     </a>
                 </li>
                 <li>
-                    SAVWIPL - Reissue ID Card
+                    Mobi - Reissue ID Card
                 </li>
             </ol>
         </div>
@@ -552,7 +552,7 @@
                     </div>
                     <div class="col-md-4 col-lg-4 mb-1 form-heading" style="text-align:center; margin-top:5px">
                         <span>
-                            SAVWIPL - Reissue ID Card
+                            Mobi - Reissue ID Card
                         </span>
                     </div>
                     <div class="col-md-4 col-lg-4 text-right">
@@ -716,13 +716,13 @@
                                     <div class="form-group col-12" id="uploadFileDiv">
                                         @if (IsNewMode)
                                         {
-                                            <div class="form-group col-md-6 col-lg-6 col-12" id="dnfFileUpload">
-                                                <label class="">
+                                            <div class="" id="dnfFileUpload">
+                                                <label style="display: inline-block; margin-right: 12px !important;">
                                                     Upload Photo
                                                     @*Upload Image for ID Card*@
                                                 </label>
                                                 <input type="file" id="fileToUpload" name="fileToUpload" style="background-color: white !important; width: 215px" />
-                                                <div><small><b>Note: Passport size photo in office uniform</b></small></div>
+                                                <div><small style="color: #dd0a0a;"><b>Note: Passport size photo in office uniform</b></small></div>
                                             </div>
                                         }
                                         else if (IsEditMode)
@@ -778,7 +778,7 @@
 
                 @if (IsViewMode)
                 {
-                    <div id="accordion">
+                    @*<div id="accordion" style="display:none">
                         <div class="card" id="actionTab">
                             <div class="card-header collapsed" id="headingFive" data-toggle="collapse" data-target="#collapseFive" aria-expanded="true" aria-controls="collapseFive">
                                 <h5 class="mb-0">
@@ -822,7 +822,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div>*@
                 }
 
                 @if (IsViewMode || IsEditMode)
@@ -870,11 +870,6 @@
                         </div>
                     </div>
                 }
-
-                <div class="pt-3">
-                    <p class="text-left f-600">SF_SO/1_018.00</p>
-                </div>
-
 
                 @if (IsEditMode)
                 {
@@ -1244,7 +1239,7 @@
             else {
                 $(window).scrollTop(0);
             }
-            $('#myModal5').animate({ scrollTop: 0 }, 'slow');
+            var mainDiv = document.querySelector(".main"); mainDiv.scrollTop = 0;
             return false;
         }
         $("#headingErr").addClass('d-none');
@@ -1252,6 +1247,8 @@
         errors = "";
         errorCount = 0;
 
+        $(".full-screen-container").removeClass('invisible');
+        $(".full-screen-container").show();
         $("#pageLoader").removeClass('invisible');
         $("#btnSubmit").text('Saving');
         $("#btnSubmit").prop("disabled", true);
@@ -1293,6 +1290,8 @@
                     $("#btnSubmit").prop("disabled", false);
                     $("#btnCancel").prop("disabled", false);
                 }
+                $("#loader").addClass('invisible');
+                $(".full-screen-container").hide();
             }),
             error: (function (data) {
                 failureModal(data.Message);
@@ -1306,6 +1305,8 @@
                 $("#btnSubmit").prop("disabled", false);
                 $("#btnCancel").prop("disabled", false);
                 $("#pageLoader").addClass('invisible');
+                $("#loader").addClass('invisible');
+                $(".full-screen-container").hide();
             })
         })
         $("#tab").val(2);
@@ -1337,7 +1338,9 @@
     }
 
     function saveResponse(text) {
-        
+        debugger;
+        $(".full-screen-container").removeClass('invisible');
+        $(".full-screen-container").show();
         let errorCount = 1;
         var errors = "";
         var status = '', comment = '';
@@ -1346,85 +1349,41 @@
             case 'approve': {
                 status = 'Approved';
                 if (currentUserDesgn == "ID Card Office") {
-                    var dateOfIssue = document.forms["RIDCForm"]["txtDateOfIssue"].value;
-                    if (dateOfIssue == "") {
-                        errors += "<li id='error" + errorCount + "'>" + "Date Of Issue" + "</li>";
-                        AddError("txtDateOfIssue", '', errorCount);
-                        errorCount++;
-                    }
-                    else {
-                        RemoveError("txtDateOfIssue");
-                    }
-
-
-      
-                    var drpChargeable = $("#drpChargeable option:selected").val();
-                    if (drpChargeable == "") {
-                        errors += "<li id='error" + errorCount + "'>" + "Chargeable" + "</li>";
-                        AddError("drpChargeable", '', errorCount);
-                        errorCount++;
-                    }
-                    else {
-                        RemoveError("drpChargeable");
-                    }
-                    var IDCardNumber = document.getElementById("txtIDCardNumber").value;
-                    if (IDCardNumber == "") {
-                        errors += "<li id='error" + errorCount + "'>" + "ID Card Number" + "</li>";
-                        AddError("txtIDCardNumber", '', errorCount);
-                        errorCount++;
-                    }
-                    else {
-                        RemoveError("txtIDCardNumber");
-                    }
-
-                    if (errors.length) {
-                        DisplayAlert('error', 'Error', 'Please enter the details in Action Section');
-                        errors = "<ol id='errorList'>" + errors + "</ol>";
-                        $("#headingErr").removeClass('d-none');
-                        document.getElementById("add_to_me").innerHTML = errors;
-                        errors = "";
-                        errorCount = 0;
-                        if (isEditMode) {
-                            $("#myModalRequest").scrollTop(0);
-                        }
-                        else {
-                            $(window).scrollTop(0);
-                        }
-                        $('#myModal5').animate({ scrollTop: 0 }, 'slow');
-                        return false;
-                    }
-                    $("#headingErr").addClass('d-none');
-                    document.getElementById("add_to_me").innerHTML = '';
-                    errors = "";
-                    errorCount = 0;
-                    ValidityUpdate(status, appRowId, comment, approvalType, text);
+                    FormApproval(status, appRowId, comment, approvalType, text);
+                    
                 }
                 else {
                     FormApproval(status, appRowId, comment, approvalType, text);
+                  
                 }
-
+                
                 break;
             }
             case 'reject': {
                 status = 'Rejected';
                 if (comment == '') {
-                    validityModal(text);
-                    return;
+                    FormApproval(status, appRowId, comment, approvalType, text);
+                    //validityModal(text);
+                  
+                    //return;
                 }
                 else {
                     FormApproval(status, appRowId, comment, approvalType, text);
+                   
                 }
                 break;
             }
             case 'enquire': {
                 status = 'Enquired';
                 if (comment == '') {
-                    validityModal(text);
+                    //validityModal(text);
                     FormApproval(status, appRowId, comment, approvalType, text);
-                    return;
+                   
+                    //return;
                 }
                 else {
                     FormApproval(status, appRowId, comment, approvalType, text);
+                   
                 }
                 break;
             }
@@ -1456,7 +1415,9 @@
     }
 
     function FormApproval(status, appRowId, comment, approvalType, text) {
-        
+        $(".full-screen-container").removeClass('invisible');
+        $(".full-screen-container").show();
+        $("#pageLoader").removeClass('invisible');
         spinner.show();
         $.ajax({
             url: '/List/SaveResponse',
@@ -1467,21 +1428,32 @@
                 if (data.Result == 1) {
                     successModal(text);
                     spinner.hide();
-                    setTimeout(FilterMyTasks, 5000);
-                    spinner.hide();
+                    //setTimeout(FilterMyTasks, 5000);
+
+                    $("#loader").addClass('invisible');
+                    $(".full-screen-container").hide();
+                    $("#pageLoader").addClass('invisible');
                 }
                 else {
                     failureModal();
-                    spinner.hide();
+
+                    $("#loader").addClass('invisible');
+                    $(".full-screen-container").hide();
+                    $("#pageLoader").addClass('invisible');
                 }
             }),
             error: (function (data) {
                 failureModal();
-                spinner.hide();
+                $("#pageLoader").addClass('invisible');
+
+                $("#loader").addClass('invisible');
+                $(".full-screen-container").hide();
             })
         })
 
+        $("#tab").val(1);
     }
+
 
     function requiredModal(text) {
         $('#modalTitle').html('Required!');

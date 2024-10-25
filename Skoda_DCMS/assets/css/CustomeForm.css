@@ -1,0 +1,500 @@
+﻿
+.deviationDate {
+    /*max-width: fit-content !important;*/
+    /* max-width:20px;*/
+    width: 15px;
+    margin-left: 1px;
+    margin-right: 1px;
+    height: 30px !important;
+    border: none !important;
+    max-width: 95px !important;
+    background-color: #fff !important;
+    outline: none !important;
+}
+
+.astColor {
+    color: red;
+}
+
+/*New design css start here*/
+
+.textTrans {
+    width: 100%;
+    max-width: 99%;
+    border-radius: 5px;
+    margin-right: 0px;
+    border: 1px solid #BFBFBF !important;
+}
+
+.empDetailsBg {
+    background-color: #fffbef;
+}
+#accordion select {
+    color: #000;
+    width: 100% !important;
+    max-width: 100%;
+    height: 45px;
+    background-color: #fff;
+    border: 1px solid #BFBFBF;
+    box-sizing: border-box;
+    border-radius: 5px;
+    background-image: url(data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>);
+    background-repeat: no-repeat;
+    background-position: right .75rem center;
+    background-size: 16px 12px;
+}
+
+#accordion input[type='text'] {
+    width: 100% !important;
+    max-width: 100%;
+    height: 45px;
+    background-color: #fff;
+    border: 1px solid #BFBFBF !important;
+    box-sizing: border-box;
+    border-radius: 5px !important;
+}
+
+#accordion input[type='date'] {
+    width: 100% !important;
+    max-width: 100%;
+    height: 45px;
+    background-color: #fff;
+    border: 1px solid #BFBFBF !important;
+    box-sizing: border-box;
+    border-radius: 5px;
+}
+
+#accordion input[type='time'] {
+    height: 45px;
+}
+
+#accordion label {
+    font-size: 16px;
+    line-height: 22px;
+    font-weight: 600;
+    color: #201F1F;
+}
+
+#accordion table tr td {
+    border: none;
+    font-size: 16px;
+    line-height: 19px;
+    color: #201F1F;
+    background-color: white;
+}
+
+#accordion label {
+    display: block;
+}
+
+#accordion .card-header {
+    background: rgb(4 59 100) !important;
+    border-radius: 5px 5px 0px 0px;
+    position: relative;
+    margin-top: 15px;
+}
+
+    #accordion .card-header.collapsed h5:after {
+        content: '+';
+        position: absolute;
+        right: 22px;
+        top: 17px;
+        font-size: 20px;
+        font-weight: 600;
+        color: #fff;
+    }
+
+    #accordion .card-header h5:after {
+        content: '-';
+        position: absolute;
+        right: 22px;
+        top: 17px;
+        font-size: 20px;
+        font-weight: 600;
+        color: #fff;
+    }
+
+#accordion h5 button {
+    font-size: 18px;
+    line-height: 22px;
+    /* identical to box height */
+    padding-left: 0px;
+    display: flex;
+    align-items: center;
+    text-transform: uppercase;
+    /* Text_white */
+
+    color: #FFFFFF;
+}
+
+    #accordion h5 button:focus {
+        box-shadow: none;
+    }
+
+.empDetailsFields label {
+    display: block !important;
+    margin-bottom: 0px;
+}
+
+.empDetailsFields .row label {
+    display: block;
+    margin-bottom: 0px;
+}
+
+    .empDetailsFields .row label:nth-child(1) {
+        font-style: normal;
+        font-weight: normal !important;
+        font-size: 12px;
+        line-height: 18px;
+        color: #A9A9A9 !important;
+    }
+
+    .empDetailsFields .row label:nth-child(2) {
+        font-style: normal;
+        font-weight: normal;
+        font-size: 18px;
+        line-height: 22px;
+        color: #201F1F;
+    }
+
+.firstLastName {
+    font-style: normal;
+    font-weight: normal;
+    font-size: 20px;
+    line-height: 24px;
+    /* identical to box height */
+
+    display: flex;
+    align-items: center;
+    color: #201F1F;
+}
+
+.submit-btn {
+    background: #3D3D3D;
+    border-radius: 5px;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 16px;
+    line-height: 173.7%;
+    /* identical to box height, or 28px */
+    padding: 0.5rem 2rem;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    text-transform: uppercase;
+    color: #FFFFFF;
+    border-color: transparent !important;
+}
+
+.cancl-btn {
+    background: #FAE99B;
+    border-radius: 5px;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 16px;
+    border-color: transparent !important;
+    line-height: 173.7%;
+    /* identical to box height, or 28px */
+    padding: 0.5rem 2rem;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    text-transform: uppercase;
+    color: #212221;
+    margin-left: 10px;
+}
+
+
+
+
+.card-footer {
+    display: flex;
+    background-color: transparent !important;
+}
+
+.photo-form {
+    width: 100%;
+}
+
+.ui-front {
+    z-index: 9999999 !important;
+}
+/*Animation CSS Starts*/
+
+div.input-block {
+    position: relative;
+}
+
+    div.input-block input {
+        font-weight: 500;
+        font-size: 1rem;
+        color: #000;
+        width: 188px;
+        padding: 15px 15px;
+        border-bottom-left-radius: 5px !important;
+        border-top-left-radius: 5px !important;
+        border-bottom-right-radius: 0px !important;
+        border-top-right-radius: 0px !important;
+        border: 1px solid #D9D9D9;
+        outline: none;
+    }
+
+    div.input-block textarea {
+        font-weight: 500;
+        font-size: 1rem;
+        color: #000;
+        width: 100%;
+        padding: 15px 15px;
+        border-bottom-left-radius: 5px !important;
+        border-top-left-radius: 5px !important;
+        border-bottom-right-radius: 0px !important;
+        border-top-right-radius: 0px !important;
+        background-color: #fff;
+        border: 1px solid #D9D9D9;
+        outline: none;
+    }
+
+    div.input-block span.placeholder {
+        position: absolute;
+        margin: 17px 0;
+        padding: 0 4px;
+        font-family: Roboto, sans-serif;
+        color: #6c757d;
+        display: flex;
+        align-items: center;
+        font-size: 1rem;
+        top: -6px;
+        left: 15px;
+        transition: all 0.2s;
+        transform-origin: 0% 0%;
+        background: none;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    div.input-block textarea:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: #fff !important;
+    }
+
+    div.input-block textarea:valid + span.placeholder,
+    div.input-block textarea:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px) !important;
+        background: #fff !important;
+    }
+
+    div.input-block input:valid + span.placeholder,
+    div.input-block input:focus + span.placeholder {
+        transform: scale(0.8) translateY(-25px);
+        background-color: #fff;
+    }
+
+.empDetailsFields div.input-block input:valid + span.placeholder,
+.empDetailsFields div.input-block input:focus + span.placeholder {
+    transform: scale(0.8) translateY(-25px);
+    background-color: rgb(219,238,213);
+}
+
+div.input-block input.spanUpperSide + span.placeholder {
+    transform: scale(0.8) translateY(-25px);
+    background-color: rgb(219,238,213);
+}
+
+.empDetailsFields div.input-block input:read-only + span.placeholder,
+.empDetailsFields div.input-block input:read-only + span.placeholder {
+    transform: scale(0.8) translateY(-25px);
+    background-color: rgb(219,238,213);
+}
+
+div.input-block input:read-only + span.placeholder,
+div.input-block input:read-only + span.placeholder {
+    transform: scale(0.8) translateY(-25px);
+    background-color: #fff;
+}
+
+
+div.inputSelect span.placeholder {
+    position: absolute;
+    margin: 17px 0;
+    padding: 0 4px;
+    font-family: Roboto, sans-serif;
+    color: #000;
+    display: flex;
+    align-items: center;
+    font-size: 1rem;
+    top: -6px;
+    left: 15px;
+    transition: all 0.2s;
+    transform-origin: 0% 0%;
+    background: none;
+    pointer-events: none;
+    z-index: 1;
+}
+
+div.inputSelect select:focus + span.placeholder {
+    transform: scale(0.8) translateY(-25px);
+    background: #fff;
+    z-index: 9;
+}
+
+.empDetailsFields div.inputSelect select:focus + span.placeholder {
+    transform: scale(0.8) translateY(-25px);
+    background-color: rgb(219,238,213);
+    z-index: 9;
+}
+
+div.inputSelect select:not([value=""]):valid + span.placeholder {
+    transition: all 0.2s;
+    transform-origin: 0% 0%;
+}
+
+
+
+div.input-block input:focus + span.placeholder {
+    color: #284B63;
+}
+
+.breadcrumb {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    padding: 1rem 1rem 0;
+    margin-bottom: 0;
+    list-style: none;
+    background-color: #FFFFFF;
+    border-radius: .25rem;
+}
+
+body.nav-sm .container.body .left_col {
+    width: 63px;
+    padding: 0;
+    position: fixed;
+    height: 100%;
+    z-index: 8;
+}
+
+.card {
+    position: relative;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    border: 0px;
+    border-radius: .25rem;
+}
+
+.dropdown-toggle::after {
+    display: none;
+    width: 0;
+    height: 0;
+    margin-left: .255em;
+    vertical-align: .255em;
+    content: "";
+    border-top: .3em solid;
+    border-right: .3em solid transparent;
+    border-bottom: 0;
+    border-left: .3em solid transparent;
+}
+
+input.spanUpperSide + span.placeholder {
+    background-color: rgb(219,238,213);
+}
+
+inputSelect.spanUpperSide + span.placeholder {
+    background-color: rgb(219,238,213) !important;
+}
+
+select.spanUpperSide + span.placeholder {
+    transform: scale(0.8) translateY(-25px) !important;
+    background-color: #fff !important;
+    z-index: 9;
+}
+
+.empDetailsFields select.spanUpperSide + span.placeholder {
+    transform: scale(0.8) translateY(-25px) !important;
+    background-color: rgb(219,238,213) !important;
+    z-index: 9;
+}
+
+textarea.spanUpperSide + span.placeholder {
+    transform: scale(0.8) translateY(-25px) !important;
+    background: #fff !important;
+    z-index: 9;
+}
+
+.TransView {
+    background-color: white !important;
+}
+
+@media only screen and (min-width: 992px) {
+    div .input-block span.placeholder {
+        font-size: 15px;
+    }
+
+    div.inputSelect span.placeholder {
+        font-size: 14px;
+    }
+}
+
+input[type='date'].spanUpperSide + span.placeholder {
+    transform: scale(0.8) translateY(-25px) !important;
+    background: #fff !important;
+    z-index: 9;
+}
+
+.showBorder {
+    border: 1px solid #dee2e6;
+}
+
+.forSameHt {
+    padding-bottom: 40px;
+    height: 78px !important;
+}
+
+.forPoints input[type='checkbox'] {
+    margin-right: 2px;
+    position: relative;
+    top: 2px;
+}
+
+#lblReason {
+    font-size: 16px !important;
+}
+
+#drpCurrency {
+    max-width: 100% !important;
+}
+
+#accordion table.tblBorders tr td {
+    border: 1px solid #dee2e6 !important;
+}
+
+#txtAboutRoleAppliedFor {
+    padding-top: 25px !important;
+}
+
+#fileToUpload {
+    border: none !important;
+    width: 100% !important;
+}
+
+#moduleBody td {
+    vertical-align: middle;
+}
+
+.wd {
+    margin-top: 6px;
+}
+
+label#lblThirdPartyPhotographer {
+    font-size: 15px !important;
+}

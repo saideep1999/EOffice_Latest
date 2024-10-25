@@ -13,23 +13,13 @@ namespace Skoda_DCMS.Controllers
     {
         NEIFDAL neifDAL;
 
-        //[HttpPost]
-        //public async Task<ActionResult> SaveDAF(FormCollection form)
-        //{
-        //    HttpPostedFileBase file = null, file1 = null;
-
-        //    if (Request.Files.Count > 0)
-        //    {
-        //        HttpFileCollectionBase files = Request.Files;
-        //        //file will be Photo only and file1 => LicensePhotoCopy
-        //        file = Request.Files[0].ContentLength > 0 ? files["photo"] : null;
-        //        file1 = Request.Files[1].ContentLength > 0 ? files["licensePhotoCopy"] : null;
-
-        //    }
-        //    neifDAL = new NEIFDAL();
-        //    var result = await neifDAL.SaveDAF(form, (UserData)Session["UserData"], file, file1);
-        //    return Json(result, JsonRequestBehavior.AllowGet);
-        //}
+        [HttpPost]
+        public async Task<ActionResult> SaveNEIF(FormCollection form)
+        {
+            neifDAL = new NEIFDAL();
+            var result = await neifDAL.SaveNEIF(form, (UserData)Session["UserData"]);
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
         // GET: NEIF
         public ActionResult Index()
         {

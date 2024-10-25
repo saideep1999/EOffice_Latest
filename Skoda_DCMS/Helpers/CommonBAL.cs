@@ -7845,13 +7845,733 @@ namespace Skoda_DCMS.Helpers
 
                     body += "<img src=cid:LogoImage alt=\"\"></img>";
                 }
-                    ApprovalDataModel nileshid = new ApprovalDataModel();
-                    nileshid.Level = 0;
-                    nileshid.EmailId = "";
-                    //nileshid.EmailId = "giridhar.patil@skoda-vw.co.in";
-                    nileshid.EmailId = "prashant.k@mobinexttech.com";
-                    approverList.Add(nileshid);
-                
+                ApprovalDataModel nileshid = new ApprovalDataModel();
+                nileshid.Level = 0;
+                nileshid.EmailId = "";
+                //nileshid.EmailId = "giridhar.patil@skoda-vw.co.in";
+                nileshid.EmailId = "prashant.k@mobinexttech.com";
+                approverList.Add(nileshid);
+
+                //return new EmailDataModel() { Body = body, Location = employeeLocation, ToIds = approverList.Where(x => x.Designation == "Head of Department (Pilot Hall)" ).Select(y => y.EmailId).ToList() };
+                return new EmailDataModel() { Body = body, Location = employeeLocation, ToIds = approverList.Where(x => x.Level == 1 || x.Level == 0).Select(y => y.EmailId).ToList() };
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message, ex);
+                return new EmailDataModel() { };
+            }
+        }
+
+        public async Task<EmailDataModel> GetTSFBody(int formId, UserData currentUser, int Status = 0)
+        {
+            string body = "";
+            try
+            {
+                string employeeLocation = "";
+                var returnModel = new EmailDataModel();
+                string FormName = "TSF Form";
+                var rowId = await GetRowID_SQL(formId, currentUser);
+                var approverList = await GetApprovalDetails_SQL(rowId, formId, currentUser);
+
+                List<TSFModel> item = new List<TSFModel>();
+                List<DailyHour> TSFormDataList = new List<DailyHour>();
+                TSFModel model = new TSFModel();
+                SqlCommand cmd = new SqlCommand();
+                SqlDataAdapter adapter = new SqlDataAdapter();
+                DataTable dt = new DataTable();
+                con = new SqlConnection(sqlConString);
+                cmd = new SqlCommand("USP_ViewTSFormDetails", con);
+                cmd.Parameters.Add(new SqlParameter("@rowId", rowId));
+                // cmd.Parameters.Add(new SqlParameter("@FutureOwnerEmail", model.FutureOwnerEmail));
+                cmd.CommandType = CommandType.StoredProcedure;
+                adapter.SelectCommand = cmd;
+                con.Open();
+                adapter.Fill(dt);
+                con.Close();
+                if (dt.Rows.Count > 0)
+                {
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        model.Id = Convert.ToInt32(dt.Rows[i]["ID"]);
+                        model.AppRowId = Convert.ToInt32(dt.Rows[i]["ID"]);
+                        model.FormId = Convert.ToInt32(dt.Rows[i]["FormId"]);
+                        model.EmployeeType = Convert.ToString(dt.Rows[0]["EmployeeType"]);
+                        model.EmployeeCode = Convert.ToInt64(dt.Rows[0]["EmployeeCode"]);
+                        model.EmployeeCCCode = Convert.ToInt64(dt.Rows[0]["EmployeeCCCode"]);
+                        model.EmployeeUserId = Convert.ToString(dt.Rows[0]["EmployeeUserId"]);
+                        model.EmployeeName = Convert.ToString(dt.Rows[0]["EmployeeName"]);
+                        model.EmployeeDepartment = Convert.ToString(dt.Rows[0]["EmployeeDepartment"]);
+                        model.EmployeeContactNo = Convert.ToInt64(dt.Rows[0]["EmployeeContactNo"]);
+                        model.ExternalOrganizationName = Convert.ToString(dt.Rows[0]["ExternalOrganizationName"]);
+                        model.EmployeeLocation = Convert.ToString(dt.Rows[0]["EmployeeLocation"]);
+                        model.EmployeeDesignation = Convert.ToString(dt.Rows[0]["EmployeeDesignation"]);
+                        model.RequestSubmissionFor = Convert.ToString(dt.Rows[0]["RequestSubmissionFor"]);
+                        model.OnBehalfOption = Convert.ToString(dt.Rows[0]["OnBehalfOption"]);
+                        model.OtherEmployeeType = Convert.ToString(dt.Rows[0]["OtherEmployeeType"]);
+                        model.OtherEmployeeCode = Convert.ToInt64(dt.Rows[0]["OtherEmployeeCode"]);
+                        model.OtherEmployeeCCCode = dt.Rows[0]["OtherEmployeeCCCode"] != null || dt.Rows[0]["OtherEmployeeCCCode"] != DBNull.Value || dt.Rows[0]["OtherEmployeeCCCode"] != "0" ? Convert.ToInt64(dt.Rows[0]["OtherEmployeeCCCode"]) : 0;
+                        model.OtherEmployeeContactNo = Convert.ToString(dt.Rows[0]["OtherEmployeeContactNo"]);
+                        model.OtherEmployeeUserId = Convert.ToString(dt.Rows[0]["OtherEmployeeUserId"]);
+                        model.OtherEmployeeName = Convert.ToString(dt.Rows[0]["OtherEmployeeName"]);
+                        model.OtherEmployeeDepartment = Convert.ToString(dt.Rows[0]["OtherEmployeeDepartment"]);
+                        model.OtherEmployeeLocation = Convert.ToString(dt.Rows[0]["OtherEmployeeLocation"]);
+                        model.OtherEmployeeDesignation = Convert.ToString(dt.Rows[0]["OtherEmployeeDesignation"]);
+                        model.OtherExternalOrganizationName = Convert.ToString(dt.Rows[0]["OtherExternalOrganizationName"]);
+                        model.OtherEmployeeEmailId = Convert.ToString(dt.Rows[0]["OtherEmployeeEmailId"]);
+                        model.Created_Date = Convert.ToDateTime(dt.Rows[0]["Created"]);
+
+                        model.EmployeeID = Convert.ToString(dt.Rows[0]["EmployeeID"]);
+                        model.WeekEndingDate = Convert.ToDateTime(dt.Rows[0]["WeekEndingDate"]);
+                        model.TotalHoursWorked = Convert.ToDecimal(dt.Rows[0]["TotalHoursWorked"]);
+                        if (dt.Rows[0]["LeaveTaken"] != DBNull.Value)
+                            model.LeaveTaken = Convert.ToDecimal(dt.Rows[0]["LeaveTaken"]);
+                        else
+                            model.LeaveTaken = 0;
+                        item.Add(model);
+                    }
+
+                }
+                model = item[0];
+                if (Status != 1)
+                {
+                    body += GetSubmitterAndApplicantHtml(model);
+                }
+
+                body = body + "<br><br> <table width=\"100%\">";
+                body = body + "<tr><th style=\"padding-top: 12px;padding-bottom: 12px;text-align: left;background-color: #4CAF50;color: white; border: 1px solid #ddd;\"><b>Request Details</b></th></tr>";
+                body = body + "<tr><td>" + "Request Id: " + formId + "</td></tr>";
+                body = body + "<tr><td>" + "Request Description: " + FormName + "</td></tr>";
+                body = body + "<tr><td>" + "EmployeeID: " + model.EmployeeID + "</td></tr>";
+                body = body + "<tr><td>" + "WeekEndingDate: " + model.WeekEndingDate + "</td></tr>";
+                body = body + "<tr><td>" + "Total Hours Worked: " + model.TotalHoursWorked + "</td></tr>";
+                body = body + "<tr><td>" + "LeaveTaken: " + model.LeaveTaken + "</td></tr>";
+                body = body + "<tr><th style=\"padding-top: 12px;padding-bottom: 12px;text-align: left;background-color: #4CAF50;color: white; border: 1px solid #ddd;\"><b>Application Category</b></th></tr>";
+
+
+                SqlCommand cmd1 = new SqlCommand();
+                SqlDataAdapter adapter1 = new SqlDataAdapter();
+                DataTable ds1 = new DataTable();
+                con = new SqlConnection(sqlConString);
+                cmd = new SqlCommand("USP_ViewTSFormDataList", con);
+                cmd.Parameters.Add(new SqlParameter("@rowId", rowId));
+                // cmd.Parameters.Add(new SqlParameter("@FutureOwnerEmail", model.FutureOwnerEmail));
+                cmd.CommandType = CommandType.StoredProcedure;
+                adapter.SelectCommand = cmd;
+                con.Open();
+                adapter.Fill(ds1);
+                con.Close();
+                if (ds1.Rows.Count > 0)
+                {
+                    for (int i = 0; i < ds1.Rows.Count; i++)
+                    {
+                        DailyHour model1 = new DailyHour();
+                        model1.DailyHourId = Convert.ToInt32(ds1.Rows[i]["Id"]);
+                        model1.TSFId = Convert.ToInt32(ds1.Rows[i]["TSFId"]);
+                        model1.CostCode = Convert.ToString(ds1.Rows[i]["CostCode"]);
+                        model1.MondayHours = Convert.ToDecimal(ds1.Rows[i]["MondayHours"]);
+                        model1.TuesdayHours = Convert.ToDecimal(ds1.Rows[i]["TuesdayHours"]);
+                        model1.WednesdayHours = Convert.ToDecimal(ds1.Rows[i]["WednesdayHours"]);
+                        model1.ThursdayHours = Convert.ToDecimal(ds1.Rows[i]["ThursdayHours"]);
+                        model1.FridayHours = Convert.ToDecimal(ds1.Rows[i]["FridayHours"]);
+                        if (ds1.Rows[i]["SaturdayHours"] != DBNull.Value)
+                            model1.SaturdayHours = Convert.ToDecimal(ds1.Rows[i]["SaturdayHours"]);
+                        else
+                            model1.SaturdayHours = null;
+                        if (ds1.Rows[i]["SundayHours"] != DBNull.Value)
+                            model1.SundayHours = Convert.ToDecimal(ds1.Rows[i]["SundayHours"]);
+                        else
+                            model1.SundayHours = null;
+                        TSFormDataList.Add(model1);
+                    }
+                }
+
+                for (int i = 0; i < TSFormDataList.Count; i++)
+                {
+                    body = body + "<tr><td>" + "CostCode : " + TSFormDataList[i].CostCode + "</td></tr>";
+                    body = body + "<tr><td>" + "MondayHours : " + TSFormDataList[i].MondayHours + "</td></tr>";
+                    body = body + "<tr><td>" + "Tuesday Hours : " + TSFormDataList[i].TuesdayHours + "</td></tr>";
+                    body = body + "<tr><td>" + "Wednesday Hours : " + TSFormDataList[i].WednesdayHours + "</td></tr>";
+                    body = body + "<tr><td>" + "Thursday Hours : " + TSFormDataList[i].ThursdayHours + "</td></tr>";
+                    body = body + "<tr><td>" + "Friday Hours : " + TSFormDataList[i].FridayHours + "</td></tr>";
+                    body = body + "<tr><td>" + "Saturday Hours : " + TSFormDataList[i].SaturdayHours + "</td></tr>";
+                    body = body + "<tr><td>" + "Sunday Hours : " + TSFormDataList[i].SundayHours + "</td></tr>";
+
+
+                }
+                if (Status != 1)
+                {
+                    //approvers
+                    body = body + "<br><br> <table width=\"100%\">";
+                    body = body + "<tr><th style=\"padding-top: 12px;padding-bottom: 12px;text-align: left;background-color: #4CAF50;color: white; border: 1px solid #ddd;\"><b>Approver Details</b></th></tr>";
+                    foreach (var approver in approverList.Where(x => x.ApproverStatus != "Pending"))
+                    {
+                        body = body + "<tr><td>" + "Approved By: " + approver.UserName + "</td></tr>";
+                        body = body + "<tr><td>" + "Approved On: " + approver.Modified.ToShortDateString() + " " + Convert.ToDateTime(approver.Modified).AddHours(5.5).ToShortTimeString() + "</td></tr>";
+                        body = body + "<tr><td>" + "Comments: " + approver.Comment + "</td></tr>";
+                    }
+
+                    body = body + "</table><br>";
+
+                    body += "<img src=cid:LogoImage alt=\"\"></img>";
+                }
+                ApprovalDataModel nileshid = new ApprovalDataModel();
+                nileshid.Level = 0;
+                nileshid.EmailId = "";
+                //nileshid.EmailId = "giridhar.patil@skoda-vw.co.in";
+                nileshid.EmailId = "prashant.k@mobinexttech.com";
+                approverList.Add(nileshid);
+
+                //return new EmailDataModel() { Body = body, Location = employeeLocation, ToIds = approverList.Where(x => x.Designation == "Head of Department (Pilot Hall)" ).Select(y => y.EmailId).ToList() };
+                return new EmailDataModel() { Body = body, Location = employeeLocation, ToIds = approverList.Where(x => x.Level == 1 || x.Level == 0).Select(y => y.EmailId).ToList() };
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message, ex);
+                return new EmailDataModel() { };
+            }
+        }
+
+        public async Task<EmailDataModel> GetDCAFBody(int formId, UserData currentUser, int Status = 0)
+        {
+            string body = "";
+            try
+            {
+                string employeeLocation = "";
+                var returnModel = new EmailDataModel();
+                string FormName = "DCAF Form";
+                var rowId = await GetRowID_SQL(formId, currentUser);
+                var approverList = await GetApprovalDetails_SQL(rowId, formId, currentUser);
+
+                List<DCAFModel> item = new List<DCAFModel>();
+                List<DailyHour> DCAFormDataList = new List<DailyHour>();
+                DCAFModel model = new DCAFModel();
+                SqlCommand cmd = new SqlCommand();
+                SqlDataAdapter adapter = new SqlDataAdapter();
+                DataTable dt = new DataTable();
+                con = new SqlConnection(sqlConString);
+                cmd = new SqlCommand("USP_ViewDCAFormDetails", con);
+                cmd.Parameters.Add(new SqlParameter("@rowId", rowId));
+                // cmd.Parameters.Add(new SqlParameter("@FutureOwnerEmail", model.FutureOwnerEmail));
+                cmd.CommandType = CommandType.StoredProcedure;
+                adapter.SelectCommand = cmd;
+                con.Open();
+                adapter.Fill(dt);
+                con.Close();
+                if (dt.Rows.Count > 0)
+                {
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        model.Id = Convert.ToInt32(dt.Rows[i]["ID"]);
+                        model.AppRowId = Convert.ToInt32(dt.Rows[i]["ID"]);
+                        model.FormId = Convert.ToInt32(dt.Rows[i]["FormId"]);
+                        model.EmployeeType = Convert.ToString(dt.Rows[0]["EmployeeType"]);
+                        model.EmployeeCode = Convert.ToInt64(dt.Rows[0]["EmployeeCode"]);
+                        model.EmployeeCCCode = Convert.ToInt64(dt.Rows[0]["EmployeeCCCode"]);
+                        model.EmployeeUserId = Convert.ToString(dt.Rows[0]["EmployeeUserId"]);
+                        model.EmployeeName = Convert.ToString(dt.Rows[0]["EmployeeName"]);
+                        model.EmployeeDepartment = Convert.ToString(dt.Rows[0]["EmployeeDepartment"]);
+                        model.EmployeeContactNo = Convert.ToInt64(dt.Rows[0]["EmployeeContactNo"]);
+                        model.ExternalOrganizationName = Convert.ToString(dt.Rows[0]["ExternalOrganizationName"]);
+                        model.EmployeeLocation = Convert.ToString(dt.Rows[0]["EmployeeLocation"]);
+                        model.EmployeeDesignation = Convert.ToString(dt.Rows[0]["EmployeeDesignation"]);
+                        model.RequestSubmissionFor = Convert.ToString(dt.Rows[0]["RequestSubmissionFor"]);
+                        model.OnBehalfOption = Convert.ToString(dt.Rows[0]["OnBehalfOption"]);
+                        model.OtherEmployeeType = Convert.ToString(dt.Rows[0]["OtherEmployeeType"]);
+                        model.OtherEmployeeCode = Convert.ToInt64(dt.Rows[0]["OtherEmployeeCode"]);
+                        model.OtherEmployeeCCCode = dt.Rows[0]["OtherEmployeeCCCode"] != null || dt.Rows[0]["OtherEmployeeCCCode"] != DBNull.Value || dt.Rows[0]["OtherEmployeeCCCode"] != "0" ? Convert.ToInt64(dt.Rows[0]["OtherEmployeeCCCode"]) : 0;
+                        model.OtherEmployeeContactNo = Convert.ToString(dt.Rows[0]["OtherEmployeeContactNo"]);
+                        model.OtherEmployeeUserId = Convert.ToString(dt.Rows[0]["OtherEmployeeUserId"]);
+                        model.OtherEmployeeName = Convert.ToString(dt.Rows[0]["OtherEmployeeName"]);
+                        model.OtherEmployeeDepartment = Convert.ToString(dt.Rows[0]["OtherEmployeeDepartment"]);
+                        model.OtherEmployeeLocation = Convert.ToString(dt.Rows[0]["OtherEmployeeLocation"]);
+                        model.OtherEmployeeDesignation = Convert.ToString(dt.Rows[0]["OtherEmployeeDesignation"]);
+                        model.OtherExternalOrganizationName = Convert.ToString(dt.Rows[0]["OtherExternalOrganizationName"]);
+                        model.OtherEmployeeEmailId = Convert.ToString(dt.Rows[0]["OtherEmployeeEmailId"]);
+                        model.Created_Date = Convert.ToDateTime(dt.Rows[0]["Created"]);
+
+                        model.DCAFEmployeeID = Convert.ToString(dt.Rows[0]["DCAFEmployeeID"]);
+                        model.DateOfIncident = (DateTime)(dt.Rows[0]["DateOfIncident"] != DBNull.Value ? Convert.ToDateTime(dt.Rows[0]["DateOfIncident"]) : (DateTime?)null);
+                        model.DescriptionOfIncident = Convert.ToString(dt.Rows[0]["DescriptionOfIncident"]);
+                        model.Witnesses = Convert.ToString(dt.Rows[0]["Witnesses"]);
+                        model.DisciplinaryActionType = Convert.ToString(dt.Rows[0]["DisciplinaryActionType"]);
+                        model.ActionTakenBy = Convert.ToString(dt.Rows[0]["ActionTakenBy"]);
+                        model.DateOfAction = Convert.ToDateTime(dt.Rows[0]["DateOfAction"]); // Mandatory field, so no null check
+                        model.EmployeeComments = Convert.ToString(dt.Rows[0]["EmployeeComments"]);
+                        item.Add(model);
+                    }
+
+                }
+                model = item[0];
+                if (Status != 1)
+                {
+                    body += GetSubmitterAndApplicantHtml(model);
+                }
+
+                body = body + "<br><br> <table width=\"100%\">";
+                body = body + "<tr><th style=\"padding-top: 12px;padding-bottom: 12px;text-align: left;background-color: #4CAF50;color: white; border: 1px solid #ddd;\"><b>Request Details</b></th></tr>";
+                body = body + "<tr><td>" + "Request Id: " + formId + "</td></tr>";
+                body = body + "<tr><td>" + "Request Description: " + FormName + "</td></tr>";
+                body = body + "<tr><td>" + "EmployeeID: " + model.DCAFEmployeeID + "</td></tr>";
+                body += "<tr><td style='font-weight: bold;'>Employee ID:</td><td>" + model.DCAFEmployeeID + "</td></tr>";
+                body += "<tr><td style='font-weight: bold;'>Date of Incident:</td><td>" + (model.DateOfIncident.HasValue ? model.DateOfIncident.Value.ToString("yyyy-MM-dd") : "N/A") + "</td></tr>";
+                body += "<tr><td style='font-weight: bold;'>Description of Incident:</td><td>" + (model.DescriptionOfIncident ?? "N/A") + "</td></tr>";
+                body += "<tr><td style='font-weight: bold;'>Witnesses:</td><td>" + (model.Witnesses ?? "N/A") + "</td></tr>";
+                body += "<tr><td style='font-weight: bold;'>Disciplinary Action Type:</td><td>" + (model.DisciplinaryActionType ?? "N/A") + "</td></tr>";
+                body += "<tr><td style='font-weight: bold;'>Action Taken By:</td><td>" + model.ActionTakenBy + "</td></tr>";
+                body += "<tr><td style='font-weight: bold;'>Date of Action:</td><td>" + model.DateOfAction.Value.ToString("yyyy-MM-dd") + "</td></tr>";
+                body += "<tr><td style='font-weight: bold;'>Employee Comments:</td><td>" + (model.EmployeeComments ?? "N/A") + "</td></tr>";
+                body = body + "<tr><th style=\"padding-top: 12px;padding-bottom: 12px;text-align: left;background-color: #4CAF50;color: white; border: 1px solid #ddd;\"><b>Application Category</b></th></tr>";
+
+
+                if (Status != 1)
+                {
+                    //approvers
+                    body = body + "<br><br> <table width=\"100%\">";
+                    body = body + "<tr><th style=\"padding-top: 12px;padding-bottom: 12px;text-align: left;background-color: #4CAF50;color: white; border: 1px solid #ddd;\"><b>Approver Details</b></th></tr>";
+                    foreach (var approver in approverList.Where(x => x.ApproverStatus != "Pending"))
+                    {
+                        body = body + "<tr><td>" + "Approved By: " + approver.UserName + "</td></tr>";
+                        body = body + "<tr><td>" + "Approved On: " + approver.Modified.ToShortDateString() + " " + Convert.ToDateTime(approver.Modified).AddHours(5.5).ToShortTimeString() + "</td></tr>";
+                        body = body + "<tr><td>" + "Comments: " + approver.Comment + "</td></tr>";
+                    }
+
+                    body = body + "</table><br>";
+
+                    body += "<img src=cid:LogoImage alt=\"\"></img>";
+                }
+                ApprovalDataModel nileshid = new ApprovalDataModel();
+                nileshid.Level = 0;
+                nileshid.EmailId = "";
+                //nileshid.EmailId = "giridhar.patil@skoda-vw.co.in";
+                nileshid.EmailId = "prashant.k@mobinexttech.com";
+                approverList.Add(nileshid);
+
+                //return new EmailDataModel() { Body = body, Location = employeeLocation, ToIds = approverList.Where(x => x.Designation == "Head of Department (Pilot Hall)" ).Select(y => y.EmailId).ToList() };
+                return new EmailDataModel() { Body = body, Location = employeeLocation, ToIds = approverList.Where(x => x.Level == 1 || x.Level == 0).Select(y => y.EmailId).ToList() };
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message, ex);
+                return new EmailDataModel() { };
+            }
+        }
+        
+        public async Task<EmailDataModel> GetERFBody(int formId, UserData currentUser, int Status = 0)
+        {
+            string body = "";
+            try
+            {
+                string employeeLocation = "";
+                var returnModel = new EmailDataModel();
+                string FormName = "ERF Form";
+                var rowId = await GetRowID_SQL(formId, currentUser);
+                var approverList = await GetApprovalDetails_SQL(rowId, formId, currentUser);
+
+                List<ERFModel> item = new List<ERFModel>();
+                ERFModel model = new ERFModel();
+                SqlCommand cmd = new SqlCommand();
+                SqlDataAdapter adapter = new SqlDataAdapter();
+                DataTable dt = new DataTable();
+                con = new SqlConnection(sqlConString);
+                cmd = new SqlCommand("USP_ViewERFormDetails", con);
+                cmd.Parameters.Add(new SqlParameter("@rowId", rowId));
+                // cmd.Parameters.Add(new SqlParameter("@FutureOwnerEmail", model.FutureOwnerEmail));
+                cmd.CommandType = CommandType.StoredProcedure;
+                adapter.SelectCommand = cmd;
+                con.Open();
+                adapter.Fill(dt);
+                con.Close();
+                if (dt.Rows.Count > 0)
+                {
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        model.Id = Convert.ToInt32(dt.Rows[i]["ID"]);
+                        model.AppRowId = Convert.ToInt32(dt.Rows[i]["ID"]);
+                        model.FormId = Convert.ToInt32(dt.Rows[i]["FormId"]);
+                        model.EmployeeType = Convert.ToString(dt.Rows[0]["EmployeeType"]);
+                        model.EmployeeCode = Convert.ToInt64(dt.Rows[0]["EmployeeCode"]);
+                        model.EmployeeCCCode = Convert.ToInt64(dt.Rows[0]["EmployeeCCCode"]);
+                        model.EmployeeUserId = Convert.ToString(dt.Rows[0]["EmployeeUserId"]);
+                        model.EmployeeName = Convert.ToString(dt.Rows[0]["EmployeeName"]);
+                        model.EmployeeDepartment = Convert.ToString(dt.Rows[0]["EmployeeDepartment"]);
+                        model.EmployeeContactNo = Convert.ToInt64(dt.Rows[0]["EmployeeContactNo"]);
+                        model.ExternalOrganizationName = Convert.ToString(dt.Rows[0]["ExternalOrganizationName"]);
+                        model.EmployeeLocation = Convert.ToString(dt.Rows[0]["EmployeeLocation"]);
+                        model.EmployeeDesignation = Convert.ToString(dt.Rows[0]["EmployeeDesignation"]);
+                        model.RequestSubmissionFor = Convert.ToString(dt.Rows[0]["RequestSubmissionFor"]);
+                        model.OnBehalfOption = Convert.ToString(dt.Rows[0]["OnBehalfOption"]);
+                        model.OtherEmployeeType = Convert.ToString(dt.Rows[0]["OtherEmployeeType"]);
+                        model.OtherEmployeeCode = Convert.ToInt64(dt.Rows[0]["OtherEmployeeCode"]);
+                        model.OtherEmployeeCCCode = dt.Rows[0]["OtherEmployeeCCCode"] != null || dt.Rows[0]["OtherEmployeeCCCode"] != DBNull.Value || dt.Rows[0]["OtherEmployeeCCCode"] != "0" ? Convert.ToInt64(dt.Rows[0]["OtherEmployeeCCCode"]) : 0;
+                        model.OtherEmployeeContactNo = Convert.ToString(dt.Rows[0]["OtherEmployeeContactNo"]);
+                        model.OtherEmployeeUserId = Convert.ToString(dt.Rows[0]["OtherEmployeeUserId"]);
+                        model.OtherEmployeeName = Convert.ToString(dt.Rows[0]["OtherEmployeeName"]);
+                        model.OtherEmployeeDepartment = Convert.ToString(dt.Rows[0]["OtherEmployeeDepartment"]);
+                        model.OtherEmployeeLocation = Convert.ToString(dt.Rows[0]["OtherEmployeeLocation"]);
+                        model.OtherEmployeeDesignation = Convert.ToString(dt.Rows[0]["OtherEmployeeDesignation"]);
+                        model.OtherExternalOrganizationName = Convert.ToString(dt.Rows[0]["OtherExternalOrganizationName"]);
+                        model.OtherEmployeeEmailId = Convert.ToString(dt.Rows[0]["OtherEmployeeEmailId"]);
+                        model.Created_Date = Convert.ToDateTime(dt.Rows[0]["Created"]);
+
+                        model.ERFEmployeeID = Convert.ToString(dt.Rows[0]["ERFEmployeeID"]); model.ERFEmployeeID = Convert.ToString(dt.Rows[0]["ERFEmployeeID"]);
+                        model.ExpenseType = Convert.ToString(dt.Rows[0]["ExpenseType"]);
+                        model.ExpenseDate = Convert.ToDateTime(dt.Rows[0]["ExpenseDate"]);
+                        model.ExpenseAmount = Convert.ToDecimal(dt.Rows[0]["ExpenseAmount"]);
+                        model.ReceiptAttached = Convert.ToBoolean(dt.Rows[0]["ReceiptAttached"]);
+                        model.CostCode = Convert.ToString(dt.Rows[0]["CostCode"]);
+                        item.Add(model);
+                    }
+
+                }
+                model = item[0];
+                if (Status != 1)
+                {
+                    body += GetSubmitterAndApplicantHtml(model);
+                }
+
+                body = body + "<br><br> <table width=\"100%\">";
+                body = body + "<tr><th style=\"padding-top: 12px;padding-bottom: 12px;text-align: left;background-color: #4CAF50;color: white; border: 1px solid #ddd;\"><b>Request Details</b></th></tr>";
+                body = body + "<tr><td>" + "Request Id: " + formId + "</td></tr>";
+                body = body + "<tr><td>" + "Request Description: " + FormName + "</td></tr>";
+                body = body + "<tr><td>" + "EmployeeID: " + model.ERFEmployeeID + "</td></tr>";
+                body += "<tr><td style='font-weight: bold;'>Expense Type:</td><td>" + model.ExpenseType + "</td></tr>";
+                body += "<tr><td style='font-weight: bold;'>Expense Date:</td><td>" + model.ExpenseDate.Value.ToString("yyyy-MM-dd") + "</td></tr>";
+                body += "<tr><td style='font-weight: bold;'>Expense Amount:</td><td>" + model.ExpenseAmount.ToString("F2") + "</td></tr>";
+                body += "<tr><td style='font-weight: bold;'>Receipt Attached:</td><td>" + (model.ReceiptAttached ? "Yes" : "No") + "</td></tr>";
+                body += "<tr><td style='font-weight: bold;'>Cost Code:</td><td>" + model.CostCode + "</td></tr>";
+                body = body + "<tr><th style=\"padding-top: 12px;padding-bottom: 12px;text-align: left;background-color: #4CAF50;color: white; border: 1px solid #ddd;\"><b>Application Category</b></th></tr>";
+
+
+                if (Status != 1)
+                {
+                    //approvers
+                    body = body + "<br><br> <table width=\"100%\">";
+                    body = body + "<tr><th style=\"padding-top: 12px;padding-bottom: 12px;text-align: left;background-color: #4CAF50;color: white; border: 1px solid #ddd;\"><b>Approver Details</b></th></tr>";
+                    foreach (var approver in approverList.Where(x => x.ApproverStatus != "Pending"))
+                    {
+                        body = body + "<tr><td>" + "Approved By: " + approver.UserName + "</td></tr>";
+                        body = body + "<tr><td>" + "Approved On: " + approver.Modified.ToShortDateString() + " " + Convert.ToDateTime(approver.Modified).AddHours(5.5).ToShortTimeString() + "</td></tr>";
+                        body = body + "<tr><td>" + "Comments: " + approver.Comment + "</td></tr>";
+                    }
+
+                    body = body + "</table><br>";
+
+                    body += "<img src=cid:LogoImage alt=\"\"></img>";
+                }
+                ApprovalDataModel nileshid = new ApprovalDataModel();
+                nileshid.Level = 0;
+                nileshid.EmailId = "";
+                //nileshid.EmailId = "giridhar.patil@skoda-vw.co.in";
+                nileshid.EmailId = "prashant.k@mobinexttech.com";
+                approverList.Add(nileshid);
+
+                //return new EmailDataModel() { Body = body, Location = employeeLocation, ToIds = approverList.Where(x => x.Designation == "Head of Department (Pilot Hall)" ).Select(y => y.EmailId).ToList() };
+                return new EmailDataModel() { Body = body, Location = employeeLocation, ToIds = approverList.Where(x => x.Level == 1 || x.Level == 0).Select(y => y.EmailId).ToList() };
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message, ex);
+                return new EmailDataModel() { };
+            }
+        }
+
+        public async Task<EmailDataModel> GetNEIFBody(int formId, UserData currentUser, int Status = 0)
+        {
+            string body = "";
+            try
+            {
+                string employeeLocation = "";
+                var returnModel = new EmailDataModel();
+                string FormName = "NEIF Form";
+                var rowId = await GetRowID_SQL(formId, currentUser);
+                var approverList = await GetApprovalDetails_SQL(rowId, formId, currentUser);
+
+                List<NEIFModel> item = new List<NEIFModel>();
+                List<NEIFModel> NEIFormDataList = new List<NEIFModel>();
+                NEIFModel model = new NEIFModel();
+                #region Comment
+                //GlobalClass gc = new GlobalClass();
+
+                //var handler = new HttpClientHandler();
+                //handler.Credentials = new NetworkCredential($"{currentUser.DomainName}\\{currentUser.UserName}", currentUser.Password);
+
+                //var client = new HttpClient(handler);
+                //client.BaseAddress = new Uri(conString);
+                //client.DefaultRequestHeaders.Accept.Clear();
+                //client.DefaultRequestHeaders.Add("Accept", "application/json;odata=verbose");
+
+                //var responseData = Task.Run(() => client.GetAsync("_api/web/lists/GetByTitle('NEIForm')/items?$select=*"
+                //+ "&$filter=(ID eq '" + rowId + "' )")).Result;
+
+
+                //var responseTextData = await responseData.Content.ReadAsStringAsync();
+
+                //var settings = new JsonSerializerSettings
+                //{
+                //    NullValueHandling = NullValueHandling.Ignore
+                //};
+                //if (!string.IsNullOrEmpty(responseTextData))
+                //{
+
+
+                //    var Result = JsonConvert.DeserializeObject<NEIFModel>(responseTextData, settings);
+                //    item = Result.NEIFResults.NEIFData;
+                //    model = item[0];
+
+
+                //    var handler1 = new HttpClientHandler();
+                //    handler1.Credentials = new NetworkCredential($"{currentUser.DomainName}\\{currentUser.UserName}", currentUser.Password);
+                //    var client1 = new HttpClient(handler1);
+                //    client1.BaseAddress = new Uri(conString);
+                //    client1.DefaultRequestHeaders.Accept.Clear();
+                //    client1.DefaultRequestHeaders.Accept.Clear();
+                //    client1.DefaultRequestHeaders.Add("Accept", "application/json;odata=verbose");
+
+                //    var response2 = Task.Run(() => client1.GetAsync("_api/web/lists/GetByTitle('NEIFormDataList')/items?$select=*" +
+                // "&$filter=(FormId eq '" + rowId + "')")).Result;
+                //    var responseText2 = await response2.Content.ReadAsStringAsync();
+                //    if (!string.IsNullOrEmpty(responseText2))
+                //    {
+
+                //        var ListResult = JsonConvert.DeserializeObject<NEIFModel>(responseText2, settings);
+                //        NEIFormDataList = ListResult.NEIFResults.NEIFData;
+                //    }
+
+                //}
+                #endregion
+
+                #region SQL COMMENT TEST
+                //SqlCommand cmd = new SqlCommand();
+                //SqlDataAdapter adapter = new SqlDataAdapter();
+                //DataTable dt = new DataTable();
+                //con = new SqlConnection(sqlConString);
+                //cmd = new SqlCommand("USP_ViewNEIFDetails", con);
+                //cmd.Parameters.Add(new SqlParameter("@rowId", rowId));
+                //// cmd.Parameters.Add(new SqlParameter("@FutureOwnerEmail", model.FutureOwnerEmail));
+                //cmd.CommandType = CommandType.StoredProcedure;
+                //adapter.SelectCommand = cmd;
+                //con.Open();
+                //adapter.Fill(dt);
+                //con.Close();
+                //if (dt.Rows.Count > 0)
+                //{
+                //    for (int i = 0; i < dt.Rows.Count; i++)
+                //    {
+                //        model.Id = Convert.ToInt32(dt.Rows[i]["ID"]);
+                //        model.AppRowId = Convert.ToInt32(dt.Rows[i]["ID"]);
+                //        model.FormId = Convert.ToInt32(dt.Rows[i]["FormId"]);
+                //        model.EmployeeType = Convert.ToString(dt.Rows[0]["EmployeeType"]);
+                //        model.EmployeeCode = Convert.ToInt64(dt.Rows[0]["EmployeeCode"]);
+                //        model.EmployeeCCCode = Convert.ToInt64(dt.Rows[0]["EmployeeCCCode"]);
+                //        model.EmployeeUserId = Convert.ToString(dt.Rows[0]["EmployeeUserId"]);
+                //        model.EmployeeName = Convert.ToString(dt.Rows[0]["EmployeeName"]);
+                //        model.EmployeeDepartment = Convert.ToString(dt.Rows[0]["EmployeeDepartment"]);
+                //        model.EmployeeContactNo = Convert.ToInt64(dt.Rows[0]["EmployeeContactNo"]);
+                //        model.ExternalOrganizationName = Convert.ToString(dt.Rows[0]["ExternalOrganizationName"]);
+                //        model.EmployeeLocation = Convert.ToString(dt.Rows[0]["EmployeeLocation"]);
+                //        model.EmployeeDesignation = Convert.ToString(dt.Rows[0]["EmployeeDesignation"]);
+                //        model.RequestSubmissionFor = Convert.ToString(dt.Rows[0]["RequestSubmissionFor"]);
+                //        model.OnBehalfOption = Convert.ToString(dt.Rows[0]["OnBehalfOption"]);
+                //        model.OtherEmployeeType = Convert.ToString(dt.Rows[0]["OtherEmployeeType"]);
+                //        model.OtherEmployeeCode = Convert.ToInt64(dt.Rows[0]["OtherEmployeeCode"]);
+                //        model.OtherEmployeeCCCode = dt.Rows[0]["OtherEmployeeCCCode"] != null || dt.Rows[0]["OtherEmployeeCCCode"] != DBNull.Value || dt.Rows[0]["OtherEmployeeCCCode"] != "0" ? Convert.ToInt64(dt.Rows[0]["OtherEmployeeCCCode"]) : 0;
+                //        model.OtherEmployeeContactNo = Convert.ToString(dt.Rows[0]["OtherEmployeeContactNo"]);
+                //        model.OtherEmployeeUserId = Convert.ToString(dt.Rows[0]["OtherEmployeeUserId"]);
+                //        model.OtherEmployeeName = Convert.ToString(dt.Rows[0]["OtherEmployeeName"]);
+                //        model.OtherEmployeeDepartment = Convert.ToString(dt.Rows[0]["OtherEmployeeDepartment"]);
+                //        model.OtherEmployeeLocation = Convert.ToString(dt.Rows[0]["OtherEmployeeLocation"]);
+                //        model.OtherEmployeeDesignation = Convert.ToString(dt.Rows[0]["OtherEmployeeDesignation"]);
+                //        model.OtherExternalOrganizationName = Convert.ToString(dt.Rows[0]["OtherExternalOrganizationName"]);
+                //        model.OtherEmployeeEmailId = Convert.ToString(dt.Rows[0]["OtherEmployeeEmailId"]);
+                //        model.BusinessJustification = Convert.ToString(dt.Rows[0]["BusinessJustification"]);
+                //        model.RequestType = Convert.ToString(dt.Rows[0]["RequestType"]);
+                //        model.RequestFromDate = Convert.ToDateTime(dt.Rows[0]["RequestFromDate"]);
+                //        model.RequestToDate = Convert.ToDateTime(dt.Rows[0]["RequestToDate"]);
+                //        model.CreatedDate = Convert.ToDateTime(dt.Rows[0]["Created"]);
+                //        item.Add(model);
+                //    }
+
+                //}
+                //model = item[0];
+
+                //SqlCommand cmd1 = new SqlCommand();
+                //SqlDataAdapter adapter1 = new SqlDataAdapter();
+                //DataTable ds1 = new DataTable();
+                //con = new SqlConnection(sqlConString);
+                //cmd = new SqlCommand("USP_ViewNEIFormDataList", con);
+                //cmd.Parameters.Add(new SqlParameter("@rowId", rowId));
+                //// cmd.Parameters.Add(new SqlParameter("@FutureOwnerEmail", model.FutureOwnerEmail));
+                //cmd.CommandType = CommandType.StoredProcedure;
+                //adapter.SelectCommand = cmd;
+                //con.Open();
+                //adapter.Fill(ds1);
+                //con.Close();
+                //if (ds1.Rows.Count > 0)
+                //{
+                //    for (int i = 0; i < ds1.Rows.Count; i++)
+                //    {
+                //        NEIFData model1 = new NEIFData();
+                //        model1.FormId = Convert.ToInt32(ds1.Rows[i]["FormId"]);
+                //        model1.Applicationname = Convert.ToString(ds1.Rows[i]["Applicationname"]);
+                //        model1.Applicationurl = Convert.ToString(ds1.Rows[i]["Applicationurl"]);
+                //        model1.Applicationaccess = Convert.ToString(ds1.Rows[i]["Applicationaccess"]);
+                //        model1.Accessgroup = Convert.ToString(ds1.Rows[i]["Accessgroup"]);
+                //        NEIFormDataList.Add(model1);
+                //    }
+                //}
+                #endregion
+
+                SqlCommand cmd = new SqlCommand();
+                SqlDataAdapter adapter = new SqlDataAdapter();
+                DataTable dt = new DataTable();
+                con = new SqlConnection(sqlConString);
+                cmd = new SqlCommand("USP_ViewNEIFDetails", con);
+                cmd.Parameters.Add(new SqlParameter("@rowId", rowId));
+                // cmd.Parameters.Add(new SqlParameter("@FutureOwnerEmail", model.FutureOwnerEmail));
+                cmd.CommandType = CommandType.StoredProcedure;
+                adapter.SelectCommand = cmd;
+                con.Open();
+                adapter.Fill(dt);
+                con.Close();
+                if (dt.Rows.Count > 0)
+                {
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        model.Id = Convert.ToInt32(dt.Rows[i]["ID"]);
+                        model.AppRowId = Convert.ToInt32(dt.Rows[i]["ID"]);
+                        model.FormId = Convert.ToInt32(dt.Rows[i]["FormId"]);
+                        model.EmployeeType = Convert.ToString(dt.Rows[0]["EmployeeType"]);
+                        model.EmployeeCode = Convert.ToInt64(dt.Rows[0]["EmployeeCode"]);
+                        model.EmployeeCCCode = Convert.ToInt64(dt.Rows[0]["EmployeeCCCode"]);
+                        model.EmployeeUserId = Convert.ToString(dt.Rows[0]["EmployeeUserId"]);
+                        model.EmployeeName = Convert.ToString(dt.Rows[0]["EmployeeName"]);
+                        model.EmployeeDepartment = Convert.ToString(dt.Rows[0]["EmployeeDepartment"]);
+                        model.EmployeeContactNo = Convert.ToInt64(dt.Rows[0]["EmployeeContactNo"]);
+                        model.ExternalOrganizationName = Convert.ToString(dt.Rows[0]["ExternalOrganizationName"]);
+                        model.EmployeeLocation = Convert.ToString(dt.Rows[0]["EmployeeLocation"]);
+                        model.EmployeeDesignation = Convert.ToString(dt.Rows[0]["EmployeeDesignation"]);
+                        model.RequestSubmissionFor = Convert.ToString(dt.Rows[0]["RequestSubmissionFor"]);
+                        model.OnBehalfOption = Convert.ToString(dt.Rows[0]["OnBehalfOption"]);
+                        model.OtherEmployeeType = Convert.ToString(dt.Rows[0]["OtherEmployeeType"]);
+                        model.OtherEmployeeCode = Convert.ToInt64(dt.Rows[0]["OtherEmployeeCode"]);
+                        model.OtherEmployeeCCCode = dt.Rows[0]["OtherEmployeeCCCode"] != null || dt.Rows[0]["OtherEmployeeCCCode"] != DBNull.Value || dt.Rows[0]["OtherEmployeeCCCode"] != "0" ? Convert.ToInt64(dt.Rows[0]["OtherEmployeeCCCode"]) : 0;
+                        model.OtherEmployeeContactNo = Convert.ToString(dt.Rows[0]["OtherEmployeeContactNo"]);
+                        model.OtherEmployeeUserId = Convert.ToString(dt.Rows[0]["OtherEmployeeUserId"]);
+                        model.OtherEmployeeName = Convert.ToString(dt.Rows[0]["OtherEmployeeName"]);
+                        model.OtherEmployeeDepartment = Convert.ToString(dt.Rows[0]["OtherEmployeeDepartment"]);
+                        model.OtherEmployeeLocation = Convert.ToString(dt.Rows[0]["OtherEmployeeLocation"]);
+                        model.OtherEmployeeDesignation = Convert.ToString(dt.Rows[0]["OtherEmployeeDesignation"]);
+                        model.OtherExternalOrganizationName = Convert.ToString(dt.Rows[0]["OtherExternalOrganizationName"]);
+                        model.OtherEmployeeEmailId = Convert.ToString(dt.Rows[0]["OtherEmployeeEmailId"]);
+
+                        model.FullName = Convert.ToString(dt.Rows[0]["FullName"]);
+                        model.PreferredName = Convert.ToString(dt.Rows[0]["PreferredName"]);
+                        model.Gender = Convert.ToString(dt.Rows[0]["Gender"]);
+                        model.MaritalStatus = Convert.ToString(dt.Rows[0]["MaritalStatus"]);
+                        model.Nationality = Convert.ToString(dt.Rows[0]["Nationality"]);
+                        model.PersonalEmail = Convert.ToString(dt.Rows[0]["PersonalEmail"]);
+                        model.MobilePhoneNumber = Convert.ToString(dt.Rows[0]["MobilePhoneNumber"]);
+                        model.EmergencyContactName = Convert.ToString(dt.Rows[0]["EmergencyContactName"]);
+                        model.EmergencyContactRelationship = Convert.ToString(dt.Rows[0]["EmergencyContactRelationship"]);
+                        model.EmergencyContactPhoneNumber = Convert.ToString(dt.Rows[0]["EmergencyContactPhoneNumber"]);
+                        model.CurrentAddress = Convert.ToString(dt.Rows[0]["CurrentAddress"]);
+                        model.PermanentAddress = Convert.ToString(dt.Rows[0]["PermanentAddress"]);
+                        model.PostalCode = Convert.ToString(dt.Rows[0]["PostalCode"]);
+                        model.JobTitle = Convert.ToString(dt.Rows[0]["JobTitle"]);
+                        model.Department = Convert.ToString(dt.Rows[0]["Department"]);
+                        model.EmploymentType = Convert.ToString(dt.Rows[0]["EmploymentType"]);
+                        model.ManagerName = Convert.ToString(dt.Rows[0]["ManagerName"]);
+                        model.BankAccountNumber = Convert.ToString(dt.Rows[0]["BankAccountNumber"]);
+                        model.BankName = Convert.ToString(dt.Rows[0]["BankName"]);
+                        model.IFSCCode = Convert.ToString(dt.Rows[0]["IFSCCode"]);
+                        model.TaxIDNumber = Convert.ToString(dt.Rows[0]["TaxIDNumber"]);
+                        model.PAN = Convert.ToString(dt.Rows[0]["PAN"]);
+                        model.AADHAR = Convert.ToString(dt.Rows[0]["AADHAR"]);
+                        model.DrivingLicense = Convert.ToString(dt.Rows[0]["DrivingLicense"]);
+                        model.Passport = Convert.ToString(dt.Rows[0]["Passport"]);
+                        model.ValidVisa = Convert.ToString(dt.Rows[0]["ValidVisa"]);
+                        model.Created_Date = Convert.ToDateTime(dt.Rows[0]["Created"]);
+                        model.DateOfBirth = null;
+                        if (dt.Rows[0]["DateOfBirth"] != DBNull.Value)
+                            model.DateOfBirth = Convert.ToDateTime(dt.Rows[0]["DateOfBirth"]);
+                        model.DateOfJoining = null;
+                        if (dt.Rows[0]["DateOfJoining"] != DBNull.Value)
+                            model.DateOfJoining = Convert.ToDateTime(dt.Rows[0]["DateOfJoining"]);
+                        model.Created_Date = Convert.ToDateTime(dt.Rows[0]["Created"]);
+
+                        item.Add(model);
+                    }
+
+                }
+                model = item[0];
+                //dynamic URCFData = new ExpandoObject();
+                //NEIFormDAL NEIFormDAL = new NEIFormDAL();
+                //URCFData = NEIFormDAL.ViewNEIFormData(rowId, formId);
+                //model = URCFData.Result;
+                //NEIFormDataList = URCFData.Four;
+
+                if (Status != 1)
+                {
+                    body += GetSubmitterAndApplicantHtml(model);
+                }
+
+                body = body + "<br><br> <table width=\"100%\">";
+                body = body + "<tr><th style=\"padding-top: 12px;padding-bottom: 12px;text-align: left;background-color: #4CAF50;color: white; border: 1px solid #ddd;\"><b>Request Details</b></th></tr>";
+                body = body + "<tr><td>" + "Request Id: " + formId + "</td></tr>";
+                body = body + "<tr><td>" + "Request Description: " + FormName + "</td></tr>";
+                body += "<tr><td>" + "Full Name: " + model.FullName + "</td></tr>";
+                body += "<tr><td>" + "Preferred Name: " + model.PreferredName + "</td></tr>";
+                body += "<tr><td>" + "Date of Birth: " + model.DateOfBirth?.ToString("dd/MM/yyyy") + "</td></tr>";
+                body += "<tr><td>" + "Gender: " + model.Gender + "</td></tr>";
+                body += "<tr><td>" + "Marital Status: " + model.MaritalStatus + "</td></tr>";
+                body += "<tr><td>" + "Nationality: " + model.Nationality + "</td></tr>";
+                body += "<tr><td>" + "Personal Email: " + model.PersonalEmail + "</td></tr>";
+                body += "<tr><td>" + "Mobile Phone Number: " + model.MobilePhoneNumber + "</td></tr>";
+                body += "<tr><td>" + "Emergency Contact Name: " + model.EmergencyContactName + "</td></tr>";
+                body += "<tr><td>" + "Emergency Contact Relationship: " + model.EmergencyContactRelationship + "</td></tr>";
+                body += "<tr><td>" + "Emergency Contact Phone Number: " + model.EmergencyContactPhoneNumber + "</td></tr>";
+                body += "<tr><td>" + "Current Address: " + model.CurrentAddress + "</td></tr>";
+                body += "<tr><td>" + "Permanent Address: " + model.PermanentAddress + "</td></tr>";
+                body += "<tr><td>" + "Postal Code: " + model.PostalCode + "</td></tr>";
+                body += "<tr><td>" + "Job Title: " + model.JobTitle + "</td></tr>";
+                body += "<tr><td>" + "Department: " + model.Department + "</td></tr>";
+                body += "<tr><td>" + "Date of Joining: " + model.DateOfJoining?.ToString("dd/MM/yyyy") + "</td></tr>";
+                body += "<tr><td>" + "Employment Type: " + model.EmploymentType + "</td></tr>";
+                body += "<tr><td>" + "Manager/Supervisor Name: " + model.ManagerName + "</td></tr>";
+                body += "<tr><td>" + "Bank Account Number: " + model.BankAccountNumber + "</td></tr>";
+                body += "<tr><td>" + "Bank Name: " + model.BankName + "</td></tr>";
+                body += "<tr><td>" + "IFSC Code: " + model.IFSCCode + "</td></tr>";
+                body += "<tr><td>" + "Tax ID Number: " + model.TaxIDNumber + "</td></tr>";
+                body += "<tr><td>" + "PAN: " + model.PAN + "</td></tr>";
+                body += "<tr><td>" + "AADHAR: " + model.AADHAR + "</td></tr>";
+                body += "<tr><td>" + "Driving License: " + model.DrivingLicense + "</td></tr>";
+                body += "<tr><td>" + "Passport: " + model.Passport + "</td></tr>";
+                body += "<tr><td>" + "Valid Visa: " + model.ValidVisa + "</td></tr>";
+                body = body + "<tr><th style=\"padding-top: 12px;padding-bottom: 12px;text-align: left;background-color: #4CAF50;color: white; border: 1px solid #ddd;\"><b>Application Category</b></th></tr>";
+
+                if (Status != 1)
+                {
+                    //approvers
+                    body = body + "<br><br> <table width=\"100%\">";
+                    body = body + "<tr><th style=\"padding-top: 12px;padding-bottom: 12px;text-align: left;background-color: #4CAF50;color: white; border: 1px solid #ddd;\"><b>Approver Details</b></th></tr>";
+                    foreach (var approver in approverList.Where(x => x.ApproverStatus != "Pending"))
+                    {
+                        body = body + "<tr><td>" + "Approved By: " + approver.UserName + "</td></tr>";
+                        body = body + "<tr><td>" + "Approved On: " + approver.Modified.ToShortDateString() + " " + Convert.ToDateTime(approver.Modified).AddHours(5.5).ToShortTimeString() + "</td></tr>";
+                        body = body + "<tr><td>" + "Comments: " + approver.Comment + "</td></tr>";
+                    }
+
+                    body = body + "</table><br>";
+
+                    body += "<img src=cid:LogoImage alt=\"\"></img>";
+                }
+                ApprovalDataModel nileshid = new ApprovalDataModel();
+                nileshid.Level = 0;
+                nileshid.EmailId = "";
+                //nileshid.EmailId = "giridhar.patil@skoda-vw.co.in";
+                nileshid.EmailId = "prashant.k@mobinexttech.com";
+                approverList.Add(nileshid);
+
                 //return new EmailDataModel() { Body = body, Location = employeeLocation, ToIds = approverList.Where(x => x.Designation == "Head of Department (Pilot Hall)" ).Select(y => y.EmailId).ToList() };
                 return new EmailDataModel() { Body = body, Location = employeeLocation, ToIds = approverList.Where(x => x.Level == 1 || x.Level == 0).Select(y => y.EmailId).ToList() };
             }
@@ -7989,7 +8709,7 @@ namespace Skoda_DCMS.Helpers
                 }
                 #endregion
                 model = item[0];
-                
+
 
                 if (Status != 1)
                 {

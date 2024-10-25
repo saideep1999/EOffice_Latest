@@ -639,17 +639,17 @@
                                             <div class="form-group col-md-12 col-12">
                                                 @if (IsNewMode)
                                                 {
-                                                    <div class="d-flex mb-4 mt-2">
+                                                    <div class="mb-4 mt-2">
                                                         <div class="mr-3">
                                                             <input type="checkbox" class="ThirdPartyPhotographerchk mr-1" name="ChkThirdPartyPhotographer" id="ChkThirdPartyPhotographer" value="3rd Party Photographer">
-                                                            <label id="lblThirdPartyPhotographer">
+                                                            <label id="lblThirdPartyPhotographer" style="display: inline-block;">
                                                                 3rd Party Photographer
                                                             </label>
                                                         </div>
                                                     </div>
                                                     <div class="d-flex mb-4 mt-2">
                                                         <div class="mr-3">
-                                                            <label id="lblDevice"> Device</label>
+                                                            <label id="lblDevice" style="font-size: 19px !important; margin-right: 25px;"> Device</label>
                                                         </div>
                                                         <div class="mr-3">
                                                             <input type="checkbox" class="deviceCheck mr-1" name="chkVideoCamera" id="chkVideoCamera" value="VideoCamera"> Video Camera
@@ -1208,7 +1208,7 @@
                                                     <option value="No" @(PPF?.ExceptionalPhoto == "No" ? "selected" : "")>No</option>
                                                 </select>
                                                 <span class="placeholder">Exceptional Photo?</span>
-                                                <div class="f-600"><small>Exceptional Photo? (Pre-series Full Car/Partial car with characteristics/ Cockpit). If Yes, Contact Comm’n & SO Dept.</small></div>
+                                                <div class="f-600" style="color: #dd0a0a;"><small>Exceptional Photo? (Pre-series Full Car/Partial car with characteristics/ Cockpit). If Yes, Contact Comm’n & SO Dept.</small></div>
                                             </div>
 
                                             <div class="form-group col-md-12 col-12 input-block">
@@ -1241,7 +1241,7 @@
                                             </div>
 
                                             <div>
-                                                <small>Note:<span class="ml-1 d-inline-block">(Validity: maximum 01 year for pre-series related photography, for other, 5 yrs for MobiIPL employees )</span></small>
+                                                <small style="color: #dd0a0a;">Note:<span class="ml-1 d-inline-block">(Validity: maximum 01 year for pre-series related photography, for other, 5 yrs for MobiIPL employees )</span></small>
                                             </div>
 
                                         </div>
@@ -1383,7 +1383,7 @@
                     </div>
                 </div>
             </div>
-
+            <br />
             @*<div id="accordion">
                     <div class="card">
                         <div class="card-header collapsed" id="headingFive" data-toggle="collapse" data-target="#collapseFive" aria-expanded="true" aria-controls="collapseFive">
@@ -2173,7 +2173,6 @@
             document.getElementById("add_to_me").innerHTML = errors;
             errors = "";
             errorCount = 0;
-            $(window).scrollTop(0);
             if (IsEditMode) {
                 $("#myModalEdit").scrollTop(0);
                 $("#myModalRequest").scrollTop(0);
@@ -2181,6 +2180,7 @@
             else {
                 $(window).scrollTop(0);
             }
+            var mainDiv = document.querySelector(".main"); mainDiv.scrollTop = 0;
             return false;
         }
         $("#headingErr").addClass('d-none');
@@ -2259,7 +2259,7 @@
     });
 
     function saveResponse(text) {
-
+        debugger;
         $(".full-screen-container").removeClass('invisible');
         $(".full-screen-container").show();
         $("#pageLoader").removeClass('invisible');
@@ -2268,21 +2268,27 @@
         switch (text) {
             case 'approve': {
                 status = 'Approved';
+                $(".full-screen-container").hide();
+                $("#pageLoader").addClass('invisible');
                 break;
             }
             case 'reject': {
                 status = 'Rejected';
                 if (comment == '') {
-                    validityModal(text);
-                    return;
+                    //validityModal(text);
+                    $(".full-screen-container").hide();
+                    $("#pageLoader").addClass('invisible');
+                    //return;
                 }
                 break;
             }
             case 'enquire': {
                 status = 'Enquired';
                 if (comment == '') {
-                    validityModal(text);
-                    return;
+                    //validityModal(text);
+                    $(".full-screen-container").hide();
+                    $("#pageLoader").addClass('invisible');
+                    //return;
                 }
                 break;
             }

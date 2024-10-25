@@ -55,7 +55,17 @@ namespace Skoda_DCMS.Helpers
         public SignupApproverDAL signupApproverDAL;
         public CreateApprovalsDAL createApprovalsDAL;
         public POCRFormDAL POCRFormDAL;
+        public NEIFDAL NEIFDAL;
+        public TSFDAL TSFDAL;
         public DLADDAL DLAD;
+        public GSFDAL GSFDAL;
+        public TRFDAL TRFDAL;
+        public DCAFDAL DCAFDAL;
+        public ERFDAL ERFDAL;
+        public CPAFDAL CPAFDAL;
+        public TEFDAL TEFDAL;
+        public CAFDAL CAFDAL;
+        public SalaryReviewAdjustmentDAL SalaryReviewAdjustmentDAL;
 
         public static List<Tuple<string, string, Func<Task<dynamic>>, Func<int, int, Task<dynamic>>>> Mapping;
         public static bool IsUserLoggedOut;
@@ -108,6 +118,16 @@ namespace Skoda_DCMS.Helpers
             createApprovalsDAL = new CreateApprovalsDAL();
             POCRFormDAL = new POCRFormDAL();
             DLAD = new DLADDAL();
+            NEIFDAL = new NEIFDAL();
+            TSFDAL = new TSFDAL();
+            DCAFDAL = new DCAFDAL();
+            GSFDAL = new GSFDAL();
+            TRFDAL = new TRFDAL();
+            ERFDAL = new ERFDAL();
+            CPAFDAL = new CPAFDAL();
+            TEFDAL = new TEFDAL();
+            CAFDAL = new CAFDAL();
+            SalaryReviewAdjustmentDAL = new SalaryReviewAdjustmentDAL();
 
             listDal = new ListDAL();
             if (Mapping == null)
@@ -159,6 +179,16 @@ namespace Skoda_DCMS.Helpers
             Mapping.Add(new Tuple<string, string, Func<Task<dynamic>>, Func<int, int, Task<dynamic>>>("CA", "CreateApprovals.cshtml", null, createApprovalsDAL.ViewCreateApprovalsData));
             Mapping.Add(new Tuple<string, string, Func<Task<dynamic>>, Func<int, int, Task<dynamic>>>("POCRF", "POCRForm.cshtml", null, POCRFormDAL.ViewPOCRFormData));
             Mapping.Add(new Tuple<string, string, Func<Task<dynamic>>, Func<int, int, Task<dynamic>>>("DLAD", "DLADForm.cshtml", null, DLAD.ViewDLADFormData));
+            Mapping.Add(new Tuple<string, string, Func<Task<dynamic>>, Func<int, int, Task<dynamic>>>("NEIF", "NEIForm.cshtml", null, NEIFDAL.ViewNEIFormData));
+            Mapping.Add(new Tuple<string, string, Func<Task<dynamic>>, Func<int, int, Task<dynamic>>>("TSF", "TSForm.cshtml", null, TSFDAL.ViewTSFormData));
+            Mapping.Add(new Tuple<string, string, Func<Task<dynamic>>, Func<int, int, Task<dynamic>>>("ERF", "ERForm.cshtml", null, ERFDAL.ViewERFormData));
+            Mapping.Add(new Tuple<string, string, Func<Task<dynamic>>, Func<int, int, Task<dynamic>>>("DCAF", "DCAForm.cshtml", null, DCAFDAL.ViewDCAFormData));
+            Mapping.Add(new Tuple<string, string, Func<Task<dynamic>>, Func<int, int, Task<dynamic>>>("GSF", "GoalSettingForm.cshtml", null, GSFDAL.GetGSFDetails));
+            Mapping.Add(new Tuple<string, string, Func<Task<dynamic>>, Func<int, int, Task<dynamic>>>("TRF", "TrainingRequest.cshtml", null, TRFDAL.GetTRFDetails));
+            Mapping.Add(new Tuple<string, string, Func<Task<dynamic>>, Func<int, int, Task<dynamic>>>("CPAF", "CPAForm.cshtml", null, CPAFDAL.ViewCPAFormData));
+            Mapping.Add(new Tuple<string, string, Func<Task<dynamic>>, Func<int, int, Task<dynamic>>>("TEF", "TEForm.cshtml", null, TEFDAL.ViewTEFormData));
+            Mapping.Add(new Tuple<string, string, Func<Task<dynamic>>, Func<int, int, Task<dynamic>>>("CAF", "CAForm.cshtml", null, CAFDAL.ViewCAFormData));
+            Mapping.Add(new Tuple<string, string, Func<Task<dynamic>>, Func<int, int, Task<dynamic>>>("SRAF", "SalaryReviewAdjustment.cshtml", null, SalaryReviewAdjustmentDAL.GetSRAFDetails));
         }
 
         public static Dictionary<string, string> ListNames
@@ -211,7 +241,17 @@ namespace Skoda_DCMS.Helpers
                     { "SAF", "SAFDAL" },
                     { "CA", "CreateApprovalsDAL" },
                     { "POCRF", "POCRForm" },
-                    { "DLAD", "ServerLaptopDesktopLocalAdminForm" }
+                    { "DLAD", "ServerLaptopDesktopLocalAdminForm" },
+                    { "NEIF", "NEIF" },
+                    { "TSF", "TSF" },
+                    { "ERF", "ERF" },
+                    { "DCAF", "DCAF" },
+                    { "CPAF", "CPAF" },
+                    { "GSF", "GSFForm" },
+                    { "TRF", "TrainingRequest" },
+                    { "TEF", "TEF" },
+                    { "CAF", "CAF" },
+                    { "SRAF", "SalaryReviewAdjustment" }
                 };
             }
         }

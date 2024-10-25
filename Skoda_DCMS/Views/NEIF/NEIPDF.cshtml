@@ -1,0 +1,614 @@
+﻿
+@{
+    Layout = null;
+}
+
+@model Skoda_DCMS.Models.NEIFModel
+@{
+    bool IsNew = true;
+    Skoda_DCMS.Models.NEIFModel NEIF = null;
+    dynamic FlagRedirect = null;
+    bool IsEdit = true, IsNewMode = true, IsEditMode = false, IsViewMode = false;
+    int FormId = 0, AppRowId = 0, ApprovalType = 0;
+    var CurrentUserDesgn = "";
+    var SecurityDesgnString = "Security";
+    Layout = ViewBag.Layout;
+    var currentUser = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    List<Skoda_DCMS.Models.ApprovalDataModel> appList = new List<Skoda_DCMS.Models.ApprovalDataModel>();
+    string disabled = "";
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IsNew = ViewBag.IsNew;
+        IsEdit = ViewBag.IsEdit;
+        IsNewMode = ViewBag.IsNewMode;
+        IsEditMode = ViewBag.IsEditMode;
+        IsViewMode = ViewBag.IsViewMode;
+        disabled = IsViewMode ? "disabled" : "";
+        NEIF = ViewBag.Model.one[0] as Skoda_DCMS.Models.NEIFModel;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+        appList = ViewBag.Model?.three as List<Skoda_DCMS.Models.ApprovalDataModel>;
+        CurrentUserDesgn = appList?.Where(x => x.ApproverUserName.ToLower() == currentUser.UserName.ToLower()).Select(x => x.Designation).FirstOrDefault();
+    }
+    ViewBag.Title = "New Employee Information Form";
+    int count = 0;
+}
+
+
+<!DOCTYPE html>
+<html>
+<head>
+
+    <style type="text/css">
+        *:visited, *:focus {
+            box-shadow: none;
+        }
+
+        input, select, input:focus, select:focus, textarea, textarea:focus {
+            border: 1px solid #000;
+        }
+
+        input, textarea {
+            padding: 5px;
+        }
+
+        .asset {
+            border: 1px solid black;
+            height: 20px;
+        }
+
+        .signature-table thead td {
+            border-bottom: 1px solid black;
+            border-left: 1px solid black;
+            border-collapse: collapse;
+        }
+
+        .signature-table tbody, .signature-table td {
+            border: none;
+            border-left: 1px solid black;
+            border-collapse: collapse;
+            padding: 5px;
+        }
+
+            .signature-table td:first-child {
+                border-left: none;
+            }
+
+        .signature-table {
+            border: 1px solid black;
+        }
+
+        @@font-face {
+            font-family: 'SKODANext-Black';
+            src: url('../../fonts/SKODANextfont/SKODANext-Black.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Bold.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Light.ttf') format('truetype');
+            src: url('../../fonts/SKODANextfont/SKODANext-Regular.ttf') format('truetype');
+        }
+
+        body {
+            font-family: 'SKODANext-Black';
+        }
+
+        .form_lbl {
+            color: #000;
+            font-weight: 600;
+        }
+
+        #formlbl {
+            width: 250px;
+        }
+
+        label {
+            font-family: "Trebuchet MS", Verdana, Halvetica, Arial;
+            font-size: 20px;
+            font-weight: normal;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+            table td, th {
+                padding-left: 10px;
+            }
+    </style>
+
+</head>
+<body>
+
+    <table style="width: 100%; font-size: 14px; color: #000; font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+        <tr>
+            <td>
+                <table style="width: 100%;" cellspadding="0" cellspacing="0">
+                    <tr>
+                        <td colspan="6" width="60%" style="text-align: right;">
+                            @*<img style="width: 50%;" src='@Server.MapPath("~/assets/img/SAVWIPL_Merger_Logo.JPG")'>*@
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="6" align="center">
+                <h2 style="font-weight:bold"> New Employee Information Form  </h2>
+            </td>
+        </tr>
+
+        <tr>
+            <td style="padding: 15px;">
+                <table cellspacing="0" border="" cellpadding="0" width="100%">
+                    @if (NEIF.RequestSubmissionFor == "Self")
+                    {
+                        <tr>
+                            <td colspan="6" align='left'>
+                                <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Submitter Details</u></b></h6>
+                            </td>
+                        </tr>
+                        <tr style="margin-top:5px;">
+                            <td style="width:20%; font-weight: bold;">
+                                Employee Name
+                            </td>
+                            <td style="width: 30%; font-weight: normal;" colspan="2" align='left'>
+                                <span style="height: 25px; width:85%; border-radius: 0; "> @(NEIF.EmployeeName)  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Employee Code
+                            </td>
+                            <td style="width: 30%; font-weight: normal;" colspan="2" align='left'>
+                                <span style="height: 25px; width:85%; border-radius: 0; "> @(NEIF.EmployeeCode) </span>
+                            </td>
+
+                        </tr>
+                        <tr style="margin-top:5px;">
+                            <td style="width:20%; font-weight: bold;">
+                                Designation
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(NEIF.EmployeeDesignation) </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Location
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(NEIF.EmployeeLocation) </span>
+                            </td>
+
+                        </tr>
+                        <tr style="margin-top:5px;">
+                            <td style="width:20%; font-weight: bold;">
+                                Department
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(NEIF.EmployeeDepartment) </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                Contact Number
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(NEIF.EmployeeContactNo) </span>
+                            </td>
+
+                        </tr>
+                        <tr style="margin-top:5px;">
+                            <td style="width:20%; font-weight: bold;">
+                                Cost Center Number
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(NEIF.EmployeeCCCode)  </span>
+                            </td>
+                            <td style="width:20%; font-weight: bold;">
+                                UserID
+                            </td>
+                            <td colspan="2" align='left'>
+                                <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(NEIF.EmployeeUserId)  </span>
+                            </td>
+
+                        </tr>
+                    }
+                    else
+                    {
+                        if (NEIF.EmployeeType == "SAVWIPLEmployee")
+                        {
+                            <tr>
+                                <td colspan="6" align='left'>
+                                    <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Submitter Details</u></b></h6>
+                                </td>
+                            </tr>
+                            <tr>
+
+                                <td style="width:20%; font-weight: bold;">
+                                    Employee Name
+                                </td>
+                                <td style="width: 30%" colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(NEIF.OtherEmployeeName)  </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Employee Code
+                                </td>
+                                <td style="width: 30%" colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(NEIF.OtherEmployeeCode) </span>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Designation
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(NEIF.OtherEmployeeDesignation) </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Location
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(NEIF.OtherEmployeeLocation) </span>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Department
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(NEIF.OtherEmployeeDepartment) </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Contact Number
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(NEIF.OtherEmployeeContactNo) </span>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Cost Center Number
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(NEIF.OtherEmployeeCCCode)  </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    UserID
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(NEIF.OtherEmployeeUserId)  </span>
+                                </td>
+
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" align='left'>
+                                    <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Submitter Details</u></b></h6>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Employee Name
+                                </td>
+                                <td style="width: 30%" colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(NEIF.OtherEmployeeName)  </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Employee Code
+                                </td>
+                                <td style="width: 30%" colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(NEIF.OtherEmployeeCode) </span>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Designation
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(NEIF.OtherEmployeeDesignation) </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Location
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(NEIF.OtherEmployeeLocation) </span>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Department
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(NEIF.OtherEmployeeDepartment) </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    Contact Number
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(NEIF.OtherEmployeeContactNo) </span>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:20%; font-weight: bold;">
+                                    Cost Center Number
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(NEIF.OtherEmployeeCCCode)  </span>
+                                </td>
+                                <td style="width:20%; font-weight: bold;">
+                                    UserID
+                                </td>
+                                <td colspan="2" align='left'>
+                                    <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0; "> @(NEIF.OtherEmployeeUserId)  </span>
+                                </td>
+
+                            </tr>
+                        }
+
+                    }
+                    <tr>
+                        <td colspan="6" align='left'>
+                            <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Transaction Field</u></b></h6>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="6" align='left'>
+                            <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Personal Details</u></b></h6>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">Full Name</td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0;">@(NEIF.FullName)</span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">Preferred Name</td>
+                        <td colspan="3" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0;">@(NEIF.PreferredName)</span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">Date of Birth</td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0;">@(NEIF.DateOfBirth?.ToString("dd/MM/yyyy"))</span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">Gender</td>
+                        <td colspan="3" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0;">@(NEIF.Gender)</span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">Marital Status</td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0;">@(NEIF.MaritalStatus)</span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">Nationality</td>
+                        <td colspan="3" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0;">@(NEIF.Nationality)</span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">Personal Email</td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0;">@(NEIF.PersonalEmail)</span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">Mobile Phone Number</td>
+                        <td colspan="3" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0;">@(NEIF.MobilePhoneNumber)</span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">Emergency Contact Name</td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0;">@(NEIF.EmergencyContactName)</span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">Emergency Contact Relationship</td>
+                        <td colspan="3" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0;">@(NEIF.EmergencyContactRelationship)</span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">Emergency Contact Phone Number</td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0;">@(NEIF.EmergencyContactPhoneNumber)</span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">Current Address</td>
+                        <td colspan="3" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0;">@(NEIF.CurrentAddress)</span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">Permanent Address</td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0;">@(NEIF.PermanentAddress)</span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">Postal Code</td>
+                        <td colspan="3" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0;">@(NEIF.PostalCode)</span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="6" align='left'>
+                            <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Employment Details</u></b></h6>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">Job Title</td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0;">@(NEIF.JobTitle)</span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">Department</td>
+                        <td colspan="3" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0;">@(NEIF.Department)</span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">Date of Joining</td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0;">@(NEIF.DateOfJoining?.ToString("dd/MM/yyyy"))</span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">Employment Type</td>
+                        <td colspan="3" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0;">@(NEIF.EmploymentType)</span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">Manager/Supervisor Name</td>
+                        <td colspan="5" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0;">@(NEIF.ManagerName)</span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="6" align='left'>
+                            <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Bank Details</u></b></h6>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">Bank Account Number</td>
+                        <td colspan="3" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0;">@(NEIF.BankAccountNumber)</span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">Bank Name</td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0;">@(NEIF.BankName)</span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">IFSC Code</td>
+                        <td colspan="5" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0;">@(NEIF.IFSCCode)</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="6" align='left'>
+                            <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Tax Information</u></b></h6>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">Tax ID Number</td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0;">@(NEIF.TaxIDNumber)</span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">PAN</td>
+                        <td colspan="3" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0;">@(NEIF.PAN)</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">AADHAR</td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0;">@(NEIF.AADHAR)</span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">Driving License</td>
+                        <td colspan="3" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0;">@(NEIF.DrivingLicense)</span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">Passport</td>
+                        <td colspan="2" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0;">@(NEIF.Passport)</span>
+                        </td>
+                        <td style="width:20%; font-weight: bold;">Valid Visa</td>
+                        <td colspan="3" align='left'>
+                            <span style="height: 25px; font-weight: normal; width: 85%; border-radius: 0;">@(NEIF.ValidVisa)</span>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+    <table style="width: 100%; font-size: 14px; color: #000; font-weight: 600;" border="1" cellspacing="0" cellpadding="0">
+
+        <tr>
+            <td colspan="5" align='left'>
+                <h6 style="margin-top:5px;margin-left:15px;color:black;font-weight:bold"><b><u>Approval Details</u></b></h6>
+            </td>
+        </tr>
+
+        @if (appList.Count > 0)
+        {
+            <tr>
+                <th style="width: 25%;">Name</th>
+                <th style="width: 20%;">Proccessed On</th>
+                <th style="width: 15%;">Status</th>
+                <th style="width: 10%;">Level</th>
+                <th style="width: 30%;">Comment</th>
+            </tr>
+            foreach (var item in appList)
+            {
+                <tr>
+                    <td colspan="1">
+                        <div style="margin-bottom:10px;">
+                            <div>@item.UserName</div>
+                            <div>@item.Designation</div>
+                        </div>
+                    </td>
+                    <td colspan="1">
+                        @if (item.Logic == "OR")
+                        {
+                            if (item.ApproverStatus != "Pending")
+                            {
+                                <div>
+                                    @item.TimeStamp.ToShortDateString()  @Convert.ToDateTime(@item.TimeStamp).ToShortTimeString()
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            if (item.ApproverStatus != "Pending")
+                            {
+                                <div>
+                                    @item.TimeStamp.ToShortDateString()  @Convert.ToDateTime(@item.TimeStamp).ToShortTimeString()
+                                </div>
+                            }
+                        }
+                    </td>
+                    <td colspan="1">
+                        @if (item.Logic == "OR")
+                        {
+                            if (item.ApproverStatus != "Pending")
+                            {
+                                <div>
+                                    @item.ApproverStatus
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div>
+                                @item.ApproverStatus
+                            </div>
+                        }
+                    </td>
+                    <td colspan="1">
+                        <div>
+                            @item.Level
+                        </div>
+                    </td>
+                    <td colspan="1">
+                        <div>
+                            @item.Comment
+                        </div>
+                    </td>
+                </tr>
+            }
+        }
+
+    </table>
+</body>
+</html>

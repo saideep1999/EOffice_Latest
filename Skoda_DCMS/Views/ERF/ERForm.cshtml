@@ -1,0 +1,715 @@
+﻿
+@{
+    Layout = null;
+}
+
+@model Skoda_DCMS.Models.ERFModel
+@{
+    bool IsNew = true;
+    Skoda_DCMS.Models.ERFModel ERF = null;
+    dynamic FlagRedirect = null;
+    bool IsEdit = true, IsNewMode = true, IsEditMode = false, IsViewMode = false;
+    int FormId = 0, AppRowId = 0, ApprovalType = 0;
+    var CurrentUserDesgn = "";
+    var SecurityDesgnString = "Security";
+    Layout = ViewBag.Layout;
+    var currentUser = (Skoda_DCMS.Models.UserData)HttpContext.Current.Session["UserData"];
+    List<Skoda_DCMS.Models.ApprovalDataModel> appList = new List<Skoda_DCMS.Models.ApprovalDataModel>();
+    string disabled = "";
+    if (ViewBag != null && ViewBag.IsNew != null)
+    {
+        IsNew = ViewBag.IsNew;
+        IsEdit = ViewBag.IsEdit;
+        IsNewMode = ViewBag.IsNewMode;
+        IsEditMode = ViewBag.IsEditMode;
+        IsViewMode = ViewBag.IsViewMode;
+        disabled = IsViewMode ? "disabled" : "";
+        ERF = ViewBag.Model.one[0] as Skoda_DCMS.Models.ERFModel;
+        FormId = ViewBag.FormId;
+        AppRowId = ViewBag.AppRowId;
+        ApprovalType = ViewBag.ApprovalType != null ? (int)ViewBag.ApprovalType : 0;
+        appList = ViewBag.Model?.three as List<Skoda_DCMS.Models.ApprovalDataModel>;
+        CurrentUserDesgn = appList?.Where(x => x.ApproverUserName.ToLower() == currentUser.UserName.ToLower()).Select(x => x.Designation).FirstOrDefault();
+    }
+    ViewBag.Title = "Expense Reimbursement Form";
+    int count = 0;
+}
+
+@*Loader*@
+<style type="text/css">
+    #loader {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        z-index: 10000;
+    }
+</style>
+<link href="~/assets/css/CustomeForm.css" rel="stylesheet" />
+<script type="text/javascript">
+
+    function checkSelect(id) {
+
+        if ($('#' + id).val() != '') {
+            $('#' + id).addClass('spanUpperSide');
+        }
+    }
+    /*$('#timedemo').pickatime({ twelvehour: true });*/
+
+</script>
+
+<div class="right_col bg-color">
+    @*class for hiding left menu*@
+    <form action="/List/SaveERF" id="ERForm" method="post">
+
+        <div>
+            @if (IsEditMode || IsViewMode)
+            {
+                <div>
+                    <input type="hidden" id="FormSrId" name="FormSrId" value="@(ViewBag.Model.one[0].Id)" />
+                    <input type="hidden" id="FormId" name="FormId" value="@(FormId)" />
+                    <input type="hidden" id="AppRowId" name="AppRowId" value="@(AppRowId)" />
+                </div>
+            }
+
+            <div>
+                <ol class="breadcrumb pl-0">
+                    <li>
+                        <a href="/Dashboard?formName=BTF">
+                            Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        Expense Reimbursement Form
+                    </li>
+
+                </ol>
+            </div>
+            <div class="breadcrumb-container table-bordered" style="background-color: rgb(219,238,213) !important; ">
+                <div class="col-md-2 col-lg-2">
+                    <span class="placeholder">Date : @(!IsNew || !IsEdit ? (Convert.ToDateTime(ViewBag.Model.one[0].Created_Date).ToShortDateString()) : DateTime.Now.ToShortDateString())</span>
+                </div>
+                <div class="col-md-8 col-lg-8 mt-2 mb-1 form-heading" style="text-align:center; margin-top:5px">
+                    <span>
+                        Expense Reimbursement Form
+                    </span>
+                </div>
+                <div class="col-md-2 col-lg-2">
+                    @if (!IsNew || !IsEdit)
+                    {
+                        <span class="placeholder"> Form Id : @(!IsNew || !IsEdit ? ("ERF" + FormId ?? "") : "" )</span>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="heading d-none" id="headingErr">
+            <h1 id="" class="info-header">Following fields are mandatory. Please fill in information for<br /></h1>
+            <div id="add_to_me" class="header-list" style="color:red;"></div>
+        </div>
+
+        @{
+            Html.RenderPartial("_SubmitterDetailsWithModel", (ViewBag as object));
+        }
+        @{
+            Html.RenderPartial("_ApplicantDetailsWithModel", (ViewBag as object));
+        }
+
+
+        <div class="table photoform_table mb-0">
+            <table class="photo-form">
+                <tr>
+                    <td class="border-none p-0 skoda-auto">
+
+                        <!-- ACCORDIAN STRUCTURE START HERE-->
+                        <div id="accordion">
+                            <div class="card">
+                                <div class="card-header collapsed" id="headingTwo" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                    <h5 class="mb-0">
+                                        <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                            <img src="~/assets/img/transactionIcon.svg" width="24" height="24" class="mr-2" />  Transaction Fields
+                                        </button>
+                                    </h5>
+                                </div>
+
+                                <div id="collapseThree" class="collapse" aria-labelledby="headingThree" style="">
+                                    @if (IsViewMode || IsEditMode)
+                                    {
+                                        <div class="card-body">
+                                            <div class="form-row">
+                                                <!-- Employee ID -->
+                                                <div class="form-group col-md-4">
+                                                    <label for="ERFEmployeeID">Employee ID</label>
+                                                    <input type="text" id="ERFEmployeeID" name="ERFEmployeeID" class="form-control" required @(disabled) value="@(ERF?.ERFEmployeeID ?? "")">
+                                                </div>
+                                                <!-- Expense Type -->
+                                                <div class="form-group col-md-4">
+                                                    <label for="ExpenseType">Expense Type</label>
+                                                    <select id="ExpenseType" name="ExpenseType" class="form-control" required>
+                                                        <option  @(ERF?.ExpenseType == "Travel" ? "selected" : "") value="Travel">Travel</option>
+                                                        <option  @(ERF?.ExpenseType == "Meals" ? "selected" : "") value="Meals">Meals</option>
+                                                        <option  @(ERF?.ExpenseType == "Office Supplies" ? "selected" : "") value="Office Supplies">Office Supplies</option>
+                                                    </select>
+                                                </div>
+                                                <!-- Expense Date -->
+                                                <div class="form-group col-md-4">
+                                                    <label for="ExpenseDate">Expense Date</label>
+                                                    <input type="date" id="ExpenseDate" name="ExpenseDate" class="form-control" required @(disabled) value="@(ERF?.ExpenseDate.Value.ToString("yyyy-MM-dd"))" >
+                                                </div>
+                                            </div>
+
+                                            <div class="form-row">
+                                                <!-- Expense Amount -->
+                                                <div class="form-group col-md-4">
+                                                    <label for="ExpenseAmount">Expense Amount</label>
+                                                    <input type="text" id="ExpenseAmount" name="ExpenseAmount" class="form-control" step="0.01" required @(disabled) value="@(ERF?.ExpenseAmount ?? 0)"  onkeypress="return isNumberKey(event)" oninput="validateDecimal(this)">
+                                                </div>
+                                                <!-- Receipt Attached -->
+                                                <div class="form-group col-md-4">
+                                                    <label for="ReceiptAttached">Receipt Attached</label>
+                                                    <input type="checkbox" id="ReceiptAttached" name="ReceiptAttached" @(disabled) @(ERF?.ReceiptAttached == true ? "checked" : "" )>
+                                                </div>
+                                                <!-- Cost Code -->
+                                                <div class="form-group col-md-4">
+                                                    <label for="CostCode">Cost Code</label>
+                                                    <input type="text" id="CostCode" name="CostCode" class="form-control" required @(disabled) value="@(ERF?.CostCode ?? "")">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="card-body">
+                                            <div class="form-row">
+                                                <!-- Employee ID -->
+                                                <div class="form-group col-md-4">
+                                                    <label for="ERFEmployeeID">Employee ID</label>
+                                                    <input type="text" id="ERFEmployeeID" name="ERFEmployeeID" class="form-control" required>
+                                                </div>
+                                                <!-- Expense Type -->
+                                                <div class="form-group col-md-4">
+                                                    <label for="ExpenseType">Expense Type</label>
+                                                    <select id="ExpenseType" name="ExpenseType" class="form-control" required>
+                                                        <option value="Travel">Travel</option>
+                                                        <option value="Meals">Meals</option>
+                                                        <option value="Office Supplies">Office Supplies</option>
+                                                    </select>
+                                                </div>
+                                                <!-- Expense Date -->
+                                                <div class="form-group col-md-4">
+                                                    <label for="ExpenseDate">Expense Date</label>
+                                                    <input type="date" id="ExpenseDate" name="ExpenseDate" class="form-control" required  onkeypress="return isNumberKey(event)" oninput="validateDecimal(this)">
+                                                </div>
+                                            </div>
+
+                                            <div class="form-row">
+                                                <!-- Expense Amount -->
+                                                <div class="form-group col-md-4">
+                                                    <label for="ExpenseAmount">Expense Amount</label>
+                                                    <input type="number" id="ExpenseAmount" name="ExpenseAmount" class="form-control" step="0.01" required>
+                                                </div>
+                                                <!-- Receipt Attached -->
+                                                <div class="form-group col-md-4">
+                                                    <label for="ReceiptAttached">Receipt Attached</label>
+                                                    <input type="checkbox" id="ReceiptAttached" name="ReceiptAttached">
+                                                </div>
+                                                <!-- Cost Code -->
+                                                <div class="form-group col-md-4">
+                                                    <label for="CostCode">Cost Code</label>
+                                                    <input type="text" id="CostCode" name="CostCode" class="form-control" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- END HERE ACCORDIAN -->
+
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        @if (IsViewMode || IsEditMode)
+        {
+            <div id="accordion">
+                <div class="card">
+                    <div class="card-header collapsed" id="headingFour" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                        <h5 class="mb-0">
+                            <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                                <img src="~/assets/img/approvalTracking.svg" width="24" height="24" class="mr-2" />Approval Tracking
+                            </button>
+                        </h5>
+                    </div>
+                    <div id="collapseFour" class="collapse" aria-labelledby="headingFour">
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="col-12">
+                                    <table class="table w-100 td-border showBorder">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Role</th>
+                                                <th>Processed on</th>
+                                                <th>Status</th>
+                                                <th class="text-center">Comments</th>
+                                                <th class="text-center">Approval Level</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @if (!IsNew || !IsEdit)
+                                            {
+                                                Html.RenderPartial("_ApprovalTracking", appList);
+                                            }
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br />
+        }
+
+        @if (IsNew)
+        {
+            if (!IsEdit)
+            {
+                <div class="card-footer align-content-center">
+                    <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                        Re-Submit
+                    </button>
+                    <button type="reset" class="btn btn-danger btn-sm cancl-btn" id="btnCancel">
+                        Cancel
+                    </button>
+                </div>
+            }
+            else
+            {
+                <div class="card-footer align-content-center">
+                    <button type="button" class="btn btn-primary btn-sm submit-btn" id="btnSubmit">
+                        Submit
+                    </button>
+                    <button type="reset" class="btn btn-danger btn-sm cancl-btn" id="btnCancel">
+                        Cancel
+                    </button>
+                </div>
+            }
+        }
+    </form>
+</div>
+<div class="modal fade" id="successModel" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header modelHeader">
+                <span class="modal-title modalMsgTitle" id="modalTitle"></span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label id="modalBody" class="lableMsg">  </label>
+                <input type="hidden" id="tab" value="0" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="submitBomBtn publishBtn" id="modalOkButton" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var spinner = $('#loader');
+    var currentUserDesgn = @Html.Raw(Json.Encode(CurrentUserDesgn));
+    var IsNew = @Html.Raw(Json.Encode(IsNew));
+    var IsEdit = @Html.Raw(Json.Encode(IsEdit));
+    var IsNewMode = @Html.Raw(Json.Encode(IsNewMode));
+    var IsEditMode = @Html.Raw(Json.Encode(IsEditMode));
+    var IsViewMode = @Html.Raw(Json.Encode(IsViewMode));
+    var ERF = @Html.Raw(Json.Encode(ERF));
+    var appRowId = @Html.Raw(Json.Encode(AppRowId));
+    var approvalType =@Html.Raw(Json.Encode(ApprovalType));
+    var FlagRedirect = @Html.Raw(Json.Encode(FlagRedirect));
+    var SecurityDesgnString = @Html.Raw(Json.Encode(SecurityDesgnString));
+
+    pageLoad();
+    var errorCount = 0;
+    var errors = "";
+    function pageLoad() {
+        //
+        //console.log(ERF)
+        $("#headingErr").addClass('d-none');
+
+    }
+
+    function successModal(txt) {
+        //
+        $('#modalTitle').html('Success');
+        if (txt == "approve") {
+            $('#modalBody').html('Form has been approved!');
+        }
+        else if (txt == "reject") {
+            $('#modalBody').html('Form has been rejected!');
+        }
+        else if (txt == "enquire") {
+            $('#modalBody').html('Form has been enquired!');
+        }
+        else if (txt == "cancelled") {
+            $('#modalBody').html('Form has been cancelled!');
+        }
+        else {
+            if (IsEditMode) {
+                $('#modalBody').html('Your form with ID: ERF' + txt + ' has been re-submitted! Kindly use this for future reference');
+            }
+            else {
+                $('#modalBody').html('Your form with ID: ERF' + txt + ' has been submitted! Kindly use this for future reference');
+            }
+
+        }
+        FlagRedirect = txt;
+        //$("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    //function failureModal() {
+    //    $('#modalTitle').html('Failure');
+    //    $('#modalBody').html('Some error occurred!');
+    //    $("#modalOkButton").attr('data-dismiss', 'modal');
+    //    $("#successModel").modal('show');
+    //}
+    function failureModal(txt) {
+        if (txt == null) {
+            $('#modalBody').html('Some error occurred!');
+        }
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html(txt);
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function permissionModal() {
+        $('#modalTitle').html('Failure');
+        $('#modalBody').html('No permssion granted since the device is not MobiIPL owned!');
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function requiredModal(text) {
+        $('#modalTitle').html('Required!');
+        $('#modalBody').html(text);
+        $("#modalOkButton").attr('data-dismiss', 'modal');
+        $("#successModel").modal('show');
+    }
+
+    function validityModal(txt) {
+        ////
+        if (txt == 'approve') {
+            DisplayAlert('error', 'Error', 'Please select the Type of Car');
+        }
+        else if (txt == 'reject') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for rejecting the form');
+        }
+        else if (txt == 'enquire') {
+            DisplayAlert('error', 'Warning', 'Please type in the reason for enquiring the form');
+        }
+
+    }
+
+
+    function date_val() {
+        var today = new Date().toISOString().split('T')[0];
+        document.getElementsByName("txtActivityStart")[0].setAttribute("min", today);
+    }
+
+    function setInternalYear() {
+        //
+        if (!IsEdit) {
+            var value = JSON.stringify(ERF[0]);
+            var value_1 = JSON.parse(value);
+            var activityEndDate = value_1.Value[0].ActivityEnd;
+            var regExp = /\(([^)]+)\)/;
+            var valueNumber = regExp.exec(activityEndDate);
+            var x = parseInt(valueNumber[1]);
+            var valueNumberDate = new Date(x);
+            var valueNumberDateYear = valueNumberDate.getFullYear();
+
+            var year_string = document.getElementsByName("txtActivityStart")[0].value;
+            var parts = year_string.split("-");
+            var year = new Date(parts[0], parts[1] - 1, parts[2]);
+            var min_year = year;
+            let initial_year = parseInt(parts[0]);
+            let final_year = parseInt(parts[0]) + 5;
+            var s = '<option value="-1">Choose End Year</option>';
+            for (i = initial_year + 1; i <= final_year; i++) {
+                if (i == valueNumberDateYear) {
+                    s += '<option value="' + i + '" selected>' + i + '</option>';
+                }
+                else {
+                    s += '<option value="' + i + '">' + i + '</option>';
+                }
+            }
+            $("#drpActivityEnd").html(s);
+        }
+        else {
+            var year_string = document.getElementsByName("txtActivityStart")[0].value;
+            var parts = year_string.split("-");
+            var year = new Date(parts[0], parts[1] - 1, parts[2]);
+            var min_year = year;
+            let initial_year = min_year.getFullYear();
+            let final_year = min_year.getFullYear() + 5;
+            var s = '<option value="-1">Choose End Year</option>';;
+            for (i = initial_year + 1; i <= final_year; i++) {
+                s += '<option value=" ' + i + ' ">' + i + '</option>';
+            }
+            $("#drpActivityEnd").html(s);
+        }
+
+    }
+
+    function allowNumbersOnly(e) {
+                                                                var code = (e.which) ? e.which : e.keyCode;
+                                                                if (code > 31 && (code < 48 || code > 57)) {
+                                                                e.preventDefault();
+                                                                }
+                                                                }
+
+    $("#btnSubmit").on('click', function (e) {
+        //
+        validateSubmitter();
+        validateApplicant();
+
+        var fields = [
+            { id: "ERFEmployeeID", name: "Employee ID", type: "textbox" },
+            { id: "ExpenseType", name: "Expense Type", type: "dropdown", options: ["Travel", "Meals", "Office Supplies"] },
+            { id: "ExpenseDate", name: "Expense Date", type: "date" },
+            { id: "ExpenseAmount", name: "Expense Amount", type: "textbox" },
+            { id: "ReceiptAttached", name: "Receipt Attached", type: "checkbox" },
+            { id: "CostCode", name: "Cost Code", type: "textbox" }
+        ];
+
+        fields.forEach(function (field) {
+            var fieldValue = $("#" + field.id).val();
+            if (!fieldValue || fieldValue.trim() === "") {
+                errors += "<li id='error" + errorCount + "'>" + field.name + "</li>";
+                AddError(field.id, '', errorCount);
+                errorCount++;
+            }
+        });
+        if (errors.length) {
+            errors = "<ol id='errorList'>" + errors + "</ol>";
+            $("#headingErr").removeClass('d-none');
+            document.getElementById("add_to_me").innerHTML = errors;
+            errors = "";
+            errorCount = 0;
+            if (IsEditMode) {
+                $("#myModalEdit").scrollTop(0);
+                $("#myModalRequest").scrollTop(0);
+            }
+            else {
+                $(window).scrollTop(0);
+            }
+            var mainDiv = document.querySelector(".main"); mainDiv.scrollTop = 0;
+            return false;
+        }
+        $("#headingErr").addClass('d-none');
+        document.getElementById("add_to_me").innerHTML = '';
+
+        $('#ddEmpDesignation').prop("disabled", false);
+        $('#txtOnBehalfdesignation').prop("disabled", false);
+        $(".full-screen-container").removeClass('invisible');
+        $(".full-screen-container").show();
+        $("#pageLoader").removeClass('invisible');
+        $("#btnSubmit").text('Saving');
+        $("#btnSubmit").prop("disabled", true);
+        $("#btnCancel").prop("disabled", true);
+
+       //
+        var form = $("#ERForm");
+        var formData = new FormData(form[0]);
+        $.ajax({
+            url: '/ERF/SaveERF',
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            data: formData,
+            enctype: 'multipart/form-data',
+            success: (function (data) {
+                if (data.Status == 200) {
+                    if (IsNew && IsEdit) {
+                        $("#btnSubmit").text('Submit');
+                    }
+                    else {
+                        $("#btnSubmit").text('Re-Submit');
+                    }
+                    $("#btnSubmit").prop("disabled", false);
+                    $("#btnCancel").prop("disabled", false);
+                    successModal(data.Message);
+                }
+                else {
+                    failureModal(data.Message);
+                    if (IsNew && IsEdit) {
+                        $("#btnSubmit").text('Submit');
+                    }
+                    else {
+                        $("#btnSubmit").text('Re-Submit');
+                    }
+                    $("#btnSubmit").prop("disabled", false);
+                    $("#btnCancel").prop("disabled", false);
+                    console.log("failure");
+                }
+
+                $("#loader").addClass('invisible');
+                $(".full-screen-container").hide();
+            }),
+            error: (function (data) {
+                failureModal(data.Message);
+                //failureModal();
+                console.log("error");
+                if (IsNew && IsEdit) {
+                    $("#btnSubmit").text('Submit');
+                }
+                else {
+                    $("#btnSubmit").text('Re-Submit');
+                }
+
+                $("#loader").addClass('invisible');
+                $(".full-screen-container").hide();
+                $("#btnSubmit").prop("disabled", false);
+                $("#btnCancel").prop("disabled", false);
+            })
+        })
+
+        $("#tab").val(2);
+    });
+
+    $("#btnCancel").on('click', function (e) {
+        window.location = "../Dashboard";
+    });
+
+    function saveResponse(text) {
+        debugger;
+        $(".full-screen-container").removeClass('invisible');
+        $(".full-screen-container").show();
+        $("#pageLoader").removeClass('invisible');
+        var status = '', comment = '';
+        comment = $("#comment-" + text).val();
+        switch (text) {
+            case 'approve': {
+                status = 'Approved';
+                $(".full-screen-container").hide();
+                $("#pageLoader").addClass('invisible');
+                break;
+            }
+            case 'reject': {
+                status = 'Rejected';
+                if (comment == '') {
+                    //validityModal(text);
+                    $(".full-screen-container").hide();
+                    $("#pageLoader").addClass('invisible');
+                    //return;
+                }
+                break;
+            }
+            case 'enquire': {
+                status = 'Enquired';
+                if (comment == '') {
+                    //validityModal(text);
+                    $(".full-screen-container").hide();
+                    $("#pageLoader").addClass('invisible');
+                    //return;
+                }
+                break;
+            }
+        }
+        FormApproval(status, appRowId, comment, approvalType, text);
+        $("#tab").val(1);
+
+
+    }
+
+    function FormApproval(status, appRowId, comment, approvalType, text) {
+        $(".full-screen-container").removeClass('invisible');
+        $(".full-screen-container").show();
+        $("#pageLoader").removeClass('invisible');
+        spinner.show();
+        $.ajax({
+            url: '/List/SaveResponse',
+            type: 'POST',
+            data: { response: status, appRowId: appRowId, comment: comment, approvalType: approvalType },
+            dataType: 'JSON',
+            success: (function (data) {
+                if (data.Result == 1) {
+                    successModal(text);
+                    spinner.hide();
+                    //setTimeout(FilterMyTasks, 5000);
+
+                    $("#loader").addClass('invisible');
+                    $(".full-screen-container").hide();
+                    $("#pageLoader").addClass('invisible');
+                }
+                else {
+                    failureModal();
+
+                    $("#loader").addClass('invisible');
+                    $(".full-screen-container").hide();
+                    $("#pageLoader").addClass('invisible');
+                }
+            }),
+            error: (function (data) {
+                failureModal();
+                $("#pageLoader").addClass('invisible');
+
+                $("#loader").addClass('invisible');
+                $(".full-screen-container").hide();
+            })
+        })
+
+        $("#tab").val(1);
+    }
+
+    $('#successModel').on('hidden.bs.modal', function () {
+        ////
+        var tab = $("#tab").val();
+        console.log(tab);
+        if (tab == 1) {
+            GetMyTaskTab();
+        }
+        else if (tab == 2) {
+            window.location = "../Dashboard?tab=" + tab;
+        }
+    })
+
+    $('#myModal').modal({ backdrop: 'static', keyboard: false })
+
+
+    function checkSelect(id) {
+
+        if ($('#' + id).val() != '') {
+            $('#' + id).addClass('spanUpperSide');
+        }
+    }
+
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        // Allow only numbers and one dot (.)
+        if (charCode != 46 && charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+        return true;
+    }
+
+    function validateDecimal(input) {
+        // Replace multiple dots or wrong format
+        let value = input.value;
+        if (value.split('.').length > 2) {
+            input.value = value.substring(0, value.length - 1); // Remove the last entered character
+        }
+    }
+</script>
+

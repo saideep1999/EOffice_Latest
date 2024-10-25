@@ -488,6 +488,7 @@ namespace Skoda_DCMS.DAL
                         modelData.Designation = Convert.ToString(dt1.Rows[i]["Designation"]);
                         modelData.ApproverUserName = Convert.ToString(dt1.Rows[i]["ApproverUserName"]);
                         modelData.ApproverName = Convert.ToString(dt1.Rows[i]["ApproverName"]);
+                        modelData.TimeStamp = Convert.ToDateTime(dt1.Rows[i]["TimeStamp"]);
                         modeldatalist.Add(modelData);
 
                     }
