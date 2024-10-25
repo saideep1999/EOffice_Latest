@@ -357,6 +357,7 @@
     <Compile Include="Controllers\ITAssetController.cs" />
     <Compile Include="Controllers\ITClearanceRequestController.cs" />
     <Compile Include="Controllers\KSRMUserIdController.cs" />
+    <Compile Include="Controllers\LAFController.cs" />
     <Compile Include="Controllers\ListController.cs" />
     <Compile Include="Controllers\EmployeeClearanceController.cs" />
     <Compile Include="Controllers\LoginController.cs" />
@@ -422,6 +423,7 @@
     <Compile Include="DAL\ITClearanceDAL.cs" />
     <Compile Include="DAL\ITClearanceRequestDAL.cs" />
     <Compile Include="DAL\KSRMUserIdDAL.cs" />
+    <Compile Include="DAL\LAFDAL.cs" />
     <Compile Include="DAL\ListDAL.cs" />
     <Compile Include="DAL\EmployeeClearanceDAL.cs" />
     <Compile Include="DAL\LoginDAL.cs" />
@@ -483,6 +485,7 @@
     <Compile Include="Models\IMACModel.cs" />
     <Compile Include="Models\IPAFModel.cs" />
     <Compile Include="Models\ISCLSCModel.cs" />
+    <Compile Include="Models\LAFModel.cs" />
     <Compile Include="Models\MaterialRequestModel.cs" />
     <Compile Include="Models\MMRModel.cs" />
     <Compile Include="Models\NEIFModel.cs" />
@@ -3993,6 +3996,7 @@
     <Content Include="Views\Training\TrainingRequestPDF.cshtml" />
     <Content Include="Views\GoalSetting\GoalSettingPDF.cshtml" />
     <Content Include="Views\SalaryReviewAdjustment\SalaryReviewAdjustmentPDF.cshtml" />
+    <Content Include="Views\LAF\LAForm.cshtml" />
     <None Include="Web.Beta.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
