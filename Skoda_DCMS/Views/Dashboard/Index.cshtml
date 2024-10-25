@@ -593,7 +593,7 @@
         font-size: 14px;
         line-height: 17px;
         /* identical to box height */
-        text-transform: uppercase;
+        /*text-transform: uppercase;*/
         /* Text_white */
         color: #0C6980;
     }
@@ -995,7 +995,10 @@
         -webkit-animation: spin 2s linear infinite;
         animation: spin 2s linear infinite;
     }
-
+    .icon_img_dashboard {
+        width: 30px;
+        /*filter: drop-shadow(1px 1px 3px #466a91);*/
+    }
 
 </style>
 
@@ -1135,7 +1138,8 @@
                     </div>
                 </div>
                 <div class="col-4 iconStyle">
-                    <i class="fa fa-tasks icondes" style="-webkit-text-stroke: 2px white;"></i>
+                    <img class="icon_img_dashboard" src="~/assets/img/Total_task.png" />
+                    @*<i class="fa fa-tasks icondes" style="-webkit-text-stroke: 2px white;"></i>*@
                 </div>
             </div>
             <div class="card-footer1"><h2 class="topic">Total Task</h2></div>
@@ -1149,13 +1153,14 @@
                     </div>
                 </div>
                 <div class="col-4 iconStyle">
-                    <i class="fa fa-check-square-o icondes" style="-webkit-text-stroke: 2px white;"></i>
+                    <img class="icon_img_dashboard" src="~/assets/img/approved_task.png" />
+                    @*<i class="fa fa-check-square-o icondes" style="-webkit-text-stroke: 2px white;"></i>*@
                 </div>
             </div>
             <div class="card-footer2"><h2 class="topic">Approved</h2></div>
         </div>
 
-        <div class="card-boxes" onclick="GetTotalTask('Revised');">
+        @*<div class="card-boxes" onclick="GetTotalTask('Revised');">
             <div class="card-header">
                 <div class="col-8">
                     <div class="text">
@@ -1167,7 +1172,7 @@
                 </div>
             </div>
             <div class="card-footer3"><h2 class="topic">Revised</h2></div>
-        </div>
+        </div>*@
 
         <div class="card-boxes" onclick="GetTotalTask('Pending');">
             <div class="card-header">
@@ -1177,7 +1182,8 @@
                     </div>
                 </div>
                 <div class="col-4 iconStyle">
-                    <i class="fa fa-hourglass-1 icondes" style="-webkit-text-stroke: 1px white;"></i>
+                    <img class="icon_img_dashboard" src="~/assets/img/pending1.png" />
+                    @*<i class="fa fa-hourglass-1 icondes" style="-webkit-text-stroke: 1px white;"></i>*@
                 </div>
             </div>
             <div class="card-footer4"><h2 class="topic">Pending</h2></div>
@@ -1191,13 +1197,14 @@
                     </div>
                 </div>
                 <div class="col-4 iconStyle">
-                    <i class="fa fa-thumbs-down icondes" style="-webkit-text-stroke: 2px white;"></i>
+                    <img class="icon_img_dashboard" src="~/assets/img/reject.png" />
+                    @*<i class="fa fa-thumbs-down icondes" style="-webkit-text-stroke: 2px white;"></i>*@
                 </div>
             </div>
             <div class="card-footer5"><h2 class="topic">Rejected</h2></div>
         </div>
 
-        <div class="card-boxes" onclick="GetTotalTask('Cancelled');">
+        @*<div class="card-boxes" onclick="GetTotalTask('Cancelled');">
             <div class="card-header">
                 <div class="col-8">
                     <div class="text">
@@ -1209,7 +1216,7 @@
                 </div>
             </div>
             <div class="card-footer6"><h2 class="topic">Cancelled</h2></div>
-        </div>
+        </div>*@
 
     </div>
 
