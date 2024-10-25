@@ -65,7 +65,10 @@ namespace Skoda_DCMS.Helpers
         public CPAFDAL CPAFDAL;
         public TEFDAL TEFDAL;
         public CAFDAL CAFDAL;
+<<<<<<< HEAD
         public LAFDAL LAFDAL;
+=======
+>>>>>>> latestcode25102024
         public SalaryReviewAdjustmentDAL SalaryReviewAdjustmentDAL;
 
         public static List<Tuple<string, string, Func<Task<dynamic>>, Func<int, int, Task<dynamic>>>> Mapping;
@@ -128,7 +131,10 @@ namespace Skoda_DCMS.Helpers
             CPAFDAL = new CPAFDAL();
             TEFDAL = new TEFDAL();
             CAFDAL = new CAFDAL();
+<<<<<<< HEAD
             LAFDAL = new LAFDAL();
+=======
+>>>>>>> latestcode25102024
             SalaryReviewAdjustmentDAL = new SalaryReviewAdjustmentDAL();
 
             listDal = new ListDAL();
@@ -190,7 +196,10 @@ namespace Skoda_DCMS.Helpers
             Mapping.Add(new Tuple<string, string, Func<Task<dynamic>>, Func<int, int, Task<dynamic>>>("CPAF", "CPAForm.cshtml", null, CPAFDAL.ViewCPAFormData));
             Mapping.Add(new Tuple<string, string, Func<Task<dynamic>>, Func<int, int, Task<dynamic>>>("TEF", "TEForm.cshtml", null, TEFDAL.ViewTEFormData));
             Mapping.Add(new Tuple<string, string, Func<Task<dynamic>>, Func<int, int, Task<dynamic>>>("CAF", "CAForm.cshtml", null, CAFDAL.ViewCAFormData));
+<<<<<<< HEAD
             Mapping.Add(new Tuple<string, string, Func<Task<dynamic>>, Func<int, int, Task<dynamic>>>("LAF", "LAForm.cshtml", null, LAFDAL.ViewLAFormData));
+=======
+>>>>>>> latestcode25102024
             Mapping.Add(new Tuple<string, string, Func<Task<dynamic>>, Func<int, int, Task<dynamic>>>("SRAF", "SalaryReviewAdjustment.cshtml", null, SalaryReviewAdjustmentDAL.GetSRAFDetails));
         }
 
@@ -254,7 +263,10 @@ namespace Skoda_DCMS.Helpers
                     { "TRF", "TrainingRequest" },
                     { "TEF", "TEF" },
                     { "CAF", "CAF" },
+<<<<<<< HEAD
                     { "LAF", "LAF" },
+=======
+>>>>>>> latestcode25102024
                     { "SRAF", "SalaryReviewAdjustment" }
                 };
             }

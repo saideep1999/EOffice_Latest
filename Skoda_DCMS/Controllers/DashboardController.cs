@@ -2814,6 +2814,7 @@ namespace Skoda_DCMS.Controllers
             return reportData;
         }
         
+<<<<<<< HEAD
         public async Task<byte[]> GetLAFReport(List<FormData> formsList)
         {
             var reportData = new byte[0];
@@ -2930,6 +2931,8 @@ namespace Skoda_DCMS.Controllers
             return reportData;
         }
         
+=======
+>>>>>>> latestcode25102024
         //public async Task<byte[]> GetTSFReport(List<FormData> formsList)
         //{
         //    var reportData = new byte[0];

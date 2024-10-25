@@ -3996,8 +3996,11 @@
     <Content Include="Views\Training\TrainingRequestPDF.cshtml" />
     <Content Include="Views\GoalSetting\GoalSettingPDF.cshtml" />
     <Content Include="Views\SalaryReviewAdjustment\SalaryReviewAdjustmentPDF.cshtml" />
+<<<<<<< HEAD
     <Content Include="Views\LAF\LAForm.cshtml" />
     <Content Include="Views\LAF\LAPDF.cshtml" />
+=======
+>>>>>>> latestcode25102024
     <None Include="Web.Beta.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
