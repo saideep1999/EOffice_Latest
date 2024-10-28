@@ -2686,6 +2686,7 @@ namespace Skoda_DCMS.Controllers
                     row++;
                 }
 
+
                 Sheet.Cells["A:AZ"].AutoFitColumns();
                 reportData = Ep.GetAsByteArray();
                 Ep.Dispose();
