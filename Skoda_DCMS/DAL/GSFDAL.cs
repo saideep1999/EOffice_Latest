@@ -558,7 +558,7 @@ namespace Skoda_DCMS.DAL
                 }
 
                 var common = new CommonDAL();
-                // appList = common.CallAssistantAndDelegateFunc(appList);
+                appList = common.CallAssistantAndDelegateFunc(appList);
 
                 //var handler = new HttpClientHandler();
                 //handler.Credentials = new NetworkCredential($"{user.DomainName}\\{user.UserName}", user.Password);

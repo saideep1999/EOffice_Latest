@@ -139,7 +139,40 @@
                                     @if (IsViewMode || IsEditMode)
                                     {
                                         <div class="card-body">
+                                            <div class="form-row">
+                                                <div class="form-group col-md-4">
+                                                    <label for="LAFEmployeeID">Employee ID:</label>
+                                                    <input type="text" class="form-control" id="LAFEmployeeID" name="LAFEmployeeID" @(disabled) value="@(LAF?.LAFEmployeeID ?? "")">
+                                                </div>
+                                                <div class="form-group col-md-4">
+                                                    <label for="LeaveType">Leave Type:</label>
+                                                    <select class="form-control" id="LeaveType" name="LeaveType" @(disabled)>
+                                                        <option @(LAF?.LeaveType == "Paid" ? "selected" : "") value="Paid">Paid</option>
+                                                        <option @(LAF?.LeaveType == "Sick" ? "selected" : "") value="Sick">Sick</option>
+                                                        <option @(LAF?.LeaveType == "Casual" ? "selected" : "") value="Casual">Casual</option>
+                                                        <option @(LAF?.LeaveType == "Unpaid" ? "selected" : "") value="Unpaid">Unpaid</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group col-md-4">
+                                                    <label for="LeaveStartDate">Leave Start Date:</label>
+                                                    <input type="date" class="form-control" id="LeaveStartDate" name="LeaveStartDate"  @(disabled) value="@(LAF?.LeaveStartDate.Value.ToString("yyyy-MM-dd"))">
+                                                </div>
+                                            </div>
 
+                                            <div class="form-row">
+                                                <div class="form-group col-md-4">
+                                                    <label for="LeaveEndDate">Leave End Date:</label>
+                                                    <input type="date" class="form-control" id="LeaveEndDate" name="LeaveEndDate"  @(disabled) value="@(LAF?.LeaveEndDate.Value.ToString("yyyy-MM-dd"))">
+                                                </div>
+                                                <div class="form-group col-md-4">
+                                                    <label for="TotalLeaveDays">Total Leave Days:</label>
+                                                    <input type="number" class="form-control" id="TotalLeaveDays" name="TotalLeaveDays" readonly  @(disabled) value="@(LAF?.TotalLeaveDays ?? 0)">
+                                                </div>
+                                                <div class="form-group col-md-4">
+                                                    <label for="LeaveReason">Reason for Leave:</label>
+                                                    <textarea class="form-control" id="LeaveReason" name="LeaveReason" rows="3" @(disabled) value="@(LAF?.LAFEmployeeID ?? "")">@(LAF?.LeaveReason ?? "")</textarea>
+                                                </div>
+                                            </div>
                                         </div>
 
                                     }
@@ -148,7 +181,7 @@
                                         <div class="card-body">
                                             <div class="form-row">
                                                 <div class="form-group col-md-4">
-                                                    <label for="EmployeeID">Employee ID:</label>
+                                                    <label for="LAFEmployeeID">Employee ID:</label>
                                                     <input type="text" class="form-control" id="LAFEmployeeID" name="LAFEmployeeID">
                                                 </div>
                                                 <div class="form-group col-md-4">
@@ -308,6 +341,31 @@
 
     }
     $(document).ready(function () {
+        $('#LeaveStartDate, #LeaveEndDate').on('change', function () {
+            // Get the values of fromDate and toDate
+            var fromDate = $('#LeaveStartDate').val();
+            var toDate = $('#LeaveEndDate').val();
+
+            // Check if both dates are entered
+            if (fromDate && toDate) {
+                // Convert the dates to JavaScript Date objects
+                var startDate = new Date(fromDate);
+                var endDate = new Date(toDate);
+
+                // Calculate the difference in milliseconds
+                var timeDiff = endDate - startDate;
+
+                // Convert milliseconds to days
+                var dayDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+
+                // Display the difference
+                if (dayDiff >= 0) {
+                    $('#TotalLeaveDays').val(dayDiff); // Assuming totalDays is the ID of the field for displaying total days
+                } else {
+                    $('#TotalLeaveDays').val(0); // Set to 0 if toDate is earlier than fromDate
+                }
+            }
+        });
         // Array of Nationalities
         var nationalities = [
             { value: "Indian", text: "Indian" },
@@ -695,40 +753,12 @@
 
         var fields = [
             // Personal Information
-            { id: "FullName", name: "Full Name", required: true },
-            { id: "DateOfBirth", name: "Date of Birth", required: true },
-            //{ id: "Gender", name: "Gender", required: true },
-            { id: "Nationality", name: "Nationality", required: true },
-            { id: "ContactNumber", name: "Contact Number", required: true },
-            { id: "EmailAddress", name: "Email Address", required: true },
-            { id: "CurrentAddress", name: "Current Address", required: true },
-            { id: "PermanentAddress", name: "Permanent Address", required: false },
-            { id: "LinkedInProfile", name: "LinkedIn Profile", required: false },
-            { id: "WebsitePortfolio", name: "Website/Portfolio", required: false },
-
-            // Job Information
-            { id: "PositionAppliedFor", name: "Position Applied For", required: true },
-            { id: "ExpectedSalary", name: "Expected Salary", required: true },
-            { id: "NoticePeriod", name: "Notice Period", required: true },
-
-            // Educational Qualifications
-            { id: "HighestQualification", name: "Highest Qualification", required: true },
-            { id: "InstitutionName", name: "Institution Name", required: true },
-            { id: "YearOfGraduation", name: "Year of Graduation", required: true },
-            { id: "Specialization", name: "Specialization/Field of Study", required: false },
-            { id: "AdditionalCertifications", name: "Additional Certifications", required: false },
-
-            // Work Experience
-            { id: "TotalYearsOfExperience", name: "Total Years of Experience", required: true },
-            { id: "LastCompany", name: "Last Company Worked At", required: true },
-            { id: "LastJobTitle", name: "Last Job Title", required: true },
-
-            // Skills and Competencies
-            { id: "TechnicalSkills", name: "Technical Skills", required: true },
-            { id: "OtherSkills", name: "Other Skills", required: false },
-
-            // Resume/CV Upload
-            //{ id: "Resume", name: "Upload Resume", required: true }
+            { id: "LAFEmployeeID", name: "Employee ID", required: true, type: "text" },
+            { id: "LeaveType", name: "Leave Type", required: true, type: "dropdown", options: ["Paid", "Sick", "Casual", "Unpaid"] },
+            { id: "LeaveStartDate", name: "Leave Start Date", required: true, type: "date" },
+            { id: "LeaveEndDate", name: "Leave End Date", required: true, type: "date" },
+            { id: "TotalLeaveDays", name: "Total Leave Days", required: false, type: "number", calculated: true },
+            { id: "LeaveReason", name: "Reason for Leave", required: true, type: "textarea" }
         ];
         fields.forEach(function (field) {
             var element = document.getElementById(field.id);
@@ -739,21 +769,6 @@
                 errorCount++;
             }
         });
-        if (IsEditMode) {
-            var fileToUpload = $("#ResumeFilePath").val();
-            if (fileToUpload != undefined && fileToUpload != "") {
-                $("#attachedfile").val('');
-                $("#attachedfileName").val('');
-            }
-        }
-        if (IsNewMode) {
-            var attachment3 = $("#ResumeFilePath").val();
-            if (attachment3 == undefined || attachment3 == "") {
-                errors += "<li id='error" + errorCount + "'>" + "Add Resume Attachment" + "</li>";
-                //AddError("lblattached", 'lblattached', errorCount);
-                errorCount++;
-            }
-        }
         if (errors.length) {
             errors = "<ol id='errorList'>" + errors + "</ol>";
             $("#headingErr").removeClass('d-none');

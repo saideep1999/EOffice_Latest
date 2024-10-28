@@ -605,6 +605,8 @@ namespace Skoda_DCMS.DAL
                 {
                     return new ResponseModel<List<ApprovalMatrix>> { Model = new List<ApprovalMatrix>(), Status = 500, Message = "Approver is missing." }; ;
                 }
+                var common = new CommonDAL();
+                appList = common.CallAssistantAndDelegateFunc(appList);
                 //var handler = new HttpClientHandler();
                 //handler.Credentials = new NetworkCredential($"{user.DomainName}\\{user.UserName}", user.Password);
                 //var client = new HttpClient(handler);

@@ -169,7 +169,8 @@
     .cancl-btn {
         background-image: none !important;
     }
-    #pieChart {
+
+    #pieChart, #donut, #barChart {
         position: static !important;
     }
 </style>
@@ -299,12 +300,12 @@
                             <li class="nav-item w150 text-center" id="grpah">
                                 <a class="nav-link" data-toggle="tab" href="#graphical" aria-expanded="false">Analytics </a>
                             </li>
-                            @*<li class="nav-item w150 text-center" id="grpahbarChart">
-                                <a class="nav-link" data-toggle="tab" onclick="fn_barChart()" href="#graphicalbarChart" aria-expanded="false">Bar Chart </a>
-                            </li>
-                            <li class="nav-item w150 text-center" id="grpahdonutChart">
-                                <a class="nav-link" data-toggle="tab" onclick="fn_donutChart()" href="#graphicaldonutChart" aria-expanded="false">Donut Chart </a>
-                            </li>*@
+                            <li class="nav-item w150 text-center" id="grpahbarChart" style="display:none;">
+                                    <a class="nav-link" data-toggle="tab" onclick="fn_barChart()" href="#graphicalbarChart" aria-expanded="false">Bar Chart </a>
+                                </li>
+                                <li class="nav-item w150 text-center" id="grpahdonutChart" style="display:none;">
+                                    <a class="nav-link" data-toggle="tab" onclick="fn_donutChart()" href="#graphicaldonutChart" aria-expanded="false">Donut Chart </a>
+                                </li>
                         </ul>
 
                         <div class="tab-content">
@@ -324,7 +325,7 @@
                                 <div class="row pt-3">
                                     <div class="col-md-10"></div>
                                     <div class="col-md-2">
-                                        <select class="form-control">
+                                        <select class="form-control" id="drpChangeChart">
                                             <option value="pie_chart">Pie Chart</option>
                                             <option value="bar_chart">Bar Chart</option>
                                             <option value="donut_chart">Donut Chart</option>
@@ -339,13 +340,13 @@
                                 <!--End Grapgical chart -->
                             </div>
 
-                            @*<div class="container tab-pane fade" id="graphicalbarChart">
-            <div id="barChart"></div>
-        </div>
+                            <div class="container tab-pane fade" id="graphicalbarChart">
+                                <div id="barChart"></div>
+                            </div>
 
-        <div class="container tab-pane fade" id="graphicaldonutChart">
-            <div id="donut"></div>
-        </div>*@
+                            <div class="container tab-pane fade" id="graphicaldonutChart">
+                                <div id="donut"></div>
+                            </div>
 
                         </div>
                     </div>
@@ -428,6 +429,38 @@
     var arrayForChartData = [];
     var objectForChartData = {};
     $(document).ready(function () {
+        $('#drpChangeChart').on('change', function () {
+            debugger;
+            var chart = $(this).val();
+            if (chart == "bar_chart") {
+                $("#graphical").hide();
+                $("#graphicalbarChart").show();
+                $("#graphicaldonutChart").hide();
+                $("#grpah").hide();
+                $("#grpahbarChart").show();
+                $("#grpahdonutChart").hide();
+                $("#grpahbarChart a").trigger("click");
+            }
+            if (chart == "donut_chart") {
+                $("#graphical").hide();
+                $("#graphicalbarChart").hide();
+                $("#graphicaldonutChart").show();
+                $("#grpah").hide();
+                $("#grpahbarChart").hide();
+                $("#grpahdonutChart").show();
+                $("#grpahdonutChart a").trigger("click");
+            }
+            if (chart == "pie_chart") {
+                $("#graphical").show();
+                $("#graphicalbarChart").hide();
+                $("#graphicaldonutChart").hide();
+                $("#grpah").show();
+                $("#grpahbarChart").hide();
+                $("#grpahdonutChart").hide();
+                $("#grpahbarChart a").trigger("click");
+                $("#grpah a").trigger("click");
+            }
+        });
         ////
         $(".nav-upper-options .TabActive").removeClass("TabActive");
         $(".nav-upper-options .option3").addClass("TabActive");

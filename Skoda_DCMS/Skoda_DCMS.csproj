@@ -3997,6 +3997,7 @@
     <Content Include="Views\GoalSetting\GoalSettingPDF.cshtml" />
     <Content Include="Views\SalaryReviewAdjustment\SalaryReviewAdjustmentPDF.cshtml" />
     <Content Include="Views\LAF\LAForm.cshtml" />
+    <Content Include="Views\LAF\LAPDF.cshtml" />
     <None Include="Web.Beta.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

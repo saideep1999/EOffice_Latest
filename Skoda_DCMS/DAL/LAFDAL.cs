@@ -115,7 +115,7 @@ namespace Skoda_DCMS.DAL
                     cmd_form.Parameters.Add(new SqlParameter("@AppRowId", DBNull.Value));
                     cmd_form.Parameters.Add(new SqlParameter("@BusinessNeed", form["EmployeeComments"] ?? (object)DBNull.Value));
                     cmd_form.Parameters.Add(new SqlParameter("@SubmitterUserName", user.UserName));
-                    cmd_form.Parameters.Add(new SqlParameter("@FormParentId", 60));
+                    cmd_form.Parameters.Add(new SqlParameter("@FormParentId", 64));
                     cmd_form.CommandType = CommandType.StoredProcedure;
                     adapter_form.SelectCommand = cmd_form;
                     con_form.Open();
@@ -176,7 +176,7 @@ namespace Skoda_DCMS.DAL
                     cmd_form.Parameters.Add(new SqlParameter("@AppRowId", DBNull.Value));
                     cmd_form.Parameters.Add(new SqlParameter("@BusinessNeed", form["EmployeeComments"] ?? (object)DBNull.Value));
                     cmd_form.Parameters.Add(new SqlParameter("@SubmitterUserName", user.UserName));
-                    cmd_form.Parameters.Add(new SqlParameter("@FormParentId", 60));
+                    cmd_form.Parameters.Add(new SqlParameter("@FormParentId", 64));
                     cmd_form.CommandType = CommandType.StoredProcedure;
                     adapter_form.SelectCommand = cmd_form;
                     con_form.Open();
@@ -347,7 +347,7 @@ namespace Skoda_DCMS.DAL
                 }
 
                 var common = new CommonDAL();
-                // appList = common.CallAssistantAndDelegateFunc(appList);
+                appList = common.CallAssistantAndDelegateFunc(appList);
 
                 //var handler = new HttpClientHandler();
                 //handler.Credentials = new NetworkCredential($"{user.DomainName}\\{user.UserName}", user.Password);
